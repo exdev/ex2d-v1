@@ -1,0 +1,12 @@
+{
+	"publisher_id": 0,
+	"publisher_package_id": 3289,
+	"title": "ex2D - v1.0.0",
+	"description": "<p>\nex2D is a highly integrated 2D-sprite-related development extension for Unity. It aims at providing high performance 2D sprite/UI solution inside Unity, with a specific focus on creating tons of cutting-edge sprite animations and other content in complicated Unity scenes, while still maintaining great performance on mobile devices.\n</p>\n\n<br></br>\n\n<p>\n<strong>Links:</strong>\n</p>\n<p>\n*    <a href=\"http://www.ex-dev.com/ex2d\">ex2D Website</a>\n<br></br>\n*    <a href=\"http://www.ex-dev.com/ex2d/wiki\">Online Documentation</a>\n<br></br>\n*    <a href=\"http://www.ex-dev.com/downloads/ex2d_doc.zip\">Download Offline Documentation</a>\n</p>\n",
+	"changes": "New Features\nChanges\n*  Create Atlas, Sprite Animation and Sprite Font through project menu\n*  Add auto-resize collision box option in exSprite\n*  Atlas Element index saved by texture name\nFixed Bugs",
+	"version_name": "1.0.0",
+	"category": 102,
+	"price": "25",
+	"recommended_features": [],
+	"required_features": []
+}

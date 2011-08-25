@@ -1,0 +1,11 @@
+fileFormatVersion: 1
+guid: 4ac8bceb52a204a38bba4d120567f54f
+labels:
+- 2d
+- sprite
+- spriteanimation
+- animation
+- atlas
+MonoImporter:
+  importerVersion: 1
+  executionOrder: -200
