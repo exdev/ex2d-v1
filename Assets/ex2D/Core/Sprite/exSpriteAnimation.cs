@@ -149,7 +149,8 @@ public class exSpriteAnimation : MonoBehaviour {
                 sprite.SetSprite ( fi.atlas, fi.index );
 
             // check if stop
-            if ( curAnimation.wrapMode == WrapMode.Once && 
+            if ( ( curAnimation.wrapMode == WrapMode.Once ||
+                   curAnimation.wrapMode == WrapMode.Default ) && 
                  curAnimation.time >= curAnimation.length )
             {
                 Stop();
@@ -182,7 +183,17 @@ public class exSpriteAnimation : MonoBehaviour {
 
     public void Stop () {
         if ( curAnimation != null ) {
-            switch ( curAnimation.stopAction ) {
+            //
+            exAnimStopAction stopAction = curAnimation.stopAction; 
+
+            //
+            curAnimation.time = 0.0f;
+            curAnimation = null;
+            playing = false;
+            paused = false;
+
+            //
+            switch ( stopAction ) {
             case exAnimStopAction.DoNothing:
                 // Nothing todo;
                 break;
@@ -199,12 +210,6 @@ public class exSpriteAnimation : MonoBehaviour {
                 GameObject.Destroy(this);
                 break;
             }
-
-            //
-            curAnimation.time = 0.0f;
-            curAnimation = null;
-            playing = false;
-            paused = false;
         }
     }
 
