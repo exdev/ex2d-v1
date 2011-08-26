@@ -94,7 +94,7 @@ partial class exSpriteAnimClipEditor {
 
     void FrameInfoField ( Rect _rect, exSpriteAnimClip.FrameInfo _fi ) {
         bool selected = selectedFrameInfos.IndexOf(_fi) != -1;
-        exAtlasInfo.Element el = exAtlasDB.GetElement (_fi.textureGUID);
+        exAtlasDB.ElementInfo elInfo = exAtlasDB.GetElementInfo (_fi.textureGUID);
 
         // ======================================================== 
         // draw background
@@ -104,7 +104,7 @@ partial class exSpriteAnimClipEditor {
         if ( selected ) {
             GUI.color = new Color( 0.2f, 0.85f, 0.0f, 0.2f ); 
         }
-        else if ( el == null ) {
+        else if ( elInfo == null ) {
             GUI.color = new Color( 1.0f, 0.0f, 0.0f, 0.2f );
         }
         else {
@@ -117,7 +117,9 @@ partial class exSpriteAnimClipEditor {
         // draw texture
         // ======================================================== 
 
-        if ( el != null ) {
+        if ( elInfo != null ) {
+            exAtlasInfo atlasInfo = exEditorRuntimeHelper.LoadAssetFromGUID<exAtlasInfo>(elInfo.guidAtlasInfo);
+            exAtlasInfo.Element el = atlasInfo.elements[elInfo.indexInAtlasInfo];  
             float width = el.texture.width;
             float height = el.texture.height;
 
@@ -394,8 +396,7 @@ partial class exSpriteAnimClipEditor {
             List<Object> selects = new List<Object>(selectedFrameInfos.Count);
             foreach ( exSpriteAnimClip.FrameInfo fi in selectedFrameInfos ) {
                 Texture2D texture 
-                    = (Texture2D)exEditorRuntimeHelper.LoadAssetFromGUID(fi.textureGUID, 
-                                                                typeof(Texture2D));
+                    = exEditorRuntimeHelper.LoadAssetFromGUID<Texture2D>(fi.textureGUID ); 
                 selects.Add(texture);
             }
 
@@ -417,7 +418,7 @@ partial class exSpriteAnimClipEditor {
 
             GUILayout.BeginHorizontal();
                 GUI.enabled = false; 
-                Texture2D tex = (Texture2D)exEditorRuntimeHelper.LoadAssetFromGUID(fi.textureGUID, typeof(Texture2D));
+                Texture2D tex = exEditorRuntimeHelper.LoadAssetFromGUID<Texture2D>(fi.textureGUID);
                 EditorGUILayout.ObjectField( "Frame["+i+"]"
                                              , tex
                                              , typeof(Object)

@@ -55,7 +55,7 @@ public class exAtlasUtility {
             }
         }
 
-        EditorUtility.DisplayProgressBar( "Building Atlas...", "Building Atlas...", 0.1f );    
+        EditorUtility.DisplayProgressBar( "Building Atlas " + _atlasInfo.name, "Building Atlas...", 0.1f );    
 
         // build atlas texture
         int i = 0;
@@ -91,7 +91,7 @@ public class exAtlasUtility {
         }
         tex.Apply(false);
 
-        EditorUtility.DisplayProgressBar( "Building Atlas...",
+        EditorUtility.DisplayProgressBar( "Building Atlas " + _atlasInfo.name,
                                           "Import Atlas",
                                           0.9f );    
 
@@ -121,6 +121,11 @@ public class exAtlasUtility {
             el2.originalHeight = el.texture.height; 
             el2.trimRect = el.trimRect;
             atlas.elements[i] = el2;
+
+            // update the index in exAtlasDB
+            if ( el.isFontElement == false ) {
+                exAtlasDB.UpdateElementInfoIndex( exEditorRuntimeHelper.AssetToGUID(el.texture), i );
+            }
         }
         atlas.texture = texture; 
         atlas.material = material; 
@@ -152,12 +157,10 @@ public class exAtlasUtility {
 
             if ( spBase is exSprite ) {
                 exSprite sp = spBase as exSprite;
-                Texture2D texture = (Texture2D)exEditorRuntimeHelper.LoadAssetFromGUID(sp.textureGUID, 
-                                                                              typeof(Texture2D));
-                exAtlasInfo.Element el = exAtlasDB.GetElement(texture);
+                exAtlasDB.ElementInfo elInfo = exAtlasDB.GetElementInfo(sp.textureGUID);
                 bool needRebuild = false;
 
-                if ( el == null ) {
+                if ( elInfo == null ) {
                     if ( sp.atlas != null ) {
                         needRebuild = true;
                     }
@@ -165,7 +168,7 @@ public class exAtlasUtility {
                 else {
                     // find if the sp's atalsInfo need rebuild
                     foreach ( exAtlasInfo atlasInfo in _atlasInfos ) {
-                        if ( el.atlasInfo == atlasInfo ) {
+                        if ( elInfo.guidAtlasInfo == exEditorRuntimeHelper.AssetToGUID(atlasInfo) ) {
                             needRebuild = true;
                             break;
                         }
@@ -173,10 +176,12 @@ public class exAtlasUtility {
                 }
 
                 if ( needRebuild ) {
-                    exSpriteEditor.UpdateAtlas( sp, el );
+                    exSpriteEditor.UpdateAtlas( sp, elInfo );
                     bool isPrefab = (EditorUtility.GetPrefabType(spBase) == PrefabType.Prefab); 
-                    if ( isPrefab == false )
+                    if ( isPrefab == false ) {
+                        Texture2D texture = exEditorRuntimeHelper.LoadAssetFromGUID<Texture2D>(sp.textureGUID );
                         sp.Build( texture );
+                    }
                     EditorUtility.SetDirty(sp);
                 }
             }

@@ -72,7 +72,7 @@ public class exSpriteAnimationEditor : Editor {
                                                                                    , false 
 #endif
                                                                                  );
-        if ( GUILayout.Button("Edit...", GUILayout.Width(50), GUILayout.Height(15) ) ) {
+        if ( GUILayout.Button("Edit...", GUILayout.Width(40), GUILayout.Height(15) ) ) {
             exSpriteAnimClipEditor editor = exSpriteAnimClipEditor.NewWindow();
             editor.Edit(editSpAnim.defaultAnimation);
         }
@@ -129,7 +129,7 @@ public class exSpriteAnimationEditor : Editor {
                                                                  , false 
 #endif
                                                                );
-                if ( GUILayout.Button("Edit...", GUILayout.Width(50), GUILayout.Height(15) ) ) {
+                if ( GUILayout.Button("Edit...", GUILayout.Width(40), GUILayout.Height(15) ) ) {
                     exSpriteAnimClipEditor editor = exSpriteAnimClipEditor.NewWindow();
                     editor.Edit(editSpAnim.animations[i]);
                 }
@@ -181,8 +181,7 @@ public class exSpriteAnimationEditor : Editor {
         {
             exSpriteAnimClip.FrameInfo fi = editSpAnim.animations[0].frameInfos[0];
             sprite.textureGUID = fi.textureGUID;
-            Texture2D texture = (Texture2D)exEditorRuntimeHelper.LoadAssetFromGUID( sprite.textureGUID, 
-                                                                             typeof(Texture2D) );
+            Texture2D texture = exEditorRuntimeHelper.LoadAssetFromGUID<Texture2D>( sprite.textureGUID ); 
             sprite.Build( texture );
         }
         // } TODO end 

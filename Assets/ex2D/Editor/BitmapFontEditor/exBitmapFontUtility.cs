@@ -59,7 +59,7 @@ public class exBitmapFontUtility {
         string dirname = Path.GetDirectoryName(fontInfoPath);
 
         // TODO { 
-        // _bitmapFont.fontInfoGUIDs.Add(exEditorHelper.GetPathGUID(_fontInfo));
+        // _bitmapFont.fontInfoGUIDs.Add(exEditorHelper.AssetToGUID(_fontInfo));
         // } TODO end 
 
         // DELME { 

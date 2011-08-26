@@ -147,8 +147,7 @@ public class exSprite : exSpriteBase {
 
     [ContextMenu ("Rebuild")]
     void Rebuild () {
-        this.Build ( (Texture2D)exEditorRuntimeHelper.LoadAssetFromGUID( textureGUID, 
-                                                                         typeof(Texture2D)) );
+        this.Build ( exEditorRuntimeHelper.LoadAssetFromGUID<Texture2D>( textureGUID ) );
     }
 
     // ------------------------------------------------------------------ 
@@ -571,6 +570,24 @@ public class exSprite : exSpriteBase {
     override protected void Awake () {
         base.Awake();
 
+#if UNITY_EDITOR
+        // DELME { 
+        // if ( EditorApplication.isPlaying == false &&
+        //      useAtlas &&
+        //      string.IsNullOrEmpty(textureGUID) == false ) 
+        // {
+        //     exAtlasDB.ElementInfo elInfo = exAtlasDB.GetElementInfo ( textureGUID );
+        //     if ( elInfo != null &&
+        //          ( elInfo.indexInAtlas != index_ ||
+        //            elInfo.guidAtlas != exEditorRuntimeHelper.AssetToGUID(atlas_) ) ) 
+        //     {
+        //         SetSprite( exEditorRuntimeHelper.LoadAssetFromGUID<exAtlas>(elInfo.guidAtlas),
+        //                    elInfo.indexInAtlas );
+        //     }
+        // }
+        // } DELME end 
+#endif
+
         spanim = GetComponent<exSpriteAnimation>();
         if ( atlas_ != null ) {
             renderer.sharedMaterial = atlas_.material;
@@ -593,6 +610,16 @@ public class exSprite : exSpriteBase {
 #else
         meshFilter.sharedMesh = null;
 #endif
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public exAtlas.Element GetCurrentElement () {
+        if ( useAtlas )
+            return atlas_.elements[index_];
+        return null;
     }
 
     // ------------------------------------------------------------------ 

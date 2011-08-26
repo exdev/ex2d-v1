@@ -27,16 +27,21 @@ public class exSpriteAnimationUtility {
 
     static public void Build ( exSpriteAnimClip _animClip ) {
         int i = 0;
+
+        EditorUtility.DisplayProgressBar( "Building Sprite Animation Clip " + _animClip.name,
+                                          "Building Frames...",
+                                          0.1f );
+
         foreach ( exSpriteAnimClip.FrameInfo fi in _animClip.frameInfos ) {
-            exAtlasInfo.Element el = exAtlasDB.GetElement (fi.textureGUID);
-            if ( el != null ) {
+            exAtlasDB.ElementInfo elInfo = exAtlasDB.GetElementInfo (fi.textureGUID);
+            if ( elInfo != null ) {
                 // DISABLE: it is too slow { 
                 // EditorUtility.DisplayProgressBar( "Building Sprite Animation Clip...",
                 //                                   "Building FrameInfo " + el.texture.name,
                 //                                   (float)i/(float)_animClip.frameInfos.Count );    
                 // } DISABLE end 
-                fi.atlas = el.atlasInfo.atlas;
-                fi.index = el.atlasInfo.elements.IndexOf(el);
+                fi.atlas = exEditorRuntimeHelper.LoadAssetFromGUID<exAtlas>(elInfo.guidAtlas);
+                fi.index = elInfo.indexInAtlas;
             }
             else {
                 string texturePath = AssetDatabase.GUIDToAssetPath(fi.textureGUID);
@@ -88,10 +93,10 @@ public class exSpriteAnimationUtility {
         exSpriteAnimClip.FrameInfo frameInfo = new exSpriteAnimClip.FrameInfo ();
         frameInfo.length = 10.0f/60.0f;
         frameInfo.textureGUID = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(_tex));
-        exAtlasInfo.Element el = exAtlasDB.GetElement (frameInfo.textureGUID);
-        if ( el != null ) {
-            frameInfo.atlas = el.atlasInfo.atlas;
-            frameInfo.index = el.atlasInfo.elements.IndexOf(el);
+        exAtlasDB.ElementInfo elInfo = exAtlasDB.GetElementInfo (frameInfo.textureGUID);
+        if ( elInfo != null ) {
+            frameInfo.atlas = exEditorRuntimeHelper.LoadAssetFromGUID<exAtlas>(elInfo.guidAtlas);
+            frameInfo.index = elInfo.indexInAtlas;
         }
         else {
             frameInfo.atlas = null;

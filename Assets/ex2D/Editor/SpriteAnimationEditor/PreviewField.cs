@@ -65,8 +65,12 @@ partial class exSpriteAnimClipEditor {
             // draw the preview
             exSpriteAnimClip.FrameInfo fi = curEdit.GetFrameInfoBySeconds(curSeconds, curEdit.wrapMode);
             if ( fi != null ) {
-                exAtlasInfo.Element el = exAtlasDB.GetElement (fi.textureGUID);
-                if ( el != null ) {
+                exAtlasDB.ElementInfo elInfo = exAtlasDB.GetElementInfo (fi.textureGUID);
+
+                if ( elInfo != null ) {
+                    exAtlasInfo atlasInfo = exEditorRuntimeHelper.LoadAssetFromGUID<exAtlasInfo>(elInfo.guidAtlasInfo);
+                    exAtlasInfo.Element el = atlasInfo.elements[elInfo.indexInAtlasInfo];  
+
                     float width = el.texture.width;
                     float height = el.texture.height;
                     float offsetX = (width - el.trimRect.width) * 0.5f - el.trimRect.x;

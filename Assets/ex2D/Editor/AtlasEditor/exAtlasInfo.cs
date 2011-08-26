@@ -219,7 +219,7 @@ public class exAtlasInfo : ScriptableObject {
         elements.Add(el);
 
         // update atlas DB
-        exAtlasDB.UpdateElement(el);
+        exAtlasDB.AddElementInfo(el);
 
         // get sprite animation clip by textureGUID, add them to rebuildSpAnimClips
         AddSpriteAnimClipForRebuilding(el);
@@ -315,7 +315,7 @@ public class exAtlasInfo : ScriptableObject {
         elements.RemoveAt(_idx);
 
         // remove element in atlas DB
-        exAtlasDB.RemoveElement(el);
+        exAtlasDB.RemoveElementInfo(el);
 
         // get sprite animation clip by textureGUID, add them to rebuildSpAnimClips
         AddSpriteAnimClipForRebuilding(el);
@@ -408,10 +408,11 @@ public class exAtlasInfo : ScriptableObject {
     // ------------------------------------------------------------------ 
 
     public void AddSpriteAnimClipForRebuilding ( Element _el ) {
-        List<exSpriteAnimClip> spAnimClips 
-            = exSpriteAnimationDB.GetSpriteAnimClips ( exEditorRuntimeHelper.GetPathGUID(_el.texture) );
-        if ( spAnimClips != null ) {
-            foreach ( exSpriteAnimClip animClip in spAnimClips ) {
+        List<string> spAnimClipGUIDs 
+            = exSpriteAnimationDB.GetSpriteAnimClipGUIDs ( exEditorRuntimeHelper.AssetToGUID(_el.texture) );
+        if ( spAnimClipGUIDs != null ) {
+            foreach ( string animClipGUID in spAnimClipGUIDs ) {
+                exSpriteAnimClip animClip = exEditorRuntimeHelper.LoadAssetFromGUID<exSpriteAnimClip>(animClipGUID);
                 if ( rebuildSpAnimClips.IndexOf(animClip) == -1 ) {
                     animClip.editorNeedRebuild = true;
                     rebuildSpAnimClips.Add(animClip);

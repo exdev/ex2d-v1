@@ -75,5 +75,12 @@ public class exViewportPositionEditor : Editor {
 
         curEdit.y = EditorGUILayout.FloatField ( "Viewport Y", curEdit.y );
 
+        // ======================================================== 
+        // check dirty 
+        // ======================================================== 
+
+        if ( GUI.changed ) {
+            EditorUtility.SetDirty(curEdit);
+        }
 	}
 }

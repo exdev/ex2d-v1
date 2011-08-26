@@ -21,12 +21,19 @@ using System.IO;
 [CustomEditor(typeof(exSpriteBase))]
 public class exSpriteBaseEditor : exPlaneEditor {
 
+    protected enum Physics {
+        None,
+        Boxed,
+        Mesh,
+    }
+
     ///////////////////////////////////////////////////////////////////////////////
     // properties
     ///////////////////////////////////////////////////////////////////////////////
 
     private exSpriteBase editSpriteBase;
     protected bool hasPixelPerfectComponent = false;
+    protected Physics physics = Physics.None;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -40,6 +47,17 @@ public class exSpriteBaseEditor : exPlaneEditor {
         base.OnEnable();
         if ( target != editSpriteBase ) {
             editSpriteBase = target as exSpriteBase;
+
+            // get physics
+            if ( editSpriteBase.GetComponent<BoxCollider>() != null ) {
+                physics = Physics.Boxed;
+            }
+            else if ( editSpriteBase.GetComponent<MeshCollider>() != null ) {
+                physics = Physics.Mesh;
+            }
+            else {
+                physics = Physics.None;
+            }
         }
     }
 
@@ -59,36 +77,40 @@ public class exSpriteBaseEditor : exPlaneEditor {
         EditorGUIUtility.LookLikeInspector ();
         EditorGUI.indentLevel = 1;
 
+        GUILayout.BeginHorizontal();
+        // ======================================================== 
+        // Physics 
+        // ======================================================== 
+
+        GUI.enabled = !inAnimMode;
+        EditorGUIUtility.LookLikeControls ();
+		Physics newPhysics = (Physics)EditorGUILayout.EnumPopup( "Physics", physics, GUILayout.Width(165) );
+        EditorGUIUtility.LookLikeInspector ();
+        GUI.enabled = true;
+
+        //
+        if ( newPhysics != physics ) {
+            physics = newPhysics;
+
+            Collider myCollider = editSpriteBase.GetComponent<Collider>();
+            if ( myCollider != null ) {
+                Object.DestroyImmediate(myCollider);
+            }
+
+            switch ( physics ) {
+            case Physics.None: break;
+            case Physics.Boxed: editSpriteBase.gameObject.AddComponent<BoxCollider>(); break;
+            case Physics.Mesh: editSpriteBase.gameObject.AddComponent<MeshCollider>(); break;
+            }
+        }
+
+        GUILayout.Space(10);
+
         // ======================================================== 
         // Collider Auto Resize 
         // ======================================================== 
 
-        editSpriteBase.autoResizeCollision = EditorGUILayout.Toggle( "Auto Resize", editSpriteBase.autoResizeCollision );
-
-        // ======================================================== 
-        // add mesh collider button
-        // ======================================================== 
-
-        GUILayout.BeginHorizontal();
-        GUILayout.Space(15);
-            GUI.enabled = !inAnimMode && (editSpriteBase.GetComponent<Collider>() == null);
-            if ( GUILayout.Button("Add Mesh Collider", GUILayout.Width(120) ) ) {
-                editSpriteBase.AddMeshCollider();
-                GUI.changed = true;
-            }
-            GUI.enabled = true;
-
-        // ======================================================== 
-        // add box collider button
-        // ======================================================== 
-
-            GUI.enabled = !inAnimMode && (editSpriteBase.GetComponent<Collider>() == null);
-            if ( GUILayout.Button("Add Box Collider", GUILayout.Width(120) ) ) {
-                editSpriteBase.AddBoxCollider();
-                GUI.changed = true;
-            }
-            GUI.enabled = true;
-
+        editSpriteBase.autoResizeCollision = GUILayout.Toggle( editSpriteBase.autoResizeCollision, "Auto Resize", GUILayout.Width(120) );
         GUILayout.EndHorizontal();
 
         // ======================================================== 
@@ -100,7 +122,7 @@ public class exSpriteBaseEditor : exPlaneEditor {
             GUI.enabled = !inAnimMode;
             exPixelPerfect compPixelPerfect = editSpriteBase.GetComponent<exPixelPerfect>();
             hasPixelPerfectComponent = compPixelPerfect != null; 
-            bool usePixelPerfect = GUILayout.Toggle ( hasPixelPerfectComponent, "Use PixelPerfect", GUI.skin.button, GUILayout.Width(120) ); 
+            bool usePixelPerfect = GUILayout.Toggle ( hasPixelPerfectComponent, "Use PixelPerfect" ); 
             if ( usePixelPerfect != hasPixelPerfectComponent ) {
                 if ( usePixelPerfect )
                     editSpriteBase.gameObject.AddComponent<exPixelPerfect>();
@@ -172,5 +194,13 @@ public class exSpriteBaseEditor : exPlaneEditor {
         EditorGUIUtility.LookLikeControls ();
         editSpriteBase.shear = EditorGUILayout.Vector2Field ( "Shear", editSpriteBase.shear );
         EditorGUIUtility.LookLikeInspector ();
+
+        // ======================================================== 
+        // check dirty 
+        // ======================================================== 
+
+        if ( GUI.changed ) {
+            EditorUtility.SetDirty(editSpriteBase);
+        }
 	}
 }

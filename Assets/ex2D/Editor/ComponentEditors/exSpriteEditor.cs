@@ -36,14 +36,14 @@ public class exSpriteEditor : exSpriteBaseEditor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    static public void UpdateAtlas ( exSprite _sprite, exAtlasInfo.Element _el ) {
+    static public void UpdateAtlas ( exSprite _sprite, exAtlasDB.ElementInfo _elInfo ) {
         // get atlas and index from textureGUID
-        if ( _el != null ) {
-            int index = _el.atlasInfo.elements.IndexOf(_el);
-            if ( _el.atlasInfo.atlas != _sprite.atlas ||
-                 index != _sprite.index )
+        if ( _elInfo != null ) {
+            if ( _elInfo.guidAtlas != exEditorRuntimeHelper.AssetToGUID(_sprite.atlas) ||
+                 _elInfo.indexInAtlas != _sprite.index )
             {
-                _sprite.SetSprite( _el.atlasInfo.atlas, index );
+                _sprite.SetSprite( exEditorRuntimeHelper.LoadAssetFromGUID<exAtlas>(_elInfo.guidAtlas), 
+                                   _elInfo.indexInAtlas );
             }
         }
         else {
@@ -61,8 +61,7 @@ public class exSpriteEditor : exSpriteBaseEditor {
         base.OnEnable();
         if ( target != editSprite ) {
             editSprite = target as exSprite;
-            editTexture = (Texture2D)exEditorRuntimeHelper.LoadAssetFromGUID(editSprite.textureGUID, 
-                                                                       typeof(Texture2D));
+            editTexture = exEditorRuntimeHelper.LoadAssetFromGUID<Texture2D>(editSprite.textureGUID); 
         }
     }
 
@@ -103,13 +102,11 @@ public class exSpriteEditor : exSpriteBaseEditor {
         if ( editTexture != null ) {
             if ( editSprite.renderer.sharedMaterial == null ) {
                 needRebuild = true;
-                // Debug.Log("rebuild editSprite.renderer.sharedMaterial == null");
             }
             else if ( meshFilter.sharedMesh == null ) {
                 bool isPrefab = (EditorUtility.GetPrefabType(target) == PrefabType.Prefab); 
                 if ( isPrefab == false ) {
                     needRebuild = true;
-                    // Debug.Log("rebuild editSprite.renderer.sharedMesh == null");
                 }
             }
         }
@@ -132,7 +129,7 @@ public class exSpriteEditor : exSpriteBaseEditor {
                                                                        , GUILayout.Height(100) 
                                                                      );
         if ( newTexture != editTexture ) {
-            editSprite.textureGUID = newTexture ? exEditorRuntimeHelper.GetPathGUID(newTexture) : "";
+            editSprite.textureGUID = newTexture ? exEditorRuntimeHelper.AssetToGUID(newTexture) : "";
             editTexture = newTexture;
             if ( editTexture ) {
                 if ( editSprite.customSize == false ) {
@@ -155,33 +152,24 @@ public class exSpriteEditor : exSpriteBaseEditor {
         GUI.enabled = true;
         EditorGUIUtility.LookLikeInspector ();
 
-        exAtlasInfo.Element el = exAtlasDB.GetElement(editTexture);
+        exAtlasDB.ElementInfo elInfo = exAtlasDB.GetElementInfo(editSprite.textureGUID);
 
         // ======================================================== 
         // get atlas and index from textureGUID
         // ======================================================== 
 
         if ( !EditorApplication.isPlaying ) {
-            if ( el != null ) {
-                int index = el.atlasInfo.elements.IndexOf(el);;
+            if ( elInfo != null ) {
 
                 // ======================================================== 
                 // check atlas and index  
                 // ======================================================== 
 
-                if ( el.atlasInfo.atlas != editSprite.atlas ||
-                     index != editSprite.index )
+                if ( elInfo.guidAtlas != exEditorRuntimeHelper.AssetToGUID(editSprite.atlas) ||
+                     elInfo.indexInAtlas != editSprite.index )
                 {
-                    editSprite.SetSprite( el.atlasInfo.atlas, index );
-                }
-
-                // ======================================================== 
-                // check material
-                // ======================================================== 
-
-                if ( editSprite.renderer.sharedMaterial != el.atlasInfo.material ) {
-                    needRebuild = true;
-                    // Debug.Log("rebuild editSprite.renderer.sharedMaterial != el.atlasInfo.material");
+                    editSprite.SetSprite( exEditorRuntimeHelper.LoadAssetFromGUID<exAtlas>(elInfo.guidAtlas), 
+                                          elInfo.indexInAtlas );
                 }
             }
             else {
@@ -213,7 +201,7 @@ public class exSpriteEditor : exSpriteBaseEditor {
         GUI.enabled = true;
 
         GUI.enabled = !inAnimMode;
-        if ( GUILayout.Button("Edit...", GUILayout.Width(50), GUILayout.Height(15) ) ) {
+        if ( GUILayout.Button("Edit...", GUILayout.Width(40), GUILayout.Height(15) ) ) {
             exAtlasEditor editor = exAtlasEditor.NewWindow();
             editor.Edit(editSprite.atlas);
         }
@@ -253,7 +241,6 @@ public class exSpriteEditor : exSpriteBaseEditor {
             }
             editSprite.trimUV = trimUV;
             needRebuild = true;
-            // Debug.Log("newTrimTexture");
         }
         GUI.enabled = true;
 
@@ -295,7 +282,8 @@ public class exSpriteEditor : exSpriteBaseEditor {
         GUILayout.BeginHorizontal();
         GUILayout.Space(30);
         if ( GUILayout.Button("Reset to original...", GUILayout.Width(150) ) ) {
-            if ( el != null ) {
+            if ( elInfo != null ) {
+                exAtlas.Element el = editSprite.GetCurrentElement();
                 editSprite.width = el.trimRect.width;
                 editSprite.height = el.trimRect.height;
             }
@@ -330,7 +318,6 @@ public class exSpriteEditor : exSpriteBaseEditor {
                 editSprite.Build( editTexture );
             }
             else if ( GUI.changed ) {
-                // Debug.Log("update mesh...");
                 if ( meshFilter.sharedMesh != null )
                     editSprite.UpdateMesh( meshFilter.sharedMesh );
                 EditorUtility.SetDirty(editSprite);

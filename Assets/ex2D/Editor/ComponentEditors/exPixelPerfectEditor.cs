@@ -62,5 +62,13 @@ public class exPixelPerfectEditor : Editor {
                                                                     , true 
 #endif
                                                                   );
+
+        // ======================================================== 
+        // check dirty 
+        // ======================================================== 
+
+        if ( GUI.changed ) {
+            EditorUtility.SetDirty(curEdit);
+        }
     }
 }

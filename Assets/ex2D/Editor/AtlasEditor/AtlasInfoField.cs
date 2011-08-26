@@ -177,15 +177,15 @@ partial class exAtlasEditor : EditorWindow {
             // } DISABLE end 
             if ( o is Texture2D ) {
                 Texture2D t = o as Texture2D;
-                exAtlasInfo.Element el = exAtlasDB.GetElement(t);
-                if ( el == null ) {
+                exAtlasDB.ElementInfo elInfo = exAtlasDB.GetElementInfo(t);
+                if ( elInfo == null ) {
                     curEdit.AddElement( t, true );
                     dirty = true;
                 }
                 else {
                     Debug.LogError( "The texture [" + t.name + "]" + 
                                     " has already been added in atlas: " +
-                                    AssetDatabase.GetAssetPath(el.atlasInfo) );
+                                    AssetDatabase.GUIDToAssetPath(elInfo.guidAtlasInfo) );
                 }
             }
             else if ( o is exBitmapFont ) {
