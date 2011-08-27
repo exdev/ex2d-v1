@@ -26,7 +26,8 @@ public class exSoftClip : exPlane {
 
     public Vector2 center = Vector2.zero;
 
-    override public float width {
+    [SerializeField] protected float width_ = 1.0f;
+    public float width {
         get { return width_; }
         set {
             if ( width_ != value ) {
@@ -36,7 +37,8 @@ public class exSoftClip : exPlane {
         }
     }
 
-    override public float height {
+    [SerializeField] protected float height_ = 1.0f;
+    public float height {
         get { return height_; }
         set {
             if ( height_ != value ) {
@@ -46,7 +48,7 @@ public class exSoftClip : exPlane {
         }
     }
 
-    public List<exSpriteBase> sprites = new List<exSpriteBase>();
+    public List<exPlane> planes = new List<exPlane>();
 
     ///////////////////////////////////////////////////////////////////////////////
     // static functions
@@ -70,8 +72,8 @@ public class exSoftClip : exPlane {
     // ------------------------------------------------------------------ 
 
     [ContextMenu ("Add To Clip")]
-    void AddToClip () {
-        sprites.Clear();
+    public void AddToClip () {
+        planes.Clear();
         if ( transform.childCount > 0 )
             RecursivelyAddToClip (transform);
     }
@@ -82,14 +84,16 @@ public class exSoftClip : exPlane {
 
     void RecursivelyAddToClip ( Transform _t ) {
         foreach ( Transform child in _t ) {
-            exSpriteBase spriteBase = child.GetComponent<exSpriteBase>();
-            if ( spriteBase != null ) {
-                sprites.Add(spriteBase);
-                if ( spriteBase.transform.childCount > 0 )
-                    RecursivelyAddToClip (spriteBase.transform);
+            exPlane plane = child.GetComponent<exPlane>();
+            if ( plane != null ) {
+                planes.Add(plane);
+                exSoftClip clipPlane = plane as exSoftClip;
+                // if this is a clip plane, add child to it 
+                if ( clipPlane != null )
+                    clipPlane.AddToClip ();
+                else
+                    RecursivelyAddToClip (plane.transform);
             }
-
-            // exSpriteBase spriteBase = child.GetComponent<exSoftClip>();
         }
     }
 #endif
@@ -97,6 +101,70 @@ public class exSoftClip : exPlane {
     ///////////////////////////////////////////////////////////////////////////////
     // functions
     ///////////////////////////////////////////////////////////////////////////////
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void Update () {
+        //
+        Rect a = boundingRect;
+        switch ( plane ) {
+        case exSprite.Plane.XY:
+            a.x += transform.position.x;
+            a.y += transform.position.y;
+            break;
+        case exSprite.Plane.XZ:
+            a.x += transform.position.x;
+            a.y += transform.position.z;
+            break;
+        case exSprite.Plane.ZY:
+            a.x += transform.position.z;
+            a.y += transform.position.y;
+            break;
+        }
+
+        //
+        exPlane.ClipInfo newClipInfo = new exPlane.ClipInfo(); 
+        foreach ( exPlane p in planes ) {
+            //
+            Rect b = p.boundingRect;
+            switch ( plane ) {
+            case exSprite.Plane.XY:
+                b.x += transform.position.x;
+                b.y += transform.position.y;
+                break;
+            case exSprite.Plane.XZ:
+                b.x += transform.position.x;
+                b.y += transform.position.z;
+                break;
+            case exSprite.Plane.ZY:
+                b.x += transform.position.z;
+                b.y += transform.position.y;
+                break;
+            }
+
+            //
+            if ( a.xMin > b.xMin ) {
+                newClipInfo.left = (a.xMin - b.xMin) / b.width;
+                newClipInfo.clipped = true;
+            }
+            if ( b.xMax > a.xMax ) {
+                newClipInfo.right = (b.xMax - a.xMax) / b.width;
+                newClipInfo.clipped = true;
+            }
+
+            if ( a.yMax > b.yMax ) {
+                newClipInfo.left = (a.yMax - b.yMax) / b.height;
+                newClipInfo.clipped = true;
+            }
+            if ( b.yMin > a.yMin ) {
+                newClipInfo.right = (b.yMin - a.yMin) / b.height;
+                newClipInfo.clipped = true;
+            }
+            p.clipInfo = newClipInfo;
+        }
+    }
 
 #if UNITY_EDITOR
 

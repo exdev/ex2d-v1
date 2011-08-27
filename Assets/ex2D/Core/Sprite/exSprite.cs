@@ -94,7 +94,8 @@ public class exSprite : exSpriteBase {
         }
     }
 
-    override public float width {
+    [SerializeField] protected float width_ = 1.0f;
+    public float width {
         get { return width_; }
         set {
             if ( width_ != value ) {
@@ -104,7 +105,8 @@ public class exSprite : exSpriteBase {
         }
     }
 
-    override public float height {
+    [SerializeField] protected float height_ = 1.0f;
+    public float height {
         get { return height_; }
         set {
             if ( height_ != value ) {
@@ -414,7 +416,7 @@ public class exSprite : exSpriteBase {
             }
             _mesh.vertices = vertices;
             // _mesh.normals = normals;
-            _mesh.bounds = CalculateBounds( offsetX, offsetY, halfWidth, halfHeight );
+            _mesh.bounds = UpdateBounds ( offsetX, offsetY, halfWidth * 2.0f, halfHeight * 2.0f );
 
             // update box-collider if we have
             UpdateBoxCollider ( collider as BoxCollider, _mesh );

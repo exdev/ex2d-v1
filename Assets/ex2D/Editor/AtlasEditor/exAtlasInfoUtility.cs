@@ -209,7 +209,7 @@ public class exAtlasInfoUtility {
 
             // update the index in exAtlasDB
             if ( el.isFontElement == false ) {
-                exAtlasDB.UpdateElementInfoIndex( exEditorRuntimeHelper.AssetToGUID(el.texture), i );
+                exAtlasDB.UpdateElementInfo( el, i );
             }
         }
         atlas.texture = texture; 

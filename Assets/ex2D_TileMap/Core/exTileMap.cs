@@ -153,10 +153,10 @@ public class exTileMap : exPlane {
             Vector3[] vertices  = new Vector3[vertexCount];
 
             // init
-            width_ = col_ * tileWidth_;
-            height_ = row_ * tileHeight_;
-            float halfWidth = width_ * 0.5f;
-            float halfHeight = height_ * 0.5f;
+            float width = col_ * tileWidth_;
+            float height = row_ * tileHeight_;
+            float halfWidth = width * 0.5f;
+            float halfHeight = height * 0.5f;
             float offsetX = 0.0f;
             float offsetY = 0.0f;
             float curX = 0.0f;

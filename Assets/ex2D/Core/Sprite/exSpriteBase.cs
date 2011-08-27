@@ -134,28 +134,5 @@ public class exSpriteBase : exPlane {
         _boxCol.center = _mesh.bounds.center;
         _boxCol.size = _mesh.bounds.size;
     }
-
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
-    public Bounds CalculateBounds ( float _offsetX, float _offsetY,
-                                    float _halfWidth, float _halfHeight )
-    {
-        switch ( plane ) {
-        case exSprite.Plane.XY:
-            return new Bounds (  new Vector3( -_offsetX, _offsetY, 0.0f ), 
-                                 new Vector3( _halfWidth * 2.0f, _halfHeight * 2.0f, 0.2f ) );
-        case exSprite.Plane.XZ:
-            return new Bounds (  new Vector3( -_offsetX, 0.0f, _offsetY ), 
-                                 new Vector3( _halfWidth * 2.0f, 0.2f, _halfHeight * 2.0f ) );
-        case exSprite.Plane.ZY:
-            return new Bounds (  new Vector3( 0.0f, _offsetY, -_offsetX ), 
-                                 new Vector3( 0.2f, _halfHeight * 2.0f, _halfWidth * 2.0f ) );
-        default:
-            return new Bounds (  new Vector3( -_offsetX, _offsetY, 0.0f ), 
-                                 new Vector3( _halfWidth * 2.0f, _halfHeight * 2.0f, 0.2f ) );
-        }
-    } 
 }
 

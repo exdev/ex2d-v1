@@ -200,6 +200,8 @@ public class exSpriteAnimationDB : ScriptableObject {
     // ------------------------------------------------------------------ 
 
     static public bool HasSpriteAnimClipGUID ( string _guid ) {
+        Init();
+
         return db.spAnimClipGUIDs.IndexOf(_guid) != -1;
     }
 

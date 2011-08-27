@@ -166,8 +166,8 @@ public class exAtlasDB : ScriptableObject {
                         continue;
                     }
 
-                    foreach ( exAtlasInfo.Element el in atlasInfo.elements ) {
-                        AddElementInfo(el);
+                    for ( int ii = 0; ii < atlasInfo.elements.Count; ++ii ) {
+                        AddElementInfo( atlasInfo.elements[ii], ii);
                     }
 
                     atlasInfo = null;
@@ -200,6 +200,8 @@ public class exAtlasDB : ScriptableObject {
     // ------------------------------------------------------------------ 
 
     static public bool HasAtlasGUID ( string _guid ) {
+        Init();
+
         return db.atlasInfoGUIDs.IndexOf(_guid) != -1;
     }
 
@@ -213,8 +215,8 @@ public class exAtlasDB : ScriptableObject {
         string guid = exEditorRuntimeHelper.AssetToGUID (_a);
         if ( db.atlasInfoGUIDs.Contains(guid) == false ) {
             db.atlasInfoGUIDs.Add(guid);
-            foreach ( exAtlasInfo.Element el in _a.elements ) {
-                AddElementInfo(el);
+            for ( int i = 0; i < _a.elements.Count; ++i ) {
+                AddElementInfo( _a.elements[i], i);
             }
             EditorUtility.SetDirty(db);
         }
@@ -266,7 +268,7 @@ public class exAtlasDB : ScriptableObject {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    static public void AddElementInfo ( exAtlasInfo.Element _el ) {
+    static void AddElementInfo ( exAtlasInfo.Element _el, int _index ) {
         Init();
 
         if ( _el.isFontElement )
@@ -276,17 +278,17 @@ public class exAtlasDB : ScriptableObject {
         AddElementInfo ( textureGUID,
                         exEditorRuntimeHelper.AssetToGUID(_el.atlasInfo.atlas), 
                         exEditorRuntimeHelper.AssetToGUID(_el.atlasInfo),
-                        _el.atlasInfo.elements.IndexOf(_el) );
+                        _index );
     }
 
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    static public void AddElementInfo ( string _textureGUID, 
-                                        string _atlasGUID, 
-                                        string _atlasInfoGUID,
-                                        int _atlasInfoIndex ) 
+    static void AddElementInfo ( string _textureGUID, 
+                                 string _atlasGUID, 
+                                 string _atlasInfoGUID,
+                                 int _index ) 
     {
         Init();
 
@@ -300,8 +302,8 @@ public class exAtlasDB : ScriptableObject {
         }
 
         ElementInfo elInfo = new ElementInfo();
-        elInfo.indexInAtlas = _atlasInfoIndex;
-        elInfo.indexInAtlasInfo = _atlasInfoIndex;
+        elInfo.indexInAtlas = _index;
+        elInfo.indexInAtlasInfo = _index;
         elInfo.guidTexture = _textureGUID;
         elInfo.guidAtlas = _atlasGUID; 
         elInfo.guidAtlasInfo = _atlasInfoGUID;
@@ -312,10 +314,15 @@ public class exAtlasDB : ScriptableObject {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    static public void UpdateElementInfoIndex ( string _textureGUID, int _index ) {
+    static public void UpdateElementInfo ( exAtlasInfo.Element _el, int _index ) {
         Init();
 
-        ElementInfo elInfo = db.texGUIDToElementInfo[_textureGUID];
+        string textureGUID = exEditorRuntimeHelper.AssetToGUID(_el.texture);
+        if ( db.texGUIDToElementInfo.ContainsKey(textureGUID) == false ) {
+            AddElementInfo (_el, _index);
+        }
+
+        ElementInfo elInfo = db.texGUIDToElementInfo[textureGUID];
         elInfo.indexInAtlas = _index;
         elInfo.indexInAtlasInfo = _index;
     }

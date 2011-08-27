@@ -218,9 +218,6 @@ public partial class exAtlasInfo : ScriptableObject {
         el.coord[1] = padding;
         elements.Add(el);
 
-        // update atlas DB
-        exAtlasDB.AddElementInfo(el);
-
         // get sprite animation clip by textureGUID, add them to rebuildSpAnimClips
         AddSpriteAnimClipForRebuilding(el);
 

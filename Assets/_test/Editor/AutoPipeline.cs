@@ -24,7 +24,7 @@ public class AutoPipeline {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    [MenuItem("Test/Do Auto Pipeline") ]
+    // [MenuItem("Test/Do Auto Pipeline") ]
     static void DoAutoPipeline () {
         string path = "Assets/_test/PipelineTest";
         CreateAtlas (path);

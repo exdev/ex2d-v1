@@ -34,10 +34,20 @@ partial class exSpriteAnimClipEditor {
             // draw none selected object first
             // ======================================================== 
 
+            List<exSpriteAnimClip.FrameInfo> invalidFrames = new List<exSpriteAnimClip.FrameInfo>();
             foreach ( exSpriteAnimClip.FrameInfo fi in _animClip.frameInfos ) {
                 float width = (fi.length / _animClip.length) * totalWidth;
-                FrameInfoField ( new Rect( curX, yFrameInfoOffset, width, _rect.height - 2 * yFrameInfoOffset ), fi);
+                Texture2D tex2D = exEditorRuntimeHelper.LoadAssetFromGUID<Texture2D>(fi.textureGUID);
+                if ( tex2D == null ) {
+                    invalidFrames.Add(fi);
+                    continue;
+                }
+                FrameInfoField ( new Rect( curX, yFrameInfoOffset, width, _rect.height - 2 * yFrameInfoOffset ), 
+                                 fi );
                 curX += width;
+            }
+            foreach ( exSpriteAnimClip.FrameInfo fi in invalidFrames ) {
+                exSpriteAnimationUtility.RemoveFrame( curEdit, fi );
             }
 
             // ======================================================== 
@@ -120,39 +130,41 @@ partial class exSpriteAnimClipEditor {
         if ( elInfo != null ) {
             exAtlasInfo atlasInfo = exEditorRuntimeHelper.LoadAssetFromGUID<exAtlasInfo>(elInfo.guidAtlasInfo);
             exAtlasInfo.Element el = atlasInfo.elements[elInfo.indexInAtlasInfo];  
-            float width = el.texture.width;
-            float height = el.texture.height;
 
-            // get the scale
-            float scale = 1.0f;
-            if ( width > _rect.width && height > _rect.height ) {
-                scale = Mathf.Min( _rect.width / width, 
-                                   _rect.height / height );
-            }
-            else if ( width > _rect.width ) {
-                scale = _rect.width / width;
-            }
-            else if ( height > _rect.height ) {
-                scale = _rect.height / height;
-            }
+            if ( el.texture != null ) {
+                float width = el.texture.width;
+                float height = el.texture.height;
 
-            // draw
-            Rect size = new Rect( -el.trimRect.x * scale, 
-                                  -el.trimRect.y * scale, 
-                                  width * scale, 
-                                  height * scale );
-            GUI.BeginGroup( _rect );
-                GUI.BeginGroup( new Rect( (_rect.width - el.trimRect.width * scale) * 0.5f,
-                                          (_rect.height - el.trimRect.height * scale) * 0.5f,
-                                          el.trimRect.width * scale, 
-                                          el.trimRect.height * scale ) );
-                    GUI.DrawTexture( size, el.texture );
+                // get the scale
+                float scale = 1.0f;
+                if ( width > _rect.width && height > _rect.height ) {
+                    scale = Mathf.Min( _rect.width / width, 
+                                       _rect.height / height );
+                }
+                else if ( width > _rect.width ) {
+                    scale = _rect.width / width;
+                }
+                else if ( height > _rect.height ) {
+                    scale = _rect.height / height;
+                }
+
+                // draw
+                Rect size = new Rect( -el.trimRect.x * scale, 
+                                      -el.trimRect.y * scale, 
+                                      width * scale, 
+                                      height * scale );
+                GUI.BeginGroup( _rect );
+                    GUI.BeginGroup( new Rect( (_rect.width - el.trimRect.width * scale) * 0.5f,
+                                              (_rect.height - el.trimRect.height * scale) * 0.5f,
+                                              el.trimRect.width * scale, 
+                                              el.trimRect.height * scale ) );
+                        GUI.DrawTexture( size, el.texture );
+                    GUI.EndGroup();
                 GUI.EndGroup();
-            GUI.EndGroup();
+            }
         }
         else {
-            string texturePath = AssetDatabase.GUIDToAssetPath(_fi.textureGUID);
-            Texture2D tex2D = (Texture2D)AssetDatabase.LoadAssetAtPath( texturePath, typeof(Texture2D));
+            Texture2D tex2D = exEditorRuntimeHelper.LoadAssetFromGUID<Texture2D>(_fi.textureGUID);
             if ( tex2D != null ) {
                 float width = tex2D.width;
                 float height = tex2D.height;
