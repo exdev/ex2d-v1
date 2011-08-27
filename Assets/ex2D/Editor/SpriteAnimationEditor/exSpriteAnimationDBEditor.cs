@@ -33,23 +33,23 @@ public class exSpriteAnimationDBEditor : Editor {
             curEditTarget = target as exSpriteAnimationDB;
         }
         EditorGUIUtility.LookLikeInspector ();
+        EditorGUILayout.Space();
 
         // sync button
-        EditorGUILayout.Space();
+        EditorGUI.indentLevel = 1;
         if ( GUILayout.Button ("Sync", GUILayout.Width(100)) ) {
             exSpriteAnimationDB.Sync();
         }
 
         // rebuild all
         if ( GUILayout.Button ("Build All", GUILayout.Width(100)) ) {
-            foreach ( string guidAnimClip in curEditTarget.spAnimClipGUIDs ) {
-                exSpriteAnimClip spAnimClip = exEditorRuntimeHelper.LoadAssetFromGUID<exSpriteAnimClip>(guidAnimClip);
-                exSpriteAnimationUtility.Build ( spAnimClip );
-
-                spAnimClip = null;
-                EditorUtility.UnloadUnusedAssets();
-            }
+            exSpriteAnimationDB.BuildAll();
         }
+
+        // show version
+        GUI.enabled = false;
+        EditorGUILayout.LabelField( "version", curEditTarget.curVersion.ToString() );
+        GUI.enabled = true;
 
         // show spAnimClipGUIDs
         EditorGUI.indentLevel = 0;
@@ -78,7 +78,7 @@ public class exSpriteAnimationDBEditor : Editor {
 
                 // SpriteAnimClips
                 EditorGUI.indentLevel = 3;
-                List<string> spAnimClipGUIDs = exSpriteAnimationDB.GetSpriteAnimClipGUIDs(pair.Key);
+                List<string> spAnimClipGUIDs = pair.Value;
                 for ( int i = 0; i < spAnimClipGUIDs.Count; ++i ) {
                     string spAnimClipName = Path.GetFileNameWithoutExtension ( AssetDatabase.GUIDToAssetPath(spAnimClipGUIDs[i]) );
                     EditorGUILayout.LabelField ( "[" + i + "]", spAnimClipName );

@@ -1,7 +1,7 @@
 // ======================================================================================
-// File         : AtlasPacker.cs
+// File         : exAtlasInfoPacker.cs
 // Author       : Wu Jie 
-// Last Change  : 07/12/2011 | 09:39:32 AM | Tuesday,July
+// Last Change  : 08/27/2011 | 10:35:11 AM | Saturday,August
 // Description  : 
 // ======================================================================================
 
@@ -19,7 +19,7 @@ using System.IO;
 // AtlasPacker
 ///////////////////////////////////////////////////////////////////////////////
 
-partial class exAtlasEditor {
+partial class exAtlasInfo {
 
     ///////////////////////////////////////////////////////////////////////////////
     // class Node
@@ -89,25 +89,18 @@ partial class exAtlasEditor {
         int i = 0; 
         Node root = new Node( new Rect( 0,
                                         0,
-                                        curEdit.width - curEdit.padding,
-                                        curEdit.height - curEdit.padding ) );
-        EditorUtility.DisplayProgressBar( "Layout Elements...", "Layout Elements...", 0.5f  );    
-        foreach ( exAtlasInfo.Element el in curEdit.elements ) {
-            // DISABLE: it is too slow { 
-            // EditorUtility.DisplayProgressBar( "Layout Elements...",
-            //                                   "Layout " + el.texture.name,
-            //                                   (float)i / (float)curEdit.elements.Count  );    
-            // } DISABLE end 
+                                        width - padding,
+                                        height - padding ) );
+        foreach ( exAtlasInfo.Element el in elements ) {
             Node n = root.Insert (el);
             if ( n == null ) {
                 Debug.LogError( "Failed to layout element " + el.texture.name );
                 break;
             }
-            el.coord[0] = (int)n.rect.x + curEdit.padding;
-            el.coord[1] = (int)n.rect.y + curEdit.padding;
+            el.coord[0] = (int)n.rect.x + padding;
+            el.coord[1] = (int)n.rect.y + padding;
             ++i;
         }
-        EditorUtility.ClearProgressBar();
     }
 
     // ------------------------------------------------------------------ 
@@ -115,37 +108,53 @@ partial class exAtlasEditor {
     // ------------------------------------------------------------------ 
 
     public void BasicPack () {
-        int curX = curEdit.padding;
-        int curY = curEdit.padding;
+        int curX = padding;
+        int curY = padding;
         int maxY = 0; 
         int i = 0; 
 
-        EditorUtility.DisplayProgressBar( "Layout Elements...", "Layout Elements...", 0.5f  );    
-        foreach ( exAtlasInfo.Element el in curEdit.elements ) {
-            // DISABLE: it is too slow { 
-            // EditorUtility.DisplayProgressBar( "Layout Elements...",
-            //                                   "Layout " + el.texture.name,
-            //                                   (float)i / (float)curEdit.elements.Count  );    
-            // } DISABLE end 
-            if ( (curX + el.Width() + curEdit.padding) >= curEdit.width ) {
-                curX = curEdit.padding;
-                curY = curY + maxY + curEdit.padding;
+        foreach ( exAtlasInfo.Element el in elements ) {
+            if ( (curX + el.Width() + padding) >= width ) {
+                curX = padding;
+                curY = curY + maxY + padding;
                 maxY = 0;
             }
             if ( el.Height() > maxY ) {
                 maxY = el.Height();
             }
-            if ( (maxY + el.Height()) >= curEdit.height ) {
+            if ( (maxY + el.Height()) >= height ) {
                 Debug.LogError( "Failed to layout element " + el.texture.name );
                 break;
             }
             el.coord[0] = curX;
             el.coord[1] = curY;
 
-            curX = curX + el.Width() + curEdit.padding;
+            curX = curX + el.Width() + padding;
             ++i;
         }
-        EditorUtility.ClearProgressBar();
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void LayoutElements () {
+        ResetElements();
+        SortElements();
+
+        // this is very basic algorithm
+        if ( algorithm == exAtlasInfo.Algorithm.Basic ) {
+            BasicPack ();
+        }
+        else if ( algorithm == exAtlasInfo.Algorithm.Tree ) {
+            TreePack ();
+        }
+        EditorUtility.SetDirty(this);
+
+        //
+        foreach ( exAtlasInfo.Element el in elements ) {
+            AddSpriteAnimClipForRebuilding(el);
+        }
     }
 }
 

@@ -19,7 +19,7 @@ using System.IO;
 // exAtlasInfo
 ///////////////////////////////////////////////////////////////////////////////
 
-public class exAtlasInfo : ScriptableObject {
+public partial class exAtlasInfo : ScriptableObject {
 
     public enum Algorithm {
         Basic,
@@ -98,7 +98,7 @@ public class exAtlasInfo : ScriptableObject {
     /*[HideInInspector]*/ public SortBy sortBy = SortBy.UseBest;
     /*[HideInInspector]*/ public SortOrder sortOrder = SortOrder.UseBest;
     /*[HideInInspector]*/ public int padding = 2;
-    /*[HideInInspector]*/ public bool allowRotate = true;
+    /*[HideInInspector]*/ public bool allowRotate = false;
 
     // sprite settings
     /*[HideInInspector]*/ public bool showSprites = true;
@@ -315,7 +315,7 @@ public class exAtlasInfo : ScriptableObject {
         elements.RemoveAt(_idx);
 
         // remove element in atlas DB
-        exAtlasDB.RemoveElementInfo(el);
+        exAtlasDB.RemoveElementInfo(exEditorRuntimeHelper.AssetToGUID(el.texture));
 
         // get sprite animation clip by textureGUID, add them to rebuildSpAnimClips
         AddSpriteAnimClipForRebuilding(el);
@@ -413,10 +413,94 @@ public class exAtlasInfo : ScriptableObject {
         if ( spAnimClipGUIDs != null ) {
             foreach ( string animClipGUID in spAnimClipGUIDs ) {
                 exSpriteAnimClip animClip = exEditorRuntimeHelper.LoadAssetFromGUID<exSpriteAnimClip>(animClipGUID);
-                if ( rebuildSpAnimClips.IndexOf(animClip) == -1 ) {
+                if ( animClip != null && rebuildSpAnimClips.IndexOf(animClip) == -1 ) {
                     animClip.editorNeedRebuild = true;
                     rebuildSpAnimClips.Add(animClip);
                 }
+            }
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void ImportObjects ( Object[] _objects ) {
+        bool dirty = false;
+        foreach ( Object o in _objects ) {
+            if ( o is Texture2D ) {
+                Texture2D t = o as Texture2D;
+                exAtlasDB.ElementInfo elInfo = exAtlasDB.GetElementInfo(t);
+                if ( elInfo == null ) {
+                    AddElement( t, true );
+                    dirty = true;
+                }
+                else {
+                    Debug.LogError( "The texture [" + t.name + "]" + 
+                                    " has already been added in atlas: " +
+                                    AssetDatabase.GUIDToAssetPath(elInfo.guidAtlasInfo) );
+                }
+            }
+            else if ( o is exBitmapFont ) {
+                exBitmapFont f = o as exBitmapFont;
+
+                // multi-page atlas font is forbit
+                if ( f.pageInfos.Count > 1 ) {
+                    Debug.LogError("Can't not create atlas font from " + f.name + ", it has multiple page info.");
+                    continue;
+                }
+
+                // check if we have resource in the project
+                string assetPath = AssetDatabase.GetAssetPath(texture);
+                string dirname = Path.GetDirectoryName(assetPath);
+                string filename = Path.GetFileNameWithoutExtension(assetPath);
+                string bitmapFontPath = Path.Combine( dirname, filename + " - " + f.name + ".asset" );
+                exBitmapFont f2 = (exBitmapFont)AssetDatabase.LoadAssetAtPath( bitmapFontPath,
+                                                                               typeof(exBitmapFont) );
+                if ( f2 == null ) {
+                    f2 = (exBitmapFont)ScriptableObject.CreateInstance(typeof(exBitmapFont));
+                    f2.useAtlas = true;
+                    f2.name = f.name;
+                    f2.lineHeight = f.lineHeight;
+
+                    // add page info
+                    exBitmapFont.PageInfo pageInfo = new exBitmapFont.PageInfo();
+                    pageInfo.texture = texture;
+                    pageInfo.material = material;
+                    f2.pageInfos.Add(pageInfo);
+
+                    // add char info
+                    foreach ( exBitmapFont.CharInfo c in f.charInfos ) {
+                        f2.charInfos.Add(c);
+                    }
+
+                    // add kerning info
+                    foreach ( exBitmapFont.KerningInfo k in f.kernings ) {
+                        f2.kernings.Add(k);
+                    }
+
+                    AssetDatabase.CreateAsset ( f2, bitmapFontPath );
+
+                    //
+                    foreach ( exBitmapFont.CharInfo c in f2.charInfos ) {
+                        if ( c.id == -1 )
+                            continue;
+                        AddFontElement( f, f2, c );
+                    }
+                }
+                else {
+                    Debug.LogError("You already add the BitmapFont in this Atlas");
+                }
+
+                //
+                if ( bitmapFonts.IndexOf(f2) == -1 ) {
+                    bitmapFonts.Add(f2);
+                }
+
+                dirty = true;
+            }
+            if ( dirty ) {
+                EditorUtility.SetDirty(this);
             }
         }
     }

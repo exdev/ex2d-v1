@@ -120,7 +120,7 @@ public class exPlaneEditor : Editor {
         }
 
         // ======================================================== 
-        // add layer 2d button 
+        // use layer 2D
         // ======================================================== 
 
         GUILayout.BeginHorizontal();
@@ -128,12 +128,33 @@ public class exPlaneEditor : Editor {
             GUI.enabled = !inAnimMode;
             exLayer2D compLayer2D = editPlane.GetComponent<exLayer2D>();
             bool hasLayer2D = compLayer2D != null; 
-            bool useLayer2D = GUILayout.Toggle ( hasLayer2D, "Use Layer2D" ); 
+            bool useLayer2D = GUILayout.Toggle ( hasLayer2D, "Use Layer 2D" ); 
             if ( useLayer2D != hasLayer2D ) {
                 if ( useLayer2D )
                     editPlane.gameObject.AddComponent<exLayer2D>();
                 else {
                     Object.DestroyImmediate(compLayer2D);
+                }
+                GUI.changed = true;
+            }
+            GUI.enabled = true;
+        GUILayout.EndHorizontal();
+
+        // ======================================================== 
+        // use animation helper 
+        // ======================================================== 
+
+        GUILayout.BeginHorizontal();
+        GUILayout.Space(15);
+            GUI.enabled = !inAnimMode;
+            exAnimationHelper compAnimHelper = editPlane.GetComponent<exAnimationHelper>();
+            bool hasAnimHelper = compAnimHelper != null; 
+            bool useAnimHelper = GUILayout.Toggle ( hasAnimHelper, "Use Animation Helper" ); 
+            if ( useAnimHelper != hasAnimHelper ) {
+                if ( useAnimHelper )
+                    AddAnimationHelper();
+                else {
+                    Object.DestroyImmediate(compAnimHelper);
                 }
                 GUI.changed = true;
             }
@@ -183,5 +204,13 @@ public class exPlaneEditor : Editor {
             EditorUtility.SetDirty(editPlane);
         }
 	}
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    virtual protected void AddAnimationHelper () {
+        editPlane.gameObject.AddComponent<exAnimationHelper>();
+    }
 }
 

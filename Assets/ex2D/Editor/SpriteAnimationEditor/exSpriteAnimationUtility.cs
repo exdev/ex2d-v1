@@ -89,6 +89,19 @@ public class exSpriteAnimationUtility {
     // Desc: 
     // ------------------------------------------------------------------ 
 
+    static public void AddFrames ( exSpriteAnimClip _animClip, Object[] _objects ) {
+        foreach ( Object o in _objects ) {
+            if ( o is Texture2D ) {
+                Texture2D t = o as Texture2D;
+                exSpriteAnimationUtility.AddFrame( _animClip, t ); // NOTE: it will SetDirty here
+            }
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
     static public void AddFrame ( exSpriteAnimClip _animClip, Texture2D _tex ) {
         exSpriteAnimClip.FrameInfo frameInfo = new exSpriteAnimClip.FrameInfo ();
         frameInfo.length = 10.0f/60.0f;

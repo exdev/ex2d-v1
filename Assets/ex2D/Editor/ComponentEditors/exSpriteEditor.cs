@@ -348,4 +348,12 @@ public class exSpriteEditor : exSpriteBaseEditor {
             Handles.DrawPolyLine( w_vertices );
         }
     }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    override protected void AddAnimationHelper () {
+        editSprite.gameObject.AddComponent<exSpriteAnimHelper>();
+    }
 }

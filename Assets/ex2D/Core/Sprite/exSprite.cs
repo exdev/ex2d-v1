@@ -570,23 +570,23 @@ public class exSprite : exSpriteBase {
     override protected void Awake () {
         base.Awake();
 
-#if UNITY_EDITOR
         // DELME { 
-        // if ( EditorApplication.isPlaying == false &&
-        //      useAtlas &&
-        //      string.IsNullOrEmpty(textureGUID) == false ) 
-        // {
-        //     exAtlasDB.ElementInfo elInfo = exAtlasDB.GetElementInfo ( textureGUID );
-        //     if ( elInfo != null &&
-        //          ( elInfo.indexInAtlas != index_ ||
-        //            elInfo.guidAtlas != exEditorRuntimeHelper.AssetToGUID(atlas_) ) ) 
-        //     {
-        //         SetSprite( exEditorRuntimeHelper.LoadAssetFromGUID<exAtlas>(elInfo.guidAtlas),
-        //                    elInfo.indexInAtlas );
-        //     }
-        // }
+// #if UNITY_EDITOR
+//         if ( EditorApplication.isPlaying == false &&
+//              useAtlas &&
+//              string.IsNullOrEmpty(textureGUID) == false ) 
+//         {
+//             exAtlasDB.ElementInfo elInfo = exAtlasDB.GetElementInfo ( textureGUID );
+//             if ( elInfo != null &&
+//                  ( elInfo.indexInAtlas != index_ ||
+//                    elInfo.guidAtlas != exEditorRuntimeHelper.AssetToGUID(atlas_) ) ) 
+//             {
+//                 SetSprite( exEditorRuntimeHelper.LoadAssetFromGUID<exAtlas>(elInfo.guidAtlas),
+//                            elInfo.indexInAtlas );
+//             }
+//         }
+// #endif
         // } DELME end 
-#endif
 
         spanim = GetComponent<exSpriteAnimation>();
         if ( atlas_ != null ) {

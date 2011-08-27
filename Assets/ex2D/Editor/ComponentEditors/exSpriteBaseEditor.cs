@@ -114,7 +114,7 @@ public class exSpriteBaseEditor : exPlaneEditor {
         GUILayout.EndHorizontal();
 
         // ======================================================== 
-        // add pixel perfect button
+        // use pixel perfect
         // ======================================================== 
 
         GUILayout.BeginHorizontal();
@@ -122,7 +122,7 @@ public class exSpriteBaseEditor : exPlaneEditor {
             GUI.enabled = !inAnimMode;
             exPixelPerfect compPixelPerfect = editSpriteBase.GetComponent<exPixelPerfect>();
             hasPixelPerfectComponent = compPixelPerfect != null; 
-            bool usePixelPerfect = GUILayout.Toggle ( hasPixelPerfectComponent, "Use PixelPerfect" ); 
+            bool usePixelPerfect = GUILayout.Toggle ( hasPixelPerfectComponent, "Use Pixel Perfect" ); 
             if ( usePixelPerfect != hasPixelPerfectComponent ) {
                 if ( usePixelPerfect )
                     editSpriteBase.gameObject.AddComponent<exPixelPerfect>();
@@ -203,4 +203,12 @@ public class exSpriteBaseEditor : exPlaneEditor {
             EditorUtility.SetDirty(editSpriteBase);
         }
 	}
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    override protected void AddAnimationHelper () {
+        editSpriteBase.gameObject.AddComponent<exSpriteBaseAnimHelper>();
+    }
 }

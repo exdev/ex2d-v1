@@ -331,6 +331,14 @@ public class exSpriteFontEditor : exSpriteBaseEditor {
             }
         }
     }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    override protected void AddAnimationHelper () {
+        editSpriteFont.gameObject.AddComponent<exSpriteFontAnimHelper>();
+    }
 }
 
 

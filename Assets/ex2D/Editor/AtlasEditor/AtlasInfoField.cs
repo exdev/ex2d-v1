@@ -165,93 +165,10 @@ partial class exAtlasEditor : EditorWindow {
     // ------------------------------------------------------------------ 
 
     void ImportObjects () {
-        bool dirty = false;
-        EditorUtility.DisplayProgressBar( "Adding Textures...",
-                                          "Start adding ",
-                                          0.1f );    
-        foreach ( Object o in importObjects ) {
-            // DISABLE: it is too slow { 
-            // EditorUtility.DisplayProgressBar( "Adding Textures...",
-            //                                   "Adding Object " + o.name,
-            //                                   (float)i / (float)importObjects.Count );    
-            // } DISABLE end 
-            if ( o is Texture2D ) {
-                Texture2D t = o as Texture2D;
-                exAtlasDB.ElementInfo elInfo = exAtlasDB.GetElementInfo(t);
-                if ( elInfo == null ) {
-                    curEdit.AddElement( t, true );
-                    dirty = true;
-                }
-                else {
-                    Debug.LogError( "The texture [" + t.name + "]" + 
-                                    " has already been added in atlas: " +
-                                    AssetDatabase.GUIDToAssetPath(elInfo.guidAtlasInfo) );
-                }
-            }
-            else if ( o is exBitmapFont ) {
-                exBitmapFont f = o as exBitmapFont;
-
-                // multi-page atlas font is forbit
-                if ( f.pageInfos.Count > 1 ) {
-                    Debug.LogError("Can't not create atlas font from " + f.name + ", it has multiple page info.");
-                    continue;
-                }
-
-                // check if we have resource in the project
-                string assetPath = AssetDatabase.GetAssetPath(curEdit.texture);
-                string dirname = Path.GetDirectoryName(assetPath);
-                string filename = Path.GetFileNameWithoutExtension(assetPath);
-                string bitmapFontPath = Path.Combine( dirname, filename + " - " + f.name + ".asset" );
-                exBitmapFont f2 = (exBitmapFont)AssetDatabase.LoadAssetAtPath( bitmapFontPath,
-                                                                               typeof(exBitmapFont) );
-                if ( f2 == null ) {
-                    f2 = (exBitmapFont)ScriptableObject.CreateInstance(typeof(exBitmapFont));
-                    f2.useAtlas = true;
-                    f2.name = f.name;
-                    f2.lineHeight = f.lineHeight;
-
-                    // add page info
-                    exBitmapFont.PageInfo pageInfo = new exBitmapFont.PageInfo();
-                    pageInfo.texture = curEdit.texture;
-                    pageInfo.material = curEdit.material;
-                    f2.pageInfos.Add(pageInfo);
-
-                    // add char info
-                    foreach ( exBitmapFont.CharInfo c in f.charInfos ) {
-                        f2.charInfos.Add(c);
-                    }
-
-                    // add kerning info
-                    foreach ( exBitmapFont.KerningInfo k in f.kernings ) {
-                        f2.kernings.Add(k);
-                    }
-
-                    AssetDatabase.CreateAsset ( f2, bitmapFontPath );
-
-                    //
-                    foreach ( exBitmapFont.CharInfo c in f2.charInfos ) {
-                        if ( c.id == -1 )
-                            continue;
-                        curEdit.AddFontElement( f, f2, c );
-                    }
-                }
-                else {
-                    Debug.LogError("You already add the BitmapFont in this Atlas");
-                }
-
-                //
-                if ( curEdit.bitmapFonts.IndexOf(f2) == -1 ) {
-                    curEdit.bitmapFonts.Add(f2);
-                }
-
-                dirty = true;
-            }
-        }
+        EditorUtility.DisplayProgressBar( "Adding Textures...", "Start adding ", 0.2f );
+        curEdit.ImportObjects ( importObjects.ToArray() );
         importObjects.Clear();
         EditorUtility.ClearProgressBar();    
-        if ( dirty ) {
-            EditorUtility.SetDirty(curEdit);
-        }
     } 
 
     // ------------------------------------------------------------------ 

@@ -36,6 +36,22 @@ public class exSpriteAnimState {
     [System.NonSerialized] public float time = 0.0f;
     // [System.NonSerialized] public float normalizedTime = 0.0f;
     [System.NonSerialized] public float speed = 1.0f;
+
+    //
+    public exSpriteAnimState ( exSpriteAnimClip _animClip ) {
+        name = _animClip.name;
+        wrapMode = _animClip.wrapMode;
+        stopAction = _animClip.stopAction;
+        clip = _animClip;
+        length = _animClip.length;
+
+        frameTimes = new List<float>(_animClip.frameInfos.Count);
+        float tmp = 0.0f;
+        foreach ( exSpriteAnimClip.FrameInfo fi in _animClip.frameInfos ) {
+            tmp += fi.length;
+            frameTimes.Add(tmp);
+        }
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -83,21 +99,7 @@ public class exSpriteAnimation : MonoBehaviour {
 
             nameToState = new Dictionary<string,exSpriteAnimState> ();
             foreach ( exSpriteAnimClip clip in animations ) {
-                exSpriteAnimState state = new exSpriteAnimState();
-
-                state.name = clip.name;
-                state.wrapMode = clip.wrapMode;
-                state.stopAction = clip.stopAction;
-                state.clip = clip;
-                state.length = clip.length;
-
-                state.frameTimes = new List<float>(clip.frameInfos.Count);
-                float tmp = 0.0f;
-                foreach ( exSpriteAnimClip.FrameInfo fi in clip.frameInfos ) {
-                    tmp += fi.length;
-                    state.frameTimes.Add(tmp);
-                }
-
+                exSpriteAnimState state = new exSpriteAnimState(clip);
                 nameToState[state.name] = state;
             }
 
@@ -282,5 +284,37 @@ public class exSpriteAnimation : MonoBehaviour {
         }
         return null;
     } 
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public exSpriteAnimState AddAnimation ( exSpriteAnimClip _animClip ) {
+        // if we already have the animation, just return the animation state
+        if ( animations.IndexOf(_animClip) != -1 ) {
+            return nameToState[_animClip.name];
+        }
+
+        //
+        animations.Add (_animClip);
+        exSpriteAnimState state = new exSpriteAnimState(_animClip);
+        nameToState[state.name] = state;
+        return state;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void RemoveAnimation ( exSpriteAnimClip _animClip ) {
+        // if we already have the animation, just return the animation state
+        if ( animations.IndexOf(_animClip) == -1 ) {
+            return; 
+        }
+
+        //
+        animations.Remove (_animClip);
+        nameToState.Remove (_animClip.name);
+    }
 }
 

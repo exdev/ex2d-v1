@@ -266,8 +266,9 @@ partial class exAtlasEditor : EditorWindow {
                 // } TODO end 
 
                 if ( GUILayout.Button ( "Apply" ) ) {
-                    LayoutElements ();
-                    EditorUtility.SetDirty(curEdit);
+                    EditorUtility.DisplayProgressBar( "Layout Elements...", "Layout Elements...", 0.5f  );    
+                    curEdit.LayoutElements ();
+                    EditorUtility.ClearProgressBar();
                 }
                 // GUI.enabled = true;
 
@@ -479,7 +480,7 @@ partial class exAtlasEditor : EditorWindow {
                 GUI.enabled = curEdit.needRebuild;
                 if ( GUILayout.Button("Build", GUILayout.MaxWidth(100) ) ) {
                     // build atlas info to atals
-                    exAtlasUtility.Build(curEdit);
+                    exAtlasInfoUtility.Build(curEdit);
 
                     // build sprite animclip that used this atlasInfo
                     exSpriteAnimationUtility.BuildFromAtlasInfo(curEdit);
@@ -487,7 +488,7 @@ partial class exAtlasEditor : EditorWindow {
                     // update scene sprites
                     List<exAtlasInfo> rebuildAtlasInfos = new List<exAtlasInfo>();
                     rebuildAtlasInfos.Add(curEdit);
-                    exAtlasUtility.PostBuild (rebuildAtlasInfos);
+                    exAtlasInfoUtility.PostBuild (rebuildAtlasInfos);
 
                     // NOTE: without this you will got leaks message
                     EditorUtility.UnloadUnusedAssets();
@@ -635,29 +636,6 @@ partial class exAtlasEditor : EditorWindow {
     void WidthAndHeightField ( ref int _width, ref int _height ) {
         _width = EditorGUILayout.IntPopup ( "Width", _width, sizeTextList, sizeList );
         _height = EditorGUILayout.IntPopup ( "Height", _height, sizeTextList, sizeList );
-    }
-
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
-    void LayoutElements () {
-
-        curEdit.ResetElements();
-        curEdit.SortElements();
-
-        // this is very basic algorithm
-        if ( curEdit.algorithm == exAtlasInfo.Algorithm.Basic ) {
-            BasicPack ();
-        }
-        else if ( curEdit.algorithm == exAtlasInfo.Algorithm.Tree ) {
-            TreePack ();
-        }
-
-        //
-        foreach ( exAtlasInfo.Element el in curEdit.elements ) {
-            curEdit.AddSpriteAnimClipForRebuilding(el);
-        }
     }
 
     // ------------------------------------------------------------------ 

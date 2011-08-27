@@ -21,10 +21,12 @@ using System.IO;
 
 public class exSpriteAnimationDB : ScriptableObject {
 
+    public int curVersion = version;
     public List<string> spAnimClipGUIDs = new List<string>();
     public Dictionary<string,List<string> > 
         texGuidToAnimClipGUIDs = new Dictionary<string,List<string> >();
 
+    // editor
     public bool showData = true;
     public bool showTable = true;
 
@@ -32,7 +34,9 @@ public class exSpriteAnimationDB : ScriptableObject {
     // static
     ///////////////////////////////////////////////////////////////////////////////
 
+    static int version = 1;
     static bool needSync = false;
+    static bool needRebuild = false;
     static exSpriteAnimationDB db;
 
     // ------------------------------------------------------------------ 
@@ -43,8 +47,24 @@ public class exSpriteAnimationDB : ScriptableObject {
         if ( db == null )
             CreateDB ();
 
-        needSync = true;
         SyncRoot();
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    static public void BuildAll () {
+        if ( db == null )
+            CreateDB ();
+
+        foreach ( string guidAnimClip in db.spAnimClipGUIDs ) {
+            exSpriteAnimClip spAnimClip = exEditorRuntimeHelper.LoadAssetFromGUID<exSpriteAnimClip>(guidAnimClip);
+            exSpriteAnimationUtility.Build ( spAnimClip );
+
+            spAnimClip = null;
+            EditorUtility.UnloadUnusedAssets();
+        }
     }
 
     // ------------------------------------------------------------------ 
@@ -99,6 +119,12 @@ public class exSpriteAnimationDB : ScriptableObject {
             AssetDatabase.CreateAsset( db, "Assets/.ex2D_SpriteAnimationDB.asset" );
             needSync = true;
         }
+        if ( version != db.curVersion ) {
+            db.curVersion = version;
+            needSync = true;
+            needRebuild = true;
+            EditorUtility.SetDirty(db);
+        }
     }
 
     // ------------------------------------------------------------------ 
@@ -138,6 +164,12 @@ public class exSpriteAnimationDB : ScriptableObject {
 
                 EditorUtility.SetDirty(db);
             }
+
+            // rebuild
+            if ( needRebuild ) {
+                needRebuild = false;
+                BuildAll();
+            }
         }
     }
 
@@ -167,6 +199,14 @@ public class exSpriteAnimationDB : ScriptableObject {
     // Desc: 
     // ------------------------------------------------------------------ 
 
+    static public bool HasSpriteAnimClipGUID ( string _guid ) {
+        return db.spAnimClipGUIDs.IndexOf(_guid) != -1;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
     static public void AddSpriteAnimClip ( exSpriteAnimClip _animClip ) {
         Init();
 
@@ -182,22 +222,49 @@ public class exSpriteAnimationDB : ScriptableObject {
         }
     }
 
+    // DISABLE: no use { 
+    // // ------------------------------------------------------------------ 
+    // // Desc: 
+    // // ------------------------------------------------------------------ 
+
+    // static public void RemoveSpriteAnimClip ( exSpriteAnimClip _animClip ) {
+    //     Init();
+
+    //     string animClipGUID = exEditorRuntimeHelper.AssetToGUID(_animClip);
+    //     foreach ( exSpriteAnimClip.FrameInfo fi in _animClip.frameInfos ) {
+    //         if ( db.texGuidToAnimClipGUIDs.ContainsKey(fi.textureGUID) ) {
+    //             List<string> animClipGUIDs = db.texGuidToAnimClipGUIDs[fi.textureGUID];
+    //             animClipGUIDs.Remove (animClipGUID);
+    //         }
+    //     }
+
+    //     db.spAnimClipGUIDs.Remove(animClipGUID);
+    //     EditorUtility.SetDirty(db);
+    // }
+    // } DISABLE end 
+
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    static public void RemoveSpriteAnimClip ( exSpriteAnimClip _animClip ) {
+    static public void RemoveSpriteAnimClip ( string _guid ) {
         Init();
 
-        string animClipGUID = exEditorRuntimeHelper.AssetToGUID(_animClip);
-        foreach ( exSpriteAnimClip.FrameInfo fi in _animClip.frameInfos ) {
-            if ( db.texGuidToAnimClipGUIDs.ContainsKey(fi.textureGUID) ) {
-                List<string> animClipGUIDs = db.texGuidToAnimClipGUIDs[fi.textureGUID];
-                animClipGUIDs.Remove (animClipGUID);
+        // get ElementInfo that have the same atlasInfo guid to remove list 
+        foreach ( KeyValuePair<string,List<string> > pair in db.texGuidToAnimClipGUIDs ) {
+            List<string> animClipGUIDs = pair.Value;
+
+            for ( int i = 0; i < animClipGUIDs.Count; ++i ) {
+                if ( animClipGUIDs[i] == _guid ) {
+                    animClipGUIDs.RemoveAt(i);
+                    --i;
+                    continue;
+                }
             }
         }
 
-        db.spAnimClipGUIDs.Remove(animClipGUID);
+        //
+        db.spAnimClipGUIDs.Remove(_guid);
         EditorUtility.SetDirty(db);
     }
 

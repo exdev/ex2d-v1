@@ -33,7 +33,6 @@ public class exAtlasDBEditor : Editor {
             curEditTarget = target as exAtlasDB;
         }
         EditorGUIUtility.LookLikeInspector ();
-
         EditorGUILayout.Space();
 
         // sync button
@@ -44,14 +43,13 @@ public class exAtlasDBEditor : Editor {
 
         // rebuild all
         if ( GUILayout.Button ("Build All", GUILayout.Width(100)) ) {
-            foreach ( string guidAtlasInfo in curEditTarget.atlasInfoGUIDs ) {
-                exAtlasInfo atlasInfo = exEditorRuntimeHelper.LoadAssetFromGUID<exAtlasInfo>(guidAtlasInfo);
-                exAtlasUtility.Build ( atlasInfo );
-
-                atlasInfo = null;
-                EditorUtility.UnloadUnusedAssets();
-            }
+            exAtlasDB.BuildAll();
         }
+
+        // show version
+        GUI.enabled = false;
+        EditorGUILayout.LabelField( "version", curEditTarget.curVersion.ToString() );
+        GUI.enabled = true;
 
         // show atlasInfoGUIDs
         EditorGUI.indentLevel = 0;

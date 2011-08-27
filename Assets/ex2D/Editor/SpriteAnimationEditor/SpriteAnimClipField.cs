@@ -316,7 +316,7 @@ partial class exSpriteAnimClipEditor {
                 DragAndDrop.AcceptDrag();
                 EditorUtility.DisplayProgressBar( "Adding Textures...",
                                                   "Start adding ",
-                                                  0.0f );    
+                                                  0.5f );    
                 // sort
                 List<Object> objList = new List<Object>(DragAndDrop.objectReferences.Length);
                 foreach ( Object o in DragAndDrop.objectReferences ) {
@@ -324,21 +324,11 @@ partial class exSpriteAnimClipEditor {
                 }
                 objList.Sort(exEditorHelper.CompareObjectByName);
 
-                //
-                int i = 0;
-                foreach ( Object o in objList ) {
-                    // DISABLE: it is too slow { 
-                    // EditorUtility.DisplayProgressBar( "Adding Textures...",
-                    //                                   "Adding Object " + o.name,
-                    //                                   (float)i / (float)DragAndDrop.objectReferences.Length );    
-                    // } DISABLE end 
-                    if ( o is Texture2D ) {
-                        Texture2D t = o as Texture2D;
-                        exSpriteAnimationUtility.AddFrame( _animClip, t );
-                    }
-                    ++i;
-                }
+                // add objects as frames
+                exSpriteAnimationUtility.AddFrames( _animClip, objList.ToArray() );
                 EditorUtility.ClearProgressBar();    
+
+                //
                 CalculatePreviewScale();
                 Repaint();
 

@@ -106,8 +106,9 @@ public class exPlane : MonoBehaviour {
     ///////////////////////////////////////////////////////////////////////////////
 
     [System.NonSerialized] public exLayer2D layer2d;
+    // NOTE: I only public this for exAnimationHelper, user should not set it
+	[System.NonSerialized] public UpdateFlags updateFlags = UpdateFlags.None;
     protected MeshFilter meshFilter;
-	protected UpdateFlags updateFlags = UpdateFlags.None;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
