@@ -281,7 +281,7 @@ public class exAtlasDB : ScriptableObject {
         if ( db.texGUIDToElementInfo.ContainsKey(_textureGUID) ) {
             ElementInfo existsElInfo = GetElementInfo(_textureGUID);
             Debug.LogError ( "The texture: " + AssetDatabase.GUIDToAssetPath(existsElInfo.guidTexture) + 
-                             "has been added in atlas: " + Path.GetFileNameWithoutExtension(AssetDatabase.GUIDToAssetPath(existsElInfo.guidAtlasInfo)) 
+                             " has been added in atlas: " + Path.GetFileNameWithoutExtension(AssetDatabase.GUIDToAssetPath(existsElInfo.guidAtlasInfo)) 
                              + ", The new element in atlas: " + Path.GetFileNameWithoutExtension(AssetDatabase.GUIDToAssetPath(_atlasInfoGUID)) 
                              + " will not be added. please delete the incorrect data." );
             return null;

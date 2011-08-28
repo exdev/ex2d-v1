@@ -142,7 +142,7 @@ public class exTileMap : exPlane {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    override public void UpdateMesh ( Mesh _mesh ) {
+    public void UpdateMesh ( Mesh _mesh ) {
 
         // ======================================================== 
         // Update Vertex
@@ -270,6 +270,18 @@ public class exTileMap : exPlane {
         _mesh.Clear();
         updateFlags = UpdateFlags.Index | UpdateFlags.Vertex | UpdateFlags.Color;
         UpdateMesh( _mesh );
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    override protected void InternalUpdate () {
+        if ( meshFilter != null && 
+             meshFilter.sharedMesh != null ) 
+        {
+            UpdateMesh (meshFilter.sharedMesh);
+        }
     }
 
     // ------------------------------------------------------------------ 

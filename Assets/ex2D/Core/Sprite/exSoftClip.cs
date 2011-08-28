@@ -49,6 +49,7 @@ public class exSoftClip : exPlane {
     }
 
     public List<exPlane> planes = new List<exPlane>();
+    public Rect clippedRect { get; protected set; }
 
     ///////////////////////////////////////////////////////////////////////////////
     // static functions
@@ -96,6 +97,7 @@ public class exSoftClip : exPlane {
             }
         }
     }
+
 #endif
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -106,9 +108,71 @@ public class exSoftClip : exPlane {
     // Desc: 
     // ------------------------------------------------------------------ 
 
+    override protected void Awake () {
+        base.Awake();
+
+        updateFlags |= UpdateFlags.Vertex;
+        InternalUpdate ();
+        updateFlags = UpdateFlags.None;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    override protected void InternalUpdate () {
+
+        if ( (updateFlags & UpdateFlags.Vertex) != 0 ) {
+            //
+            float halfWidth = width_ * 0.5f;
+            float halfHeight = height_ * 0.5f;
+            float offsetX = 0.0f;
+            float offsetY = 0.0f;
+
+            //
+            switch ( anchor ) {
+            case Anchor.TopLeft     : offsetX = -halfWidth;   offsetY = -halfHeight;  break;
+            case Anchor.TopCenter   : offsetX = 0.0f;         offsetY = -halfHeight;  break;
+            case Anchor.TopRight    : offsetX = halfWidth;    offsetY = -halfHeight;  break;
+
+            case Anchor.MidLeft     : offsetX = -halfWidth;   offsetY = 0.0f;         break;
+            case Anchor.MidCenter   : offsetX = 0.0f;         offsetY = 0.0f;         break;
+            case Anchor.MidRight    : offsetX = halfWidth;    offsetY = 0.0f;         break;
+
+            case Anchor.BotLeft     : offsetX = -halfWidth;   offsetY = halfHeight;   break;
+            case Anchor.BotCenter   : offsetX = 0.0f;         offsetY = halfHeight;   break;
+            case Anchor.BotRight    : offsetX = halfWidth;    offsetY = halfHeight;   break;
+
+            default                 : offsetX = 0.0f;         offsetY = 0.0f;         break;
+            }
+
+            //
+            boundingRect = new Rect( -offsetX - halfWidth, 
+                                      offsetY - halfHeight,
+                                      width_, 
+                                      height_ );
+
+            // do clip
+            if ( clipInfo_.clipped ) {
+                clippedRect = new Rect( boundingRect.x + clipInfo_.left * boundingRect.width, 
+                                        boundingRect.y + clipInfo_.top * boundingRect.height, 
+                                        (1.0f - clipInfo_.left - clipInfo_.right) * boundingRect.width,
+                                        (1.0f - clipInfo_.top - clipInfo_.bottom) * boundingRect.height
+                                      ); 
+            }
+            else {
+                clippedRect = boundingRect;
+            }
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
     void Update () {
         //
-        Rect a = boundingRect;
+        Rect a = clippedRect;
         switch ( plane ) {
         case exSprite.Plane.XY:
             a.x += transform.position.x;
@@ -124,28 +188,40 @@ public class exSoftClip : exPlane {
             break;
         }
 
+        // Debug.Log ( name + " rect a = " + a
+        //             + " xMin = " + a.xMin 
+        //             + " xMax = " + a.xMax 
+        //             + " yMin = " + a.yMin 
+        //             + " yMax = " + a.yMax ); 
+
         //
-        exPlane.ClipInfo newClipInfo = new exPlane.ClipInfo(); 
         foreach ( exPlane p in planes ) {
+            exPlane.ClipInfo newClipInfo = new exPlane.ClipInfo(); 
+
             //
             Rect b = p.boundingRect;
             switch ( plane ) {
             case exSprite.Plane.XY:
-                b.x += transform.position.x;
-                b.y += transform.position.y;
+                b.x += p.transform.position.x;
+                b.y += p.transform.position.y;
                 break;
             case exSprite.Plane.XZ:
-                b.x += transform.position.x;
-                b.y += transform.position.z;
+                b.x += p.transform.position.x;
+                b.y += p.transform.position.z;
                 break;
             case exSprite.Plane.ZY:
-                b.x += transform.position.z;
-                b.y += transform.position.y;
+                b.x += p.transform.position.z;
+                b.y += p.transform.position.y;
                 break;
             }
 
+            // Debug.Log ( p.name + " rect b = " + b + ", " 
+            //             + " xMin = " + b.xMin 
+            //             + " xMax = " + b.xMax 
+            //             + " yMin = " + b.yMin 
+            //             + " yMax = " + b.yMax ); 
+
             //
-            newClipInfo.clipped = false;
             if ( a.xMin > b.xMin ) {
                 newClipInfo.left = (a.xMin - b.xMin) / b.width;
                 newClipInfo.clipped = true;
@@ -155,12 +231,12 @@ public class exSoftClip : exPlane {
                 newClipInfo.clipped = true;
             }
 
-            if ( a.yMax > b.yMax ) {
-                newClipInfo.left = (a.yMax - b.yMax) / b.height;
+            if ( a.yMin > b.yMin ) {
+                newClipInfo.top = (a.yMin - b.yMin) / b.height;
                 newClipInfo.clipped = true;
             }
-            if ( b.yMin > a.yMin ) {
-                newClipInfo.right = (b.yMin - a.yMin) / b.height;
+            if ( b.yMax > a.yMax ) {
+                newClipInfo.bottom = (b.yMax - a.yMax) / b.height;
                 newClipInfo.clipped = true;
             }
             p.clipInfo = newClipInfo;

@@ -62,6 +62,8 @@ Library/*
 # assets
 #/////////////////////////////////////////////////////////////////////////////
 
+Assets/_test/
+Assets/_test.meta
 Assets/RageSpline/
 Assets/RageSpline.meta
 

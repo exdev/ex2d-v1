@@ -483,7 +483,7 @@ public class exSpriteFont : exSpriteBase {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    override public void UpdateMesh ( Mesh _mesh ) {
+    public void UpdateMesh ( Mesh _mesh ) {
 
         // pre check fontInfo
         if ( fontInfo_ == null ) {
@@ -868,9 +868,6 @@ public class exSpriteFont : exSpriteBase {
             }
             _mesh.colors = colors;
         }
-
-        //
-        updateFlags = UpdateFlags.None;
     }
 
     // ------------------------------------------------------------------ 
@@ -884,6 +881,18 @@ public class exSpriteFont : exSpriteBase {
         _mesh.Clear();
         updateFlags = UpdateFlags.Text | UpdateFlags.Color;
         UpdateMesh( _mesh );
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    override protected void InternalUpdate () {
+        if ( meshFilter != null && 
+             meshFilter.sharedMesh != null ) 
+        {
+            UpdateMesh (meshFilter.sharedMesh);
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////////

@@ -67,6 +67,7 @@ public class exPlane : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
+    [System.Serializable]
     public class ClipInfo {
 
         static public bool operator == ( ClipInfo _a, ClipInfo _b ) { return _a.Equals(_b); }
@@ -137,7 +138,7 @@ public class exPlane : MonoBehaviour {
     [System.NonSerialized] public exLayer2D layer2d;
     // NOTE: I only public this for exAnimationHelper, user should not set it
 	[System.NonSerialized] public UpdateFlags updateFlags = UpdateFlags.None;
-    public Rect boundingRect { get; private set; }
+    public Rect boundingRect { get; protected set; }
 
     protected MeshFilter meshFilter;
 
@@ -235,11 +236,9 @@ public class exPlane : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     void LateUpdate () {
-        if ( meshFilter != null && 
-             meshFilter.sharedMesh != null &&
-             updateFlags != UpdateFlags.None ) 
-        {
-            UpdateMesh( meshFilter.sharedMesh );
+        if ( updateFlags != UpdateFlags.None ) {
+            InternalUpdate();
+            updateFlags = UpdateFlags.None;
         }
     }
 
@@ -247,7 +246,7 @@ public class exPlane : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    virtual public void UpdateMesh ( Mesh _mesh ) {
+    virtual protected void InternalUpdate () {
         // Debug.LogWarning ("You should not directly call this function. please override it!");
     }
 
@@ -255,9 +254,18 @@ public class exPlane : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public Bounds UpdateBounds ( float _offsetX, float _offsetY, float _width, float _height )
-    {
-        boundingRect = new Rect( -_offsetX, _offsetY, _width, _height );
+    public Bounds UpdateBounds ( float _offsetX, float _offsetY, float _width, float _height ) {
+        float sign_w = Mathf.Sign(_width);
+        float sign_h = Mathf.Sign(_height);
+        boundingRect = new Rect( -_offsetX - sign_w * _width * 0.5f, 
+                                  _offsetY - sign_h * _height * 0.5f, 
+                                  sign_w * _width, 
+                                  sign_h * _height );
+        // boundingRect = new Rect( -_offsetX - _width * 0.5f, 
+        //                           _offsetY - _height * 0.5f, 
+        //                           _width, 
+        //                           _height );
+
         switch ( plane ) {
         case exSprite.Plane.XY:
             return new Bounds (  new Vector3( -_offsetX, _offsetY, 0.0f ), 

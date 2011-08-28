@@ -92,8 +92,15 @@ public class exSoftClipEditor : exPlaneEditor {
         // list
         EditorGUI.indentLevel = 2;
         GUI.enabled = false;
-        foreach ( exPlane p in curEdit.planes ) {
-            EditorGUILayout.ObjectField ( p.name, p, typeof(exPlane), true );
+        for ( int i = 0; i < curEdit.planes.Count; ++i ) {
+            exPlane p = curEdit.planes[i];
+            if ( p == null ) {
+                curEdit.planes.RemoveAt(i);
+                --i;
+            }
+            else {
+                EditorGUILayout.ObjectField ( p.name, p, typeof(exPlane), true );
+            }
         }
         GUI.enabled = true;
         EditorGUI.indentLevel = 1;
