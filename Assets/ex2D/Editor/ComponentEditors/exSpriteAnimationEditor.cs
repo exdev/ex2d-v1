@@ -180,9 +180,8 @@ public class exSpriteAnimationEditor : Editor {
              editSpAnim.animations[0].frameInfos.Count > 0 ) 
         {
             exSpriteAnimClip.FrameInfo fi = editSpAnim.animations[0].frameInfos[0];
-            sprite.textureGUID = fi.textureGUID;
-            Texture2D texture = exEditorRuntimeHelper.LoadAssetFromGUID<Texture2D>( sprite.textureGUID ); 
-            sprite.Build( texture );
+            sprite.SetSprite(fi.atlas, fi.index);
+            sprite.Build();
         }
         // } TODO end 
 

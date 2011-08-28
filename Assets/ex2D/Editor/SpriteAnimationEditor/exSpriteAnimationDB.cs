@@ -36,7 +36,6 @@ public class exSpriteAnimationDB : ScriptableObject {
 
     static int version = 1;
     static bool needSync = false;
-    static bool needRebuild = false;
     static exSpriteAnimationDB db;
 
     // ------------------------------------------------------------------ 
@@ -122,7 +121,6 @@ public class exSpriteAnimationDB : ScriptableObject {
         if ( version != db.curVersion ) {
             db.curVersion = version;
             needSync = true;
-            needRebuild = true;
             EditorUtility.SetDirty(db);
         }
     }
@@ -142,6 +140,7 @@ public class exSpriteAnimationDB : ScriptableObject {
                 SyncRoot();
             }
             else {
+                // TODO: learn from AtlasDB { 
                 // create atlas element table
                 for ( int i = 0; i < db.spAnimClipGUIDs.Count; ++i ) {
                     string animClipGUID = db.spAnimClipGUIDs[i];
@@ -161,14 +160,9 @@ public class exSpriteAnimationDB : ScriptableObject {
                     spAnimClip = null;
                     EditorUtility.UnloadUnusedAssets();
                 }
+                // } TODO end 
 
                 EditorUtility.SetDirty(db);
-            }
-
-            // rebuild
-            if ( needRebuild ) {
-                needRebuild = false;
-                BuildAll();
             }
         }
     }

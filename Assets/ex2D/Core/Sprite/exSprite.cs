@@ -156,37 +156,15 @@ public class exSprite : exSpriteBase {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public void Build ( Texture2D _texture ) {
+    public void Build ( Texture2D _texture = null ) {
         EditorUtility.SetDirty (this);
 
         //
-        if ( _texture == null ) {
+        if ( atlas == null && _texture == null ) {
             GetComponent<MeshFilter>().sharedMesh = null; 
             renderer.sharedMaterial = null;
             return;
         }
-
-        // DISABLE { 
-        // // save the mesh 
-        // string texturePath = AssetDatabase.GetAssetPath(_texture);
-        // string meshDirectory = Path.Combine( Path.GetDirectoryName(texturePath), "Meshes" );
-        // string meshPath = Path.Combine( meshDirectory, _texture.name + ".asset" );
-
-        // // create new mesh
-        // Mesh newMesh = (Mesh)AssetDatabase.LoadAssetAtPath(meshPath, typeof(Mesh));
-        // if ( newMesh == null ) {
-        //     newMesh = new Mesh();
-
-        //     // check if directory exists, if not, create one.
-        //     DirectoryInfo info = new DirectoryInfo(meshDirectory);
-        //     if ( info.Exists == false )
-        //         System.IO.Directory.CreateDirectory(meshDirectory);
-
-        //     // save
-        //     AssetDatabase.CreateAsset(newMesh, meshPath);
-        //     AssetDatabase.Refresh();
-        // }
-        // } DISABLE end 
 
         // NOTE: it is possible user duplicate an GameObject, 
         //       if we directly change the mesh, the original one will changed either.
@@ -227,17 +205,26 @@ public class exSprite : exSpriteBase {
         if ( atlas != null ) {
             renderer.sharedMaterial = atlas.material;
         }
-        else {
+        else if ( _texture != null ) {
             string texturePath = AssetDatabase.GetAssetPath(_texture);
+
+            // load material from "texture_path/Materials/texture_name.mat"
             string materialDirectory = Path.Combine( Path.GetDirectoryName(texturePath), "Materials" );
             string materialPath = Path.Combine( materialDirectory, _texture.name + ".mat" );
-
             Material newMaterial = (Material)AssetDatabase.LoadAssetAtPath(materialPath, typeof(Material));
+
+            // if not found, load material from "texture_path/texture_name.mat"
+            if ( newMaterial == null ) {
+                newMaterial = (Material)AssetDatabase.LoadAssetAtPath( Path.Combine( Path.GetDirectoryName(texturePath), 
+                                                                                     Path.GetFileNameWithoutExtension(texturePath) + ".mat" ), 
+                                                                       typeof(Material) );
+            }
+
             if ( newMaterial == null ) {
                 // check if directory exists, if not, create one.
                 DirectoryInfo info = new DirectoryInfo(materialDirectory);
                 if ( info.Exists == false )
-                    System.IO.Directory.CreateDirectory(materialDirectory);
+                    AssetDatabase.CreateFolder ( texturePath, "Materials" );
 
                 // create temp materal
                 newMaterial = new Material( Shader.Find("ex2D/Alpha Blended") );
@@ -659,13 +646,18 @@ public class exSprite : exSpriteBase {
         //
         if ( checkSize && !customSize_ ) {
             exAtlas.Element el = atlas_.elements[index_];
-            float newWidth = el.coords.width * atlas_.texture.width;
-            float newHeight = el.coords.height * atlas_.texture.height;
+
+            float newWidth = el.trimRect.width;
+            float newHeight = el.trimRect.height;
+            // float newWidth = el.coords.width * atlas_.texture.width;
+            // float newHeight = el.coords.height * atlas_.texture.height;
+
             if ( el.rotated ) {
                 float tmp = newWidth;
                 newWidth = newHeight;
                 newHeight = tmp;
             } 
+
             if ( newWidth != width_ || newHeight != height_ ) {
                 width_ = newWidth;
                 height_ = newHeight;

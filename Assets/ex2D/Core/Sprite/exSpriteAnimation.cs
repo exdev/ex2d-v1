@@ -164,18 +164,28 @@ public class exSpriteAnimation : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public void Play ( string _name ) {
-        // show sprite if it is hide
-        if ( sprite.enabled == false ) {
-            sprite.enabled = true;
-        }
-
-        //
+    public void Play ( string _name, int _index = 0 ) {
         curAnimation = GetAnimation(_name);
         if ( curAnimation != null ) {
-            curAnimation.time = 0.0f;
+            if ( _index >= 0 && _index < curAnimation.frameTimes.Count )
+                curAnimation.time = curAnimation.frameTimes[_index];
             playing = true;
             paused = false;
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void SetFrame ( string _name, int _index ) {
+        curAnimation = GetAnimation(_name);
+        if ( curAnimation != null &&
+             _index >= 0 &&
+             _index < curAnimation.clip.frameInfos.Count ) 
+        {
+            exSpriteAnimClip.FrameInfo fi = curAnimation.clip.frameInfos[_index]; 
+            sprite.SetSprite ( fi.atlas, fi.index );
         }
     }
 

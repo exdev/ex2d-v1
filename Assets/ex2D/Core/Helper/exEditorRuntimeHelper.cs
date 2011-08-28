@@ -43,6 +43,8 @@ public class exEditorRuntimeHelper {
     // ------------------------------------------------------------------ 
 
     public static string AssetToGUID ( Object _o ) {
+        if ( _o == null )
+            return "";
         return AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(_o));
     }
 
@@ -51,6 +53,8 @@ public class exEditorRuntimeHelper {
     // ------------------------------------------------------------------ 
 
     public static T LoadAssetFromGUID<T> ( string _guid ) {
+        if ( string.IsNullOrEmpty(_guid) )
+            return (T)(object)null;
         string texturePath = AssetDatabase.GUIDToAssetPath(_guid);
         return (T)(object)AssetDatabase.LoadAssetAtPath( texturePath, typeof(T) );
     }

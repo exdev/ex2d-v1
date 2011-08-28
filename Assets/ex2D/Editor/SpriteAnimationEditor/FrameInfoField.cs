@@ -48,6 +48,7 @@ partial class exSpriteAnimClipEditor {
             }
             foreach ( exSpriteAnimClip.FrameInfo fi in invalidFrames ) {
                 exSpriteAnimationUtility.RemoveFrame( curEdit, fi );
+                selectedFrameInfos.Remove(fi); // unselect it if we have
             }
 
             // ======================================================== 

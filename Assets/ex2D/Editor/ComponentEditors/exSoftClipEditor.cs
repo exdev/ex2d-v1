@@ -83,10 +83,13 @@ public class exSoftClipEditor : exPlaneEditor {
         // clip objects 
         // ======================================================== 
 
+        // label
         GUILayout.BeginHorizontal();
         GUILayout.Space(15);
-        GUILayout.Label( "Clip List" );
+            GUILayout.Label( "Clip List" );
         GUILayout.EndHorizontal();
+
+        // list
         EditorGUI.indentLevel = 2;
         GUI.enabled = false;
         foreach ( exPlane p in curEdit.planes ) {
@@ -94,6 +97,15 @@ public class exSoftClipEditor : exPlaneEditor {
         }
         GUI.enabled = true;
         EditorGUI.indentLevel = 1;
+
+        // update button
+        GUILayout.BeginHorizontal();
+        GUILayout.Space(30);
+            if ( GUILayout.Button("Update", GUILayout.Width(50), GUILayout.Height(20) ) ) {
+                curEdit.AddToClip();
+                GUI.changed = true;
+            }
+        GUILayout.EndHorizontal();
 
         // ======================================================== 
         // if changes

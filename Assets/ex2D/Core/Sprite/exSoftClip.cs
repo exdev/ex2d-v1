@@ -71,7 +71,7 @@ public class exSoftClip : exPlane {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    [ContextMenu ("Add To Clip")]
+    // [ContextMenu ("Add To Clip")]
     public void AddToClip () {
         planes.Clear();
         if ( transform.childCount > 0 )
@@ -145,6 +145,7 @@ public class exSoftClip : exPlane {
             }
 
             //
+            newClipInfo.clipped = false;
             if ( a.xMin > b.xMin ) {
                 newClipInfo.left = (a.xMin - b.xMin) / b.width;
                 newClipInfo.clipped = true;
