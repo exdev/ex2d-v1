@@ -27,12 +27,19 @@ public class exPlaneEditor : Editor {
         "", "", "", 
     };
 
+    protected enum Transform2D {
+        None,
+        Screen,
+        Viewport,
+    }
+
     ///////////////////////////////////////////////////////////////////////////////
     // properties
     ///////////////////////////////////////////////////////////////////////////////
 
     private exPlane editPlane;
     protected bool inAnimMode = false;
+    protected Transform2D trans2d = Transform2D.None;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -47,6 +54,17 @@ public class exPlaneEditor : Editor {
             editPlane = target as exPlane;
             if ( editPlane.renderer != null )
                 EditorUtility.SetSelectedWireframeHidden(editPlane.renderer, true);
+
+            // get trans2d
+            if ( editPlane.GetComponent<exScreenPosition>() != null ) {
+                trans2d = Transform2D.Screen;
+            }
+            else if ( editPlane.GetComponent<exViewportPosition>() != null ) {
+                trans2d = Transform2D.Viewport;
+            }
+            else {
+                trans2d = Transform2D.None;
+            }
         }
     }
 
@@ -72,50 +90,44 @@ public class exPlaneEditor : Editor {
         // } TODO end 
 
         // ======================================================== 
-        // use screen position
+        // trans2d 
         // ======================================================== 
 
-        GUILayout.BeginHorizontal();
-        GUILayout.Space(15);
-            GUI.enabled = !inAnimMode 
-                && (editPlane.GetComponent<exViewportPosition>() == null)
-                ;
-            exScreenPosition compScreenPosition = editPlane.GetComponent<exScreenPosition>();
-            bool hasScreenPosition = compScreenPosition != null; 
-            bool useScreenPosition = GUILayout.Toggle ( hasScreenPosition, "Use Screen Position", GUI.skin.button, GUILayout.Width(120) ); 
-            if ( useScreenPosition != hasScreenPosition ) {
-                if ( useScreenPosition )
-                    editPlane.gameObject.AddComponent<exScreenPosition>();
-                else {
-                    Object.DestroyImmediate(compScreenPosition);
-                }
-                GUI.changed = true;
+        GUI.enabled = !inAnimMode;
+        EditorGUIUtility.LookLikeControls ();
+		Transform2D newTrans2D = (Transform2D)EditorGUILayout.EnumPopup( "Transform 2D", trans2d, GUILayout.Width(165) );
+        EditorGUIUtility.LookLikeInspector ();
+        GUI.enabled = true;
+
+        //
+        if ( newTrans2D != trans2d ) {
+            trans2d = newTrans2D;
+
+            exScreenPosition screenPos = editPlane.GetComponent<exScreenPosition>();
+            if ( screenPos != null ) {
+                Object.DestroyImmediate(screenPos);
             }
-            GUI.enabled = true;
-
-        // ======================================================== 
-        // use viewport position
-        // ======================================================== 
-
-            GUI.enabled = !inAnimMode 
-                && (editPlane.GetComponent<exScreenPosition>() == null)
-                ;
-            exViewportPosition compViewportPosition = editPlane.GetComponent<exViewportPosition>();
-            bool hasViewportPosition = compViewportPosition != null; 
-            bool useViewportPosition = GUILayout.Toggle ( hasViewportPosition, "Use Viewport Position", GUI.skin.button, GUILayout.Width(120) ); 
-            if ( useViewportPosition != hasViewportPosition ) {
-                if ( useViewportPosition )
-                    editPlane.gameObject.AddComponent<exViewportPosition>();
-                else {
-                    Object.DestroyImmediate(compViewportPosition);
-                }
-                GUI.changed = true;
+            exViewportPosition vpPos = editPlane.GetComponent<exViewportPosition>();
+            if ( vpPos != null ) {
+                Object.DestroyImmediate(vpPos);
             }
-            GUI.enabled = true;
-        GUILayout.EndHorizontal();
+
+            switch ( trans2d ) {
+            case Transform2D.None: 
+                break;
+
+            case Transform2D.Screen:
+                editPlane.gameObject.AddComponent<exScreenPosition>(); 
+                break;
+
+            case Transform2D.Viewport: 
+                editPlane.gameObject.AddComponent<exViewportPosition>(); 
+                break;
+            }
+        }
 
         // ======================================================== 
-        // add layer 2d button 
+        // use layer 2D
         // ======================================================== 
 
         GUILayout.BeginHorizontal();
@@ -123,7 +135,7 @@ public class exPlaneEditor : Editor {
             GUI.enabled = !inAnimMode;
             exLayer2D compLayer2D = editPlane.GetComponent<exLayer2D>();
             bool hasLayer2D = compLayer2D != null; 
-            bool useLayer2D = GUILayout.Toggle ( hasLayer2D, "Use Layer2D", GUI.skin.button, GUILayout.Width(120) ); 
+            bool useLayer2D = GUILayout.Toggle ( hasLayer2D, "Use Layer 2D" ); 
             if ( useLayer2D != hasLayer2D ) {
                 if ( useLayer2D )
                     editPlane.gameObject.AddComponent<exLayer2D>();
@@ -136,11 +148,34 @@ public class exPlaneEditor : Editor {
         GUILayout.EndHorizontal();
 
         // ======================================================== 
+        // use animation helper 
+        // ======================================================== 
+
+        GUILayout.BeginHorizontal();
+        GUILayout.Space(15);
+            GUI.enabled = !inAnimMode;
+            exAnimationHelper compAnimHelper = editPlane.GetComponent<exAnimationHelper>();
+            bool hasAnimHelper = compAnimHelper != null; 
+            bool useAnimHelper = GUILayout.Toggle ( hasAnimHelper, "Use Animation Helper" ); 
+            if ( useAnimHelper != hasAnimHelper ) {
+                if ( useAnimHelper )
+                    AddAnimationHelper();
+                else {
+                    Object.DestroyImmediate(compAnimHelper);
+                }
+                GUI.changed = true;
+            }
+            GUI.enabled = true;
+        GUILayout.EndHorizontal();
+
+        // ======================================================== 
         // plane type
         // ======================================================== 
 
         GUI.enabled = !inAnimMode;
-        editPlane.plane = (exPlane.Plane)EditorGUILayout.EnumPopup( "Plane", editPlane.plane );
+        EditorGUIUtility.LookLikeControls ();
+        editPlane.plane = (exPlane.Plane)EditorGUILayout.EnumPopup( "Plane", editPlane.plane, GUILayout.Width(165) );
+        EditorGUIUtility.LookLikeInspector ();
 
         // ======================================================== 
         // anchor
@@ -161,12 +196,28 @@ public class exPlaneEditor : Editor {
         // ======================================================== 
 
         if ( editSprite != null ) {
-            EditorGUI.indentLevel = 2;
-            editSprite.useTextureOffset = EditorGUILayout.Toggle ( "Use Texture Offset", 
-                                                                   editSprite.useTextureOffset ); 
-            EditorGUI.indentLevel = 1;
+            GUILayout.BeginHorizontal();
+            GUILayout.Space(30);
+                editSprite.useTextureOffset = GUILayout.Toggle ( editSprite.useTextureOffset, "Use Texture Offset" ); 
+            GUILayout.EndHorizontal();
         }
         GUI.enabled = true;
+
+        // ======================================================== 
+        // check dirty 
+        // ======================================================== 
+
+        if ( GUI.changed ) {
+            EditorUtility.SetDirty(editPlane);
+        }
 	}
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    virtual protected void AddAnimationHelper () {
+        editPlane.gameObject.AddComponent<exAnimationHelper>();
+    }
 }
 

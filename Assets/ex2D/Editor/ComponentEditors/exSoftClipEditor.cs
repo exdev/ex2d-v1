@@ -80,6 +80,41 @@ public class exSoftClipEditor : exPlaneEditor {
         GUI.enabled = true;
 
         // ======================================================== 
+        // clip objects 
+        // ======================================================== 
+
+        // label
+        GUILayout.BeginHorizontal();
+        GUILayout.Space(15);
+            GUILayout.Label( "Clip List" );
+        GUILayout.EndHorizontal();
+
+        // list
+        EditorGUI.indentLevel = 2;
+        GUI.enabled = false;
+        for ( int i = 0; i < curEdit.planes.Count; ++i ) {
+            exPlane p = curEdit.planes[i];
+            if ( p == null ) {
+                curEdit.planes.RemoveAt(i);
+                --i;
+            }
+            else {
+                EditorGUILayout.ObjectField ( p.name, p, typeof(exPlane), true );
+            }
+        }
+        GUI.enabled = true;
+        EditorGUI.indentLevel = 1;
+
+        // update button
+        GUILayout.BeginHorizontal();
+        GUILayout.Space(30);
+            if ( GUILayout.Button("Update", GUILayout.Width(50), GUILayout.Height(20) ) ) {
+                curEdit.AddToClip();
+                GUI.changed = true;
+            }
+        GUILayout.EndHorizontal();
+
+        // ======================================================== 
         // if changes
         // ======================================================== 
 

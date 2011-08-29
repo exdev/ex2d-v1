@@ -129,13 +129,15 @@ partial class exAtlasEditor : EditorWindow {
         }
     } 
 
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
+    // DISABLE: the focus only occur when main window lost foucs, then come in { 
+    // // ------------------------------------------------------------------ 
+    // // Desc: 
+    // // ------------------------------------------------------------------ 
 
-    void OnFocus () {
-        OnSelectionChange ();
-    }
+    // void OnFocus () {
+    //     OnSelectionChange
+    // }
+    // } DISABLE end 
 
     // ------------------------------------------------------------------ 
     // Desc: 
@@ -143,6 +145,21 @@ partial class exAtlasEditor : EditorWindow {
 
     void OnSelectionChange () {
         Edit ( Selection.activeObject );
+
+        if ( curEdit != null ) {
+            selectedElements.Clear();
+            foreach ( Object o in Selection.objects ) {
+                if ( o is Texture2D ) {
+                    foreach ( exAtlasInfo.Element el in curEdit.elements ) {
+                        if ( el.texture == o ) {
+                            AddSelected(el);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
         Repaint ();
     }
 
@@ -266,8 +283,9 @@ partial class exAtlasEditor : EditorWindow {
                 // } TODO end 
 
                 if ( GUILayout.Button ( "Apply" ) ) {
-                    LayoutElements ();
-                    EditorUtility.SetDirty(curEdit);
+                    EditorUtility.DisplayProgressBar( "Layout Elements...", "Layout Elements...", 0.5f  );    
+                    curEdit.LayoutElements ();
+                    EditorUtility.ClearProgressBar();
                 }
                 // GUI.enabled = true;
 
@@ -479,7 +497,7 @@ partial class exAtlasEditor : EditorWindow {
                 GUI.enabled = curEdit.needRebuild;
                 if ( GUILayout.Button("Build", GUILayout.MaxWidth(100) ) ) {
                     // build atlas info to atals
-                    exAtlasUtility.Build(curEdit);
+                    exAtlasInfoUtility.Build(curEdit);
 
                     // build sprite animclip that used this atlasInfo
                     exSpriteAnimationUtility.BuildFromAtlasInfo(curEdit);
@@ -487,7 +505,7 @@ partial class exAtlasEditor : EditorWindow {
                     // update scene sprites
                     List<exAtlasInfo> rebuildAtlasInfos = new List<exAtlasInfo>();
                     rebuildAtlasInfos.Add(curEdit);
-                    exAtlasUtility.PostBuild (rebuildAtlasInfos);
+                    exAtlasInfoUtility.PostBuild (rebuildAtlasInfos);
 
                     // NOTE: without this you will got leaks message
                     EditorUtility.UnloadUnusedAssets();
@@ -641,38 +659,8 @@ partial class exAtlasEditor : EditorWindow {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    void LayoutElements () {
-
-        curEdit.ResetElements();
-        curEdit.SortElements();
-
-        // this is very basic algorithm
-        if ( curEdit.algorithm == exAtlasInfo.Algorithm.Basic ) {
-            BasicPack ();
-        }
-        else if ( curEdit.algorithm == exAtlasInfo.Algorithm.Tree ) {
-            TreePack ();
-        }
-
-        //
-        foreach ( exAtlasInfo.Element el in curEdit.elements ) {
-            curEdit.AddSpriteAnimClipForRebuilding(el);
-        }
-    }
-
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
     void AddSelected ( exAtlasInfo.Element _el ) {
-        bool added = false;
-        foreach ( exAtlasInfo.Element i in selectedElements ) {
-            if ( i == _el ) {
-                added = true;
-                break;
-            }
-        }
-        if ( added == false ) {
+        if ( selectedElements.IndexOf(_el) == -1 ) {
             selectedElements.Add(_el);
         }
     }
@@ -682,15 +670,11 @@ partial class exAtlasEditor : EditorWindow {
     // ------------------------------------------------------------------ 
 
     void ToggleSelected ( exAtlasInfo.Element _el ) {
-        bool found = false;
-        foreach ( exAtlasInfo.Element i in selectedElements ) {
-            if ( i == _el ) {
-                found = true;
-                selectedElements.Remove(_el);
-                break;
-            }
+        int i = selectedElements.IndexOf(_el);
+        if ( i != -1 ) {
+            selectedElements.RemoveAt(i);
         }
-        if ( found == false ) {
+        else {
             selectedElements.Add(_el);
         }
     }

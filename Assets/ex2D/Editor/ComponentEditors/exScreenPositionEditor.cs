@@ -75,5 +75,12 @@ public class exScreenPositionEditor : Editor {
 
         curEdit.y = EditorGUILayout.FloatField ( "Screen Y", curEdit.y );
 
+        // ======================================================== 
+        // check dirty 
+        // ======================================================== 
+
+        if ( GUI.changed ) {
+            EditorUtility.SetDirty(curEdit);
+        }
 	}
 }

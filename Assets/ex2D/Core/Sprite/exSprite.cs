@@ -94,7 +94,8 @@ public class exSprite : exSpriteBase {
         }
     }
 
-    override public float width {
+    [SerializeField] protected float width_ = 1.0f;
+    public float width {
         get { return width_; }
         set {
             if ( width_ != value ) {
@@ -104,7 +105,8 @@ public class exSprite : exSpriteBase {
         }
     }
 
-    override public float height {
+    [SerializeField] protected float height_ = 1.0f;
+    public float height {
         get { return height_; }
         set {
             if ( height_ != value ) {
@@ -145,47 +147,35 @@ public class exSprite : exSpriteBase {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    [ContextMenu ("Rebuild")]
-    void Rebuild () {
-        this.Build ( (Texture2D)exEditorRuntimeHelper.LoadAssetFromGUID( textureGUID, 
-                                                                         typeof(Texture2D)) );
+    [MenuItem ("GameObject/Create Other/ex2D/Sprite Object")]
+    static void CreateSpriteObject () {
+        GameObject go = new GameObject("SpriteObject");
+        go.AddComponent<exSprite>();
+        Selection.activeObject = go;
     }
 
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public void Build ( Texture2D _texture ) {
+    [ContextMenu ("Rebuild")]
+    void Rebuild () {
+        this.Build ( exEditorRuntimeHelper.LoadAssetFromGUID<Texture2D>( textureGUID ) );
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void Build ( Texture2D _texture = null ) {
         EditorUtility.SetDirty (this);
 
         //
-        if ( _texture == null ) {
+        if ( atlas == null && _texture == null ) {
             GetComponent<MeshFilter>().sharedMesh = null; 
             renderer.sharedMaterial = null;
             return;
         }
-
-        // DISABLE { 
-        // // save the mesh 
-        // string texturePath = AssetDatabase.GetAssetPath(_texture);
-        // string meshDirectory = Path.Combine( Path.GetDirectoryName(texturePath), "Meshes" );
-        // string meshPath = Path.Combine( meshDirectory, _texture.name + ".asset" );
-
-        // // create new mesh
-        // Mesh newMesh = (Mesh)AssetDatabase.LoadAssetAtPath(meshPath, typeof(Mesh));
-        // if ( newMesh == null ) {
-        //     newMesh = new Mesh();
-
-        //     // check if directory exists, if not, create one.
-        //     DirectoryInfo info = new DirectoryInfo(meshDirectory);
-        //     if ( info.Exists == false )
-        //         System.IO.Directory.CreateDirectory(meshDirectory);
-
-        //     // save
-        //     AssetDatabase.CreateAsset(newMesh, meshPath);
-        //     AssetDatabase.Refresh();
-        // }
-        // } DISABLE end 
 
         // NOTE: it is possible user duplicate an GameObject, 
         //       if we directly change the mesh, the original one will changed either.
@@ -226,17 +216,26 @@ public class exSprite : exSpriteBase {
         if ( atlas != null ) {
             renderer.sharedMaterial = atlas.material;
         }
-        else {
+        else if ( _texture != null ) {
             string texturePath = AssetDatabase.GetAssetPath(_texture);
+
+            // load material from "texture_path/Materials/texture_name.mat"
             string materialDirectory = Path.Combine( Path.GetDirectoryName(texturePath), "Materials" );
             string materialPath = Path.Combine( materialDirectory, _texture.name + ".mat" );
-
             Material newMaterial = (Material)AssetDatabase.LoadAssetAtPath(materialPath, typeof(Material));
+
+            // if not found, load material from "texture_path/texture_name.mat"
+            if ( newMaterial == null ) {
+                newMaterial = (Material)AssetDatabase.LoadAssetAtPath( Path.Combine( Path.GetDirectoryName(texturePath), 
+                                                                                     Path.GetFileNameWithoutExtension(texturePath) + ".mat" ), 
+                                                                       typeof(Material) );
+            }
+
             if ( newMaterial == null ) {
                 // check if directory exists, if not, create one.
                 DirectoryInfo info = new DirectoryInfo(materialDirectory);
                 if ( info.Exists == false )
-                    System.IO.Directory.CreateDirectory(materialDirectory);
+                    AssetDatabase.CreateFolder ( texturePath, "Materials" );
 
                 // create temp materal
                 newMaterial = new Material( Shader.Find("ex2D/Alpha Blended") );
@@ -258,11 +257,40 @@ public class exSprite : exSpriteBase {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    override public void UpdateMesh ( Mesh _mesh ) {
+    public void UpdateMesh ( Mesh _mesh ) {
 
         exAtlas.Element el = null;
         if ( useAtlas )
             el = atlas_.elements[index_];
+
+        // ======================================================== 
+        // get clip info first
+        // ======================================================== 
+
+        float clipLeft   = 0.0f; 
+        float clipRight  = 0.0f; 
+        float clipTop    = 0.0f; 
+        float clipBottom = 0.0f;
+
+        if ( clipInfo_.clipped ) {
+            if ( scale_.x >= 0.0f ) {
+                clipLeft = clipInfo_.left;
+                clipRight = clipInfo_.right;
+            }
+            else {
+                clipLeft = clipInfo_.right;
+                clipRight = clipInfo_.left;
+            }
+
+            if ( scale_.y >= 0.0f ) {
+                clipTop = clipInfo_.top;
+                clipBottom = clipInfo_.bottom;
+            }
+            else{
+                clipTop = clipInfo_.bottom;
+                clipBottom = clipInfo_.top;
+            }
+        }
 
         // ======================================================== 
         // Update Vertex
@@ -379,6 +407,12 @@ public class exSprite : exSpriteBase {
                 }
             }
 
+            //
+            float xMinClip = scale_.x * width  * ( -0.5f + clipLeft   );
+            float xMaxClip = scale_.x * width  * (  0.5f - clipRight  );
+            float yMinClip = scale_.y * height * ( -0.5f + clipTop    );
+            float yMaxClip = scale_.y * height * (  0.5f - clipBottom );
+
             // build vertices & normals
             for ( int r = 0; r < 2; ++r ) {
                 for ( int c = 0; c < 2; ++c ) {
@@ -388,6 +422,23 @@ public class exSprite : exSpriteBase {
                     float x = -halfWidth  + c * width_  * scale_.x;
                     float y =  halfHeight - r * height_ * scale_.y;
 
+                    // do clip
+                    if ( clipInfo_.clipped ) {
+                        if ( x <= xMinClip ) {
+                            x = xMinClip;
+                        }
+                        else if ( x >= xMaxClip ) {
+                            x = xMaxClip;
+                        }
+
+                        if ( y <= yMinClip ) {
+                            y = yMinClip;
+                        }
+                        else if ( y >= yMaxClip ) {
+                            y = yMaxClip;
+                        }
+                    }
+
                     // calculate the pos affect by anchor
                     x -= offsetX;
                     y += offsetY;
@@ -395,6 +446,18 @@ public class exSprite : exSpriteBase {
                     // calculate the shear
                     x += y * shear_.x;
                     y += x * shear_.y;
+
+                    // DISABLE: we use min,max clip above { 
+                    // // do clip
+                    // if ( clipInfo_.clipped ) {
+                    //     switch (i) {
+                    //     case 0: x += scale_.x * width_ * clipLeft;  y -= scale_.y * height_ * clipBottom; break; // bl
+                    //     case 1: x -= scale_.x * width_ * clipRight; y -= scale_.y * height_ * clipBottom; break; // br
+                    //     case 2: x += scale_.x * width_ * clipLeft;  y += scale_.y * height_ * clipTop; break; // tl
+                    //     case 3: x -= scale_.x * width_ * clipRight; y += scale_.y * height_ * clipTop; break; // tr
+                    //     }
+                    // }
+                    // } DISABLE end 
 
                     // build vertices, normals and uvs
                     switch ( plane ) {
@@ -415,7 +478,7 @@ public class exSprite : exSpriteBase {
             }
             _mesh.vertices = vertices;
             // _mesh.normals = normals;
-            _mesh.bounds = CalculateBounds( offsetX, offsetY, halfWidth, halfHeight );
+            _mesh.bounds = UpdateBounds ( offsetX, offsetY, halfWidth * 2.0f, halfHeight * 2.0f );
 
             // update box-collider if we have
             UpdateBoxCollider ( collider as BoxCollider, _mesh );
@@ -439,6 +502,14 @@ public class exSprite : exSpriteBase {
                 float xEnd    = el.coords.xMax;
                 float yEnd    = el.coords.yMax;
 
+                // do uv clip
+                if ( clipInfo_.clipped ) {
+                    xStart  += el.coords.width  * clipLeft;
+                    yStart  += el.coords.height * clipTop;
+                    xEnd    -= el.coords.width  * clipRight;
+                    yEnd    -= el.coords.height * clipBottom;
+                }
+
                 if ( el.rotated ) {
                     uvs[0] = new Vector2 ( xEnd,    yEnd );
                     uvs[1] = new Vector2 ( xEnd,    yStart );
@@ -457,6 +528,14 @@ public class exSprite : exSpriteBase {
                 float yStart  = trimUV.y;
                 float xEnd    = trimUV.xMax;
                 float yEnd    = trimUV.yMax;
+
+                // do uv clip
+                if ( clipInfo_.clipped ) {
+                    xStart  += trimUV.width  * clipLeft;
+                    yStart  += trimUV.height * clipTop;
+                    xEnd    -= trimUV.width  * clipRight;
+                    yEnd    -= trimUV.height * clipBottom;
+                }
 
                 uvs[0] = new Vector2 ( xStart,  yEnd );
                 uvs[1] = new Vector2 ( xEnd,    yEnd );
@@ -494,7 +573,8 @@ public class exSprite : exSpriteBase {
             _mesh.triangles = indices; 
         }
 
-        //
+        // NOTE: though we set updateFlags to None at exPlane::LateUpdate, 
+        //       the Editor still need this or it will caused editor keep dirty
         updateFlags = UpdateFlags.None;
     }
 
@@ -510,6 +590,18 @@ public class exSprite : exSpriteBase {
         _mesh.Clear();
         updateFlags = UpdateFlags.Vertex | UpdateFlags.UV | UpdateFlags.Color | UpdateFlags.Index;
         UpdateMesh( _mesh );
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    override protected void InternalUpdate () {
+        if ( meshFilter != null && 
+             meshFilter.sharedMesh != null ) 
+        {
+            UpdateMesh (meshFilter.sharedMesh);
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -571,6 +663,24 @@ public class exSprite : exSpriteBase {
     override protected void Awake () {
         base.Awake();
 
+        // DELME { 
+// #if UNITY_EDITOR
+//         if ( EditorApplication.isPlaying == false &&
+//              useAtlas &&
+//              string.IsNullOrEmpty(textureGUID) == false ) 
+//         {
+//             exAtlasDB.ElementInfo elInfo = exAtlasDB.GetElementInfo ( textureGUID );
+//             if ( elInfo != null &&
+//                  ( elInfo.indexInAtlas != index_ ||
+//                    elInfo.guidAtlas != exEditorRuntimeHelper.AssetToGUID(atlas_) ) ) 
+//             {
+//                 SetSprite( exEditorRuntimeHelper.LoadAssetFromGUID<exAtlas>(elInfo.guidAtlas),
+//                            elInfo.indexInAtlas );
+//             }
+//         }
+// #endif
+        // } DELME end 
+
         spanim = GetComponent<exSpriteAnimation>();
         if ( atlas_ != null ) {
             renderer.sharedMaterial = atlas_.material;
@@ -593,6 +703,16 @@ public class exSprite : exSpriteBase {
 #else
         meshFilter.sharedMesh = null;
 #endif
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public exAtlas.Element GetCurrentElement () {
+        if ( useAtlas )
+            return atlas_.elements[index_];
+        return null;
     }
 
     // ------------------------------------------------------------------ 
@@ -630,13 +750,18 @@ public class exSprite : exSpriteBase {
         //
         if ( checkSize && !customSize_ ) {
             exAtlas.Element el = atlas_.elements[index_];
-            float newWidth = el.coords.width * atlas_.texture.width;
-            float newHeight = el.coords.height * atlas_.texture.height;
+
+            float newWidth = el.trimRect.width;
+            float newHeight = el.trimRect.height;
+            // float newWidth = el.coords.width * atlas_.texture.width;
+            // float newHeight = el.coords.height * atlas_.texture.height;
+
             if ( el.rotated ) {
                 float tmp = newWidth;
                 newWidth = newHeight;
                 newHeight = tmp;
             } 
+
             if ( newWidth != width_ || newHeight != height_ ) {
                 width_ = newWidth;
                 height_ = newHeight;

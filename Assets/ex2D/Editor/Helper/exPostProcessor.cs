@@ -62,18 +62,23 @@ class ex2D_PostProcessor : AssetPostprocessor {
             }
         }
 
-        // DISABLE { 
-        // foreach ( string path in _deletedAssets ) {
-        //     Object o = AssetDatabase.LoadAssetAtPath ( path, typeof(exAtlasInfo) );
-        //     if ( o != null ) {
-        //         exAtlasInfo atlasInfo = o as exAtlasInfo;
-        //         foreach ( exAtlasInfo.Element el in AtlasInfoElements ) {
-        //             exAtlasDB.RemoveElement(el);
-        //         }
-        //         exAtlasDB.RemoveAtlas(atlasInfo);
-        //     }
-        // }
+        //
+        foreach ( string path in _deletedAssets ) {
+            if ( Path.GetExtension(path) == ".asset" ) {
+                string guid = AssetDatabase.AssetPathToGUID(path);
 
+                // check if we have the guid in the exAtlasInfo
+                if ( exAtlasDB.HasAtlasGUID( guid ) ) {
+                    exAtlasDB.RemoveAtlas(guid);
+                }
+                // check if we have the guid in the exSpriteAnimClip
+                else if ( exSpriteAnimationDB.HasSpriteAnimClipGUID( guid ) ) {
+                    exSpriteAnimationDB.RemoveSpriteAnimClip(guid);
+                }
+            }
+        }
+
+        // DISABLE { 
         // for ( int i = 0; i < _movedAssets.Length; ++i )
         //     Debug.Log("Moved Asset: " + _movedAssets[i] + " from: " + _movedFromAssetPaths[i]);
         // } DISABLE end 
@@ -108,7 +113,7 @@ class ex2D_SaveAssetsProcessor : SaveAssetsProcessor {
             if ( obj is exAtlasInfo ) {
                 exAtlasInfo atlasInfo = obj as exAtlasInfo;
                 if ( atlasInfo.needRebuild ) {
-                    exAtlasUtility.Build(atlasInfo);
+                    exAtlasInfoUtility.Build(atlasInfo);
                     rebuildAtlasInfos.Add(atlasInfo);
 
                     // build sprite animclip that used this atlasInfo
@@ -144,7 +149,7 @@ class ex2D_SaveAssetsProcessor : SaveAssetsProcessor {
         // post build 
         // ======================================================== 
 
-        exAtlasUtility.PostBuild (rebuildAtlasInfos);
+        exAtlasInfoUtility.PostBuild (rebuildAtlasInfos);
 
         // NOTE: without this you will got leaks message
         EditorUtility.UnloadUnusedAssets();

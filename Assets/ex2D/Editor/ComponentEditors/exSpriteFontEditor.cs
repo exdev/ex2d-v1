@@ -145,7 +145,7 @@ public class exSpriteFontEditor : exSpriteBaseEditor {
                                                                            , false 
 #endif
                                                                          );
-        if ( GUILayout.Button("Edit...", GUILayout.Width(40), GUILayout.Height(16) ) ) {
+        if ( GUILayout.Button("Edit...", GUILayout.Width(40), GUILayout.Height(15) ) ) {
             exBitmapFontEditor editor = exBitmapFontEditor.NewWindow();
             editor.Edit(editSpriteFont.fontInfo);
         }
@@ -330,6 +330,14 @@ public class exSpriteFontEditor : exSpriteBaseEditor {
                 Handles.DrawPolyLine( w_vertices );
             }
         }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    override protected void AddAnimationHelper () {
+        editSpriteFont.gameObject.AddComponent<exSpriteFontAnimHelper>();
     }
 }
 

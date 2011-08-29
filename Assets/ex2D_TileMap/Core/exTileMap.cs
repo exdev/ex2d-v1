@@ -142,7 +142,7 @@ public class exTileMap : exPlane {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    override public void UpdateMesh ( Mesh _mesh ) {
+    public void UpdateMesh ( Mesh _mesh ) {
 
         // ======================================================== 
         // Update Vertex
@@ -153,10 +153,10 @@ public class exTileMap : exPlane {
             Vector3[] vertices  = new Vector3[vertexCount];
 
             // init
-            width_ = col_ * tileWidth_;
-            height_ = row_ * tileHeight_;
-            float halfWidth = width_ * 0.5f;
-            float halfHeight = height_ * 0.5f;
+            float width = col_ * tileWidth_;
+            float height = row_ * tileHeight_;
+            float halfWidth = width * 0.5f;
+            float halfHeight = height * 0.5f;
             float offsetX = 0.0f;
             float offsetY = 0.0f;
             float curX = 0.0f;
@@ -256,6 +256,10 @@ public class exTileMap : exPlane {
             //
             _mesh.triangles = indices; 
         }
+
+        // NOTE: though we set updateFlags to None at exPlane::LateUpdate, 
+        //       the Editor still need this or it will caused editor keep dirty
+        updateFlags = UpdateFlags.None;
     }
 
     // ------------------------------------------------------------------ 
@@ -270,6 +274,18 @@ public class exTileMap : exPlane {
         _mesh.Clear();
         updateFlags = UpdateFlags.Index | UpdateFlags.Vertex | UpdateFlags.Color;
         UpdateMesh( _mesh );
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    override protected void InternalUpdate () {
+        if ( meshFilter != null && 
+             meshFilter.sharedMesh != null ) 
+        {
+            UpdateMesh (meshFilter.sharedMesh);
+        }
     }
 
     // ------------------------------------------------------------------ 

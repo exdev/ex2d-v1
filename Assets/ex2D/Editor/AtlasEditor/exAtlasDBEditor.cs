@@ -13,6 +13,7 @@ using UnityEngine;
 using UnityEditor;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 
 ///////////////////////////////////////////////////////////////////////////////
 // defines
@@ -32,6 +33,7 @@ public class exAtlasDBEditor : Editor {
             curEditTarget = target as exAtlasDB;
         }
         EditorGUIUtility.LookLikeInspector ();
+        EditorGUILayout.Space();
 
         // sync button
         EditorGUI.indentLevel = 1;
@@ -39,22 +41,27 @@ public class exAtlasDBEditor : Editor {
             exAtlasDB.ForceSync();
         }
 
-        // show data
+        // rebuild all
+        if ( GUILayout.Button ("Build All", GUILayout.Width(100)) ) {
+            exAtlasDB.BuildAll();
+        }
+
+        // show version
+        GUI.enabled = false;
+        EditorGUILayout.LabelField( "version", curEditTarget.curVersion.ToString() );
+        GUI.enabled = true;
+
+        // show atlasInfoGUIDs
         EditorGUI.indentLevel = 0;
         curEditTarget.showData = EditorGUILayout.Foldout(curEditTarget.showData, "Atlas Asset List");
         EditorGUI.indentLevel = 2;
         if ( curEditTarget.showData ) {
             GUI.enabled = false;
-            int i = 0;
-            foreach ( exAtlasInfo atlas in curEditTarget.data ) {
-                EditorGUILayout.ObjectField( "Atlas " + i 
-                                             , atlas 
-                                             , typeof(exAtlasInfo) 
-#if !UNITY_3_0 && !UNITY_3_1 && !UNITY_3_3
-                                             , false 
-#endif
-                                           );
-                ++i;
+            for ( int i = 0; i < curEditTarget.atlasInfoGUIDs.Count; ++i ) {
+                string guid = curEditTarget.atlasInfoGUIDs[i];
+                string path = AssetDatabase.GUIDToAssetPath(guid);
+                string atlasInfoName = Path.GetFileNameWithoutExtension (path);
+                EditorGUILayout.LabelField( "[" + i + "]",  atlasInfoName );
             }
             GUI.enabled = true;
         }
@@ -65,23 +72,10 @@ public class exAtlasDBEditor : Editor {
         EditorGUI.indentLevel = 2;
         if ( curEditTarget.showTable ) {
             GUI.enabled = false;
-            int i = 0;
-            foreach ( KeyValuePair<Texture2D,exAtlasInfo.Element> pair in exAtlasDB.GetTextureToElementTable() ) {
-                if ( pair.Key != null &&
-                     pair.Value != null &&
-                     pair.Value.atlasInfo != null ) 
-                {
-                    string label = pair.Value.atlasInfo.name 
-                        + " - " + pair.Value.coord[0] + ", " + pair.Value.coord[1];
-                    EditorGUILayout.ObjectField( label 
-                                                 , pair.Key 
-                                                 , typeof(Texture2D) 
-#if !UNITY_3_0 && !UNITY_3_1 && !UNITY_3_3
-                                                 , false 
-#endif
-                                               );
-                }
-                ++i;
+            foreach ( KeyValuePair<string,exAtlasDB.ElementInfo> pair in exAtlasDB.GetTexGUIDToElementInfo() ) {
+                string textureName = Path.GetFileNameWithoutExtension ( AssetDatabase.GUIDToAssetPath(pair.Key) );
+                string atlasName = Path.GetFileNameWithoutExtension ( AssetDatabase.GUIDToAssetPath(pair.Value.guidAtlas) );
+                EditorGUILayout.LabelField ( atlasName + "[" + pair.Value.indexInAtlas + "]", textureName );
             }
             GUI.enabled = true;
         }

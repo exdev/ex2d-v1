@@ -119,13 +119,15 @@ partial class exSpriteAnimClipEditor : EditorWindow {
         }
     }
 
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
+    // DISABLE: the focus only occur when main window lost foucs, then come in { 
+    // // ------------------------------------------------------------------ 
+    // // Desc: 
+    // // ------------------------------------------------------------------ 
 
-    void OnFocus () {
-        OnSelectionChange ();
-    }
+    // void OnFocus () {
+    //     OnSelectionChange ();
+    // }
+    // } DISABLE end 
 
     // ------------------------------------------------------------------ 
     // Desc: 
@@ -657,8 +659,10 @@ partial class exSpriteAnimClipEditor : EditorWindow {
             float fiHeight = 0.0f;
 
             //
-            exAtlasInfo.Element el = exAtlasDB.GetElement (frameInfo.textureGUID);
-            if ( el != null ) {
+            exAtlasDB.ElementInfo elInfo = exAtlasDB.GetElementInfo (frameInfo.textureGUID);
+            if ( elInfo != null ) {
+                exAtlasInfo atlasInfo = exEditorRuntimeHelper.LoadAssetFromGUID<exAtlasInfo>(elInfo.guidAtlasInfo);
+                exAtlasInfo.Element el = atlasInfo.elements[elInfo.indexInAtlasInfo];  
                 fiWidth = el.trimRect.width;
                 fiHeight = el.trimRect.height;
             } else {

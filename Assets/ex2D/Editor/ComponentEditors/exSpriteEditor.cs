@@ -26,7 +26,6 @@ public class exSpriteEditor : exSpriteBaseEditor {
     ///////////////////////////////////////////////////////////////////////////////
 
     private exSprite editSprite;
-    private Texture2D editTexture;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -36,14 +35,14 @@ public class exSpriteEditor : exSpriteBaseEditor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    static public void UpdateAtlas ( exSprite _sprite, exAtlasInfo.Element _el ) {
+    static public void UpdateAtlas ( exSprite _sprite, exAtlasDB.ElementInfo _elInfo ) {
         // get atlas and index from textureGUID
-        if ( _el != null ) {
-            int index = _el.atlasInfo.elements.IndexOf(_el);
-            if ( _el.atlasInfo.atlas != _sprite.atlas ||
-                 index != _sprite.index )
+        if ( _elInfo != null ) {
+            if ( _elInfo.guidAtlas != exEditorRuntimeHelper.AssetToGUID(_sprite.atlas) ||
+                 _elInfo.indexInAtlas != _sprite.index )
             {
-                _sprite.SetSprite( _el.atlasInfo.atlas, index );
+                _sprite.SetSprite( exEditorRuntimeHelper.LoadAssetFromGUID<exAtlas>(_elInfo.guidAtlas), 
+                                   _elInfo.indexInAtlas );
             }
         }
         else {
@@ -61,8 +60,6 @@ public class exSpriteEditor : exSpriteBaseEditor {
         base.OnEnable();
         if ( target != editSprite ) {
             editSprite = target as exSprite;
-            editTexture = (Texture2D)exEditorRuntimeHelper.LoadAssetFromGUID(editSprite.textureGUID, 
-                                                                       typeof(Texture2D));
         }
     }
 
@@ -80,116 +77,124 @@ public class exSpriteEditor : exSpriteBaseEditor {
         GUILayout.Space(20);
 
         // ======================================================== 
-        // 
+        // init values
         // ======================================================== 
 
+        // 
         bool needRebuild = false;
         MeshFilter meshFilter = editSprite.GetComponent<MeshFilter>();
-        EditorGUIUtility.LookLikeInspector ();
+
+        // get ElementInfo first
+        Texture2D editTexture = exEditorRuntimeHelper.LoadAssetFromGUID<Texture2D>(editSprite.textureGUID); 
+
+        // ======================================================== 
+        // Texture preview (input)
+        // ======================================================== 
+
+        bool textureChanged = false;
         EditorGUI.indentLevel = 1;
 
-        // check if we can build the mesh 
-        if ( editSprite.GetComponent<MeshRenderer>() == null ||
-             meshFilter == null ) 
-        {
-            GUIStyle style = new GUIStyle();
-            style.fontStyle = FontStyle.Bold;
-            style.normal.textColor = Color.red;
-            GUILayout.Label( "Can't find MeshRenderer and MeshFilter in edit editSprite", style );
-            return;
-        }
-
-        // first time build.
-        if ( editTexture != null ) {
-            if ( editSprite.renderer.sharedMaterial == null ) {
-                needRebuild = true;
-                // Debug.Log("rebuild editSprite.renderer.sharedMaterial == null");
-            }
-            else if ( meshFilter.sharedMesh == null ) {
-                bool isPrefab = (EditorUtility.GetPrefabType(target) == PrefabType.Prefab); 
-                if ( isPrefab == false ) {
-                    needRebuild = true;
-                    // Debug.Log("rebuild editSprite.renderer.sharedMesh == null");
-                }
-            }
-        }
-
-        // ======================================================== 
-        // get texture
-        // ======================================================== 
-
-        EditorGUIUtility.LookLikeControls ();
-        bool textureChanged = false;
         GUI.enabled = !inAnimMode;
         GUILayout.BeginHorizontal();
         GUILayout.Space(20);
-        Texture2D newTexture = (Texture2D)EditorGUILayout.ObjectField( editTexture
-                                                                       , typeof(Texture2D)
+            EditorGUIUtility.LookLikeControls ();
+            Texture2D newTexture = (Texture2D)EditorGUILayout.ObjectField( editTexture
+                                                                           , typeof(Texture2D)
 #if !UNITY_3_0 && !UNITY_3_1 && !UNITY_3_3
-                                                                       , false
+                                                                           , false
 #endif
-                                                                       , GUILayout.Width(100)
-                                                                       , GUILayout.Height(100) 
-                                                                     );
-        if ( newTexture != editTexture ) {
-            editSprite.textureGUID = newTexture ? exEditorRuntimeHelper.GetPathGUID(newTexture) : "";
-            editTexture = newTexture;
-            if ( editTexture ) {
-                if ( editSprite.customSize == false ) {
-                    editSprite.width = editSprite.trimUV.width * editTexture.width;
-                    editSprite.height = editSprite.trimUV.height * editTexture.height;
-                }
+                                                                           , GUILayout.Width(100)
+                                                                           , GUILayout.Height(100) 
+                                                                         );
+            EditorGUIUtility.LookLikeInspector ();
+            if ( newTexture != editTexture ) {
+                editTexture = newTexture;
+                editSprite.textureGUID = exEditorRuntimeHelper.AssetToGUID(editTexture);
+                textureChanged = true;
             }
-            else {
-                editSprite.width = 1;
-                editSprite.height = 1;
-            }
-            textureChanged = true;
-        }
-        GUILayout.Space(10);
-        GUILayout.BeginVertical();
-            GUILayout.Space(90);
-            GUILayout.Label ( newTexture ? newTexture.name : "None" );
-        GUILayout.EndVertical();
+            GUILayout.Space(10);
+            GUILayout.BeginVertical();
+                GUILayout.Space(90);
+                GUILayout.Label ( editTexture ? editTexture.name : "None" );
+            GUILayout.EndVertical();
         GUILayout.EndHorizontal();
         GUI.enabled = true;
-        EditorGUIUtility.LookLikeInspector ();
-
-        exAtlasInfo.Element el = exAtlasDB.GetElement(editTexture);
 
         // ======================================================== 
+        // get atlas element info from atlas database 
+        // ======================================================== 
+
+        exAtlas editAtlas = null; 
+        int editIndex = -1; 
+        exAtlasDB.ElementInfo elInfo = exAtlasDB.GetElementInfo(editSprite.textureGUID);
+        if ( elInfo != null ) {
+            editAtlas = exEditorRuntimeHelper.LoadAssetFromGUID<exAtlas>(elInfo.guidAtlas);
+            editIndex = elInfo.indexInAtlas;
+        }
+        bool useAtlas = editAtlas != null && editIndex != -1; 
+
         // get atlas and index from textureGUID
-        // ======================================================== 
-
         if ( !EditorApplication.isPlaying ) {
-            if ( el != null ) {
-                int index = el.atlasInfo.elements.IndexOf(el);;
-
-                // ======================================================== 
-                // check atlas and index  
-                // ======================================================== 
-
-                if ( el.atlasInfo.atlas != editSprite.atlas ||
-                     index != editSprite.index )
+            // if we use atlas, check if the atlas,index changes
+            if ( useAtlas ) {
+                if ( editAtlas != editSprite.atlas ||
+                     editIndex != editSprite.index )
                 {
-                    editSprite.SetSprite( el.atlasInfo.atlas, index );
-                }
-
-                // ======================================================== 
-                // check material
-                // ======================================================== 
-
-                if ( editSprite.renderer.sharedMaterial != el.atlasInfo.material ) {
-                    needRebuild = true;
-                    // Debug.Log("rebuild editSprite.renderer.sharedMaterial != el.atlasInfo.material");
+                    editSprite.SetSprite( editAtlas, editIndex );
                 }
             }
+            // if we don't use atlas and current edit target use atlas, clear it.
             else {
-                if ( editSprite.atlas ) {
+                if ( editSprite.useAtlas )
                     editSprite.Clear();
+            }
+
+            // check if we are first time assignment
+            if ( useAtlas || editTexture != null ) {
+                if ( editSprite.renderer.sharedMaterial == null ) {
+                    needRebuild = true;
+                }
+                else if ( meshFilter.sharedMesh == null ) {
+                    bool isPrefab = (EditorUtility.GetPrefabType(target) == PrefabType.Prefab); 
+                    if ( isPrefab == false ) {
+                        needRebuild = true;
+                    }
                 }
             }
         }
+
+        // ======================================================== 
+        // get trimTexture
+        // ======================================================== 
+
+        GUI.enabled = !inAnimMode && !useAtlas;
+        bool newTrimTexture = EditorGUILayout.Toggle ( "Trim Texture", editSprite.trimTexture );
+        if ( !useAtlas && 
+             (textureChanged || newTrimTexture != editSprite.trimTexture) ) {
+            editSprite.trimTexture = newTrimTexture; 
+
+            // get trimUV
+            Rect trimUV = new Rect( 0, 0, 1, 1 );
+            if ( editTexture != null ) {
+                
+                if ( editSprite.trimTexture ) {
+                    exTextureHelper.ImportTextureForAtlas(editTexture);
+                    trimUV = exTextureHelper.GetTrimTextureRect(editTexture);
+                    trimUV = new Rect( trimUV.x/editTexture.width,
+                                       (editTexture.height - trimUV.height - trimUV.y)/editTexture.height,
+                                       trimUV.width/editTexture.width,
+                                       trimUV.height/editTexture.height );
+                }
+
+                if ( editSprite.customSize == false ) {
+                    editSprite.width = trimUV.width * editTexture.width;
+                    editSprite.height = trimUV.height * editTexture.height;
+                }
+            }
+            editSprite.trimUV = trimUV;
+            needRebuild = true;
+        }
+        GUI.enabled = true;
 
         // ======================================================== 
         // color
@@ -213,7 +218,7 @@ public class exSpriteEditor : exSpriteBaseEditor {
         GUI.enabled = true;
 
         GUI.enabled = !inAnimMode;
-        if ( GUILayout.Button("Edit...", GUILayout.Width(50), GUILayout.Height(15) ) ) {
+        if ( GUILayout.Button("Edit...", GUILayout.Width(40), GUILayout.Height(15) ) ) {
             exAtlasEditor editor = exAtlasEditor.NewWindow();
             editor.Edit(editSprite.atlas);
         }
@@ -222,39 +227,6 @@ public class exSpriteEditor : exSpriteBaseEditor {
 
         GUI.enabled = false;
         EditorGUILayout.IntField( "Index", editSprite.index );
-        GUI.enabled = true;
-
-        // ======================================================== 
-        // get trimTexture
-        // ======================================================== 
-
-        GUI.enabled = !inAnimMode && (editSprite.atlas == null);
-        bool newTrimTexture = EditorGUILayout.Toggle ( "Trim Texture", editSprite.trimTexture );
-        if ( editSprite.atlas == null && (textureChanged || newTrimTexture != editSprite.trimTexture) ) {
-            editSprite.trimTexture = newTrimTexture; 
-
-            // get trimUV
-            Rect trimUV = new Rect( 0, 0, 1, 1 );
-            if ( editTexture != null ) {
-                
-                if ( editSprite.trimTexture ) {
-                    exTextureHelper.ImportTextureForAtlas(editTexture);
-                    trimUV = exTextureHelper.GetTrimTextureRect(editTexture);
-                    trimUV = new Rect( trimUV.x/editTexture.width,
-                                       (editTexture.height - trimUV.height - trimUV.y)/editTexture.height,
-                                       trimUV.width/editTexture.width,
-                                       trimUV.height/editTexture.height );
-                }
-
-                if ( editSprite.customSize == false ) {
-                    editSprite.width = trimUV.width * editTexture.width;
-                    editSprite.height = trimUV.height * editTexture.height;
-                }
-            }
-            editSprite.trimUV = trimUV;
-            needRebuild = true;
-            // Debug.Log("newTrimTexture");
-        }
         GUI.enabled = true;
 
         // ======================================================== 
@@ -295,13 +267,14 @@ public class exSpriteEditor : exSpriteBaseEditor {
         GUILayout.BeginHorizontal();
         GUILayout.Space(30);
         if ( GUILayout.Button("Reset to original...", GUILayout.Width(150) ) ) {
-            if ( el != null ) {
+            if ( useAtlas ) {
+                exAtlas.Element el = editAtlas.elements[editIndex];
                 editSprite.width = el.trimRect.width;
                 editSprite.height = el.trimRect.height;
             }
-            else if ( newTexture ) {
-                editSprite.width = editSprite.trimUV.width * newTexture.width;
-                editSprite.height = editSprite.trimUV.height * newTexture.height;
+            else if ( editTexture ) {
+                editSprite.width = editSprite.trimUV.width * editTexture.width;
+                editSprite.height = editSprite.trimUV.height * editTexture.height;
             }
             GUI.changed = true;
         }
@@ -330,7 +303,6 @@ public class exSpriteEditor : exSpriteBaseEditor {
                 editSprite.Build( editTexture );
             }
             else if ( GUI.changed ) {
-                // Debug.Log("update mesh...");
                 if ( meshFilter.sharedMesh != null )
                     editSprite.UpdateMesh( meshFilter.sharedMesh );
                 EditorUtility.SetDirty(editSprite);
@@ -360,5 +332,25 @@ public class exSpriteEditor : exSpriteBaseEditor {
             w_vertices[4] = w_vertices[0];
             Handles.DrawPolyLine( w_vertices );
         }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void AtlasTextureField ( Rect _rect, exAtlas _atlas, int _index, Texture2D _texture ) {
+
+        exEditorHelper.DrawRect ( _rect, Color.gray, Color.black );
+
+
+        GUILayoutUtility.GetRect ( _rect.width, _rect.height );
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    override protected void AddAnimationHelper () {
+        editSprite.gameObject.AddComponent<exSpriteAnimHelper>();
     }
 }

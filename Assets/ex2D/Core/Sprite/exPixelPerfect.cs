@@ -49,25 +49,6 @@ public class exPixelPerfect : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public static void MakePixelPerfect ( exSpriteBase _sp, 
-                                          Camera _camera, 
-                                          float _screenWidth, 
-                                          float _screenHeight ) {
-        float s = 1.0f;
-        if ( _camera.orthographic ) {
-            s =  2.0f * _camera.orthographicSize / _screenHeight;
-        }
-        else {
-            float ratio = 2.0f * Mathf.Tan(Mathf.Deg2Rad * _camera.fov * 0.5f) / _screenHeight;
-            s = ratio * ( _sp.transform.position.z - _camera.transform.position.z );
-        }
-		_sp.scale = new Vector2( Mathf.Sign(_sp.scale.x) * s, Mathf.Sign(_sp.scale.y) * s );
-    }
-
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
     void Awake () {
         sprite = GetComponent<exSpriteBase>();
         if ( camera_ == null )
@@ -80,7 +61,7 @@ public class exPixelPerfect : MonoBehaviour {
 
     void Update () {
         if ( sprite ) {
-            MakePixelPerfect ( sprite, camera_, Screen.width, Screen.height );
+            sprite.MakePixelPerfect ( camera_, Screen.width, Screen.height );
         }
     }
 }

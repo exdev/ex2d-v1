@@ -65,45 +65,51 @@ partial class exSpriteAnimClipEditor {
             // draw the preview
             exSpriteAnimClip.FrameInfo fi = curEdit.GetFrameInfoBySeconds(curSeconds, curEdit.wrapMode);
             if ( fi != null ) {
-                exAtlasInfo.Element el = exAtlasDB.GetElement (fi.textureGUID);
-                if ( el != null ) {
-                    float width = el.texture.width;
-                    float height = el.texture.height;
-                    float offsetX = (width - el.trimRect.width) * 0.5f - el.trimRect.x;
-                    float offsetY = (height - el.trimRect.height) * 0.5f - el.trimRect.y;
+                exAtlasDB.ElementInfo elInfo = exAtlasDB.GetElementInfo (fi.textureGUID);
 
-                    Rect frameRect = new Rect( -el.trimRect.x * previewScale, 
-                                               -el.trimRect.y * previewScale, 
-                                               width * previewScale, 
-                                               height * previewScale );
-                    Rect rect2 = new Rect ( (_rect.width - el.trimRect.width * previewScale) * 0.5f - offsetX,
-                                            (_rect.height - el.trimRect.height * previewScale) * 0.5f - offsetY,
-                                            el.trimRect.width * previewScale, 
-                                            el.trimRect.height * previewScale );
+                if ( elInfo != null ) {
+                    exAtlasInfo atlasInfo = exEditorRuntimeHelper.LoadAssetFromGUID<exAtlasInfo>(elInfo.guidAtlasInfo);
+                    exAtlasInfo.Element el = atlasInfo.elements[elInfo.indexInAtlasInfo];  
 
-                    GUI.BeginGroup( _rect );
-                        // draw background
-                        // Color old = GUI.color;
-                        // GUI.color = new Color( 1.0f, 0.0f, 0.85f, 0.2f );
-                        //     GUI.DrawTexture( rect2, exEditorHelper.WhiteTexture() );
-                        // GUI.color = old;
+                    if ( el.texture != null ) {
+                        float width = el.texture.width;
+                        float height = el.texture.height;
+                        float offsetX = (width - el.trimRect.width) * 0.5f - el.trimRect.x;
+                        float offsetY = (height - el.trimRect.height) * 0.5f - el.trimRect.y;
 
-                        // draw texture
-                        GUI.BeginGroup( rect2 );
-                            GUI.BeginGroup( new Rect( (rect2.width - el.trimRect.width * previewScale) * 0.5f,
-                                                      (rect2.height - el.trimRect.height * previewScale) * 0.5f,
-                                                      el.trimRect.width * previewScale, 
-                                                      el.trimRect.height * previewScale ) );
-                                GUI.DrawTexture( frameRect, el.texture );
+                        Rect frameRect = new Rect( -el.trimRect.x * previewScale, 
+                                                   -el.trimRect.y * previewScale, 
+                                                   width * previewScale, 
+                                                   height * previewScale );
+                        Rect rect2 = new Rect ( (_rect.width - el.trimRect.width * previewScale) * 0.5f - offsetX,
+                                                (_rect.height - el.trimRect.height * previewScale) * 0.5f - offsetY,
+                                                el.trimRect.width * previewScale, 
+                                                el.trimRect.height * previewScale );
+
+                        GUI.BeginGroup( _rect );
+                            // draw background
+                            // Color old = GUI.color;
+                            // GUI.color = new Color( 1.0f, 0.0f, 0.85f, 0.2f );
+                            //     GUI.DrawTexture( rect2, exEditorHelper.WhiteTexture() );
+                            // GUI.color = old;
+
+                            // draw texture
+                            GUI.BeginGroup( rect2 );
+                                GUI.BeginGroup( new Rect( (rect2.width - el.trimRect.width * previewScale) * 0.5f,
+                                                          (rect2.height - el.trimRect.height * previewScale) * 0.5f,
+                                                          el.trimRect.width * previewScale, 
+                                                          el.trimRect.height * previewScale ) );
+                                    GUI.DrawTexture( frameRect, el.texture );
+                                GUI.EndGroup();
                             GUI.EndGroup();
-                        GUI.EndGroup();
 
-                        // draw border
-                        // Color oldBGColor = GUI.backgroundColor;
-                        // GUI.backgroundColor = Color.black;
-                        //     GUI.Box ( rect2, GUIContent.none, exEditorHelper.RectBorderStyle() );
-                        // GUI.backgroundColor = oldBGColor;
-                    GUI.EndGroup();
+                            // draw border
+                            // Color oldBGColor = GUI.backgroundColor;
+                            // GUI.backgroundColor = Color.black;
+                            //     GUI.Box ( rect2, GUIContent.none, exEditorHelper.RectBorderStyle() );
+                            // GUI.backgroundColor = oldBGColor;
+                        GUI.EndGroup();
+                    }
                 }
                 else {
                     string texturePath = AssetDatabase.GUIDToAssetPath(fi.textureGUID);

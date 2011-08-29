@@ -21,10 +21,24 @@ using System.IO;
 
 public class exAtlasDB : ScriptableObject {
 
-    // [HideInInspector]
-    public List<exAtlasInfo> data = new List<exAtlasInfo>();
-    public Dictionary<Texture2D,exAtlasInfo.Element> 
-        textureToElement = new Dictionary<Texture2D,exAtlasInfo.Element>();
+    [System.Serializable]
+    public class ElementInfo {
+        public int indexInAtlas;
+        public int indexInAtlasInfo;
+        public string guidTexture;
+        public string guidAtlas;
+        public string guidAtlasInfo;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////
+    // properties
+    ///////////////////////////////////////////////////////////////////////////////
+
+    public int curVersion = version;
+    public List<string> atlasInfoGUIDs = new List<string>();
+    public List<ElementInfo> elementInfos = new List<ElementInfo>();
+    public Dictionary<string,ElementInfo> 
+        texGUIDToElementInfo = new Dictionary<string,ElementInfo>();
 
     // editor
     public bool showData = true;
@@ -34,6 +48,7 @@ public class exAtlasDB : ScriptableObject {
     // static
     ///////////////////////////////////////////////////////////////////////////////
 
+    static int version = 2;
     static bool needSync = false;
     static exAtlasDB db;
 
@@ -45,7 +60,6 @@ public class exAtlasDB : ScriptableObject {
         if ( db == null )
             CreateDB ();
 
-        needSync = true;
         SyncRoot();
     }
 
@@ -53,13 +67,34 @@ public class exAtlasDB : ScriptableObject {
     // Desc: 
     // ------------------------------------------------------------------ 
 
+    static public void BuildAll () {
+        if ( db == null )
+            CreateDB ();
+
+        foreach ( string guidAtlasInfo in db.atlasInfoGUIDs ) {
+            exAtlasInfo atlasInfo = exEditorRuntimeHelper.LoadAssetFromGUID<exAtlasInfo>(guidAtlasInfo);
+            exAtlasInfoUtility.Build ( atlasInfo );
+
+            atlasInfo = null;
+            EditorUtility.UnloadUnusedAssets();
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
     static void SyncRoot () {
-        db.data.Clear();
-        db.textureToElement.Clear();
+        db.atlasInfoGUIDs.Clear();
+        db.elementInfos.Clear();
+        db.texGUIDToElementInfo.Clear();
 
         EditorUtility.DisplayProgressBar( "Syncing exAtlasDB...", "Syncing...", 0.5f );    
         SyncDirectory ("Assets");
+        EditorUtility.UnloadUnusedAssets();
         EditorUtility.ClearProgressBar();    
+
+        EditorUtility.SetDirty(db);
     }
 
     // ------------------------------------------------------------------ 
@@ -70,9 +105,12 @@ public class exAtlasDB : ScriptableObject {
         // Process the list of files found in the directory.
         string [] files = Directory.GetFiles(_path, "*.asset");
         foreach ( string fileName in files ) {
-            exAtlasInfo atlas = (exAtlasInfo)AssetDatabase.LoadAssetAtPath( fileName, typeof(exAtlasInfo) );
-            if ( atlas ) {
-                AddAtlas(atlas);
+            exAtlasInfo atlasInfo = (exAtlasInfo)AssetDatabase.LoadAssetAtPath( fileName, typeof(exAtlasInfo) );
+            if ( atlasInfo ) {
+                AddAtlas(atlasInfo);
+
+                atlasInfo = null;
+                EditorUtility.UnloadUnusedAssets();
             }
         }
 
@@ -81,9 +119,6 @@ public class exAtlasDB : ScriptableObject {
         foreach( string dirName in dirs ) {
             SyncDirectory ( dirName);
         }
-
-        //
-        EditorUtility.SetDirty(db);
     }
 
     // ------------------------------------------------------------------ 
@@ -97,7 +132,12 @@ public class exAtlasDB : ScriptableObject {
             db = ScriptableObject.CreateInstance<exAtlasDB>();
             AssetDatabase.CreateAsset( db, "Assets/.ex2D_AtlasDB.asset" );
             needSync = true;
-        } 
+        }
+        if ( version != db.curVersion ) {
+            db.curVersion = version;
+            needSync = true;
+            EditorUtility.SetDirty(db);
+        }
     }
 
     // ------------------------------------------------------------------ 
@@ -117,17 +157,11 @@ public class exAtlasDB : ScriptableObject {
             // update atlas elements in db.
             else {
                 // create atlas element table
-                for ( int i = 0; i < db.data.Count; ++i ) {
-                    exAtlasInfo atlas = db.data[i];
-                    if ( atlas == null ) {
-                        db.data.RemoveAt(i);
-                        --i;
-                        continue;
-                    }
-
-                    foreach ( exAtlasInfo.Element el in atlas.elements ) {
-                        UpdateElement(el);
-                    }
+                foreach ( ElementInfo elInfo in db.elementInfos ) {
+                    AddElementInfo( elInfo.guidTexture, 
+                                    elInfo.guidAtlas,
+                                    elInfo.guidAtlasInfo,
+                                    elInfo.indexInAtlas );
                 }
 
                 EditorUtility.SetDirty(db);
@@ -139,10 +173,20 @@ public class exAtlasDB : ScriptableObject {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    static public Dictionary<Texture2D,exAtlasInfo.Element> GetTextureToElementTable () {
+    static public Dictionary<string,ElementInfo> GetTexGUIDToElementInfo () {
         Init();
 
-        return db.textureToElement; 
+        return db.texGUIDToElementInfo; 
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    static public bool HasAtlasGUID ( string _guid ) {
+        Init();
+
+        return db.atlasInfoGUIDs.IndexOf(_guid) != -1;
     }
 
     // ------------------------------------------------------------------ 
@@ -152,87 +196,175 @@ public class exAtlasDB : ScriptableObject {
     static public void AddAtlas ( exAtlasInfo _a ) {
         Init();
 
-        if ( db.data.Contains(_a) == false ) {
-            db.data.Add(_a);
-            foreach ( exAtlasInfo.Element el in _a.elements ) {
-                UpdateElement(el);
+        string guid = exEditorRuntimeHelper.AssetToGUID (_a);
+        if ( db.atlasInfoGUIDs.Contains(guid) == false ) {
+            db.atlasInfoGUIDs.Add(guid);
+            for ( int i = 0; i < _a.elements.Count; ++i ) {
+                ElementInfo elInfo = AddElementInfo( _a.elements[i], i);
+                if ( elInfo != null )
+                    db.elementInfos.Add(elInfo);
+            }
+            EditorUtility.SetDirty(db);
+        }
+    }
+
+    // DISABLE: no use { 
+    // // ------------------------------------------------------------------ 
+    // // Desc: 
+    // // ------------------------------------------------------------------ 
+
+    // static public void RemoveAtlas ( exAtlasInfo _a ) {
+    //     Init();
+
+    //     string guid = exEditorRuntimeHelper.AssetToGUID (_a);
+    //     foreach ( exAtlasInfo.Element el in _a.elements ) {
+    //         RemoveElementInfo(exEditorRuntimeHelper.AssetToGUID(el.texture));
+    //     }
+    //     db.atlasInfoGUIDs.Remove(guid);
+    //     EditorUtility.SetDirty(db);
+    // }
+    // } DISABLE end 
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    static public void RemoveAtlas ( string _atlasInfoGUID ) {
+        Init();
+
+        // get ElementInfo that have the same atlasInfo guid to remove list 
+        List<string> removedItems = new List<string>();
+        foreach ( KeyValuePair<string,exAtlasDB.ElementInfo> pair in db.texGUIDToElementInfo ) {
+            if ( pair.Value.guidAtlasInfo == _atlasInfoGUID ) {
+                removedItems.Add(pair.Key);
             }
         }
-    }
 
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
-    static public void RemoveAtlas ( exAtlasInfo _a ) {
-        Init();
-
-        foreach ( exAtlasInfo.Element el in _a.elements ) {
-            RemoveElement(el);
+        // remove these elements
+        foreach ( string textureGUID in removedItems ) {
+            RemoveElementInfo(textureGUID);
         }
-        db.data.Remove(_a);
+
+        // remove atlas info
+        db.atlasInfoGUIDs.Remove(_atlasInfoGUID);
+        EditorUtility.SetDirty(db);
     }
 
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    static public void UpdateElement ( exAtlasInfo.Element _el ) {
+    static ElementInfo AddElementInfo ( exAtlasInfo.Element _el, int _index ) {
         Init();
 
-        if ( _el.isFontElement == false && db.textureToElement.ContainsKey(_el.texture) ) {
-            exAtlasInfo.Element exists_el = db.textureToElement[_el.texture];
-            Debug.LogError ( "The texture: [" + exists_el.texture.name + "]" +
-                             "has been added in atlas: " + AssetDatabase.GetAssetPath(exists_el.atlasInfo) 
-                             + ", The new element in atlas: " + AssetDatabase.GetAssetPath(exists_el.atlasInfo) 
-                             + " will not be added. please delete the incorrect data by yourself." );
-            return;
+        if ( _el.isFontElement )
+            return null;
+
+        string textureGUID = exEditorRuntimeHelper.AssetToGUID(_el.texture);
+        return AddElementInfo ( textureGUID,
+                                exEditorRuntimeHelper.AssetToGUID(_el.atlasInfo.atlas), 
+                                exEditorRuntimeHelper.AssetToGUID(_el.atlasInfo),
+                                _index );
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    static ElementInfo AddElementInfo ( string _textureGUID, 
+                                        string _atlasGUID, 
+                                        string _atlasInfoGUID,
+                                        int _index ) 
+    {
+        Init();
+
+        if ( db.texGUIDToElementInfo.ContainsKey(_textureGUID) ) {
+            ElementInfo existsElInfo = GetElementInfo(_textureGUID);
+            Debug.LogError ( "The texture: " + AssetDatabase.GUIDToAssetPath(existsElInfo.guidTexture) + 
+                             " has been added in atlas: " + Path.GetFileNameWithoutExtension(AssetDatabase.GUIDToAssetPath(existsElInfo.guidAtlasInfo)) 
+                             + ", The new element in atlas: " + Path.GetFileNameWithoutExtension(AssetDatabase.GUIDToAssetPath(_atlasInfoGUID)) 
+                             + " will not be added. please delete the incorrect data." );
+            return null;
         }
-        db.textureToElement[_el.texture] = _el;
+
+        ElementInfo elInfo = new ElementInfo();
+        elInfo.indexInAtlas = _index;
+        elInfo.indexInAtlasInfo = _index;
+        elInfo.guidTexture = _textureGUID;
+        elInfo.guidAtlas = _atlasGUID; 
+        elInfo.guidAtlasInfo = _atlasInfoGUID;
+        db.texGUIDToElementInfo[_textureGUID] = elInfo;
+        return elInfo;
     }
 
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    static public void RemoveElement ( exAtlasInfo.Element _el ) {
+    static public void UpdateElementInfo ( exAtlasInfo.Element _el, int _index ) {
         Init();
 
-        db.textureToElement.Remove(_el.texture);
+        ElementInfo elInfo = null;
+        string textureGUID = exEditorRuntimeHelper.AssetToGUID(_el.texture);
+        if ( db.texGUIDToElementInfo.ContainsKey(textureGUID) == false ) {
+            elInfo = AddElementInfo (_el, _index);
+            if ( elInfo != null )
+                db.elementInfos.Add(elInfo);
+        }
+        else {
+            elInfo = db.texGUIDToElementInfo[textureGUID];
+            elInfo.indexInAtlas = _index;
+            elInfo.indexInAtlasInfo = _index;
+        }
     }
 
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    static public exAtlasInfo.Element GetElement ( string _guid ) {
+    static public void RemoveElementInfo ( string _textureGUID ) {
         Init();
 
-        //
-        string texturePath = AssetDatabase.GUIDToAssetPath(_guid);
-        Texture2D tex2D = (Texture2D)AssetDatabase.LoadAssetAtPath( texturePath, typeof(Texture2D));
-        return GetElement(tex2D);
+        if ( db.texGUIDToElementInfo.ContainsKey(_textureGUID) ) {
+            db.elementInfos.Remove(db.texGUIDToElementInfo[_textureGUID]);
+            db.texGUIDToElementInfo.Remove(_textureGUID);
+        }
     }
 
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    static public exAtlasInfo.Element GetElement ( Texture2D _tex ) {
+    static public ElementInfo GetElementInfo ( Texture2D _tex ) {
         Init();
 
         if ( _tex == null )
             return null;
 
+        return GetElementInfo( exEditorRuntimeHelper.AssetToGUID(_tex) );
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    static public ElementInfo GetElementInfo ( string _textureGUID ) {
+        Init();
+
         //
-        if ( db.textureToElement.ContainsKey(_tex) ) {
-            exAtlasInfo.Element el = db.textureToElement[_tex]; 
-            // NOTE: when atlas been removed, it never notify the exAtlasDB to remove elements  
-            if ( el.atlasInfo == null ) {
-                RemoveElement (el);
-                return null;
-            }
-            return el;
+        if ( db.texGUIDToElementInfo.ContainsKey(_textureGUID) ) {
+            ElementInfo elInfo = db.texGUIDToElementInfo[_textureGUID]; 
+
+            // DELME: we don't need this anymore { 
+            // // NOTE: when atlas been removed, it never notify the exAtlasDB to remove elements  
+            // exAtlasInfo atlasInfo = exEditorRuntimeHelper.LoadAssetFromGUID<exAtlasInfo>(elInfo.guidAtlasInfo);
+            // if ( atlasInfo == null ) {
+            //     RemoveElementInfo (_textureGUID);
+            //     return null;
+            // }
+            // } DELME end 
+
+            return elInfo;
         }
 
         //

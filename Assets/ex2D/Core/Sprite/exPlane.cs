@@ -63,6 +63,48 @@ public class exPlane : MonoBehaviour {
 		BotRight,
     }
 
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    [System.Serializable]
+    public class ClipInfo {
+
+        static public bool operator == ( ClipInfo _a, ClipInfo _b ) { return _a.Equals(_b); }
+        static public bool operator != ( ClipInfo _a, ClipInfo _b ) { return !_a.Equals(_b); }
+
+        public bool clipped = false; 
+        public float top    = 0.0f; // percentage of clipped top
+        public float bottom = 0.0f; // percentage of clipped bottom
+        public float left   = 0.0f; // percentage of clipped left
+        public float right  = 0.0f; // percentage of clipped right
+
+        public override int GetHashCode() { 
+            return Mathf.FloorToInt(top * 10.0f) 
+                ^ Mathf.FloorToInt(bottom * 10.0f) 
+                ^ Mathf.FloorToInt(left * 10.0f) 
+                ^ Mathf.FloorToInt(right * 10.0f) 
+                ;
+        }
+        public override bool Equals ( object _obj ) {
+            if ( !(_obj is ClipInfo) )
+                return false;
+
+            return Equals((ClipInfo)_obj);
+        }
+        public bool Equals ( ClipInfo _other ) {
+            if ( clipped != _other.clipped ||
+                 top != _other.top ||
+                 bottom != _other.bottom ||
+                 left != _other.left ||
+                 right != _other.right )
+            {
+                return false;
+            }
+            return true;
+        }
+    }
+
     ///////////////////////////////////////////////////////////////////////////////
     // properties
     ///////////////////////////////////////////////////////////////////////////////
@@ -89,25 +131,44 @@ public class exPlane : MonoBehaviour {
         }
     }
 
-    [SerializeField] protected float width_ = 1.0f;
-    virtual public float width {
-        get { return width_; }
-        set { Debug.LogError("Readonly"); }
-    }
-
-    [SerializeField] protected float height_ = 1.0f;
-    virtual public float height {
-        get { return height_; }
-        set { Debug.LogError("Readonly"); }
-    }
-
     ///////////////////////////////////////////////////////////////////////////////
     // Non Serialized
     ///////////////////////////////////////////////////////////////////////////////
 
     [System.NonSerialized] public exLayer2D layer2d;
+    // NOTE: I only public this for exAnimationHelper, user should not set it
+	[System.NonSerialized] public UpdateFlags updateFlags = UpdateFlags.None;
+    public Rect boundingRect { get; protected set; }
+
     protected MeshFilter meshFilter;
-	protected UpdateFlags updateFlags = UpdateFlags.None;
+
+    protected ClipInfo clipInfo_ = new ClipInfo();
+    public ClipInfo clipInfo { 
+        get { return clipInfo_; }
+        set {
+            if ( clipInfo_ != value ) {
+                clipInfo_ = value;
+
+                if ( clipInfo_.clipped ) {
+                    if ( clipInfo_.left >= 1.0f ||
+                         clipInfo_.right >= 1.0f ||
+                         clipInfo_.top >= 1.0f ||
+                         clipInfo_.bottom >= 1.0f )
+                    {
+                        enabled = false; // just hide it
+                    }
+                    else {
+                        enabled = true;
+                        updateFlags |= (UpdateFlags.Vertex|UpdateFlags.UV|UpdateFlags.Text);
+                    }
+                }
+                else {
+                    enabled = true;
+                    updateFlags |= (UpdateFlags.Vertex|UpdateFlags.UV|UpdateFlags.Text);
+                }
+            }
+        } 
+    }
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -175,11 +236,9 @@ public class exPlane : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     void LateUpdate () {
-        if ( meshFilter != null && 
-             meshFilter.sharedMesh != null &&
-             updateFlags != UpdateFlags.None ) 
-        {
-            UpdateMesh( meshFilter.sharedMesh );
+        if ( updateFlags != UpdateFlags.None ) {
+            InternalUpdate();
+            updateFlags = UpdateFlags.None;
         }
     }
 
@@ -187,7 +246,37 @@ public class exPlane : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    virtual public void UpdateMesh ( Mesh _mesh ) {
+    virtual protected void InternalUpdate () {
         // Debug.LogWarning ("You should not directly call this function. please override it!");
     }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public Bounds UpdateBounds ( float _offsetX, float _offsetY, float _width, float _height ) {
+        //
+        float sign_w = Mathf.Sign(_width);
+        float sign_h = Mathf.Sign(_height);
+        boundingRect = new Rect( -_offsetX - sign_w * _width * 0.5f, 
+                                  _offsetY - sign_h * _height * 0.5f, 
+                                  sign_w * _width, 
+                                  sign_h * _height );
+
+        //
+        switch ( plane ) {
+        case exSprite.Plane.XY:
+            return new Bounds (  new Vector3( -_offsetX, _offsetY, 0.0f ), 
+                                 new Vector3( _width, _height, 0.2f ) );
+        case exSprite.Plane.XZ:
+            return new Bounds (  new Vector3( -_offsetX, 0.0f, _offsetY ), 
+                                 new Vector3( _width, 0.2f, _height ) );
+        case exSprite.Plane.ZY:
+            return new Bounds (  new Vector3( 0.0f, _offsetY, -_offsetX ), 
+                                 new Vector3( 0.2f, _height, _width ) );
+        default:
+            return new Bounds (  new Vector3( -_offsetX, _offsetY, 0.0f ), 
+                                 new Vector3( _width, _height, 0.2f ) );
+        }
+    } 
 }

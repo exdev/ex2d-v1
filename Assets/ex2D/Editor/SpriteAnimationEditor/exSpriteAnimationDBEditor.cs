@@ -13,6 +13,7 @@ using UnityEngine;
 using UnityEditor;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 
 ///////////////////////////////////////////////////////////////////////////////
 // defines
@@ -32,28 +33,35 @@ public class exSpriteAnimationDBEditor : Editor {
             curEditTarget = target as exSpriteAnimationDB;
         }
         EditorGUIUtility.LookLikeInspector ();
+        EditorGUILayout.Space();
 
         // sync button
-        EditorGUILayout.Space();
+        EditorGUI.indentLevel = 1;
         if ( GUILayout.Button ("Sync", GUILayout.Width(100)) ) {
             exSpriteAnimationDB.Sync();
         }
 
-        // show data
+        // rebuild all
+        if ( GUILayout.Button ("Build All", GUILayout.Width(100)) ) {
+            exSpriteAnimationDB.BuildAll();
+        }
+
+        // show version
+        GUI.enabled = false;
+        EditorGUILayout.LabelField( "version", curEditTarget.curVersion.ToString() );
+        GUI.enabled = true;
+
+        // show spAnimClipGUIDs
         EditorGUI.indentLevel = 0;
         curEditTarget.showData = EditorGUILayout.Foldout(curEditTarget.showData, "SpriteAnimClip Asset List");
         if ( curEditTarget.showData ) {
             GUI.enabled = false;
             EditorGUI.indentLevel = 2;
-            for ( int i = 0; i < curEditTarget.data.Count; ++i ) {
-                exSpriteAnimClip animClip = curEditTarget.data[i];
-                EditorGUILayout.ObjectField( "[" + i + "]"
-                                             , animClip
-                                             , typeof(exSpriteAnimClip)
-#if !UNITY_3_0 && !UNITY_3_1 && !UNITY_3_3
-                                             , false 
-#endif
-                                           );
+            for ( int i = 0; i < curEditTarget.spAnimClipGUIDs.Count; ++i ) {
+                string guid = curEditTarget.spAnimClipGUIDs[i];
+                string path = AssetDatabase.GUIDToAssetPath(guid);
+                string spAnimClipName = Path.GetFileNameWithoutExtension (path);
+                EditorGUILayout.LabelField( "[" + i + "]",  spAnimClipName );
             }
             GUI.enabled = true;
         }
@@ -63,30 +71,17 @@ public class exSpriteAnimationDBEditor : Editor {
         curEditTarget.showTable = EditorGUILayout.Foldout(curEditTarget.showTable, "exAtlasInfo <-> SpriteAnimClip List");
         if ( curEditTarget.showTable ) {
             GUI.enabled = false;
-            foreach ( KeyValuePair<string,List<exSpriteAnimClip> > pair in exSpriteAnimationDB.GetGUIDToAnimClips() ) {
-                // texture
-                Texture2D texture = (Texture2D)exEditorRuntimeHelper.LoadAssetFromGUID(pair.Key, typeof(Texture2D));
+            foreach ( KeyValuePair<string,List<string> > pair in exSpriteAnimationDB.GetTexGUIDToAnimClipGUIDs() ) {
+                string textureName = Path.GetFileNameWithoutExtension ( AssetDatabase.GUIDToAssetPath(pair.Key) );
                 EditorGUI.indentLevel = 2;
-                EditorGUILayout.ObjectField( "Texture"
-                                             , texture
-                                             , typeof(Texture2D)
-#if !UNITY_3_0 && !UNITY_3_1 && !UNITY_3_3
-                                             , false 
-#endif
-                                           );
+                EditorGUILayout.LabelField ( textureName, "" );
 
                 // SpriteAnimClips
                 EditorGUI.indentLevel = 3;
-                List<exSpriteAnimClip> spAnimClips = exSpriteAnimationDB.GetSpriteAnimClips(pair.Key);
-                for ( int i = 0; i < spAnimClips.Count; ++i ) {
-                    exSpriteAnimClip spAnimClip =  spAnimClips[i]; 
-                    EditorGUILayout.ObjectField( "[" + i + "]"
-                                                 , spAnimClip
-                                                 , typeof(exSpriteAnimClip)
-#if !UNITY_3_0 && !UNITY_3_1 && !UNITY_3_3
-                                                 , false 
-#endif
-                                               );
+                List<string> spAnimClipGUIDs = pair.Value;
+                for ( int i = 0; i < spAnimClipGUIDs.Count; ++i ) {
+                    string spAnimClipName = Path.GetFileNameWithoutExtension ( AssetDatabase.GUIDToAssetPath(spAnimClipGUIDs[i]) );
+                    EditorGUILayout.LabelField ( "[" + i + "]", spAnimClipName );
                 }
                 EditorGUILayout.Space();
             }

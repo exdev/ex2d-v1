@@ -12,6 +12,9 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 // exSpriteAnimState
@@ -36,6 +39,22 @@ public class exSpriteAnimState {
     [System.NonSerialized] public float time = 0.0f;
     // [System.NonSerialized] public float normalizedTime = 0.0f;
     [System.NonSerialized] public float speed = 1.0f;
+
+    //
+    public exSpriteAnimState ( exSpriteAnimClip _animClip ) {
+        name = _animClip.name;
+        wrapMode = _animClip.wrapMode;
+        stopAction = _animClip.stopAction;
+        clip = _animClip;
+        length = _animClip.length;
+
+        frameTimes = new List<float>(_animClip.frameInfos.Count);
+        float tmp = 0.0f;
+        foreach ( exSpriteAnimClip.FrameInfo fi in _animClip.frameInfos ) {
+            tmp += fi.length;
+            frameTimes.Add(tmp);
+        }
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -66,6 +85,23 @@ public class exSpriteAnimation : MonoBehaviour {
     private int defaultIndex;
 
     ///////////////////////////////////////////////////////////////////////////////
+    // static functions
+    ///////////////////////////////////////////////////////////////////////////////
+
+#if UNITY_EDITOR
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    [MenuItem ("GameObject/Create Other/ex2D/SpriteAnimation Object")]
+    static void CreateSpriteAnimationObject () {
+        GameObject go = new GameObject("SpriteAnimationObject");
+        go.AddComponent<exSpriteAnimation>();
+        Selection.activeObject = go;
+    }
+#endif
+
+    ///////////////////////////////////////////////////////////////////////////////
     // functions
     ///////////////////////////////////////////////////////////////////////////////
 
@@ -83,21 +119,7 @@ public class exSpriteAnimation : MonoBehaviour {
 
             nameToState = new Dictionary<string,exSpriteAnimState> ();
             foreach ( exSpriteAnimClip clip in animations ) {
-                exSpriteAnimState state = new exSpriteAnimState();
-
-                state.name = clip.name;
-                state.wrapMode = clip.wrapMode;
-                state.stopAction = clip.stopAction;
-                state.clip = clip;
-                state.length = clip.length;
-
-                state.frameTimes = new List<float>(clip.frameInfos.Count);
-                float tmp = 0.0f;
-                foreach ( exSpriteAnimClip.FrameInfo fi in clip.frameInfos ) {
-                    tmp += fi.length;
-                    state.frameTimes.Add(tmp);
-                }
-
+                exSpriteAnimState state = new exSpriteAnimState(clip);
                 nameToState[state.name] = state;
             }
 
@@ -149,7 +171,8 @@ public class exSpriteAnimation : MonoBehaviour {
                 sprite.SetSprite ( fi.atlas, fi.index );
 
             // check if stop
-            if ( curAnimation.wrapMode == WrapMode.Once && 
+            if ( ( curAnimation.wrapMode == WrapMode.Once ||
+                   curAnimation.wrapMode == WrapMode.Default ) && 
                  curAnimation.time >= curAnimation.length )
             {
                 Stop();
@@ -161,16 +184,11 @@ public class exSpriteAnimation : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public void Play ( string _name ) {
-        // show sprite if it is hide
-        if ( sprite.enabled == false ) {
-            sprite.enabled = true;
-        }
-
-        //
+    public void Play ( string _name, int _index = 0 ) {
         curAnimation = GetAnimation(_name);
         if ( curAnimation != null ) {
-            curAnimation.time = 0.0f;
+            if ( _index >= 0 && _index < curAnimation.frameTimes.Count )
+                curAnimation.time = curAnimation.frameTimes[_index];
             playing = true;
             paused = false;
         }
@@ -180,9 +198,34 @@ public class exSpriteAnimation : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
+    public void SetFrame ( string _name, int _index ) {
+        curAnimation = GetAnimation(_name);
+        if ( curAnimation != null &&
+             _index >= 0 &&
+             _index < curAnimation.clip.frameInfos.Count ) 
+        {
+            exSpriteAnimClip.FrameInfo fi = curAnimation.clip.frameInfos[_index]; 
+            sprite.SetSprite ( fi.atlas, fi.index );
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
     public void Stop () {
         if ( curAnimation != null ) {
-            switch ( curAnimation.stopAction ) {
+            //
+            exAnimStopAction stopAction = curAnimation.stopAction; 
+
+            //
+            curAnimation.time = 0.0f;
+            curAnimation = null;
+            playing = false;
+            paused = false;
+
+            //
+            switch ( stopAction ) {
             case exAnimStopAction.DoNothing:
                 // Nothing todo;
                 break;
@@ -199,12 +242,6 @@ public class exSpriteAnimation : MonoBehaviour {
                 GameObject.Destroy(this);
                 break;
             }
-
-            //
-            curAnimation.time = 0.0f;
-            curAnimation = null;
-            playing = false;
-            paused = false;
         }
     }
 
@@ -277,5 +314,37 @@ public class exSpriteAnimation : MonoBehaviour {
         }
         return null;
     } 
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public exSpriteAnimState AddAnimation ( exSpriteAnimClip _animClip ) {
+        // if we already have the animation, just return the animation state
+        if ( animations.IndexOf(_animClip) != -1 ) {
+            return nameToState[_animClip.name];
+        }
+
+        //
+        animations.Add (_animClip);
+        exSpriteAnimState state = new exSpriteAnimState(_animClip);
+        nameToState[state.name] = state;
+        return state;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void RemoveAnimation ( exSpriteAnimClip _animClip ) {
+        // if we already have the animation, just return the animation state
+        if ( animations.IndexOf(_animClip) == -1 ) {
+            return; 
+        }
+
+        //
+        animations.Remove (_animClip);
+        nameToState.Remove (_animClip.name);
+    }
 }
 

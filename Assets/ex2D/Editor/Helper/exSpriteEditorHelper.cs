@@ -97,10 +97,9 @@ public class exSpriteEditorHelper {
             // } DISABLE end 
             if ( spBase is exSprite ) {
                 exSprite sp = spBase as exSprite;
-                Texture2D texture = (Texture2D)exEditorRuntimeHelper.LoadAssetFromGUID(sp.textureGUID, 
-                                                                              typeof(Texture2D));
-                exAtlasInfo.Element el = exAtlasDB.GetElement(texture);
-                exSpriteEditor.UpdateAtlas( sp, el );
+                Texture2D texture = exEditorRuntimeHelper.LoadAssetFromGUID<Texture2D>(sp.textureGUID); 
+                exAtlasDB.ElementInfo elInfo = exAtlasDB.GetElementInfo(texture);
+                exSpriteEditor.UpdateAtlas( sp, elInfo );
                 sp.Build( texture );
             }
             if ( spBase is exSpriteFont ) {
