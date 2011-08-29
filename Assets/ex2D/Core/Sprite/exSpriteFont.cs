@@ -217,6 +217,18 @@ public class exSpriteFont : exSpriteBase {
     ///////////////////////////////////////////////////////////////////////////////
 
 #if UNITY_EDITOR
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    [MenuItem ("GameObject/Create Other/ex2D/SpriteFont Object")]
+    static void CreateSpriteFontObject () {
+        GameObject go = new GameObject("SpriteFontObject");
+        go.AddComponent<exSpriteFont>();
+        Selection.activeObject = go;
+    }
+
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
@@ -279,6 +291,7 @@ public class exSpriteFont : exSpriteBase {
             }
         }
     }
+
 #endif
 
     // ------------------------------------------------------------------ 
@@ -371,8 +384,13 @@ public class exSpriteFont : exSpriteBase {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    void UpdateOutline ( int _vertexStartAt, int _indexStartAt, int _srcVertexStartAt,
-                         Vector3[] _vertices, Vector2[] _uvs, int[] _indices ) {
+    void UpdateOutline ( int _vertexStartAt, 
+                         int _indexStartAt, 
+                         int _srcVertexStartAt,
+                         Vector3[] _vertices, 
+                         Vector2[] _uvs, 
+                         int[] _indices ) {
+
         int numVerts = text_.Length * 4;
         int numIndices = text_.Length * 6;
         float length = Mathf.Sqrt(outlineWidth_*outlineWidth_*0.5f);
@@ -444,9 +462,13 @@ public class exSpriteFont : exSpriteBase {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    void UpdateShadow ( int _vertexStartAt, int _indexStartAt, int _srcVertexStartAt,
-                         Vector3[] _vertices, Vector2[] _uvs, int[] _indices ) 
-    {
+    void UpdateShadow ( int _vertexStartAt, 
+                        int _indexStartAt, 
+                        int _srcVertexStartAt,
+                        Vector3[] _vertices, 
+                        Vector2[] _uvs, 
+                        int[] _indices ) {
+
         for ( int i = 0; i < text_.Length; ++i ) {
             int vert_id = 4 * i;
             int idx_id = 6 * i;
@@ -534,6 +556,8 @@ public class exSpriteFont : exSpriteBase {
         // ======================================================== 
 
         if ( (updateFlags & UpdateFlags.Text) != 0 ) {
+            updateFlags &= ~UpdateFlags.Vertex; // remove vertex update, if we have
+
             _mesh.Clear();
 
             float[] lineWidths;
@@ -549,6 +573,45 @@ public class exSpriteFont : exSpriteBase {
                             out offsetX,
                             out offsetY );
 
+            // get clip info first
+            float width = 2.0f * halfWidth;
+            float height = 2.0f * halfHeight;
+
+            float clipLeft   = 0.0f; 
+            float clipRight  = 0.0f; 
+            float clipTop    = 0.0f; 
+            float clipBottom = 0.0f;
+
+            float xMinClip = -halfWidth * scale_.x;
+            float xMaxClip =  halfWidth * scale_.x;
+            float yMinClip = -halfHeight * scale_.y;
+            float yMaxClip =  halfHeight * scale_.y;
+
+            if ( clipInfo_.clipped ) {
+                if ( scale_.x >= 0.0f ) {
+                    clipLeft = clipInfo_.left;
+                    clipRight = clipInfo_.right;
+                }
+                else {
+                    clipLeft = clipInfo_.right;
+                    clipRight = clipInfo_.left;
+                }
+
+                if ( scale_.y >= 0.0f ) {
+                    clipTop = clipInfo_.top;
+                    clipBottom = clipInfo_.bottom;
+                }
+                else{
+                    clipTop = clipInfo_.bottom;
+                    clipBottom = clipInfo_.top;
+                }
+
+                //
+                xMinClip = scale_.x * width  * ( -0.5f + clipLeft   );
+                xMaxClip = scale_.x * width  * (  0.5f - clipRight  );
+                yMinClip = scale_.y * height * ( -0.5f + clipTop    );
+                yMaxClip = scale_.y * height * (  0.5f - clipBottom );
+            }
 
             //
             Vector3[] vertices  = new Vector3[vertexCount];
@@ -600,6 +663,13 @@ public class exSpriteFont : exSpriteBase {
                 // if we don't have the character, it will become space.
                 exBitmapFont.CharInfo charInfo = fontInfo_.GetCharInfo(id);
 
+                //
+                float charClipLeft   = 0.0f;
+                float charClipRight  = 0.0f;
+                float charClipTop    = 0.0f;
+                float charClipBottom = 0.0f;
+
+                //
                 if ( charInfo != null ) {
                     // build vertices & normals
                     for ( int r = 0; r < 2; ++r ) {
@@ -609,6 +679,33 @@ public class exSpriteFont : exSpriteBase {
                             // calculate the base pos
                             float x = curX - halfWidth + c * charInfo.width * scale_.x + charInfo.xoffset * scale_.x;
                             float y = -curY + halfHeight - r * charInfo.height * scale_.y - charInfo.yoffset * scale_.y;
+
+                            // do clip
+                            if ( clipInfo_.clipped ) {
+                                //
+                                if ( x <= xMinClip ) {
+                                    if ( j == 0 )
+                                        charClipLeft = (xMinClip - x) / charInfo.width  * scale_.x; 
+                                    x = xMinClip;
+                                }
+                                else if ( x >= xMaxClip ) {
+                                    if ( j == 3 )
+                                        charClipRight = (x - xMaxClip) / charInfo.width  * scale_.x; 
+                                    x = xMaxClip;
+                                }
+
+                                //
+                                if ( y <= yMinClip ) {
+                                    if ( j == 3 )
+                                        charClipTop = (yMinClip - y) / charInfo.height * scale_.y; 
+                                    y = yMinClip;
+                                }
+                                else if ( y >= yMaxClip ) {
+                                    if ( j == 0 )
+                                        charClipBottom = (y - yMaxClip) / charInfo.height * scale_.y; 
+                                    y = yMaxClip;
+                                }
+                            }
 
                             // calculate the pos affect by anchor
                             x -= offsetX;
@@ -639,11 +736,23 @@ public class exSpriteFont : exSpriteBase {
                     // build uv
                     float textureWidth = fontInfo_.pageInfos[0].texture.width;
                     float textureHeight = fontInfo_.pageInfos[0].texture.height;
+                    float charUVWidth = (float)charInfo.width/(float)textureWidth;
+                    float charUVHeight = (float)charInfo.height/(float)textureHeight;
+
                     float xStart  = charInfo.uv0.x;
                     float yStart  = charInfo.uv0.y;
-                    float xEnd    = xStart + (float)charInfo.width/(float)textureWidth;
-                    float yEnd    = yStart + (float)charInfo.height/(float)textureHeight;
+                    float xEnd    = xStart + charUVWidth; 
+                    float yEnd    = yStart + charUVHeight; 
 
+                    // do uv clip
+                    if ( clipInfo_.clipped ) {
+                        xStart  += charUVWidth  * charClipLeft;
+                        yStart  += charUVHeight * charClipTop;
+                        xEnd    -= charUVWidth  * charClipRight;
+                        yEnd    -= charUVHeight * charClipBottom;
+                    }
+
+                    //
                     uvs[vert_id + 0] = new Vector2 ( xStart,  yEnd );
                     uvs[vert_id + 1] = new Vector2 ( xEnd,    yEnd );
                     uvs[vert_id + 2] = new Vector2 ( xStart,  yStart );
@@ -669,14 +778,22 @@ public class exSpriteFont : exSpriteBase {
 
             // update outline
             if ( useOutline_ ) {
-                UpdateOutline ( outlineVertexStartAt, outlineIndexStartAt, vertexStartAt,
-                                vertices, uvs, indices );
+                UpdateOutline ( outlineVertexStartAt, 
+                                outlineIndexStartAt, 
+                                vertexStartAt,
+                                vertices, 
+                                uvs, 
+                                indices );
             }
 
             // update shadow
             if ( useShadow_ ) {
-                UpdateShadow ( shadowVertexStartAt, shadowIndexStartAt, vertexStartAt, 
-                               vertices, uvs, indices );
+                UpdateShadow ( shadowVertexStartAt, 
+                               shadowIndexStartAt, 
+                               vertexStartAt, 
+                               vertices, 
+                               uvs, 
+                               indices );
             }
 
             //
@@ -805,14 +922,22 @@ public class exSpriteFont : exSpriteBase {
 
             // update outline
             if ( useOutline_ ) {
-                UpdateOutline ( outlineVertexStartAt, -1, vertexStartAt,
-                                vertices, null, null );
+                UpdateOutline ( outlineVertexStartAt, 
+                                -1, 
+                                vertexStartAt,
+                                vertices, 
+                                null, 
+                                null );
             }
 
             // update shadow
             if ( useShadow_ ) {
-                UpdateShadow ( shadowVertexStartAt, -1, vertexStartAt, 
-                               vertices, null, null );
+                UpdateShadow ( shadowVertexStartAt, 
+                               -1, 
+                               vertexStartAt, 
+                               vertices, 
+                               null, 
+                               null );
             }
 
             _mesh.vertices = vertices;
@@ -868,6 +993,10 @@ public class exSpriteFont : exSpriteBase {
             }
             _mesh.colors = colors;
         }
+
+        // NOTE: though we set updateFlags to None at exPlane::LateUpdate, 
+        //       the Editor still need this or it will caused editor keep dirty
+        updateFlags = UpdateFlags.None;
     }
 
     // ------------------------------------------------------------------ 

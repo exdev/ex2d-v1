@@ -159,8 +159,7 @@ public class exSpriteBaseEditor : exPlaneEditor {
             //     if ( editSprite != null ) {
             //         editSprite.customSize = false;
             //     }
-            //     exPixelPerfect.MakePixelPerfect ( editSpriteBase, 
-            //                                     Camera.main,
+            //     editSpriteBase.MakePixelPerfect ( Camera.main,
             //                                     PlayerSettings.defaultScreenWidth,
             //                                     PlayerSettings.defaultScreenHeight );
             //     GUI.changed = true;

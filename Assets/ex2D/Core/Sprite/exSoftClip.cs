@@ -61,7 +61,7 @@ public class exSoftClip : exPlane {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    [MenuItem ("GameObject/Create Other/ex2D SoftClipObject")]
+    [MenuItem ("GameObject/Create Other/ex2D/SoftClip Object")]
     static void CreateSoftClipObject () {
         GameObject go = new GameObject("SoftClipObject");
         go.AddComponent<exSoftClip>();
@@ -114,6 +114,42 @@ public class exSoftClip : exPlane {
         updateFlags |= UpdateFlags.Vertex;
         InternalUpdate ();
         updateFlags = UpdateFlags.None;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    override protected void OnEnable () {
+        base.OnEnable();
+
+        for ( int i = 0; i < planes.Count; ++i ) {
+            exPlane p = planes[i];
+            if ( p == null ) {
+                planes.RemoveAt(i);
+                --i;
+                continue;
+            }
+            p.enabled = true;
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    override protected void OnDisable () {
+        base.OnDisable();
+
+        for ( int i = 0; i < planes.Count; ++i ) {
+            exPlane p = planes[i];
+            if ( p == null ) {
+                planes.RemoveAt(i);
+                --i;
+                continue;
+            }
+            p.enabled = false;
+        }
     }
 
     // ------------------------------------------------------------------ 
@@ -188,14 +224,15 @@ public class exSoftClip : exPlane {
             break;
         }
 
-        // Debug.Log ( name + " rect a = " + a
-        //             + " xMin = " + a.xMin 
-        //             + " xMax = " + a.xMax 
-        //             + " yMin = " + a.yMin 
-        //             + " yMax = " + a.yMax ); 
-
         //
-        foreach ( exPlane p in planes ) {
+        for ( int i = 0; i < planes.Count; ++i ) {
+            exPlane p = planes[i];
+            if ( p == null ) {
+                planes.RemoveAt(i);
+                --i;
+                continue;
+            }
+
             exPlane.ClipInfo newClipInfo = new exPlane.ClipInfo(); 
 
             //
@@ -214,12 +251,6 @@ public class exSoftClip : exPlane {
                 b.y += p.transform.position.y;
                 break;
             }
-
-            // Debug.Log ( p.name + " rect b = " + b + ", " 
-            //             + " xMin = " + b.xMin 
-            //             + " xMax = " + b.xMax 
-            //             + " yMin = " + b.yMin 
-            //             + " yMax = " + b.yMax ); 
 
             //
             if ( a.xMin > b.xMin ) {

@@ -118,15 +118,15 @@ public class exAtlasInfoUtility {
 
         // check if the atlas info is valid for build 
         if ( atlas == null ) {
-            Debug.LogError("Failed to build atlas info, the atlas is missing!");
+            Debug.LogError("Failed to build atlas info " + _atlasInfo.name + ", the atlas is missing!");
             return;
         }
         if ( texture == null ) {
-            Debug.LogError("Failed to build atlas info, the texture is missing!");
+            Debug.LogError("Failed to build atlas info "  + _atlasInfo.name + ", the texture is missing!");
             return;
         }
         if ( material == null ) {
-            Debug.LogError("Failed to build atlas info, the material is missing!");
+            Debug.LogError("Failed to build atlas info "  + _atlasInfo.name + ", the material is missing!");
             return;
         }
 

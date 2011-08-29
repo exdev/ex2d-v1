@@ -113,9 +113,16 @@ public class exPlaneEditor : Editor {
             }
 
             switch ( trans2d ) {
-            case Transform2D.None: break;
-            case Transform2D.Screen: editPlane.gameObject.AddComponent<exScreenPosition>(); break;
-            case Transform2D.Viewport: editPlane.gameObject.AddComponent<exViewportPosition>(); break;
+            case Transform2D.None: 
+                break;
+
+            case Transform2D.Screen:
+                editPlane.gameObject.AddComponent<exScreenPosition>(); 
+                break;
+
+            case Transform2D.Viewport: 
+                editPlane.gameObject.AddComponent<exViewportPosition>(); 
+                break;
             }
         }
 

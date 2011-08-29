@@ -108,14 +108,14 @@ public class exSpriteEditor : exSpriteBaseEditor {
                                                                          );
             EditorGUIUtility.LookLikeInspector ();
             if ( newTexture != editTexture ) {
-                editSprite.textureGUID = exEditorRuntimeHelper.AssetToGUID(newTexture);
-                textureChanged = true;
                 editTexture = newTexture;
+                editSprite.textureGUID = exEditorRuntimeHelper.AssetToGUID(editTexture);
+                textureChanged = true;
             }
             GUILayout.Space(10);
             GUILayout.BeginVertical();
                 GUILayout.Space(90);
-                GUILayout.Label ( newTexture ? newTexture.name : "None" );
+                GUILayout.Label ( editTexture ? editTexture.name : "None" );
             GUILayout.EndVertical();
         GUILayout.EndHorizontal();
         GUI.enabled = true;
@@ -135,7 +135,7 @@ public class exSpriteEditor : exSpriteBaseEditor {
 
         // get atlas and index from textureGUID
         if ( !EditorApplication.isPlaying ) {
-            // check if change/clear sprite
+            // if we use atlas, check if the atlas,index changes
             if ( useAtlas ) {
                 if ( editAtlas != editSprite.atlas ||
                      editIndex != editSprite.index )
@@ -143,8 +143,10 @@ public class exSpriteEditor : exSpriteBaseEditor {
                     editSprite.SetSprite( editAtlas, editIndex );
                 }
             }
-            else if ( editSprite.atlas ) {
-                editSprite.Clear();
+            // if we don't use atlas and current edit target use atlas, clear it.
+            else {
+                if ( editSprite.useAtlas )
+                    editSprite.Clear();
             }
 
             // check if we are first time assignment

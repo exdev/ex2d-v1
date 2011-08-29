@@ -55,27 +55,36 @@ public class exViewportPosition : MonoBehaviour {
     }
 
     ///////////////////////////////////////////////////////////////////////////////
+    //
+    ///////////////////////////////////////////////////////////////////////////////
+
+    exPlane plane;
+
+    ///////////////////////////////////////////////////////////////////////////////
     // functions
     ///////////////////////////////////////////////////////////////////////////////
 
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
+    // DISABLE { 
+    // // ------------------------------------------------------------------ 
+    // // Desc: 
+    // //  example: CalculateWorldPosition(Screen.width, Screen.height) 
+    // // ------------------------------------------------------------------ 
 
-    Vector3 CalculateWorldPosition ( float _screenWidth, float _screenHeight ) {
-        float s = 1.0f;
-        if ( camera_.orthographic ) {
-            s =  2.0f * camera_.orthographicSize / _screenHeight;
-        }
-        else {
-            float ratio = 2.0f * Mathf.Tan(Mathf.Deg2Rad * camera_.fov * 0.5f) / _screenHeight;
-            s = ratio * ( transform.position.z - camera_.transform.position.z );
-        }
+    // Vector3 CalculateWorldPosition ( float _screenWidth, float _screenHeight ) {
+    //     float s = 1.0f;
+    //     if ( camera_.orthographic ) {
+    //         s =  2.0f * camera_.orthographicSize / _screenHeight;
+    //     }
+    //     else {
+    //         float ratio = 2.0f * Mathf.Tan(Mathf.Deg2Rad * camera_.fov * 0.5f) / _screenHeight;
+    //         s = ratio * ( transform.position.z - camera_.transform.position.z );
+    //     }
 
-        return new Vector3( (x - 0.5f) * _screenWidth * s + camera_.transform.position.x,
-                            (0.5f - y) * _screenHeight * s + camera_.transform.position.y,
-                            transform.position.z );
-    }
+    //     return new Vector3( (x_ - 0.5f) * _screenWidth * s + camera_.transform.position.x,
+    //                         (y_ - 0.5f) * _screenHeight * s + camera_.transform.position.y,
+    //                         transform.position.z );
+    // }
+    // } DISABLE end 
 
     // ------------------------------------------------------------------ 
     // Desc: 
@@ -84,6 +93,7 @@ public class exViewportPosition : MonoBehaviour {
     void Awake () {
         if ( camera_ == null )
             camera_ = Camera.main;
+        plane = GetComponent<exPlane>();
     }
 
     // ------------------------------------------------------------------ 
@@ -91,7 +101,16 @@ public class exViewportPosition : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     void LateUpdate () {
-        Vector3 newPos = CalculateWorldPosition ( Screen.width, Screen.height );
+        //
+        Vector3 newPos = Vector3.zero;
+
+        //
+        if ( plane )
+            newPos = plane.ViewportToWorldPoint ( camera_, x_, y_ );
+        else 
+            newPos = camera_.ViewportToWorldPoint( new Vector3(x_, y_, transform.position.z) );
+
+        //
         if ( newPos != transform.position ) {
             transform.position = newPos;
         }

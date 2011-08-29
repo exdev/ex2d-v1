@@ -256,6 +256,10 @@ public class exTileMap : exPlane {
             //
             _mesh.triangles = indices; 
         }
+
+        // NOTE: though we set updateFlags to None at exPlane::LateUpdate, 
+        //       the Editor still need this or it will caused editor keep dirty
+        updateFlags = UpdateFlags.None;
     }
 
     // ------------------------------------------------------------------ 

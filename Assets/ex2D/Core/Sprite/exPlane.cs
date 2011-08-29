@@ -159,12 +159,12 @@ public class exPlane : MonoBehaviour {
                     }
                     else {
                         enabled = true;
-                        updateFlags |= (UpdateFlags.Vertex|UpdateFlags.UV);
+                        updateFlags |= (UpdateFlags.Vertex|UpdateFlags.UV|UpdateFlags.Text);
                     }
                 }
                 else {
                     enabled = true;
-                    updateFlags |= (UpdateFlags.Vertex|UpdateFlags.UV);
+                    updateFlags |= (UpdateFlags.Vertex|UpdateFlags.UV|UpdateFlags.Text);
                 }
             }
         } 
@@ -255,17 +255,15 @@ public class exPlane : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     public Bounds UpdateBounds ( float _offsetX, float _offsetY, float _width, float _height ) {
+        //
         float sign_w = Mathf.Sign(_width);
         float sign_h = Mathf.Sign(_height);
         boundingRect = new Rect( -_offsetX - sign_w * _width * 0.5f, 
                                   _offsetY - sign_h * _height * 0.5f, 
                                   sign_w * _width, 
                                   sign_h * _height );
-        // boundingRect = new Rect( -_offsetX - _width * 0.5f, 
-        //                           _offsetY - _height * 0.5f, 
-        //                           _width, 
-        //                           _height );
 
+        //
         switch ( plane ) {
         case exSprite.Plane.XY:
             return new Bounds (  new Vector3( -_offsetX, _offsetY, 0.0f ), 

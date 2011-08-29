@@ -129,13 +129,15 @@ partial class exAtlasEditor : EditorWindow {
         }
     } 
 
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
+    // DISABLE: the focus only occur when main window lost foucs, then come in { 
+    // // ------------------------------------------------------------------ 
+    // // Desc: 
+    // // ------------------------------------------------------------------ 
 
-    void OnFocus () {
-        OnSelectionChange ();
-    }
+    // void OnFocus () {
+    //     OnSelectionChange
+    // }
+    // } DISABLE end 
 
     // ------------------------------------------------------------------ 
     // Desc: 
@@ -143,6 +145,21 @@ partial class exAtlasEditor : EditorWindow {
 
     void OnSelectionChange () {
         Edit ( Selection.activeObject );
+
+        if ( curEdit != null ) {
+            selectedElements.Clear();
+            foreach ( Object o in Selection.objects ) {
+                if ( o is Texture2D ) {
+                    foreach ( exAtlasInfo.Element el in curEdit.elements ) {
+                        if ( el.texture == o ) {
+                            AddSelected(el);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
         Repaint ();
     }
 
@@ -643,14 +660,7 @@ partial class exAtlasEditor : EditorWindow {
     // ------------------------------------------------------------------ 
 
     void AddSelected ( exAtlasInfo.Element _el ) {
-        bool added = false;
-        foreach ( exAtlasInfo.Element i in selectedElements ) {
-            if ( i == _el ) {
-                added = true;
-                break;
-            }
-        }
-        if ( added == false ) {
+        if ( selectedElements.IndexOf(_el) == -1 ) {
             selectedElements.Add(_el);
         }
     }
@@ -660,15 +670,11 @@ partial class exAtlasEditor : EditorWindow {
     // ------------------------------------------------------------------ 
 
     void ToggleSelected ( exAtlasInfo.Element _el ) {
-        bool found = false;
-        foreach ( exAtlasInfo.Element i in selectedElements ) {
-            if ( i == _el ) {
-                found = true;
-                selectedElements.Remove(_el);
-                break;
-            }
+        int i = selectedElements.IndexOf(_el);
+        if ( i != -1 ) {
+            selectedElements.RemoveAt(i);
         }
-        if ( found == false ) {
+        else {
             selectedElements.Add(_el);
         }
     }

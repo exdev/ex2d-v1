@@ -119,13 +119,15 @@ partial class exSpriteAnimClipEditor : EditorWindow {
         }
     }
 
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
+    // DISABLE: the focus only occur when main window lost foucs, then come in { 
+    // // ------------------------------------------------------------------ 
+    // // Desc: 
+    // // ------------------------------------------------------------------ 
 
-    void OnFocus () {
-        OnSelectionChange ();
-    }
+    // void OnFocus () {
+    //     OnSelectionChange ();
+    // }
+    // } DISABLE end 
 
     // ------------------------------------------------------------------ 
     // Desc: 

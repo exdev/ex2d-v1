@@ -147,6 +147,17 @@ public class exSprite : exSpriteBase {
     // Desc: 
     // ------------------------------------------------------------------ 
 
+    [MenuItem ("GameObject/Create Other/ex2D/Sprite Object")]
+    static void CreateSpriteObject () {
+        GameObject go = new GameObject("SpriteObject");
+        go.AddComponent<exSprite>();
+        Selection.activeObject = go;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
     [ContextMenu ("Rebuild")]
     void Rebuild () {
         this.Build ( exEditorRuntimeHelper.LoadAssetFromGUID<Texture2D>( textureGUID ) );
@@ -251,6 +262,35 @@ public class exSprite : exSpriteBase {
         exAtlas.Element el = null;
         if ( useAtlas )
             el = atlas_.elements[index_];
+
+        // ======================================================== 
+        // get clip info first
+        // ======================================================== 
+
+        float clipLeft   = 0.0f; 
+        float clipRight  = 0.0f; 
+        float clipTop    = 0.0f; 
+        float clipBottom = 0.0f;
+
+        if ( clipInfo_.clipped ) {
+            if ( scale_.x >= 0.0f ) {
+                clipLeft = clipInfo_.left;
+                clipRight = clipInfo_.right;
+            }
+            else {
+                clipLeft = clipInfo_.right;
+                clipRight = clipInfo_.left;
+            }
+
+            if ( scale_.y >= 0.0f ) {
+                clipTop = clipInfo_.top;
+                clipBottom = clipInfo_.bottom;
+            }
+            else{
+                clipTop = clipInfo_.bottom;
+                clipBottom = clipInfo_.top;
+            }
+        }
 
         // ======================================================== 
         // Update Vertex
@@ -367,30 +407,11 @@ public class exSprite : exSpriteBase {
                 }
             }
 
-            // get left & right in clipInfo
-            float left = 1.0f; 
-            float right = 1.0f; 
-            float top = 1.0f; 
-            float bottom = 1.0f;
-            if ( clipInfo_.clipped ) {
-                if ( scale_.x >= 0.0f ) {
-                    left = clipInfo_.left;
-                    right = clipInfo_.right;
-                }
-                else {
-                    left = clipInfo_.right;
-                    right = clipInfo_.left;
-                }
-
-                if ( scale_.y >= 0.0f ) {
-                    top = clipInfo_.top;
-                    bottom = clipInfo_.bottom;
-                }
-                else{
-                    top = clipInfo_.bottom;
-                    bottom = clipInfo_.top;
-                }
-            }
+            //
+            float xMinClip = scale_.x * width  * ( -0.5f + clipLeft   );
+            float xMaxClip = scale_.x * width  * (  0.5f - clipRight  );
+            float yMinClip = scale_.y * height * ( -0.5f + clipTop    );
+            float yMaxClip = scale_.y * height * (  0.5f - clipBottom );
 
             // build vertices & normals
             for ( int r = 0; r < 2; ++r ) {
@@ -401,6 +422,23 @@ public class exSprite : exSpriteBase {
                     float x = -halfWidth  + c * width_  * scale_.x;
                     float y =  halfHeight - r * height_ * scale_.y;
 
+                    // do clip
+                    if ( clipInfo_.clipped ) {
+                        if ( x <= xMinClip ) {
+                            x = xMinClip;
+                        }
+                        else if ( x >= xMaxClip ) {
+                            x = xMaxClip;
+                        }
+
+                        if ( y <= yMinClip ) {
+                            y = yMinClip;
+                        }
+                        else if ( y >= yMaxClip ) {
+                            y = yMaxClip;
+                        }
+                    }
+
                     // calculate the pos affect by anchor
                     x -= offsetX;
                     y += offsetY;
@@ -409,15 +447,17 @@ public class exSprite : exSpriteBase {
                     x += y * shear_.x;
                     y += x * shear_.y;
 
-                    // do clip
-                    if ( clipInfo_.clipped ) {
-                        switch (i) {
-                        case 0: x += scale_.x * width_ * left;  y -= scale_.y * height_ * bottom; break; // bl
-                        case 1: x -= scale_.x * width_ * right; y -= scale_.y * height_ * bottom; break; // br
-                        case 2: x += scale_.x * width_ * left;  y += scale_.y * height_ * top; break; // tl
-                        case 3: x -= scale_.x * width_ * right; y += scale_.y * height_ * top; break; // tr
-                        }
-                    }
+                    // DISABLE: we use min,max clip above { 
+                    // // do clip
+                    // if ( clipInfo_.clipped ) {
+                    //     switch (i) {
+                    //     case 0: x += scale_.x * width_ * clipLeft;  y -= scale_.y * height_ * clipBottom; break; // bl
+                    //     case 1: x -= scale_.x * width_ * clipRight; y -= scale_.y * height_ * clipBottom; break; // br
+                    //     case 2: x += scale_.x * width_ * clipLeft;  y += scale_.y * height_ * clipTop; break; // tl
+                    //     case 3: x -= scale_.x * width_ * clipRight; y += scale_.y * height_ * clipTop; break; // tr
+                    //     }
+                    // }
+                    // } DISABLE end 
 
                     // build vertices, normals and uvs
                     switch ( plane ) {
@@ -455,37 +495,20 @@ public class exSprite : exSpriteBase {
         if ( (updateFlags & UpdateFlags.UV) != 0 ) {
             Vector2[] uvs = new Vector2[4];
 
-            // get left & right in clipInfo
-            float left = 1.0f; 
-            float right = 1.0f; 
-            float top = 1.0f; 
-            float bottom = 1.0f;
-            if ( clipInfo_.clipped ) {
-                if ( scale_.x >= 0.0f ) {
-                    left = clipInfo_.left;
-                    right = clipInfo_.right;
-                }
-                else {
-                    left = clipInfo_.right;
-                    right = clipInfo_.left;
-                }
-
-                if ( scale_.y >= 0.0f ) {
-                    top = clipInfo_.top;
-                    bottom = clipInfo_.bottom;
-                }
-                else{
-                    top = clipInfo_.bottom;
-                    bottom = clipInfo_.top;
-                }
-            }
-
             // if the sprite is in an atlas
             if ( el != null ) {
                 float xStart  = el.coords.x;
                 float yStart  = el.coords.y;
                 float xEnd    = el.coords.xMax;
                 float yEnd    = el.coords.yMax;
+
+                // do uv clip
+                if ( clipInfo_.clipped ) {
+                    xStart  += el.coords.width  * clipLeft;
+                    yStart  += el.coords.height * clipTop;
+                    xEnd    -= el.coords.width  * clipRight;
+                    yEnd    -= el.coords.height * clipBottom;
+                }
 
                 if ( el.rotated ) {
                     uvs[0] = new Vector2 ( xEnd,    yEnd );
@@ -499,14 +522,6 @@ public class exSprite : exSpriteBase {
                     uvs[2] = new Vector2 ( xStart,  yStart );
                     uvs[3] = new Vector2 ( xEnd,    yStart );
                 }
-
-                // do clip
-                if ( clipInfo_.clipped ) {
-                    uvs[0].x += el.coords.width * left;  uvs[0].y -= el.coords.height * bottom;
-                    uvs[1].x -= el.coords.width * right; uvs[1].y -= el.coords.height * bottom;
-                    uvs[2].x += el.coords.width * left;  uvs[2].y += el.coords.height * top;
-                    uvs[3].x -= el.coords.width * right; uvs[3].y += el.coords.height * top;
-                }
             }
             else {
                 float xStart  = trimUV.x;
@@ -514,18 +529,18 @@ public class exSprite : exSpriteBase {
                 float xEnd    = trimUV.xMax;
                 float yEnd    = trimUV.yMax;
 
+                // do uv clip
+                if ( clipInfo_.clipped ) {
+                    xStart  += trimUV.width  * clipLeft;
+                    yStart  += trimUV.height * clipTop;
+                    xEnd    -= trimUV.width  * clipRight;
+                    yEnd    -= trimUV.height * clipBottom;
+                }
+
                 uvs[0] = new Vector2 ( xStart,  yEnd );
                 uvs[1] = new Vector2 ( xEnd,    yEnd );
                 uvs[2] = new Vector2 ( xStart,  yStart );
                 uvs[3] = new Vector2 ( xEnd,    yStart );
-
-                // do clip
-                if ( clipInfo_.clipped ) {
-                    uvs[0].x += trimUV.width * left;  uvs[0].y -= trimUV.height * bottom;
-                    uvs[1].x -= trimUV.width * right; uvs[1].y -= trimUV.height * bottom;
-                    uvs[2].x += trimUV.width * left;  uvs[2].y += trimUV.height * top;
-                    uvs[3].x -= trimUV.width * right; uvs[3].y += trimUV.height * top;
-                }
             }
             _mesh.uv = uvs;
         }
@@ -557,6 +572,10 @@ public class exSprite : exSpriteBase {
             indices[5] = 3;
             _mesh.triangles = indices; 
         }
+
+        // NOTE: though we set updateFlags to None at exPlane::LateUpdate, 
+        //       the Editor still need this or it will caused editor keep dirty
+        updateFlags = UpdateFlags.None;
     }
 
     // ------------------------------------------------------------------ 

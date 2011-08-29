@@ -355,12 +355,15 @@ public class exAtlasDB : ScriptableObject {
         if ( db.texGUIDToElementInfo.ContainsKey(_textureGUID) ) {
             ElementInfo elInfo = db.texGUIDToElementInfo[_textureGUID]; 
 
-            // NOTE: when atlas been removed, it never notify the exAtlasDB to remove elements  
-            exAtlasInfo atlasInfo = exEditorRuntimeHelper.LoadAssetFromGUID<exAtlasInfo>(elInfo.guidAtlasInfo);
-            if ( atlasInfo == null ) {
-                RemoveElementInfo (_textureGUID);
-                return null;
-            }
+            // DELME: we don't need this anymore { 
+            // // NOTE: when atlas been removed, it never notify the exAtlasDB to remove elements  
+            // exAtlasInfo atlasInfo = exEditorRuntimeHelper.LoadAssetFromGUID<exAtlasInfo>(elInfo.guidAtlasInfo);
+            // if ( atlasInfo == null ) {
+            //     RemoveElementInfo (_textureGUID);
+            //     return null;
+            // }
+            // } DELME end 
+
             return elInfo;
         }
 
