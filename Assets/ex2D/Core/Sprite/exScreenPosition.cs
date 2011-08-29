@@ -109,6 +109,7 @@ public class exScreenPosition : MonoBehaviour {
             newPos = plane.ScreenToWorldPoint ( camera_, x_, y_ );
         else 
             newPos = camera_.ScreenToWorldPoint( new Vector3(x_, y_, transform.position.z) );
+        newPos.z = transform.position.z;
 
         //
         if ( newPos != transform.position ) {

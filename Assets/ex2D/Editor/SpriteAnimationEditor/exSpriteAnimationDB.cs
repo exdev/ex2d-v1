@@ -37,6 +37,7 @@ public class exSpriteAnimationDB : ScriptableObject {
     static int version = 1;
     static bool needSync = false;
     static exSpriteAnimationDB db;
+    public static string dbPath = "Assets/.ex2D_SpriteAnimationDB.asset";
 
     // ------------------------------------------------------------------ 
     // Desc: 
@@ -112,10 +113,10 @@ public class exSpriteAnimationDB : ScriptableObject {
 
     static void CreateDB () {
         // get sprite animation clip db, if not found, create one
-        db = (exSpriteAnimationDB)AssetDatabase.LoadAssetAtPath( "Assets/.ex2D_SpriteAnimationDB.asset", typeof(exSpriteAnimationDB) );
+        db = (exSpriteAnimationDB)AssetDatabase.LoadAssetAtPath( dbPath, typeof(exSpriteAnimationDB) );
         if ( db == null ) {
             db = ScriptableObject.CreateInstance<exSpriteAnimationDB>();
-            AssetDatabase.CreateAsset( db, "Assets/.ex2D_SpriteAnimationDB.asset" );
+            AssetDatabase.CreateAsset( db, dbPath );
             needSync = true;
         }
         if ( version != db.curVersion ) {

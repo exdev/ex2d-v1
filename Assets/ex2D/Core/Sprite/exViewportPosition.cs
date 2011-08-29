@@ -109,6 +109,7 @@ public class exViewportPosition : MonoBehaviour {
             newPos = plane.ViewportToWorldPoint ( camera_, x_, y_ );
         else 
             newPos = camera_.ViewportToWorldPoint( new Vector3(x_, y_, transform.position.z) );
+        newPos.z = transform.position.z;
 
         //
         if ( newPos != transform.position ) {

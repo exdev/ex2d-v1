@@ -64,6 +64,12 @@ class ex2D_PostProcessor : AssetPostprocessor {
 
         //
         foreach ( string path in _deletedAssets ) {
+            if ( string.Equals(path, exAtlasDB.dbPath, System.StringComparison.CurrentCultureIgnoreCase) || 
+                 string.Equals(path, exSpriteAnimationDB.dbPath, System.StringComparison.CurrentCultureIgnoreCase) )
+            {
+                continue;
+            }
+
             if ( Path.GetExtension(path) == ".asset" ) {
                 string guid = AssetDatabase.AssetPathToGUID(path);
 

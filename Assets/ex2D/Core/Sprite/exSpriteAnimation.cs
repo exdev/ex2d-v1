@@ -184,7 +184,15 @@ public class exSpriteAnimation : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public void Play ( string _name, int _index = 0 ) {
+    public void Play ( string _name ) {
+        Play( _name, 0 );
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void Play ( string _name, int _index ) {
         curAnimation = GetAnimation(_name);
         if ( curAnimation != null ) {
             if ( _index >= 0 && _index < curAnimation.frameTimes.Count )

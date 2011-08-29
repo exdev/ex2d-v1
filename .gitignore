@@ -64,6 +64,8 @@ Library/*
 
 Assets/_test/
 Assets/_test.meta
+Assets/JSONObject/
+Assets/JSONObject.meta
 Assets/RageSpline/
 Assets/RageSpline.meta
 

@@ -51,6 +51,7 @@ public class exAtlasDB : ScriptableObject {
     static int version = 2;
     static bool needSync = false;
     static exAtlasDB db;
+    public static string dbPath = "Assets/.ex2D_AtlasDB.asset"; 
 
     // ------------------------------------------------------------------ 
     // Desc: 
@@ -127,10 +128,10 @@ public class exAtlasDB : ScriptableObject {
 
     static void CreateDB () {
         // get atlas db, if not found, create one
-        db = (exAtlasDB)AssetDatabase.LoadAssetAtPath( "Assets/.ex2D_AtlasDB.asset", typeof(exAtlasDB) );
+        db = (exAtlasDB)AssetDatabase.LoadAssetAtPath( dbPath, typeof(exAtlasDB) );
         if ( db == null ) {
             db = ScriptableObject.CreateInstance<exAtlasDB>();
-            AssetDatabase.CreateAsset( db, "Assets/.ex2D_AtlasDB.asset" );
+            AssetDatabase.CreateAsset( db, dbPath );
             needSync = true;
         }
         if ( version != db.curVersion ) {
