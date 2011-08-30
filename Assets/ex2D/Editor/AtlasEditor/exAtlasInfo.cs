@@ -312,7 +312,7 @@ public partial class exAtlasInfo : ScriptableObject {
         elements.RemoveAt(_idx);
 
         // remove element in atlas DB
-        exAtlasDB.RemoveElementInfo(exEditorRuntimeHelper.AssetToGUID(el.texture));
+        exAtlasDB.RemoveElementInfo(exEditorHelper.AssetToGUID(el.texture));
 
         // get sprite animation clip by textureGUID, add them to rebuildSpAnimClips
         AddSpriteAnimClipForRebuilding(el);
@@ -406,10 +406,10 @@ public partial class exAtlasInfo : ScriptableObject {
 
     public void AddSpriteAnimClipForRebuilding ( Element _el ) {
         List<string> spAnimClipGUIDs 
-            = exSpriteAnimationDB.GetSpriteAnimClipGUIDs ( exEditorRuntimeHelper.AssetToGUID(_el.texture) );
+            = exSpriteAnimationDB.GetSpriteAnimClipGUIDs ( exEditorHelper.AssetToGUID(_el.texture) );
         if ( spAnimClipGUIDs != null ) {
             foreach ( string animClipGUID in spAnimClipGUIDs ) {
-                exSpriteAnimClip animClip = exEditorRuntimeHelper.LoadAssetFromGUID<exSpriteAnimClip>(animClipGUID);
+                exSpriteAnimClip animClip = exEditorHelper.LoadAssetFromGUID<exSpriteAnimClip>(animClipGUID);
                 if ( animClip != null && rebuildSpAnimClips.IndexOf(animClip) == -1 ) {
                     animClip.editorNeedRebuild = true;
                     rebuildSpAnimClips.Add(animClip);
@@ -440,6 +440,10 @@ public partial class exAtlasInfo : ScriptableObject {
             }
             else if ( o is exBitmapFont ) {
                 exBitmapFont f = o as exBitmapFont;
+                if ( f.useAtlas ) {
+                    // NOTE: it is still possible we have atlas font in the obj list since we use Selection.GetFiltered().
+                    continue;
+                }
 
                 // multi-page atlas font is forbit
                 if ( f.pageInfos.Count > 1 ) {

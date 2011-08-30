@@ -1,7 +1,7 @@
 // ======================================================================================
 // File         : exBitmapFontUtility.cs
 // Author       : Wu Jie 
-// Last Change  : 07/15/2011 | 15:35:49 PM | Friday,July
+// Last Change  : 08/30/2011 | 10:54:56 AM | Tuesday,August
 // Description  : 
 // ======================================================================================
 
@@ -19,13 +19,48 @@ using System.IO;
 // exBitmapFontUtility
 ///////////////////////////////////////////////////////////////////////////////
 
-public class exBitmapFontUtility {
+public static class exBitmapFontUtility {
 
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    static public void Build ( exBitmapFont _bitmapFont, Object _fontInfo ) {
+    [MenuItem ("GameObject/Create Other/ex2D/SpriteFont Object")]
+    public static void CreateSpriteFontObject () {
+        GameObject go = new GameObject("SpriteFontObject");
+        go.AddComponent<exSpriteFont>();
+        Selection.activeObject = go;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public static exBitmapFont Create ( string _path, string _name ) {
+        //
+        if ( new DirectoryInfo(_path).Exists == false ) {
+            Debug.LogError ( "can't create asset, path not found" );
+            return null;
+        }
+        if ( string.IsNullOrEmpty(_name) ) {
+            Debug.LogError ( "can't create asset, the name is empty" );
+            return null;
+        }
+        string assetPath = Path.Combine( _path, _name + ".asset" );
+
+        //
+        exBitmapFont newBitmapFont = ScriptableObject.CreateInstance<exBitmapFont>();
+        AssetDatabase.CreateAsset(newBitmapFont, assetPath);
+        Selection.activeObject = newBitmapFont;
+        return newBitmapFont;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public static void Build ( this exBitmapFont _bitmapFont, 
+                               Object _fontInfo ) {
 
         EditorUtility.DisplayProgressBar( "Building BitmapFont...",
                                           "Build BitmapFont " + _bitmapFont.name, 

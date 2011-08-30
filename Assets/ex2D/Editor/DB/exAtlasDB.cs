@@ -73,7 +73,7 @@ public class exAtlasDB : ScriptableObject {
             CreateDB ();
 
         foreach ( string guidAtlasInfo in db.atlasInfoGUIDs ) {
-            exAtlasInfo atlasInfo = exEditorRuntimeHelper.LoadAssetFromGUID<exAtlasInfo>(guidAtlasInfo);
+            exAtlasInfo atlasInfo = exEditorHelper.LoadAssetFromGUID<exAtlasInfo>(guidAtlasInfo);
             exAtlasInfoUtility.Build ( atlasInfo );
 
             atlasInfo = null;
@@ -197,7 +197,7 @@ public class exAtlasDB : ScriptableObject {
     static public void AddAtlas ( exAtlasInfo _a ) {
         Init();
 
-        string guid = exEditorRuntimeHelper.AssetToGUID (_a);
+        string guid = exEditorHelper.AssetToGUID (_a);
         if ( db.atlasInfoGUIDs.Contains(guid) == false ) {
             db.atlasInfoGUIDs.Add(guid);
             for ( int i = 0; i < _a.elements.Count; ++i ) {
@@ -217,9 +217,9 @@ public class exAtlasDB : ScriptableObject {
     // static public void RemoveAtlas ( exAtlasInfo _a ) {
     //     Init();
 
-    //     string guid = exEditorRuntimeHelper.AssetToGUID (_a);
+    //     string guid = exEditorHelper.AssetToGUID (_a);
     //     foreach ( exAtlasInfo.Element el in _a.elements ) {
-    //         RemoveElementInfo(exEditorRuntimeHelper.AssetToGUID(el.texture));
+    //         RemoveElementInfo(exEditorHelper.AssetToGUID(el.texture));
     //     }
     //     db.atlasInfoGUIDs.Remove(guid);
     //     EditorUtility.SetDirty(db);
@@ -261,10 +261,10 @@ public class exAtlasDB : ScriptableObject {
         if ( _el.isFontElement )
             return null;
 
-        string textureGUID = exEditorRuntimeHelper.AssetToGUID(_el.texture);
+        string textureGUID = exEditorHelper.AssetToGUID(_el.texture);
         return AddElementInfo ( textureGUID,
-                                exEditorRuntimeHelper.AssetToGUID(_el.atlasInfo.atlas), 
-                                exEditorRuntimeHelper.AssetToGUID(_el.atlasInfo),
+                                exEditorHelper.AssetToGUID(_el.atlasInfo.atlas), 
+                                exEditorHelper.AssetToGUID(_el.atlasInfo),
                                 _index );
     }
 
@@ -306,7 +306,7 @@ public class exAtlasDB : ScriptableObject {
         Init();
 
         ElementInfo elInfo = null;
-        string textureGUID = exEditorRuntimeHelper.AssetToGUID(_el.texture);
+        string textureGUID = exEditorHelper.AssetToGUID(_el.texture);
         if ( db.texGUIDToElementInfo.ContainsKey(textureGUID) == false ) {
             elInfo = AddElementInfo (_el, _index);
             if ( elInfo != null )
@@ -342,7 +342,7 @@ public class exAtlasDB : ScriptableObject {
         if ( _tex == null )
             return null;
 
-        return GetElementInfo( exEditorRuntimeHelper.AssetToGUID(_tex) );
+        return GetElementInfo( exEditorHelper.AssetToGUID(_tex) );
     }
 
     // ------------------------------------------------------------------ 
@@ -358,7 +358,7 @@ public class exAtlasDB : ScriptableObject {
 
             // DELME: we don't need this anymore { 
             // // NOTE: when atlas been removed, it never notify the exAtlasDB to remove elements  
-            // exAtlasInfo atlasInfo = exEditorRuntimeHelper.LoadAssetFromGUID<exAtlasInfo>(elInfo.guidAtlasInfo);
+            // exAtlasInfo atlasInfo = exEditorHelper.LoadAssetFromGUID<exAtlasInfo>(elInfo.guidAtlasInfo);
             // if ( atlasInfo == null ) {
             //     RemoveElementInfo (_textureGUID);
             //     return null;

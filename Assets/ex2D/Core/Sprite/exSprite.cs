@@ -142,25 +142,20 @@ public class exSprite : exSpriteBase {
     ///////////////////////////////////////////////////////////////////////////////
 
 #if UNITY_EDITOR
-
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
-    [MenuItem ("GameObject/Create Other/ex2D/Sprite Object")]
-    static void CreateSpriteObject () {
-        GameObject go = new GameObject("SpriteObject");
-        go.AddComponent<exSprite>();
-        Selection.activeObject = go;
-    }
-
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
 
     [ContextMenu ("Rebuild")]
     void Rebuild () {
-        this.Build ( exEditorRuntimeHelper.LoadAssetFromGUID<Texture2D>( textureGUID ) );
+
+        Texture2D texture = null;
+        if ( string.IsNullOrEmpty(textureGUID) == false ) {
+            string texturePath = AssetDatabase.GUIDToAssetPath(textureGUID);
+            texture = (Texture2D)AssetDatabase.LoadAssetAtPath( texturePath, typeof(Texture2D) );
+        }
+
+        this.Build (texture);
     }
 
     // ------------------------------------------------------------------ 
@@ -672,9 +667,9 @@ public class exSprite : exSpriteBase {
 //             exAtlasDB.ElementInfo elInfo = exAtlasDB.GetElementInfo ( textureGUID );
 //             if ( elInfo != null &&
 //                  ( elInfo.indexInAtlas != index_ ||
-//                    elInfo.guidAtlas != exEditorRuntimeHelper.AssetToGUID(atlas_) ) ) 
+//                    elInfo.guidAtlas != exEditorHelper.AssetToGUID(atlas_) ) ) 
 //             {
-//                 SetSprite( exEditorRuntimeHelper.LoadAssetFromGUID<exAtlas>(elInfo.guidAtlas),
+//                 SetSprite( exEditorHelper.LoadAssetFromGUID<exAtlas>(elInfo.guidAtlas),
 //                            elInfo.indexInAtlas );
 //             }
 //         }

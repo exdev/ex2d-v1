@@ -38,10 +38,10 @@ public class exSpriteEditor : exSpriteBaseEditor {
     static public void UpdateAtlas ( exSprite _sprite, exAtlasDB.ElementInfo _elInfo ) {
         // get atlas and index from textureGUID
         if ( _elInfo != null ) {
-            if ( _elInfo.guidAtlas != exEditorRuntimeHelper.AssetToGUID(_sprite.atlas) ||
+            if ( _elInfo.guidAtlas != exEditorHelper.AssetToGUID(_sprite.atlas) ||
                  _elInfo.indexInAtlas != _sprite.index )
             {
-                _sprite.SetSprite( exEditorRuntimeHelper.LoadAssetFromGUID<exAtlas>(_elInfo.guidAtlas), 
+                _sprite.SetSprite( exEditorHelper.LoadAssetFromGUID<exAtlas>(_elInfo.guidAtlas), 
                                    _elInfo.indexInAtlas );
             }
         }
@@ -85,7 +85,7 @@ public class exSpriteEditor : exSpriteBaseEditor {
         MeshFilter meshFilter = editSprite.GetComponent<MeshFilter>();
 
         // get ElementInfo first
-        Texture2D editTexture = exEditorRuntimeHelper.LoadAssetFromGUID<Texture2D>(editSprite.textureGUID); 
+        Texture2D editTexture = exEditorHelper.LoadAssetFromGUID<Texture2D>(editSprite.textureGUID); 
 
         // ======================================================== 
         // Texture preview (input)
@@ -109,7 +109,7 @@ public class exSpriteEditor : exSpriteBaseEditor {
             EditorGUIUtility.LookLikeInspector ();
             if ( newTexture != editTexture ) {
                 editTexture = newTexture;
-                editSprite.textureGUID = exEditorRuntimeHelper.AssetToGUID(editTexture);
+                editSprite.textureGUID = exEditorHelper.AssetToGUID(editTexture);
                 textureChanged = true;
             }
             GUILayout.Space(10);
@@ -128,7 +128,7 @@ public class exSpriteEditor : exSpriteBaseEditor {
         int editIndex = -1; 
         exAtlasDB.ElementInfo elInfo = exAtlasDB.GetElementInfo(editSprite.textureGUID);
         if ( elInfo != null ) {
-            editAtlas = exEditorRuntimeHelper.LoadAssetFromGUID<exAtlas>(elInfo.guidAtlas);
+            editAtlas = exEditorHelper.LoadAssetFromGUID<exAtlas>(elInfo.guidAtlas);
             editIndex = elInfo.indexInAtlas;
         }
         bool useAtlas = editAtlas != null && editIndex != -1; 

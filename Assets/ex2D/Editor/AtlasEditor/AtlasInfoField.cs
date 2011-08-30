@@ -126,7 +126,8 @@ partial class exAtlasEditor : EditorWindow {
                 // Show a copy icon on the drag
                 foreach ( Object o in DragAndDrop.objectReferences ) {
                     if ( o is Texture2D || 
-                         (o is exBitmapFont && (o as exBitmapFont).useAtlas == false) ) 
+                         (o is exBitmapFont && (o as exBitmapFont).useAtlas == false) ||
+                         exEditorHelper.IsDirectory(o) ) 
                     {
                         DragAndDrop.visualMode = DragAndDropVisualMode.Copy;
                         break;
@@ -134,6 +135,16 @@ partial class exAtlasEditor : EditorWindow {
                 }
             }
             else if ( e.type == EventType.DragPerform ) {
+                DragAndDrop.AcceptDrag();
+
+                // add Texture2D objects
+                Object[] objs = Selection.GetFiltered( typeof(Texture2D), SelectionMode.DeepAssets);
+                importObjects.AddRange(objs);
+
+                // add exBitmapFont objects
+                objs = Selection.GetFiltered( typeof(exBitmapFont), SelectionMode.DeepAssets);
+                importObjects.AddRange(objs);
+
                 // NOTE: Unity3D have a problem in ImportTextureForAtlas, when a texture is an active selection, 
                 //       no matter how you change your import settings, finally it will apply changes that in Inspector (shows when object selected)
                 oldSelActiveObject = null;
@@ -143,12 +154,6 @@ partial class exAtlasEditor : EditorWindow {
                 }
                 oldSelActiveObject = Selection.activeObject;
                 Selection.activeObject = null;
-
-                //
-                DragAndDrop.AcceptDrag();
-                foreach ( Object o in DragAndDrop.objectReferences ) {
-                    importObjects.Add(o);
-                }
 
                 //
                 doImport = true;

@@ -37,7 +37,7 @@ partial class exSpriteAnimClipEditor {
             List<exSpriteAnimClip.FrameInfo> invalidFrames = new List<exSpriteAnimClip.FrameInfo>();
             foreach ( exSpriteAnimClip.FrameInfo fi in _animClip.frameInfos ) {
                 float width = (fi.length / _animClip.length) * totalWidth;
-                Texture2D tex2D = exEditorRuntimeHelper.LoadAssetFromGUID<Texture2D>(fi.textureGUID);
+                Texture2D tex2D = exEditorHelper.LoadAssetFromGUID<Texture2D>(fi.textureGUID);
                 if ( tex2D == null ) {
                     invalidFrames.Add(fi);
                     continue;
@@ -47,7 +47,7 @@ partial class exSpriteAnimClipEditor {
                 curX += width;
             }
             foreach ( exSpriteAnimClip.FrameInfo fi in invalidFrames ) {
-                exSpriteAnimationUtility.RemoveFrame( curEdit, fi );
+                curEdit.RemoveFrame(fi);
                 selectedFrameInfos.Remove(fi); // unselect it if we have
             }
 
@@ -129,7 +129,7 @@ partial class exSpriteAnimClipEditor {
         // ======================================================== 
 
         if ( elInfo != null ) {
-            exAtlasInfo atlasInfo = exEditorRuntimeHelper.LoadAssetFromGUID<exAtlasInfo>(elInfo.guidAtlasInfo);
+            exAtlasInfo atlasInfo = exEditorHelper.LoadAssetFromGUID<exAtlasInfo>(elInfo.guidAtlasInfo);
             exAtlasInfo.Element el = atlasInfo.elements[elInfo.indexInAtlasInfo];  
 
             if ( el.texture != null ) {
@@ -165,7 +165,7 @@ partial class exSpriteAnimClipEditor {
             }
         }
         else {
-            Texture2D tex2D = exEditorRuntimeHelper.LoadAssetFromGUID<Texture2D>(_fi.textureGUID);
+            Texture2D tex2D = exEditorHelper.LoadAssetFromGUID<Texture2D>(_fi.textureGUID);
             if ( tex2D != null ) {
                 float width = tex2D.width;
                 float height = tex2D.height;
@@ -409,7 +409,7 @@ partial class exSpriteAnimClipEditor {
             List<Object> selects = new List<Object>(selectedFrameInfos.Count);
             foreach ( exSpriteAnimClip.FrameInfo fi in selectedFrameInfos ) {
                 Texture2D texture 
-                    = exEditorRuntimeHelper.LoadAssetFromGUID<Texture2D>(fi.textureGUID ); 
+                    = exEditorHelper.LoadAssetFromGUID<Texture2D>(fi.textureGUID ); 
                 selects.Add(texture);
             }
 
@@ -431,7 +431,7 @@ partial class exSpriteAnimClipEditor {
 
             GUILayout.BeginHorizontal();
                 GUI.enabled = false; 
-                Texture2D tex = exEditorRuntimeHelper.LoadAssetFromGUID<Texture2D>(fi.textureGUID);
+                Texture2D tex = exEditorHelper.LoadAssetFromGUID<Texture2D>(fi.textureGUID);
                 EditorGUILayout.ObjectField( "Frame["+i+"]"
                                              , tex
                                              , typeof(Object)
@@ -453,7 +453,7 @@ partial class exSpriteAnimClipEditor {
 
         //
         if ( needUpdate ) {
-            exSpriteAnimationUtility.Update(curEdit);
+            curEdit.UpdateLength();
             curEdit.editorNeedRebuild = true;
             EditorUtility.SetDirty(curEdit);
         }

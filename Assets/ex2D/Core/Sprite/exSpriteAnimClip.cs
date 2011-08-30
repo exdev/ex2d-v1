@@ -12,10 +12,6 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-#if UNITY_EDITOR
-using UnityEditor;
-using System.IO;
-#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 // exSpriteAnimClip
@@ -80,53 +76,8 @@ public class exSpriteAnimClip : ScriptableObject {
     private EventInfo tmpEventInfo = new EventInfo();
 
     ///////////////////////////////////////////////////////////////////////////////
-    // static
+    // functions
     ///////////////////////////////////////////////////////////////////////////////
-
-#if UNITY_EDITOR
-
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
-    public static exSpriteAnimClip Create ( string _path, string _name ) {
-        //
-        if ( new DirectoryInfo(_path).Exists == false ) {
-            Debug.LogError ( "can't create asset, path not found" );
-            return null;
-        }
-        if ( string.IsNullOrEmpty(_name) ) {
-            Debug.LogError ( "can't create asset, the name is empty" );
-            return null;
-        }
-        string assetPath = Path.Combine( _path, _name + ".asset" );
-
-        //
-        exSpriteAnimClip newAnimClip = ScriptableObject.CreateInstance<exSpriteAnimClip>();
-        AssetDatabase.CreateAsset(newAnimClip, assetPath);
-        Selection.activeObject = newAnimClip;
-        return newAnimClip;
-    }
-
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // Editor Only
-    // ------------------------------------------------------------------ 
-
-    public FrameInfo GetFrameInfoBySeconds ( float _seconds, WrapMode _wrapMode ) {
-        float t = WrapSeconds(_seconds, _wrapMode);
-
-        //
-        float totalTime = 0.0f;
-        foreach ( FrameInfo fi in frameInfos ) {
-            totalTime += fi.length;
-            if ( t <= totalTime )
-                return fi;
-        }
-        return null;
-    }
-
-#endif
 
     // ------------------------------------------------------------------ 
     // Desc: 

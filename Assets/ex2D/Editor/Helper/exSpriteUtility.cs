@@ -1,7 +1,7 @@
 // ======================================================================================
-// File         : exSpriteEditorHelper.cs
+// File         : exSpriteUtility.cs
 // Author       : Wu Jie 
-// Last Change  : 08/06/2011 | 22:07:15 PM | Saturday,August
+// Last Change  : 08/30/2011 | 11:00:17 AM | Tuesday,August
 // Description  : 
 // ======================================================================================
 
@@ -19,7 +19,18 @@ using System.IO;
 // functions
 ///////////////////////////////////////////////////////////////////////////////
 
-public class exSpriteEditorHelper {
+public static class exSpriteUtility {
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    [MenuItem ("GameObject/Create Other/ex2D/Sprite Object")]
+    static void CreateSpriteObject () {
+        GameObject go = new GameObject("SpriteObject");
+        go.AddComponent<exSprite>();
+        Selection.activeObject = go;
+    }
 
     // ------------------------------------------------------------------ 
     // Desc: 
@@ -41,7 +52,7 @@ public class exSpriteEditorHelper {
             // } DISABLE end 
 
             layerObj.UpdateLayer();
-            exSpriteEditorHelper.RecursivelyUpdateLayer(layerObj.transform);
+            exSpriteUtility.RecursivelyUpdateLayer(layerObj.transform);
         }
         EditorUtility.ClearProgressBar();
     }
@@ -97,7 +108,7 @@ public class exSpriteEditorHelper {
             // } DISABLE end 
             if ( spBase is exSprite ) {
                 exSprite sp = spBase as exSprite;
-                Texture2D texture = exEditorRuntimeHelper.LoadAssetFromGUID<Texture2D>(sp.textureGUID); 
+                Texture2D texture = exEditorHelper.LoadAssetFromGUID<Texture2D>(sp.textureGUID); 
                 exAtlasDB.ElementInfo elInfo = exAtlasDB.GetElementInfo(texture);
                 exSpriteEditor.UpdateAtlas( sp, elInfo );
                 sp.Build( texture );
@@ -138,7 +149,7 @@ public class exSpriteEditorHelper {
             exLayer2D layer = child.GetComponent<exLayer2D>();
             if ( layer ) {
                 layer.UpdateLayer();
-                exSpriteEditorHelper.RecursivelyUpdateLayer ( layer.transform );
+                exSpriteUtility.RecursivelyUpdateLayer ( layer.transform );
             }
         }
     }

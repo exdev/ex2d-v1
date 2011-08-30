@@ -59,8 +59,8 @@ public class exSpriteAnimationDB : ScriptableObject {
             CreateDB ();
 
         foreach ( string guidAnimClip in db.spAnimClipGUIDs ) {
-            exSpriteAnimClip spAnimClip = exEditorRuntimeHelper.LoadAssetFromGUID<exSpriteAnimClip>(guidAnimClip);
-            exSpriteAnimationUtility.Build ( spAnimClip );
+            exSpriteAnimClip spAnimClip = exEditorHelper.LoadAssetFromGUID<exSpriteAnimClip>(guidAnimClip);
+            spAnimClip .Build ();
 
             spAnimClip = null;
             EditorUtility.UnloadUnusedAssets();
@@ -145,7 +145,7 @@ public class exSpriteAnimationDB : ScriptableObject {
                 // create atlas element table
                 for ( int i = 0; i < db.spAnimClipGUIDs.Count; ++i ) {
                     string animClipGUID = db.spAnimClipGUIDs[i];
-                    exSpriteAnimClip spAnimClip = exEditorRuntimeHelper.LoadAssetFromGUID<exSpriteAnimClip>(animClipGUID);
+                    exSpriteAnimClip spAnimClip = exEditorHelper.LoadAssetFromGUID<exSpriteAnimClip>(animClipGUID);
 
                     if ( spAnimClip == null ) {
                         db.spAnimClipGUIDs.RemoveAt(i);
@@ -207,7 +207,7 @@ public class exSpriteAnimationDB : ScriptableObject {
     static public void AddSpriteAnimClip ( exSpriteAnimClip _animClip ) {
         Init();
 
-        string guidAnimClip = exEditorRuntimeHelper.AssetToGUID (_animClip);
+        string guidAnimClip = exEditorHelper.AssetToGUID (_animClip);
         if ( db.spAnimClipGUIDs.Contains(guidAnimClip) == false ) {
             db.spAnimClipGUIDs.Add(guidAnimClip);
 
@@ -227,7 +227,7 @@ public class exSpriteAnimationDB : ScriptableObject {
     // static public void RemoveSpriteAnimClip ( exSpriteAnimClip _animClip ) {
     //     Init();
 
-    //     string animClipGUID = exEditorRuntimeHelper.AssetToGUID(_animClip);
+    //     string animClipGUID = exEditorHelper.AssetToGUID(_animClip);
     //     foreach ( exSpriteAnimClip.FrameInfo fi in _animClip.frameInfos ) {
     //         if ( db.texGuidToAnimClipGUIDs.ContainsKey(fi.textureGUID) ) {
     //             List<string> animClipGUIDs = db.texGuidToAnimClipGUIDs[fi.textureGUID];
@@ -273,7 +273,7 @@ public class exSpriteAnimationDB : ScriptableObject {
     {
         Init();
 
-        string animClipGUID = exEditorRuntimeHelper.AssetToGUID(_animClip);
+        string animClipGUID = exEditorHelper.AssetToGUID(_animClip);
 
         List<string> animClipGUIDs;
         if ( db.texGuidToAnimClipGUIDs.ContainsKey(_fi.textureGUID) == false ) {
@@ -300,7 +300,7 @@ public class exSpriteAnimationDB : ScriptableObject {
 
         if ( db.texGuidToAnimClipGUIDs.ContainsKey(_fi.textureGUID) ) {
             List<string> animClips = db.texGuidToAnimClipGUIDs[_fi.textureGUID];
-            animClips.Remove ( exEditorRuntimeHelper.AssetToGUID(_animClip) );
+            animClips.Remove ( exEditorHelper.AssetToGUID(_animClip) );
         }
     }
 }

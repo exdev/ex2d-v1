@@ -427,7 +427,7 @@ partial class exAtlasEditor : EditorWindow {
                 else {
                     GUI.enabled = true;
                     if ( GUILayout.Button ( "Create Atlas..." ) ) {
-                        exAtlas newAtlas = exAtlas.Create( dir, curEdit.atlasName );
+                        exAtlas newAtlas = exAtlasInfoUtility.CreateAtlas( dir, curEdit.atlasName );
                         curEdit.atlas = newAtlas;
                         EditorUtility.SetDirty(curEdit);
                     }
@@ -517,30 +517,34 @@ partial class exAtlasEditor : EditorWindow {
 
         GUILayout.EndVertical();
 
+        // ======================================================== 
+        // space 
+        // ======================================================== 
+
         GUILayout.Space(20);
         lastRect = GUILayoutUtility.GetLastRect ();  
-        float xMax = lastRect.xMax;
-
-        GUILayout.BeginVertical();
-        // ======================================================== 
-        // zoom in/out slider 
-        // ======================================================== 
-
-        curEdit.scale = EditorGUILayout.Slider ( "Zoom", curEdit.scale, 0.1f, 2.0f, GUILayout.MaxWidth(300) );
 
         // ======================================================== 
         // atlas area 
         // ======================================================== 
 
-        // exAtlas Border and Background
-        GUILayout.Space(10);
-        lastRect = GUILayoutUtility.GetLastRect ();  
-        int borderSize = 1;
-        atlasInfoRect = new Rect( xMax + borderSize, 
-                                  lastRect.yMax + borderSize, 
-                                  curEdit.width * curEdit.scale, 
-                                  curEdit.height * curEdit.scale );
-        AtlasInfoField ( atlasInfoRect, borderSize, curEdit );
+        GUILayout.BeginVertical();
+
+            // ======================================================== 
+            // zoom in/out slider 
+            // ======================================================== 
+
+            curEdit.scale = EditorGUILayout.Slider ( "Zoom", curEdit.scale, 0.1f, 2.0f, GUILayout.MaxWidth(300) );
+            GUILayout.Space(10);
+
+            // exAtlas Border and Background
+            lastRect = GUILayoutUtility.GetLastRect ();  
+            int borderSize = 1;
+            atlasInfoRect = new Rect( lastRect.xMax + borderSize, 
+                                      lastRect.yMax + borderSize, 
+                                      curEdit.width * curEdit.scale, 
+                                      curEdit.height * curEdit.scale );
+            AtlasInfoField ( atlasInfoRect, borderSize, curEdit );
         GUILayout.EndVertical();
         GUILayout.EndHorizontal();
 

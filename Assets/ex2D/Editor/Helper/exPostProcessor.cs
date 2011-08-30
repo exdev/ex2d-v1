@@ -134,7 +134,7 @@ class ex2D_SaveAssetsProcessor : SaveAssetsProcessor {
             if ( obj is exSpriteAnimClip ) {
                 exSpriteAnimClip spAnimClip = obj as exSpriteAnimClip;
                 if ( spAnimClip.editorNeedRebuild )
-                    exSpriteAnimationUtility.Build(spAnimClip);
+                    spAnimClip.Build();
             }
 
             // TODO { 
@@ -145,8 +145,8 @@ class ex2D_SaveAssetsProcessor : SaveAssetsProcessor {
             // if ( obj is exBitmapFont ) {
             //     exBitmapFont bitmapFont = obj as exBitmapFont;
             //     if ( bitmapFont.editorNeedRebuild )
-            //         Object fontInfo = exEditorRuntimeHelper.LoadAssetFromGUID(bitmapFont.fontinfoGUID);
-            //         exBitmapFontUtility.Build(bitmapFont, fontInfo );
+            //         Object fontInfo = exEditorHelper.LoadAssetFromGUID(bitmapFont.fontinfoGUID);
+            //         bitmapFont.Build( fontInfo );
             // }
             // } TODO end 
         }

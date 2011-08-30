@@ -111,21 +111,25 @@ partial class exTileMapEditor : exPlaneEditor {
         MeshFilter meshFilter = editTileMap.GetComponent<MeshFilter>();
 
         //
-        EditorGUIUtility.LookLikeInspector ();
         EditorGUILayout.Space ();
         EditorGUI.indentLevel = 1;
 
-        // ======================================================== 
-        // row
-        // ======================================================== 
+        EditorGUIUtility.LookLikeControls ();
+        GUILayout.BeginHorizontal ();
 
-        int newRow = EditorGUILayout.IntField( "Row", editTileMap.row ); 
+            // ======================================================== 
+            // col 
+            // ======================================================== 
 
-        // ======================================================== 
-        // col 
-        // ======================================================== 
+            int newCol = EditorGUILayout.IntField( "Col", editTileMap.col ); 
 
-        int newCol = EditorGUILayout.IntField( "Col", editTileMap.col ); 
+            // ======================================================== 
+            // row
+            // ======================================================== 
+
+            int newRow = EditorGUILayout.IntField( "Row", editTileMap.row ); 
+
+        GUILayout.EndHorizontal ();
 
         if ( newRow != editTileMap.row ||
              newCol != editTileMap.col )
@@ -134,17 +138,23 @@ partial class exTileMapEditor : exPlaneEditor {
             needRebuild = true;
         }
 
-        // ======================================================== 
-        // Tile Width 
-        // ======================================================== 
+        GUILayout.BeginHorizontal ();
 
-        editTileMap.tileWidth = EditorGUILayout.IntField( "Tile Width", editTileMap.tileWidth ); 
+            // ======================================================== 
+            // Tile Width 
+            // ======================================================== 
 
-        // ======================================================== 
-        // Tile Height 
-        // ======================================================== 
+            editTileMap.tileWidth = EditorGUILayout.IntField( "Tile Width", editTileMap.tileWidth ); 
 
-        editTileMap.tileHeight = EditorGUILayout.IntField( "Tile Height", editTileMap.tileHeight ); 
+            // ======================================================== 
+            // Tile Height 
+            // ======================================================== 
+
+            editTileMap.tileHeight = EditorGUILayout.IntField( "Tile Height", editTileMap.tileHeight ); 
+
+        GUILayout.EndHorizontal ();
+
+        EditorGUIUtility.LookLikeInspector ();
 
         // ======================================================== 
         // color
@@ -152,33 +162,25 @@ partial class exTileMapEditor : exPlaneEditor {
 
         editTileMap.color = EditorGUILayout.ColorField ( "Color", editTileMap.color );
 
-        ///////////////////////////////////////////////////////////////////////////////
-        // Preview
-        ///////////////////////////////////////////////////////////////////////////////
-
         // ======================================================== 
         // Show Grid
         // ======================================================== 
 
         editTileMap.editorShowGrid = EditorGUILayout.Toggle( "Show Grid", editTileMap.editorShowGrid ); 
 
-        // DISABLE { 
-        // // ======================================================== 
-        // // Rebuild button
-        // // ======================================================== 
+        // ======================================================== 
+        // TileInfo Field 
+        // ======================================================== 
 
-        // GUI.enabled = !inAnimMode; 
-        // GUILayout.BeginHorizontal();
-        // GUILayout.FlexibleSpace();
-        // if ( GUILayout.Button("Rebuild...", GUILayout.Width(100), GUILayout.Height(25) ) ) {
-        //     needRebuild = true;
-        // }
-        // GUILayout.Space(5);
-        // GUILayout.EndHorizontal();
-        // GUI.enabled = true;
-        // } DISABLE end 
+        TileInfoField ( editTileMap.tileInfo ); 
+        if ( editTileMap.tileInfo != null && meshFilter.sharedMesh == null ) {
+            needRebuild = true;
+        }
 
+        // ======================================================== 
         // if dirty, build it.
+        // ======================================================== 
+
         if ( !EditorApplication.isPlaying && !AnimationUtility.InAnimationMode() ) {
             if ( needRebuild ) {
                 // Debug.Log("rebuild mesh...");
@@ -209,9 +211,21 @@ partial class exTileMapEditor : exPlaneEditor {
         // ======================================================== 
 
         mousePos = e.mousePosition;
+        int controlID = GUIUtility.GetControlID(FocusType.Passive);
         switch ( e.type ) {
         case EventType.mouseMove:
             HandleUtility.Repaint();
+            break;
+
+        case EventType.mouseDown:
+            if ( isMouseInside == false ) {
+                HandleUtility.AddDefaultControl(-1);
+                Selection.activeObject = null;
+            }
+            break;
+
+        case EventType.layout: 
+            HandleUtility.AddDefaultControl(controlID);
             break;
         }
 
@@ -232,9 +246,108 @@ partial class exTileMapEditor : exPlaneEditor {
 
             if ( isMouseInside ) {
                 DrawMouseGrid ( pos );
+                GUI.DrawTexture ( new Rect( mousePos.x, 
+                                            mousePos.y, 
+                                            editTileMap.tileInfo.tileWidth, 
+                                            editTileMap.tileInfo.tileHeight ), 
+                                  editTileMap.tileInfo.texture );
             }
         }
 
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void TileInfoField ( exTileInfo _tileInfo ) {
+        GUILayout.BeginHorizontal();
+            editTileMap.tileInfo 
+                = (exTileInfo)EditorGUILayout.ObjectField( "Tile Info"
+                                                           , editTileMap.tileInfo
+                                                           , typeof(exTileInfo)
+#if !UNITY_3_0 && !UNITY_3_1 && !UNITY_3_3
+                                                           , false
+#endif
+                                                         );
+            if ( GUILayout.Button("Edit...", GUILayout.Width(40), GUILayout.Height(15) ) ) {
+                exTileInfoEditor editor = exTileInfoEditor.NewWindow();
+                editor.Edit(editTileMap.tileInfo);
+            }
+        GUILayout.EndHorizontal();
+
+        if ( editTileMap.tileInfo == null )
+            return;
+
+        exTileInfo tileInfo = editTileMap.tileInfo;
+        int col = 0;
+        int row = 0;
+        int uvX = tileInfo.padding;
+        int uvY = tileInfo.padding;
+
+        // count the col
+        while ( (uvX + tileInfo.tileWidth + tileInfo.padding) <= tileInfo.texture.width ) {
+            uvX = uvX + tileInfo.tileWidth + tileInfo.padding; 
+            ++col;
+        }
+
+        // count the row
+        while ( (uvY + tileInfo.tileHeight + tileInfo.padding) <= tileInfo.texture.height ) {
+            uvY = uvY + tileInfo.tileHeight + tileInfo.padding; 
+            ++row;
+        }
+
+        // show texture by grids
+        float curX = 0.0f;
+        float curY = 0.0f;
+        float interval = 2.0f;
+        int borderSize = 1;
+        uvX = tileInfo.padding;
+        uvY = tileInfo.padding;
+
+        //
+        EditorGUILayout.Space ();
+        Rect lastRect = GUILayoutUtility.GetLastRect ();  
+
+        //
+        Rect filedRect = new Rect( 30, 
+                                   lastRect.yMax,
+                                   (tileInfo.tileWidth + interval + 2 * borderSize) * col + interval,
+                                   (tileInfo.tileHeight + interval + 2 * borderSize) * row + interval );
+        GUI.BeginGroup(filedRect);
+
+            while ( (uvY + tileInfo.tileHeight + tileInfo.padding) <= tileInfo.texture.height ) {
+                while ( (uvX + tileInfo.tileWidth + tileInfo.padding) <= tileInfo.texture.width ) {
+                    Rect rect = new Rect( curX, 
+                                          curY, 
+                                          tileInfo.tileWidth + 2 * borderSize, 
+                                          tileInfo.tileHeight + 2 * borderSize );
+                    GUI.BeginGroup( rect );
+                        GUI.DrawTexture( new Rect( -uvX + 1, 
+                                                   -uvY + 1, 
+                                                   tileInfo.texture.width, 
+                                                   tileInfo.texture.height ), 
+                                         tileInfo.texture );
+                        exEditorHelper.DrawRect ( new Rect( 0, 0, rect.width, rect.height ),
+                                                  new Color ( 1.0f, 1.0f, 1.0f, 0.0f ),
+                                                  Color.gray );
+                    GUI.EndGroup();
+
+                    uvX = uvX + tileInfo.tileWidth + tileInfo.padding; 
+                    curX = curX + tileInfo.tileWidth + interval + 2 * borderSize; 
+                }
+
+                // step uv
+                uvX = tileInfo.padding;
+                uvY = uvY + tileInfo.tileHeight + tileInfo.padding; 
+
+                // step pos
+                curX = 0.0f;
+                curY = curY + tileInfo.tileHeight + interval + 2 * borderSize; 
+            }
+
+        GUI.EndGroup();
+        GUILayoutUtility.GetRect ( filedRect.width, filedRect.height );
     }
 
     // ------------------------------------------------------------------ 
@@ -279,18 +392,23 @@ partial class exTileMapEditor : exPlaneEditor {
     // ------------------------------------------------------------------ 
 
     void DrawMouseGrid ( Vector3 _pos ) {
+        if ( editTileMap.tileInfo == null )
+            return;
+
         Handles.color = Color.white;
         Color faceColor = new Color( 1.0f, 1.0f, 1.0f, 0.2f );
         Color lineColor = new Color( 0.0f, 0.0f, 0.0f, 1.0f );
+        float width = editTileMap.tileInfo.tileWidth;
+        float height = editTileMap.tileInfo.tileHeight;
 
         switch ( editTileMap.plane ) {
         case exPlane.Plane.XY:
             Handles.DrawSolidRectangleWithOutline( new Vector3[] {
-                                                   _pos + new Vector3( 0.0f,                   0.0f,                   0.0f ), 
-                                                   _pos + new Vector3( 0.0f,                   editTileMap.tileHeight, 0.0f ),
-                                                   _pos + new Vector3( editTileMap.tileWidth,  editTileMap.tileHeight, 0.0f ),
-                                                   _pos + new Vector3( editTileMap.tileWidth,  0.0f,                   0.0f ),
-                                                   _pos + new Vector3( 0.0f,                   0.0f,                   0.0f )
+                                                   _pos + new Vector3( 0.0f,   0.0f,   0.0f ), 
+                                                   _pos + new Vector3( 0.0f,   height, 0.0f ),
+                                                   _pos + new Vector3( width,  height, 0.0f ),
+                                                   _pos + new Vector3( width,  0.0f,   0.0f ),
+                                                   _pos + new Vector3( 0.0f,   0.0f,   0.0f )
                                                    },
                                                    faceColor, 
                                                    lineColor );
@@ -298,11 +416,11 @@ partial class exTileMapEditor : exPlaneEditor {
 
         case exPlane.Plane.XZ:
             Handles.DrawSolidRectangleWithOutline( new Vector3[] {
-                                                   _pos + new Vector3( 0.0f,                   0.0f, 0.0f ), 
-                                                   _pos + new Vector3( 0.0f,                   0.0f, editTileMap.tileHeight ),
-                                                   _pos + new Vector3( editTileMap.tileWidth,  0.0f, editTileMap.tileHeight ),
-                                                   _pos + new Vector3( editTileMap.tileWidth,  0.0f, 0.0f ),
-                                                   _pos + new Vector3( 0.0f,                   0.0f, 0.0f )
+                                                   _pos + new Vector3( 0.0f,   0.0f, 0.0f   ), 
+                                                   _pos + new Vector3( 0.0f,   0.0f, height ),
+                                                   _pos + new Vector3( width,  0.0f, height ),
+                                                   _pos + new Vector3( width,  0.0f, 0.0f   ),
+                                                   _pos + new Vector3( 0.0f,   0.0f, 0.0f   )
                                                    },
                                                    faceColor, 
                                                    lineColor );
@@ -310,11 +428,11 @@ partial class exTileMapEditor : exPlaneEditor {
 
         case exPlane.Plane.ZY:
             Handles.DrawSolidRectangleWithOutline( new Vector3[] {
-                                                   _pos + new Vector3( 0.0f,                   0.0f, 0.0f ), 
-                                                   _pos + new Vector3( editTileMap.tileHeight, 0.0f, 0.0f  ),
-                                                   _pos + new Vector3( editTileMap.tileHeight, 0.0f, editTileMap.tileWidth ),
-                                                   _pos + new Vector3( 0.0f,                   0.0f, editTileMap.tileWidth ),
-                                                   _pos + new Vector3( 0.0f,                   0.0f, 0.0f )
+                                                   _pos + new Vector3( 0.0f,   0.0f, 0.0f  ), 
+                                                   _pos + new Vector3( height, 0.0f, 0.0f  ),
+                                                   _pos + new Vector3( height, 0.0f, width ),
+                                                   _pos + new Vector3( 0.0f,   0.0f, width ),
+                                                   _pos + new Vector3( 0.0f,   0.0f, 0.0f  )
                                                    },
                                                    faceColor, 
                                                    lineColor );

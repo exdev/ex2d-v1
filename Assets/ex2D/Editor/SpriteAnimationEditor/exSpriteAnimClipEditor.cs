@@ -115,7 +115,7 @@ partial class exSpriteAnimClipEditor : EditorWindow {
         previewScale = 1.0f;
 
         if ( curEdit ) {
-            exSpriteAnimationUtility.Update(curEdit);
+            curEdit.UpdateLength();
         }
     }
 
@@ -237,7 +237,7 @@ partial class exSpriteAnimClipEditor : EditorWindow {
 
             GUI.enabled = curEdit.editorNeedRebuild; 
             if ( GUILayout.Button("Build", GUILayout.MaxWidth(100) ) ) {
-                exSpriteAnimationUtility.Build(curEdit);
+                curEdit.Build();
             }
             GUI.enabled = true; 
 
@@ -266,7 +266,7 @@ partial class exSpriteAnimClipEditor : EditorWindow {
                         fi.length = Mathf.Max(1.0f/60.0f, fi.length + delta * ratio);
                     }
                     curEdit.length = newLength;
-                    exSpriteAnimationUtility.Update(curEdit);
+                    curEdit.UpdateLength();
                     curEdit.editorNeedRebuild = true;
                 }
                 GUI.enabled = true;
@@ -661,7 +661,7 @@ partial class exSpriteAnimClipEditor : EditorWindow {
             //
             exAtlasDB.ElementInfo elInfo = exAtlasDB.GetElementInfo (frameInfo.textureGUID);
             if ( elInfo != null ) {
-                exAtlasInfo atlasInfo = exEditorRuntimeHelper.LoadAssetFromGUID<exAtlasInfo>(elInfo.guidAtlasInfo);
+                exAtlasInfo atlasInfo = exEditorHelper.LoadAssetFromGUID<exAtlasInfo>(elInfo.guidAtlasInfo);
                 exAtlasInfo.Element el = atlasInfo.elements[elInfo.indexInAtlasInfo];  
                 fiWidth = el.trimRect.width;
                 fiHeight = el.trimRect.height;
@@ -838,9 +838,9 @@ partial class exSpriteAnimClipEditor : EditorWindow {
 
         if ( selectedFrameInfos.Count != 0 ) {
             foreach ( exSpriteAnimClip.FrameInfo fi in selectedFrameInfos ) {
-                exSpriteAnimationUtility.RemoveFrame( curEdit, fi );
+                curEdit.RemoveFrame(fi);
             }
-            exSpriteAnimationUtility.Update( curEdit );
+            curEdit.UpdateLength();
             selectedFrameInfos.Clear();
         }
     } 
@@ -867,7 +867,7 @@ partial class exSpriteAnimClipEditor : EditorWindow {
         }
 
         // re-calculate the animclip length
-        exSpriteAnimationUtility.Update(curEdit);
+        curEdit.UpdateLength();
 
         //
         curEdit.editorNeedRebuild = true;
@@ -969,7 +969,7 @@ partial class exSpriteAnimClipEditor : EditorWindow {
             }
             insertAt = -1;
             selectedFrameInfos.Clear();
-            exSpriteAnimationUtility.Update(curEdit);
+            curEdit.UpdateLength();
 
             curEdit.editorNeedRebuild = true;
             EditorUtility.SetDirty(curEdit);

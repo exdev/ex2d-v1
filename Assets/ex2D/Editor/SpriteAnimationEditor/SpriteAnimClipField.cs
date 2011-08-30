@@ -305,7 +305,8 @@ partial class exSpriteAnimClipEditor {
             else if ( e.type == EventType.DragUpdated ) {
                 // Show a copy icon on the drag
                 foreach ( Object o in DragAndDrop.objectReferences ) {
-                    if ( o is Texture2D ) {
+                    if ( o is Texture2D ||
+                         exEditorHelper.IsDirectory(o) ) {
                         DragAndDrop.visualMode = DragAndDropVisualMode.Copy;
                         break;
                     }
@@ -318,14 +319,20 @@ partial class exSpriteAnimClipEditor {
                                                   "Start adding ",
                                                   0.5f );    
                 // sort
-                List<Object> objList = new List<Object>(DragAndDrop.objectReferences.Length);
-                foreach ( Object o in DragAndDrop.objectReferences ) {
-                    objList.Add(o);
-                }
-                objList.Sort(exEditorHelper.CompareObjectByName);
+                // DISABLE: we use Selection.GetFiltered instead { 
+                // List<Object> objList = new List<Object>(DragAndDrop.objectReferences.Length);
+                // foreach ( Object o in DragAndDrop.objectReferences ) {
+                //     objList.Add(o);
+                // }
+                // objList.Sort(exEditorHelper.CompareObjectByName);
+                // } DISABLE end 
+
+                // sort
+                Object[] objList = Selection.GetFiltered( typeof(Texture2D), SelectionMode.DeepAssets);
+                System.Array.Sort( objList, exEditorHelper.CompareObjectByName );
 
                 // add objects as frames
-                exSpriteAnimationUtility.AddFrames( _animClip, objList.ToArray() );
+                _animClip.AddFrames( objList );
                 EditorUtility.ClearProgressBar();    
 
                 //

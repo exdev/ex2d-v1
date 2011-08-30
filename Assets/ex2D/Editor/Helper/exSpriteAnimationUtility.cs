@@ -19,15 +19,47 @@ using System.IO;
 // exSpriteAnimationUtility
 ///////////////////////////////////////////////////////////////////////////////
 
-public class exSpriteAnimationUtility {
+public static class exSpriteAnimationUtility {
 
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    static public void Build ( exSpriteAnimClip _animClip ) {
-        int i = 0;
+    [MenuItem ("GameObject/Create Other/ex2D/SpriteAnimation Object")]
+    static void CreateSpriteAnimationObject () {
+        GameObject go = new GameObject("SpriteAnimationObject");
+        go.AddComponent<exSpriteAnimation>();
+        Selection.activeObject = go;
+    }
 
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public static exSpriteAnimClip CreateSpriteAnimClip ( string _path, string _name ) {
+        //
+        if ( new DirectoryInfo(_path).Exists == false ) {
+            Debug.LogError ( "can't create asset, path not found" );
+            return null;
+        }
+        if ( string.IsNullOrEmpty(_name) ) {
+            Debug.LogError ( "can't create asset, the name is empty" );
+            return null;
+        }
+        string assetPath = Path.Combine( _path, _name + ".asset" );
+
+        //
+        exSpriteAnimClip newAnimClip = ScriptableObject.CreateInstance<exSpriteAnimClip>();
+        AssetDatabase.CreateAsset(newAnimClip, assetPath);
+        Selection.activeObject = newAnimClip;
+        return newAnimClip;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public static void Build ( this exSpriteAnimClip _animClip ) {
         EditorUtility.DisplayProgressBar( "Building Sprite Animation Clip " + _animClip.name,
                                           "Building Frames...",
                                           0.1f );
@@ -35,12 +67,7 @@ public class exSpriteAnimationUtility {
         foreach ( exSpriteAnimClip.FrameInfo fi in _animClip.frameInfos ) {
             exAtlasDB.ElementInfo elInfo = exAtlasDB.GetElementInfo (fi.textureGUID);
             if ( elInfo != null ) {
-                // DISABLE: it is too slow { 
-                // EditorUtility.DisplayProgressBar( "Building Sprite Animation Clip...",
-                //                                   "Building FrameInfo " + el.texture.name,
-                //                                   (float)i/(float)_animClip.frameInfos.Count );    
-                // } DISABLE end 
-                fi.atlas = exEditorRuntimeHelper.LoadAssetFromGUID<exAtlas>(elInfo.guidAtlas);
+                fi.atlas = exEditorHelper.LoadAssetFromGUID<exAtlas>(elInfo.guidAtlas);
                 fi.index = elInfo.indexInAtlas;
             }
             else {
@@ -53,7 +80,6 @@ public class exSpriteAnimationUtility {
                 fi.atlas = null;
                 fi.index = -1;
             }
-            ++i;
         }
         EditorUtility.ClearProgressBar();
 
@@ -65,7 +91,7 @@ public class exSpriteAnimationUtility {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    static public void BuildFromAtlasInfo ( exAtlasInfo _atlasInfo ) {
+    public static void BuildFromAtlasInfo ( exAtlasInfo _atlasInfo ) {
         EditorUtility.DisplayProgressBar( "Building Sprite Animation Clips...",
                                           "Building Sprite Animation Clips...",
                                           0.5f );    
@@ -78,7 +104,7 @@ public class exSpriteAnimationUtility {
                 //                                   "Building Sprite Animation Clips " + sp.name,
                 //                                   (float)i/(float)_atlasInfo.rebuildSpAnimClips.Count );    
                 // } DISABLE end 
-                Build(sp);
+                sp.Build();
             }
         }
         _atlasInfo.rebuildSpAnimClips.Clear();
@@ -89,11 +115,11 @@ public class exSpriteAnimationUtility {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    static public void AddFrames ( exSpriteAnimClip _animClip, Object[] _objects ) {
+    public static void AddFrames ( this exSpriteAnimClip _animClip, Object[] _objects ) {
         foreach ( Object o in _objects ) {
             if ( o is Texture2D ) {
                 Texture2D t = o as Texture2D;
-                exSpriteAnimationUtility.AddFrame( _animClip, t ); // NOTE: it will SetDirty here
+                _animClip.AddFrame(t); // NOTE: it will SetDirty here
             }
         }
     }
@@ -102,13 +128,13 @@ public class exSpriteAnimationUtility {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    static public void AddFrame ( exSpriteAnimClip _animClip, Texture2D _tex ) {
+    public static void AddFrame ( this exSpriteAnimClip _animClip, Texture2D _tex ) {
         exSpriteAnimClip.FrameInfo frameInfo = new exSpriteAnimClip.FrameInfo ();
         frameInfo.length = 10.0f/60.0f;
         frameInfo.textureGUID = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(_tex));
         exAtlasDB.ElementInfo elInfo = exAtlasDB.GetElementInfo (frameInfo.textureGUID);
         if ( elInfo != null ) {
-            frameInfo.atlas = exEditorRuntimeHelper.LoadAssetFromGUID<exAtlas>(elInfo.guidAtlas);
+            frameInfo.atlas = exEditorHelper.LoadAssetFromGUID<exAtlas>(elInfo.guidAtlas);
             frameInfo.index = elInfo.indexInAtlas;
         }
         else {
@@ -127,7 +153,7 @@ public class exSpriteAnimationUtility {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    static public void RemoveFrame ( exSpriteAnimClip _animClip, exSpriteAnimClip.FrameInfo _fi ) {
+    public static void RemoveFrame ( this exSpriteAnimClip _animClip, exSpriteAnimClip.FrameInfo _fi ) {
         _animClip.frameInfos.Remove(_fi);
         _animClip.length -= _fi.length;
 
@@ -140,10 +166,29 @@ public class exSpriteAnimationUtility {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    static public void Update ( exSpriteAnimClip _animClip ) {
+    public static void UpdateLength ( this exSpriteAnimClip _animClip ) {
         _animClip.length = 0.0f;
         foreach ( exSpriteAnimClip.FrameInfo fi in _animClip.frameInfos ) {
             _animClip.length += fi.length;
         }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public static exSpriteAnimClip.FrameInfo GetFrameInfoBySeconds ( this exSpriteAnimClip _animClip, 
+                                                                     float _seconds, 
+                                                                     WrapMode _wrapMode ) {
+        float t = _animClip.WrapSeconds(_seconds, _wrapMode);
+
+        //
+        float totalTime = 0.0f;
+        foreach ( exSpriteAnimClip.FrameInfo fi in _animClip.frameInfos ) {
+            totalTime += fi.length;
+            if ( t <= totalTime )
+                return fi;
+        }
+        return null;
     }
 }

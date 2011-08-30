@@ -12,10 +12,6 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-#if UNITY_EDITOR
-using UnityEditor;
-using System.IO;
-#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 // exBitmapFont
@@ -107,31 +103,5 @@ public class exBitmapFont : ScriptableObject {
             return idToCharInfo[_id];
         return null;
     }
-
-#if UNITY_EDITOR
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
-    public static exBitmapFont Create ( string _path, string _name ) {
-        //
-        if ( new DirectoryInfo(_path).Exists == false ) {
-            Debug.LogError ( "can't create asset, path not found" );
-            return null;
-        }
-        if ( string.IsNullOrEmpty(_name) ) {
-            Debug.LogError ( "can't create asset, the name is empty" );
-            return null;
-        }
-        string assetPath = Path.Combine( _path, _name + ".asset" );
-
-        //
-        exBitmapFont newBitmapFont = ScriptableObject.CreateInstance<exBitmapFont>();
-        AssetDatabase.CreateAsset(newBitmapFont, assetPath);
-        Selection.activeObject = newBitmapFont;
-        return newBitmapFont;
-    }
-#endif
-
 }
 

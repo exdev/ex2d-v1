@@ -12,9 +12,6 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 // exSpriteAnimState
@@ -83,23 +80,6 @@ public class exSpriteAnimation : MonoBehaviour {
     private bool paused = false;
     private exAtlas defaultAtlas;
     private int defaultIndex;
-
-    ///////////////////////////////////////////////////////////////////////////////
-    // static functions
-    ///////////////////////////////////////////////////////////////////////////////
-
-#if UNITY_EDITOR
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
-    [MenuItem ("GameObject/Create Other/ex2D/SpriteAnimation Object")]
-    static void CreateSpriteAnimationObject () {
-        GameObject go = new GameObject("SpriteAnimationObject");
-        go.AddComponent<exSpriteAnimation>();
-        Selection.activeObject = go;
-    }
-#endif
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -247,7 +227,7 @@ public class exSpriteAnimation : MonoBehaviour {
                 break;
 
             case exAnimStopAction.Destroy:
-                GameObject.Destroy(this);
+                GameObject.Destroy(gameObject);
                 break;
             }
         }

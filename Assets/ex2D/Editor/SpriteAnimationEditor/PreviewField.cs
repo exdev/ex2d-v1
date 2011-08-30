@@ -68,7 +68,7 @@ partial class exSpriteAnimClipEditor {
                 exAtlasDB.ElementInfo elInfo = exAtlasDB.GetElementInfo (fi.textureGUID);
 
                 if ( elInfo != null ) {
-                    exAtlasInfo atlasInfo = exEditorRuntimeHelper.LoadAssetFromGUID<exAtlasInfo>(elInfo.guidAtlasInfo);
+                    exAtlasInfo atlasInfo = exEditorHelper.LoadAssetFromGUID<exAtlasInfo>(elInfo.guidAtlasInfo);
                     exAtlasInfo.Element el = atlasInfo.elements[elInfo.indexInAtlasInfo];  
 
                     if ( el.texture != null ) {

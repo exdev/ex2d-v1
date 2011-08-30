@@ -18,7 +18,7 @@ using System.IO;
 // functions
 ///////////////////////////////////////////////////////////////////////////////
 
-public class exEditorHelper {
+static public class exEditorHelper {
 
     ///////////////////////////////////////////////////////////////////////////////
     //
@@ -30,6 +30,56 @@ public class exEditorHelper {
 
     static GUIStyle styleRectBorder = null;
     static GUIStyle styleRectSelectBox = null;
+
+    // project
+    static bool projectCallbackRegistered = false;
+    static bool doRenameAsset = false;
+    static string renameAssetGUID = "";
+    static string defaultName = "Unknown";
+
+    ///////////////////////////////////////////////////////////////////////////////
+    // project rename
+    ///////////////////////////////////////////////////////////////////////////////
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public static void RenameProjectWindowItem ( string _guid, string _defaultName ) {
+        RegisterProjectOnGUICallback();
+
+        renameAssetGUID = _guid;
+        defaultName = _defaultName;
+        doRenameAsset = true;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    static void RegisterProjectOnGUICallback () {
+        if ( projectCallbackRegistered == false ) {
+            projectCallbackRegistered = true;
+            EditorApplication.projectWindowItemOnGUI = ProjectWindowItemOnGUI;
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    static void ProjectWindowItemOnGUI ( string _guid, Rect _selectionRect ) {
+        if ( doRenameAsset ) {
+            if ( _guid == renameAssetGUID ) {
+                // TODO { 
+                // DrawRect( _selectionRect, Color.black, Color.gray );
+                EditorGUI.LabelField( _selectionRect, defaultName, "" );
+                // process rename
+                doRenameAsset = false;
+                // } TODO end 
+            }
+        }
+    } 
 
     ///////////////////////////////////////////////////////////////////////////////
     // special texture
@@ -168,8 +218,44 @@ public class exEditorHelper {
 
 
     ///////////////////////////////////////////////////////////////////////////////
-    // functions
+    // asset path
     ///////////////////////////////////////////////////////////////////////////////
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public static string GetCurrentDirectory () {
+        if ( Selection.activeObject ) {
+            string path = AssetDatabase.GetAssetPath(Selection.activeObject);
+            if ( Path.GetExtension(path) != "" ) {
+                path = Path.GetDirectoryName(path);
+            }
+            return path;
+        }
+        return "Assets";
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public static string AssetToGUID ( Object _o ) {
+        if ( _o == null )
+            return "";
+        return AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(_o));
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public static T LoadAssetFromGUID<T> ( string _guid ) {
+        if ( string.IsNullOrEmpty(_guid) )
+            return (T)(object)null;
+        string texturePath = AssetDatabase.GUIDToAssetPath(_guid);
+        return (T)(object)AssetDatabase.LoadAssetAtPath( texturePath, typeof(T) );
+    }
 
     // ------------------------------------------------------------------ 
     // Desc: 
@@ -183,6 +269,22 @@ public class exEditorHelper {
         }
         return false;
     }
+
+    ///////////////////////////////////////////////////////////////////////////////
+    // object 
+    ///////////////////////////////////////////////////////////////////////////////
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public static int CompareObjectByName ( Object _a, Object _b ) {
+        return string.Compare( _a.name, _b.name );
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////
+    // editor draw
+    ///////////////////////////////////////////////////////////////////////////////
 
     // ------------------------------------------------------------------ 
     // Desc: 
@@ -240,14 +342,6 @@ public class exEditorHelper {
         GUI.backgroundColor = _borderColor;
             GUI.Box ( _rect, GUIContent.none, exEditorHelper.RectBorderStyle() );
         GUI.backgroundColor = old;
-    }
-
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
-    public static int CompareObjectByName ( Object _a, Object _b ) {
-        return string.Compare( _a.name, _b.name );
     }
 
     ///////////////////////////////////////////////////////////////////////////////

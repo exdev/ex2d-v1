@@ -41,15 +41,17 @@ public class exTextureHelper {
     public static void ImportTextureForAtlas ( Texture2D _tex ) {
         string path = AssetDatabase.GetAssetPath(_tex);
         TextureImporter importer = TextureImporter.GetAtPath(path) as TextureImporter;
-        if (importer.textureType != TextureImporterType.Advanced ||
-            importer.textureFormat != TextureImporterFormat.AutomaticTruecolor ||
-            importer.npotScale != TextureImporterNPOTScale.None ||
-            importer.isReadable != true)
+        if ( importer.textureType != TextureImporterType.Advanced ||
+             importer.textureFormat != TextureImporterFormat.AutomaticTruecolor ||
+             importer.npotScale != TextureImporterNPOTScale.None ||
+             importer.isReadable != true ||
+             importer.mipmapEnabled != false )
         {
             importer.textureFormat = TextureImporterFormat.AutomaticTruecolor;
             importer.textureType = TextureImporterType.Advanced;
             importer.npotScale = TextureImporterNPOTScale.None;
             importer.isReadable = true;
+            importer.mipmapEnabled = false;
             AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate|ImportAssetOptions.ForceSynchronousImport);
         }
     }

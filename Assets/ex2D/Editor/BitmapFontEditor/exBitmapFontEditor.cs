@@ -191,7 +191,7 @@ partial class exBitmapFontEditor : EditorWindow {
 
         GUI.enabled = curEdit.editorNeedRebuild;
         if ( GUILayout.Button("Build", GUILayout.MaxWidth(100) ) ) {
-            exBitmapFontUtility.Build(curEdit, curFontInfo );
+            curEdit.Build( curFontInfo );
         }
         GUI.enabled = true;
 
@@ -210,7 +210,7 @@ partial class exBitmapFontEditor : EditorWindow {
 
         // check if there have 
         if ( curEdit == null ) {
-            curEdit = exBitmapFont.Create( newPath, newName );
+            curEdit = exBitmapFontUtility.Create( newPath, newName );
         }
 
         // check if we have the texture and textasset with the same name of bitmapfont 
@@ -219,7 +219,7 @@ partial class exBitmapFontEditor : EditorWindow {
                                           0.2f );    
 
         // if we have enough infomation, try to build the exBitmapFont asset
-        exBitmapFontUtility.Build ( curEdit, _fontInfo );
+        curEdit.Build ( _fontInfo );
 
         EditorUtility.ClearProgressBar();    
     }

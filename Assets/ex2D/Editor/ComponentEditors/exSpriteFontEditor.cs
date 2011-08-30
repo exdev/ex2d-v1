@@ -42,8 +42,10 @@ public class exSpriteFontEditor : exSpriteBaseEditor {
         base.OnEnable();
         if ( target != editSpriteFont ) {
             editSpriteFont = target as exSpriteFont;
-            long lines = exStringHelper.CountLinesInString(editSpriteFont.text);
-            textAreaHeight = lines * EditorStyles.textField.lineHeight;
+            if ( EditorApplication.isPlaying == false ) {
+                long lines = exStringHelper.CountLinesInString(editSpriteFont.text);
+                textAreaHeight = lines * EditorStyles.textField.lineHeight;
+            }
         }
     }
 

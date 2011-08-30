@@ -29,13 +29,22 @@ public class exTileMap : exPlane {
     // properties
     ///////////////////////////////////////////////////////////////////////////////
 
-    [SerializeField] protected exTileInfo info_;
-    public exTileInfo info { 
-        get { return info_; } 
+    [SerializeField] protected exTileInfo tileInfo_;
+    public exTileInfo tileInfo { 
+        get { return tileInfo_; } 
         set { 
-            if ( info_ != value ) {
-                info_ = value;
-                // TODO: ??? change texture or what ?
+            if ( tileInfo_ != value ) {
+                tileInfo_ = value;
+                // renderer
+                if ( renderer ) {
+                    if ( tileInfo_ ) {
+                        renderer.sharedMaterial = tileInfo_.material;
+                    }
+                    else {
+                        renderer.sharedMaterial = null;
+                        GetComponent<MeshFilter>().sharedMesh = null; 
+                    }
+                }
             }
         }
     }
@@ -93,7 +102,6 @@ public class exTileMap : exPlane {
     ///////////////////////////////////////////////////////////////////////////////
 
 #if UNITY_EDITOR
-
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
@@ -189,8 +197,8 @@ public class exTileMap : exPlane {
                     for ( int r = 0; r < 2; ++r ) {
                         for ( int c = 0; c < 2; ++c ) {
                             int j = r * 2 + c;
-                            float x = curX - halfWidth + c * tileWidth_;
-                            float y = -curY + halfHeight - r * tileHeight_;
+                            float x = curX - halfWidth + c * tileInfo_.tileWidth;
+                            float y = -curY + halfHeight - r * tileInfo_.tileHeight;
 
                             // build vertices and normals
                             switch ( plane ) {

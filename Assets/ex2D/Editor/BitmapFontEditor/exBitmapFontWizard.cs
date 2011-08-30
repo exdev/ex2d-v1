@@ -82,7 +82,7 @@ public class exBitmapFontWizard : ScriptableWizard {
 
             GUI.enabled = false;
             // asset path
-            assetPath = exEditorRuntimeHelper.GetCurrentDirectory();
+            assetPath = exEditorHelper.GetCurrentDirectory();
             EditorGUILayout.TextField( "Saved Path", assetPath, GUILayout.MaxWidth(405) );
 
             // asset name
@@ -130,7 +130,7 @@ public class exBitmapFontWizard : ScriptableWizard {
                                           0.1f );    
 
         // check if there have 
-        exBitmapFont bitmapFont = exBitmapFont.Create( _path, _name );
+        exBitmapFont bitmapFont = exBitmapFontUtility.Create( _path, _name );
 
         // check if we have the texture and textasset with the same name of bitmapfont 
         EditorUtility.DisplayProgressBar( "Creating BitmapFont...",
@@ -138,7 +138,7 @@ public class exBitmapFontWizard : ScriptableWizard {
                                           0.2f );    
 
         // if we have enough infomation, try to build the exBitmapFont asset
-        exBitmapFontUtility.Build ( bitmapFont, _fontInfo );
+        bitmapFont.Build ( _fontInfo );
         EditorUtility.ClearProgressBar();    
 
         //

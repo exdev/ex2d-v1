@@ -1,7 +1,7 @@
 // ======================================================================================
-// File         : exFastPool.cs
+// File         : exPool.cs
 // Author       : Wu Jie 
-// Last Change  : 08/06/2011 | 21:41:16 PM | Saturday,August
+// Last Change  : 08/30/2011 | 00:44:50 AM | Tuesday,August
 // Description  : 
 // ======================================================================================
 
@@ -13,7 +13,77 @@ using UnityEngine;
 using System.Collections;
 
 ///////////////////////////////////////////////////////////////////////////////
-// defines
+// class exPool
+// 
+// Purpose: 
+// 
+///////////////////////////////////////////////////////////////////////////////
+
+[System.Serializable]
+public class exPool<T> {
+
+    public int size;
+    public GameObject prefab;
+
+    private T[] objects;
+    private int idx = 0;
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void Init () {
+        objects = new T[size]; 
+        idx = size-1;
+        Reset ();
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void Reset () {
+        if ( prefab != null ) {
+            for ( int i = 0; i < size; ++i ) {
+                GameObject obj = GameObject.Instantiate(prefab, Vector3.zero, Quaternion.identity) as GameObject;
+                objects[i] = (T)(object)obj.GetComponent(typeof(T));
+                (objects[i] as MonoBehaviour).enabled = false;
+            }
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public T Request ( Vector3 _pos, Quaternion _rot )  {
+        if ( idx < 0 )
+            Debug.LogError ("Error: the pool do not have enough free item.");
+
+        MonoBehaviour result = objects[idx] as MonoBehaviour;
+        --idx; 
+
+        result.transform.position = _pos;
+        result.transform.rotation = _rot;
+        result.enabled = true;
+        return (T)(object)result;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void Return ( T _obj ) {
+        ++idx;
+        objects[idx] = _obj;
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// class exFastPool
+// 
+// Purpose: 
+// 
 ///////////////////////////////////////////////////////////////////////////////
 
 [System.Serializable]

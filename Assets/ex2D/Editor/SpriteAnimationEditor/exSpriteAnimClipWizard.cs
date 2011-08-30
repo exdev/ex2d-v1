@@ -53,7 +53,7 @@ public class exSpriteAnimClipWizard : ScriptableWizard {
 
     void OnGUI () {
         GUILayout.BeginVertical();
-            assetPath = exEditorRuntimeHelper.GetCurrentDirectory();
+            assetPath = exEditorHelper.GetCurrentDirectory();
             assetPath = EditorGUILayout.TextField( "Saved Path", assetPath, GUILayout.MaxWidth(405) );
 
             assetName = Path.GetFileNameWithoutExtension(assetName);
@@ -73,7 +73,7 @@ public class exSpriteAnimClipWizard : ScriptableWizard {
                                                                 "Yes", "No" );
                     }
                     if ( doCreate ) {
-                        exSpriteAnimClip clip = exSpriteAnimClip.Create ( assetPath, assetName );
+                        exSpriteAnimClip clip = exSpriteAnimationUtility.CreateSpriteAnimClip ( assetPath, assetName );
                         EditorGUIUtility.PingObject(clip);
                     }
                     Close();

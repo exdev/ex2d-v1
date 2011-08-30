@@ -25,7 +25,29 @@ public class exAtlasInfoUtility {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    static public exAtlasInfo CreateAtlasInfo ( string _path, string _name, int _width, int _height ) {
+    public static exAtlas CreateAtlas ( string _path, string _name ) {
+        if ( new DirectoryInfo(_path).Exists == false ) {
+            Debug.LogError ( "can't create asset, path not found" );
+            return null;
+        }
+        if ( string.IsNullOrEmpty(_name) ) {
+            Debug.LogError ( "can't create asset, the name is empty" );
+            return null;
+        }
+        string assetPath = Path.Combine( _path, _name + ".asset" );
+
+        //
+        exAtlas newAtlas = ScriptableObject.CreateInstance<exAtlas>();
+        AssetDatabase.CreateAsset(newAtlas, assetPath);
+        Selection.activeObject = newAtlas;
+        return newAtlas;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public static exAtlasInfo CreateAtlasInfo ( string _path, string _name, int _width, int _height ) {
         // create atlas info
         EditorUtility.DisplayProgressBar( "Creating Atlas...",
                                           "Creating Atlas Asset...",
@@ -90,7 +112,7 @@ public class exAtlasInfoUtility {
         newAtlasInfo.material.mainTexture = newAtlasInfo.texture;
 
         // create new atlas and setup it for both atlas info and atlas asset
-        exAtlas newAtlas = exAtlas.Create( _path, _name );
+        exAtlas newAtlas = CreateAtlas( _path, _name );
         newAtlas.texture = newAtlasInfo.texture;
         newAtlas.material = newAtlasInfo.material;
         newAtlasInfo.atlas = newAtlas;
@@ -110,7 +132,7 @@ public class exAtlasInfoUtility {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    static public void Build ( exAtlasInfo _atlasInfo ) {
+    public static void Build ( exAtlasInfo _atlasInfo ) {
 
         exAtlas atlas = _atlasInfo.atlas;
         Texture2D texture = _atlasInfo.texture;
@@ -226,7 +248,7 @@ public class exAtlasInfoUtility {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    static public void PostBuild ( List<exAtlasInfo> _atlasInfos ) {
+    public static void PostBuild ( List<exAtlasInfo> _atlasInfos ) {
         if ( _atlasInfos.Count == 0 )
             return;
 
@@ -253,7 +275,7 @@ public class exAtlasInfoUtility {
                 else {
                     // find if the sp's atalsInfo need rebuild
                     foreach ( exAtlasInfo atlasInfo in _atlasInfos ) {
-                        if ( elInfo.guidAtlasInfo == exEditorRuntimeHelper.AssetToGUID(atlasInfo) ) {
+                        if ( elInfo.guidAtlasInfo == exEditorHelper.AssetToGUID(atlasInfo) ) {
                             needRebuild = true;
                             break;
                         }
@@ -264,7 +286,7 @@ public class exAtlasInfoUtility {
                     exSpriteEditor.UpdateAtlas( sp, elInfo );
                     bool isPrefab = (EditorUtility.GetPrefabType(spBase) == PrefabType.Prefab); 
                     if ( isPrefab == false ) {
-                        Texture2D texture = exEditorRuntimeHelper.LoadAssetFromGUID<Texture2D>(sp.textureGUID );
+                        Texture2D texture = exEditorHelper.LoadAssetFromGUID<Texture2D>(sp.textureGUID );
                         sp.Build( texture );
                     }
                     EditorUtility.SetDirty(sp);
