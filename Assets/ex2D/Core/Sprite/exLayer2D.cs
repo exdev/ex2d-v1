@@ -71,7 +71,7 @@ public class exLayer2D : MonoBehaviour {
 #if UNITY_EDITOR
         if ( AnimationUtility.InAnimationMode() == false ) {
             if ( EditorApplication.isPlaying ) {
-                if ( depth != transform.position.z ) {
+                if ( Mathf.Approximately(depth, transform.position.z) == false ) {
                     transform.position = new Vector3( transform.position.x,
                                                       transform.position.y,
                                                       depth );
@@ -79,7 +79,7 @@ public class exLayer2D : MonoBehaviour {
             }
             else {
                 float newDepth = exLayer2D.CalcDepth( Camera.main, layer_, bias_ );
-                if ( newDepth != depth || newDepth != transform.position.z ) {
+                if ( Mathf.Approximately(newDepth,depth) == false || Mathf.Approximately(newDepth,transform.position.z) == false ) {
                     depth = newDepth;
                     transform.position = new Vector3( transform.position.x,
                                                       transform.position.y,
@@ -88,7 +88,7 @@ public class exLayer2D : MonoBehaviour {
             }
         }
 #else
-        if ( depth != transform.position.z ) {
+        if ( Mathf.Approximately(depth, transform.position.z) == false ) {
             transform.position = new Vector3( transform.position.x,
                                               transform.position.y,
                                               depth );
