@@ -21,7 +21,7 @@ using UnityEditor;
 ///////////////////////////////////////////////////////////////////////////////
 
 [ExecuteInEditMode]
-[AddComponentMenu("ex2D Helper/Soft Clip")]
+[AddComponentMenu("ex2D Sprite/Soft Clip")]
 public class exSoftClip : exPlane {
 
     public Vector2 center = Vector2.zero;
@@ -67,13 +67,13 @@ public class exSoftClip : exPlane {
         go.AddComponent<exSoftClip>();
         Selection.activeObject = go;
     }
-
+#endif
+    
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    // [ContextMenu ("Add To Clip")]
-    public void AddToClip () {
+    public void UpdateClipList () {
         planes.Clear();
         if ( transform.childCount > 0 )
             RecursivelyAddToClip (transform);
@@ -90,15 +90,14 @@ public class exSoftClip : exPlane {
                 planes.Add(plane);
                 exSoftClip clipPlane = plane as exSoftClip;
                 // if this is a clip plane, add child to it 
-                if ( clipPlane != null )
-                    clipPlane.AddToClip ();
-                else
-                    RecursivelyAddToClip (plane.transform);
+                if ( clipPlane != null ) {
+                    clipPlane.UpdateClipList ();
+                    continue;
+                }
             }
+            RecursivelyAddToClip (child);
         }
     }
-
-#endif
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions

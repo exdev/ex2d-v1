@@ -52,8 +52,10 @@ public class exPlaneEditor : Editor {
     virtual protected void OnEnable () {
         if ( target != editPlane ) {
             editPlane = target as exPlane;
-            if ( editPlane.renderer != null )
+
+            if ( editPlane.renderer != null ) {
                 EditorUtility.SetSelectedWireframeHidden(editPlane.renderer, true);
+            }
 
             // get trans2d
             if ( editPlane.GetComponent<exScreenPosition>() != null ) {

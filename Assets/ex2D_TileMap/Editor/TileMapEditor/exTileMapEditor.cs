@@ -26,6 +26,7 @@ partial class exTileMapEditor : exPlaneEditor {
     private Vector3 startOffset = Vector3.zero;
     private Rect tileMapRect;
     private bool isMouseInside = false;
+    private GameObject mouseTile = null;
 
     // ------------------------------------------------------------------ 
     // Desc: 
@@ -37,6 +38,15 @@ partial class exTileMapEditor : exPlaneEditor {
             editTileMap = target as exTileMap;
         }
         InternalUpdate ();
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void OnDisable () {
+        Object.DestroyImmediate(mouseTile); 
+        mouseTile = null;
     }
 
     // ------------------------------------------------------------------ 
@@ -246,11 +256,6 @@ partial class exTileMapEditor : exPlaneEditor {
 
             if ( isMouseInside ) {
                 DrawMouseGrid ( pos );
-                GUI.DrawTexture ( new Rect( mousePos.x, 
-                                            mousePos.y, 
-                                            editTileMap.tileInfo.tileWidth, 
-                                            editTileMap.tileInfo.tileHeight ), 
-                                  editTileMap.tileInfo.texture );
             }
         }
 
@@ -382,6 +387,16 @@ partial class exTileMapEditor : exPlaneEditor {
         isMouseInside = false;
         if ( tileMapRect.Contains(worldMousePos) ) {
             isMouseInside = true;
+            if ( mouseTile == null ) {
+                mouseTile = new GameObject(".temp_mouse_tile");
+                mouseTile.transform.parent = editTileMap.transform;
+                EditorUtility.SetSelectedWireframeHidden(mouseTile.renderer, true);
+
+                exTileMap tm = mouseTile.AddComponent<exTileMap>();
+                tm.Resize(1,1);
+                tm.tileInfo = editTileMap.tileInfo;
+                tm.Build();
+            }
         }
 
         return (startPos + deltaPos);
@@ -438,5 +453,8 @@ partial class exTileMapEditor : exPlaneEditor {
                                                    lineColor );
             break;
         }
+
+        if ( mouseTile != null )
+            mouseTile.transform.position = _pos;
     }
 }

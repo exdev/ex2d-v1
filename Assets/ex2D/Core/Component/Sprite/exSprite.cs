@@ -677,9 +677,9 @@ public class exSprite : exSpriteBase {
         // } DELME end 
 
         spanim = GetComponent<exSpriteAnimation>();
-        if ( atlas_ != null ) {
-            renderer.sharedMaterial = atlas_.material;
-
+        if ( atlas_ != null ||
+             ( renderer.sharedMaterial != null && renderer.sharedMaterial.mainTexture != null ) ) 
+        {
             meshFilter.sharedMesh = new Mesh();
             ForceUpdateMesh( meshFilter.sharedMesh );
         }

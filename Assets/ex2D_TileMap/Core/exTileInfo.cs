@@ -28,7 +28,7 @@ public class exTileInfo : ScriptableObject {
     public int tileWidth = 32;
     public int tileHeight = 32;
     public int padding = 1;
-    public Vector2 anchor = Vector2.zero; // the anchor point of each tile-texture 
+    public Vector2 anchor = Vector2.zero; // the anchor point of each tile-texture, anchor is start from left-bottom 
 
     // ------------------------------------------------------------------ 
     // Desc: 

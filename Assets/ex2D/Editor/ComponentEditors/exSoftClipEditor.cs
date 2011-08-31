@@ -109,7 +109,7 @@ public class exSoftClipEditor : exPlaneEditor {
         GUILayout.BeginHorizontal();
         GUILayout.Space(30);
             if ( GUILayout.Button("Update", GUILayout.Width(50), GUILayout.Height(20) ) ) {
-                curEdit.AddToClip();
+                curEdit.UpdateClipList();
                 GUI.changed = true;
             }
         GUILayout.EndHorizontal();

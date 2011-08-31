@@ -64,23 +64,27 @@ class ex2D_PostProcessor : AssetPostprocessor {
 
         //
         foreach ( string path in _deletedAssets ) {
+            // check if we are .ex2D_AtlasDB or .ex2D_SpriteAnimationDB
             if ( string.Equals(path, exAtlasDB.dbPath, System.StringComparison.CurrentCultureIgnoreCase) || 
                  string.Equals(path, exSpriteAnimationDB.dbPath, System.StringComparison.CurrentCultureIgnoreCase) )
             {
                 continue;
             }
 
-            if ( Path.GetExtension(path) == ".asset" ) {
-                string guid = AssetDatabase.AssetPathToGUID(path);
+            // check if we are asset
+            if ( Path.GetExtension(path) != ".asset" )
+                continue;
 
-                // check if we have the guid in the exAtlasInfo
-                if ( exAtlasDB.HasAtlasGUID( guid ) ) {
-                    exAtlasDB.RemoveAtlas(guid);
-                }
-                // check if we have the guid in the exSpriteAnimClip
-                else if ( exSpriteAnimationDB.HasSpriteAnimClipGUID( guid ) ) {
-                    exSpriteAnimationDB.RemoveSpriteAnimClip(guid);
-                }
+            // 
+            string guid = AssetDatabase.AssetPathToGUID(path);
+
+            // check if we have the guid in the exAtlasInfo
+            if ( exAtlasDB.HasAtlasGUID( guid ) ) {
+                exAtlasDB.RemoveAtlas(guid);
+            }
+            // check if we have the guid in the exSpriteAnimClip
+            else if ( exSpriteAnimationDB.HasSpriteAnimClipGUID( guid ) ) {
+                exSpriteAnimationDB.RemoveSpriteAnimClip(guid);
             }
         }
 
@@ -106,8 +110,21 @@ class ex2D_SaveAssetsProcessor : SaveAssetsProcessor {
 
     static void OnWillSaveAssets ( string[] _paths ) {
         List<exAtlasInfo> rebuildAtlasInfos = new List<exAtlasInfo>();
+        List<exSpriteAnimClip> rebuildSpriteAnimClips = new List<exSpriteAnimClip>();
 
+        //
         foreach ( string path in _paths ) {
+            // check if we are .ex2D_AtlasDB or .ex2D_SpriteAnimationDB
+            if ( string.Equals(path, exAtlasDB.dbPath, System.StringComparison.CurrentCultureIgnoreCase) || 
+                 string.Equals(path, exSpriteAnimationDB.dbPath, System.StringComparison.CurrentCultureIgnoreCase) )
+            {
+                continue;
+            }
+
+            // check if we are asset
+            if ( Path.GetExtension(path) != ".asset" )
+                continue;
+
             Object obj = (Object)AssetDatabase.LoadAssetAtPath ( path, typeof(Object) );
             if ( obj == null )
                 continue;
@@ -119,11 +136,7 @@ class ex2D_SaveAssetsProcessor : SaveAssetsProcessor {
             if ( obj is exAtlasInfo ) {
                 exAtlasInfo atlasInfo = obj as exAtlasInfo;
                 if ( atlasInfo.needRebuild ) {
-                    exAtlasInfoUtility.Build(atlasInfo);
                     rebuildAtlasInfos.Add(atlasInfo);
-
-                    // build sprite animclip that used this atlasInfo
-                    exSpriteAnimationUtility.BuildFromAtlasInfo(atlasInfo);
                 }
             }
 
@@ -134,7 +147,7 @@ class ex2D_SaveAssetsProcessor : SaveAssetsProcessor {
             if ( obj is exSpriteAnimClip ) {
                 exSpriteAnimClip spAnimClip = obj as exSpriteAnimClip;
                 if ( spAnimClip.editorNeedRebuild )
-                    spAnimClip.Build();
+                    rebuildSpriteAnimClips.Add(spAnimClip);
             }
 
             // TODO { 
@@ -149,6 +162,27 @@ class ex2D_SaveAssetsProcessor : SaveAssetsProcessor {
             //         bitmapFont.Build( fontInfo );
             // }
             // } TODO end 
+        }
+
+        // NOTE: we need to make sure exAtlasInfo build before exSpriteAnimClip,
+        //       because during build, exAtlasDB will update ElementInfo, and exSpriteAnimClip need this for checking error. 
+
+        // ======================================================== 
+        // build exAtlasInfo first
+        // ======================================================== 
+
+        foreach ( exAtlasInfo atlasInfo in rebuildAtlasInfos ) {
+            exAtlasInfoUtility.Build(atlasInfo);
+            // build sprite animclip that used this atlasInfo
+            exSpriteAnimationUtility.BuildFromAtlasInfo(atlasInfo);
+        }
+
+        // ======================================================== 
+        // build exSpriteAnimClip 
+        // ======================================================== 
+
+        foreach ( exSpriteAnimClip spAnimClip in rebuildSpriteAnimClips ) {
+            spAnimClip.Build();
         }
 
         // ======================================================== 

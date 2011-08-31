@@ -315,29 +315,49 @@ partial class exSpriteAnimClipEditor {
             }
             else if ( e.type == EventType.DragPerform ) {
                 DragAndDrop.AcceptDrag();
+
+                // store old selection state
+                List<Object> oldSelObjects = new List<Object>();
+                foreach ( Object o in Selection.objects ) {
+                    oldSelObjects.Add(o);
+                }
+                Object oldSelActiveObject = Selection.activeObject;
+
+                //
                 EditorUtility.DisplayProgressBar( "Adding Textures...",
                                                   "Start adding ",
                                                   0.5f );    
                 // sort
-                // DISABLE: we use Selection.GetFiltered instead { 
-                // List<Object> objList = new List<Object>(DragAndDrop.objectReferences.Length);
-                // foreach ( Object o in DragAndDrop.objectReferences ) {
-                //     objList.Add(o);
-                // }
-                // objList.Sort(exEditorHelper.CompareObjectByName);
-                // } DISABLE end 
+                List<Object> objList = new List<Object>(DragAndDrop.objectReferences.Length);
+                foreach ( Object o in DragAndDrop.objectReferences ) {
+                    if ( exEditorHelper.IsDirectory(o) ) {
+                        Selection.activeObject = o;
+                        Object[] objs = Selection.GetFiltered( typeof(Texture2D), SelectionMode.DeepAssets);
+                        objList.AddRange(objs);
+                    }
+                    else if ( o is Texture2D ) {
+                        objList.Add(o);
+                    }
+                }
+                objList.Sort(exEditorHelper.CompareObjectByName);
 
-                // sort
-                Object[] objList = Selection.GetFiltered( typeof(Texture2D), SelectionMode.DeepAssets);
-                System.Array.Sort( objList, exEditorHelper.CompareObjectByName );
+                // DELME { 
+                // // sort
+                // Object[] objList = Selection.GetFiltered( typeof(Texture2D), SelectionMode.DeepAssets);
+                // System.Array.Sort( objList, exEditorHelper.CompareObjectByName );
+                // } DELME end 
 
                 // add objects as frames
-                _animClip.AddFrames( objList );
+                _animClip.AddFrames( objList.ToArray() );
                 EditorUtility.ClearProgressBar();    
 
                 //
                 CalculatePreviewScale();
                 Repaint();
+
+                // recover selections
+                Selection.activeObject = oldSelActiveObject;
+                Selection.objects = oldSelObjects.ToArray();
 
                 e.Use();
             }

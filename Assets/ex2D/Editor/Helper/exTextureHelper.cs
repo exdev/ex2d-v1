@@ -10,9 +10,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 using UnityEngine;
-#if UNITY_EDITOR
 using UnityEditor;
-#endif
 using System.Collections;
 using System.Collections.Generic;
 
@@ -37,7 +35,6 @@ public class exTextureHelper {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-#if UNITY_EDITOR
     public static void ImportTextureForAtlas ( Texture2D _tex ) {
         string path = AssetDatabase.GetAssetPath(_tex);
         TextureImporter importer = TextureImporter.GetAtPath(path) as TextureImporter;
@@ -55,7 +52,6 @@ public class exTextureHelper {
             AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate|ImportAssetOptions.ForceSynchronousImport);
         }
     }
-#endif
 
     // ------------------------------------------------------------------ 
     // Desc: 

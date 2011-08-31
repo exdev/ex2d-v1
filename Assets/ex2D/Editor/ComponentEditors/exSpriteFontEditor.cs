@@ -322,12 +322,14 @@ public class exSpriteFontEditor : exSpriteBaseEditor {
         Vector3[] vertices = meshFilter.sharedMesh.vertices;
         Vector3[] w_vertices = new Vector3[5];
         if ( vertices.Length > 0 ) {
+            Transform trans = editSpriteFont.transform;
+
             for ( int i = 0; i < editSpriteFont.text.Length; ++i ) {
                 int vert_id = vertexStartAt + 4 * i;
-                w_vertices[0] = editSpriteFont.transform.position + vertices[vert_id+0]; 
-                w_vertices[1] = editSpriteFont.transform.position + vertices[vert_id+1]; 
-                w_vertices[2] = editSpriteFont.transform.position + vertices[vert_id+3]; 
-                w_vertices[3] = editSpriteFont.transform.position + vertices[vert_id+2]; 
+                w_vertices[0] = trans.localToWorldMatrix * new Vector4 ( vertices[vert_id+0].x, vertices[vert_id+0].y, vertices[vert_id+0].z, 1.0f );
+                w_vertices[1] = trans.localToWorldMatrix * new Vector4 ( vertices[vert_id+1].x, vertices[vert_id+1].y, vertices[vert_id+1].z, 1.0f ); 
+                w_vertices[2] = trans.localToWorldMatrix * new Vector4 ( vertices[vert_id+3].x, vertices[vert_id+3].y, vertices[vert_id+3].z, 1.0f ); 
+                w_vertices[3] = trans.localToWorldMatrix * new Vector4 ( vertices[vert_id+2].x, vertices[vert_id+2].y, vertices[vert_id+2].z, 1.0f ); 
                 w_vertices[4] = w_vertices[0];
                 Handles.DrawPolyLine( w_vertices );
             }

@@ -102,11 +102,10 @@ public class exLayer2D : MonoBehaviour {
 
     public void SetLayer ( int _layer, float _bias ) {
         int newLayer = Mathf.Clamp( _layer, 0, MAX_LAYER-1 );
-        float newBias = _bias;
 
-        if ( layer_ != newLayer || bias_ != newBias ) {
+        if ( layer_ != newLayer || Mathf.Approximately(bias_, _bias) == false ) {
             layer_ = newLayer;
-            bias_ = newBias;
+            bias_ = _bias;
 
             depth = exLayer2D.CalcDepth( Camera.main, layer_, bias_ );
             transform.position = new Vector3( transform.position.x,

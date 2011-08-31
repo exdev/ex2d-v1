@@ -157,6 +157,8 @@ public class exAtlasDB : ScriptableObject {
             }
             // update atlas elements in db.
             else {
+                db.texGUIDToElementInfo.Clear();
+
                 // create atlas element table
                 foreach ( ElementInfo elInfo in db.elementInfos ) {
                     AddElementInfo( elInfo.guidTexture, 
@@ -317,6 +319,7 @@ public class exAtlasDB : ScriptableObject {
             elInfo.indexInAtlas = _index;
             elInfo.indexInAtlasInfo = _index;
         }
+        EditorUtility.SetDirty(db);
     }
 
     // ------------------------------------------------------------------ 
@@ -329,6 +332,7 @@ public class exAtlasDB : ScriptableObject {
         if ( db.texGUIDToElementInfo.ContainsKey(_textureGUID) ) {
             db.elementInfos.Remove(db.texGUIDToElementInfo[_textureGUID]);
             db.texGUIDToElementInfo.Remove(_textureGUID);
+            EditorUtility.SetDirty(db);
         }
     }
 

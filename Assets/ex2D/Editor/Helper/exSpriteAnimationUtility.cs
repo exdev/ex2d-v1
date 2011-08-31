@@ -64,6 +64,7 @@ public static class exSpriteAnimationUtility {
                                           "Building Frames...",
                                           0.1f );
 
+        bool hasError = false;
         foreach ( exSpriteAnimClip.FrameInfo fi in _animClip.frameInfos ) {
             exAtlasDB.ElementInfo elInfo = exAtlasDB.GetElementInfo (fi.textureGUID);
             if ( elInfo != null ) {
@@ -79,11 +80,12 @@ public static class exSpriteAnimationUtility {
                                  + "in exAtlasInfo." );
                 fi.atlas = null;
                 fi.index = -1;
+                hasError = true;
             }
         }
         EditorUtility.ClearProgressBar();
 
-        _animClip.editorNeedRebuild = false;
+        _animClip.editorNeedRebuild = hasError;
         EditorUtility.SetDirty(_animClip);
     }
 
@@ -96,18 +98,22 @@ public static class exSpriteAnimationUtility {
                                           "Building Sprite Animation Clips...",
                                           0.5f );    
 
-        for ( int i = 0; i < _atlasInfo.rebuildSpAnimClips.Count; ++i ) {
-            exSpriteAnimClip sp = _atlasInfo.rebuildSpAnimClips[i];
+
+        for ( int i = 0; i < _atlasInfo.rebuildAnimClipGUIDs.Count; ++i ) {
+            string guidAnimClip = _atlasInfo.rebuildAnimClipGUIDs[i];
+            exSpriteAnimClip sp = 
+                exEditorHelper.LoadAssetFromGUID<exSpriteAnimClip>(guidAnimClip);
             if ( sp ) {
                 // DISABLE: it is too slow { 
                 // EditorUtility.DisplayProgressBar( "Building Sprite Animation Clips...",
                 //                                   "Building Sprite Animation Clips " + sp.name,
-                //                                   (float)i/(float)_atlasInfo.rebuildSpAnimClips.Count );    
+                //                                   (float)i/(float)_atlasInfo.rebuildAnimClipGUIDs.Count );    
                 // } DISABLE end 
+                sp.editorNeedRebuild = true;
                 sp.Build();
             }
         }
-        _atlasInfo.rebuildSpAnimClips.Clear();
+        _atlasInfo.rebuildAnimClipGUIDs.Clear();
         EditorUtility.ClearProgressBar();
     }
 
@@ -144,7 +150,7 @@ public static class exSpriteAnimationUtility {
         _animClip.frameInfos.Add(frameInfo);
         _animClip.length += frameInfo.length;
 
-        exSpriteAnimationDB.UpdateDataBase ( _animClip, frameInfo );
+        exSpriteAnimationDB.AddFrameInfo ( _animClip, frameInfo );
         _animClip.editorNeedRebuild = true;
         EditorUtility.SetDirty(_animClip);
     } 
@@ -157,7 +163,7 @@ public static class exSpriteAnimationUtility {
         _animClip.frameInfos.Remove(_fi);
         _animClip.length -= _fi.length;
 
-        exSpriteAnimationDB.OnFrameInfoRemoved ( _animClip, _fi );
+        exSpriteAnimationDB.RemoveFrameInfo ( _animClip, _fi );
         _animClip.editorNeedRebuild = true;
         EditorUtility.SetDirty(_animClip);
     }

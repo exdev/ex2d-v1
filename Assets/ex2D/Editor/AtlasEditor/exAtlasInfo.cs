@@ -113,7 +113,7 @@ public partial class exAtlasInfo : ScriptableObject {
     /*[HideInInspector]*/ public List<exBitmapFont> bitmapFonts = new List<exBitmapFont>(); 
 
     //
-    /*[HideInInspector]*/ public List<exSpriteAnimClip> rebuildSpAnimClips = new List<exSpriteAnimClip>();
+    /*[HideInInspector]*/ public List<string> rebuildAnimClipGUIDs = new List<string>();
     /*[HideInInspector]*/ public bool needUpdateAnimClips = false;
     /*[HideInInspector]*/ public bool needRebuild = false;
 
@@ -218,7 +218,7 @@ public partial class exAtlasInfo : ScriptableObject {
         el.coord[1] = padding;
         elements.Add(el);
 
-        // get sprite animation clip by textureGUID, add them to rebuildSpAnimClips
+        // get sprite animation clip by textureGUID, add them to rebuildAnimClipGUIDs
         AddSpriteAnimClipForRebuilding(el);
 
         //
@@ -314,7 +314,7 @@ public partial class exAtlasInfo : ScriptableObject {
         // remove element in atlas DB
         exAtlasDB.RemoveElementInfo(exEditorHelper.AssetToGUID(el.texture));
 
-        // get sprite animation clip by textureGUID, add them to rebuildSpAnimClips
+        // get sprite animation clip by textureGUID, add them to rebuildAnimClipGUIDs
         AddSpriteAnimClipForRebuilding(el);
 
         //
@@ -407,12 +407,11 @@ public partial class exAtlasInfo : ScriptableObject {
     public void AddSpriteAnimClipForRebuilding ( Element _el ) {
         List<string> spAnimClipGUIDs 
             = exSpriteAnimationDB.GetSpriteAnimClipGUIDs ( exEditorHelper.AssetToGUID(_el.texture) );
+
         if ( spAnimClipGUIDs != null ) {
             foreach ( string animClipGUID in spAnimClipGUIDs ) {
-                exSpriteAnimClip animClip = exEditorHelper.LoadAssetFromGUID<exSpriteAnimClip>(animClipGUID);
-                if ( animClip != null && rebuildSpAnimClips.IndexOf(animClip) == -1 ) {
-                    animClip.editorNeedRebuild = true;
-                    rebuildSpAnimClips.Add(animClip);
+                if ( rebuildAnimClipGUIDs.IndexOf(animClipGUID) == -1 ) {
+                    rebuildAnimClipGUIDs.Add(animClipGUID);
                 }
             }
         }

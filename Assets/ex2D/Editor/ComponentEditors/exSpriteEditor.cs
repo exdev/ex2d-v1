@@ -324,12 +324,15 @@ public class exSpriteEditor : exSpriteBaseEditor {
         //
         Vector3[] vertices = meshFilter.sharedMesh.vertices;
         if ( vertices.Length > 0 ) {
+            Transform trans = editSprite.transform;
+
             Vector3[] w_vertices = new Vector3[5];
-            w_vertices[0] = editSprite.transform.position + vertices[0]; 
-            w_vertices[1] = editSprite.transform.position + vertices[1]; 
-            w_vertices[2] = editSprite.transform.position + vertices[3]; 
-            w_vertices[3] = editSprite.transform.position + vertices[2]; 
+            w_vertices[0] = trans.localToWorldMatrix * new Vector4 ( vertices[0].x, vertices[0].y, vertices[0].z, 1.0f );
+            w_vertices[1] = trans.localToWorldMatrix * new Vector4 ( vertices[1].x, vertices[1].y, vertices[1].z, 1.0f ); 
+            w_vertices[2] = trans.localToWorldMatrix * new Vector4 ( vertices[3].x, vertices[3].y, vertices[3].z, 1.0f ); 
+            w_vertices[3] = trans.localToWorldMatrix * new Vector4 ( vertices[2].x, vertices[2].y, vertices[2].z, 1.0f ); 
             w_vertices[4] = w_vertices[0];
+
             Handles.DrawPolyLine( w_vertices );
         }
     }
