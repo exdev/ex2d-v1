@@ -25,17 +25,6 @@ public static class exBitmapFontUtility {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    [MenuItem ("GameObject/Create Other/ex2D/SpriteFont Object")]
-    public static void CreateSpriteFontObject () {
-        GameObject go = new GameObject("SpriteFontObject");
-        go.AddComponent<exSpriteFont>();
-        Selection.activeObject = go;
-    }
-
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
     public static exBitmapFont Create ( string _path, string _name ) {
         //
         if ( new DirectoryInfo(_path).Exists == false ) {

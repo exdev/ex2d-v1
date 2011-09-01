@@ -140,7 +140,11 @@ public class exPlaneEditor : Editor {
             bool useLayer2D = GUILayout.Toggle ( hasLayer2D, "Use Layer 2D" ); 
             if ( useLayer2D != hasLayer2D ) {
                 if ( useLayer2D )
-                    editPlane.gameObject.AddComponent<exLayer2D>();
+                    switch ( editPlane.plane ) {
+                    case exPlane.Plane.XY: editPlane.layer2d = editPlane.gameObject.AddComponent<exLayerXY>(); break;
+                    case exPlane.Plane.XZ: editPlane.layer2d = editPlane.gameObject.AddComponent<exLayerXZ>(); break;
+                    case exPlane.Plane.ZY: editPlane.layer2d = editPlane.gameObject.AddComponent<exLayerZY>(); break;
+                    }
                 else {
                     Object.DestroyImmediate(compLayer2D);
                 }

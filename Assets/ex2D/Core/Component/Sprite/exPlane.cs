@@ -115,6 +115,27 @@ public class exPlane : MonoBehaviour {
         set {
             if ( plane_ != value ) {
                 plane_ = value;
+
+                int layer = 0;
+                float bias = 0.0f;
+#if UNITY_EDITOR
+                if ( EditorApplication.isPlaying == false ) {
+                    layer2d = GetComponent<exLayer2D>();
+                }
+#endif
+                if ( layer2d ) {
+                    layer = layer2d.layer; 
+                    bias = layer2d.bias; 
+                    Object.DestroyImmediate(layer2d);
+                }
+                switch ( plane_ ) {
+                case exPlane.Plane.XY: layer2d = gameObject.AddComponent<exLayerXY>(); break;
+                case exPlane.Plane.XZ: layer2d = gameObject.AddComponent<exLayerXZ>(); break;
+                case exPlane.Plane.ZY: layer2d = gameObject.AddComponent<exLayerZY>(); break;
+                }
+                layer2d.SetLayer( layer, bias );
+
+                //
                 updateFlags |= UpdateFlags.Vertex;
             }
         }
@@ -193,18 +214,13 @@ public class exPlane : MonoBehaviour {
 
         // NOTE: though we have ExecuteInEditMode, user can Add/Remove layer2d in Editor
 #if UNITY_EDITOR
-        exLayer2D my_layer2d = layer2d;
         if ( EditorApplication.isPlaying == false ) {
-            my_layer2d = GetComponent<exLayer2D>();
+            layer2d = GetComponent<exLayer2D>();
         }
-        if ( my_layer2d ) {
-            my_layer2d.enabled = true;
-        }
-#else
+#endif
         if ( layer2d ) {
             layer2d.enabled = true;
         }
-#endif
     }
 
     // ------------------------------------------------------------------ 
@@ -217,18 +233,13 @@ public class exPlane : MonoBehaviour {
 
         // NOTE: though we have ExecuteInEditMode, user can Add/Remove layer2d in Editor
 #if UNITY_EDITOR
-        exLayer2D my_layer2d = layer2d;
         if ( EditorApplication.isPlaying == false ) {
-            my_layer2d = GetComponent<exLayer2D>();
+            layer2d = GetComponent<exLayer2D>();
         }
-        if ( my_layer2d ) {
-            my_layer2d.enabled = false;
-        }
-#else
+#endif
         if ( layer2d ) {
             layer2d.enabled = false;
         }
-#endif
     }
 
     // ------------------------------------------------------------------ 

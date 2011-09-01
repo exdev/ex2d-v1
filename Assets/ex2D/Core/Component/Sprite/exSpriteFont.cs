@@ -217,6 +217,18 @@ public class exSpriteFont : exSpriteBase {
     ///////////////////////////////////////////////////////////////////////////////
 
 #if UNITY_EDITOR
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    [MenuItem ("GameObject/Create Other/ex2D/SpriteFont Object")]
+    public static void CreateSpriteFontObject () {
+        GameObject go = new GameObject("SpriteFontObject");
+        go.AddComponent<exSpriteFont>();
+        Selection.activeObject = go;
+    }
+
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 

@@ -16,7 +16,7 @@ UNITY_EDITOR_DLL = /Applications/Unity/Unity.app/Contents/Frameworks/Managed/Uni
 UNITY_VER = UNITY_3_4 
 
 # defines
-DEFINE_ARGUMENT = -d:UNITY_EDITOR -d:UNITY_3_4 
+DEFINE_ARGUMENT = -d:UNITY_EDITOR -d:UNITY_3_4
 
 # Utilities.
 MKDIR = mkdir -p
@@ -49,7 +49,7 @@ RUNTIME_SOURCE_DIRS += Assets/ex2D/Core/Component/Helper/
 RUNTIME_SOURCE_DIRS += Assets/ex2D/Core/Component/Sprite/
 RUNTIME_SOURCE_DIRS += Assets/ex2D/Core/Extension/
 RUNTIME_SOURCE_DIRS += Assets/ex2D/Core/Helper/
-RUNTIME_SOURCE = $(wildcard $(addsuffix /*.cs,$(RUNTIME_SOURCE_DIRS)))
+RUNTIME_SOURCE = $(wildcard $(addsuffix *.cs,$(RUNTIME_SOURCE_DIRS)))
 
 # deubg argument
 # RUNTIME_ARGUMENT = $(DEFINE_ARGUMENT) -d:DEBUG -r:$(UNITY_ENGINE_DLL),$(UNITY_EDITOR_DLL)
@@ -71,9 +71,10 @@ EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/BitmapFontEditor/
 EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/ComponentEditors/
 EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/DB/
 EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/GroupImportEditor/
-EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/Helper/
+EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/EditorHelper/
+EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/SceneHelper/
 EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/SpriteAnimationEditor/
-EDITOR_SOURCE = $(wildcard $(addsuffix /*.cs,$(EDITOR_SOURCE_DIRS)))
+EDITOR_SOURCE = $(wildcard $(addsuffix *.cs,$(EDITOR_SOURCE_DIRS)))
 
 # deubg argument
 # EDITOR_ARGUMENT = $(DEFINE_ARGUMENT) -d:DEBUG -r:$(RUNTIME_TARGET),$(UNITY_ENGINE_DLL),$(UNITY_EDITOR_DLL)

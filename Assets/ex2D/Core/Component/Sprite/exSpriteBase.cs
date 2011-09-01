@@ -95,7 +95,11 @@ public class exSpriteBase : exPlane {
 
     void Reset() {
         if ( GetComponent<exLayer2D>() == null ) {
-            gameObject.AddComponent<exLayer2D>();
+            switch ( plane ) {
+            case exPlane.Plane.XY: layer2d = gameObject.AddComponent<exLayerXY>(); break;
+            case exPlane.Plane.XZ: layer2d = gameObject.AddComponent<exLayerXZ>(); break;
+            case exPlane.Plane.ZY: layer2d = gameObject.AddComponent<exLayerZY>(); break;
+            }
         }
     }
 

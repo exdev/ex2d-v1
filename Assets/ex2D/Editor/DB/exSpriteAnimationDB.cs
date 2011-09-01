@@ -45,6 +45,16 @@ public class exSpriteAnimationDB : ScriptableObject {
     public bool showData = true;
     public bool showTable = true;
 
+    // FIXME: conflict with CreateDB I doubt. when I delete DB and create it, crash with this { 
+    // // ------------------------------------------------------------------ 
+    // // Desc: 
+    // // ------------------------------------------------------------------ 
+
+    // void OnEnable () {
+    //     Init();
+    // }
+    // } FIXME end 
+
     ///////////////////////////////////////////////////////////////////////////////
     // static
     ///////////////////////////////////////////////////////////////////////////////
@@ -80,6 +90,15 @@ public class exSpriteAnimationDB : ScriptableObject {
             spAnimClip = null;
             EditorUtility.UnloadUnusedAssets();
         }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    static public bool DBExists () {
+        FileInfo fileInfo = new FileInfo(dbPath);
+        return fileInfo.Exists;
     }
 
     // ------------------------------------------------------------------ 
@@ -129,12 +148,16 @@ public class exSpriteAnimationDB : ScriptableObject {
 
     static void CreateDB () {
         // get sprite animation clip db, if not found, create one
-        db = (exSpriteAnimationDB)AssetDatabase.LoadAssetAtPath( dbPath, typeof(exSpriteAnimationDB) );
-        if ( db == null ) {
+        if ( DBExists() == false ) {
             db = ScriptableObject.CreateInstance<exSpriteAnimationDB>();
             AssetDatabase.CreateAsset( db, dbPath );
             needSync = true;
         }
+        else {
+            db = (exSpriteAnimationDB)AssetDatabase.LoadAssetAtPath( dbPath, typeof(exSpriteAnimationDB) );
+        }
+
+        //
         if ( version != db.curVersion ) {
             db.curVersion = version;
             needSync = true;
@@ -146,6 +169,7 @@ public class exSpriteAnimationDB : ScriptableObject {
     // Desc: 
     // ------------------------------------------------------------------ 
 
+    [MenuItem("Edit/ex2D/Create SpriteAnimation DB")]
     static public void Init () {
         // if db not found we need to create it and re-initliaze
         if ( db == null ) {

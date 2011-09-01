@@ -12,23 +12,19 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 // exSpriteAnimState
 ///////////////////////////////////////////////////////////////////////////////
 
-public enum exAnimStopAction {
-    DoNothing,
-    DefaultSprite,
-    Hide,
-    Destroy
-}
-
 [System.Serializable]
 public class exSpriteAnimState {
     [System.NonSerialized] public string name;
     [System.NonSerialized] public WrapMode wrapMode;
-    [System.NonSerialized] public exAnimStopAction stopAction;
+    [System.NonSerialized] public exSpriteAnimClip.StopAction stopAction;
     [System.NonSerialized] public exSpriteAnimClip clip;
     [System.NonSerialized] public float length;
 
@@ -84,6 +80,19 @@ public class exSpriteAnimation : MonoBehaviour {
     ///////////////////////////////////////////////////////////////////////////////
     // functions
     ///////////////////////////////////////////////////////////////////////////////
+
+#if UNITY_EDITOR
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    [MenuItem ("GameObject/Create Other/ex2D/SpriteAnimation Object")]
+    static void CreateSpriteAnimationObject () {
+        GameObject go = new GameObject("SpriteAnimationObject");
+        go.AddComponent<exSpriteAnimation>();
+        Selection.activeObject = go;
+    }
+#endif
 
     // ------------------------------------------------------------------ 
     // Desc: 
@@ -204,7 +213,7 @@ public class exSpriteAnimation : MonoBehaviour {
     public void Stop () {
         if ( curAnimation != null ) {
             //
-            exAnimStopAction stopAction = curAnimation.stopAction; 
+            exSpriteAnimClip.StopAction stopAction = curAnimation.stopAction; 
 
             //
             curAnimation.time = 0.0f;
@@ -214,19 +223,19 @@ public class exSpriteAnimation : MonoBehaviour {
 
             //
             switch ( stopAction ) {
-            case exAnimStopAction.DoNothing:
+            case exSpriteAnimClip.StopAction.DoNothing:
                 // Nothing todo;
                 break;
 
-            case exAnimStopAction.DefaultSprite:
+            case exSpriteAnimClip.StopAction.DefaultSprite:
                 sprite.SetSprite( defaultAtlas, defaultIndex );
                 break;
 
-            case exAnimStopAction.Hide:
+            case exSpriteAnimClip.StopAction.Hide:
                 sprite.enabled = false;
                 break;
 
-            case exAnimStopAction.Destroy:
+            case exSpriteAnimClip.StopAction.Destroy:
                 GameObject.Destroy(gameObject);
                 break;
             }

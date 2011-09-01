@@ -253,8 +253,8 @@ static public class exEditorHelper {
     public static T LoadAssetFromGUID<T> ( string _guid ) {
         if ( string.IsNullOrEmpty(_guid) )
             return (T)(object)null;
-        string texturePath = AssetDatabase.GUIDToAssetPath(_guid);
-        return (T)(object)AssetDatabase.LoadAssetAtPath( texturePath, typeof(T) );
+        string assetPath = AssetDatabase.GUIDToAssetPath(_guid);
+        return (T)(object)AssetDatabase.LoadAssetAtPath( assetPath, typeof(T) );
     }
 
     // ------------------------------------------------------------------ 

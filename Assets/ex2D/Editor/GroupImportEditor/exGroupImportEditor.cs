@@ -36,7 +36,7 @@ class exGroupImportEditor : EditorWindow {
 
     [MenuItem ("Window/ex2D/Group Import Editor %&g")]
     static exGroupImportEditor NewWindow () {
-        exGroupImportEditor newWindow = (exGroupImportEditor)EditorWindow.GetWindow(typeof(exGroupImportEditor));
+        exGroupImportEditor newWindow = EditorWindow.GetWindow<exGroupImportEditor>();
         newWindow.wantsMouseMove = true;
         newWindow.autoRepaintOnSceneChange = true;
         return newWindow;

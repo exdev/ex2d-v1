@@ -1,7 +1,7 @@
 // ======================================================================================
 // File         : exLayer2D.cs
 // Author       : Wu Jie 
-// Last Change  : 07/29/2011 | 18:51:20 PM | Friday,July
+// Last Change  : 09/01/2011 | 14:35:44 PM | Thursday,September
 // Description  : 
 // ======================================================================================
 
@@ -37,30 +37,30 @@ public class exLayer2D : MonoBehaviour {
     //
     ///////////////////////////////////////////////////////////////////////////////
 
-    protected float depth = 0.0f;
+    protected float depth_ = 0.0f;
+    public float depth { 
+        get { return depth_; } 
+        set {
+            if ( Mathf.Approximately(depth_,value) == false ) {
+                depth_ = value;
+                UpdateTransformDepth ();
+            }
+        }
+    }
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
     ///////////////////////////////////////////////////////////////////////////////
+
+    virtual public float CalculateDepth ( Camera _cam ) { return 0.0f; }
+    virtual public void UpdateTransformDepth () {}
 
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
 
     void OnEnable () {
-        depth = exLayer2D.CalcDepth( Camera.main, layer_, bias_ );
-    }
-
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
-    public static float CalcDepth ( Camera _cam, int _layer, float _bias ) {
-        if ( _cam == null )
-            return 0.0f;
-        float dist = _cam.farClipPlane - _cam.nearClipPlane;
-        float unitLayer = dist/MAX_LAYER;
-        return ((float)_layer + _bias) * unitLayer + _cam.transform.position.z + _cam.nearClipPlane;
+        depth = CalculateDepth( Camera.main );
     }
 
     // ------------------------------------------------------------------ 
@@ -71,28 +71,15 @@ public class exLayer2D : MonoBehaviour {
 #if UNITY_EDITOR
         if ( AnimationUtility.InAnimationMode() == false ) {
             if ( EditorApplication.isPlaying ) {
-                if ( Mathf.Approximately(depth, transform.position.z) == false ) {
-                    transform.position = new Vector3( transform.position.x,
-                                                      transform.position.y,
-                                                      depth );
-                }
+                UpdateTransformDepth ();
             }
             else {
-                float newDepth = exLayer2D.CalcDepth( Camera.main, layer_, bias_ );
-                if ( Mathf.Approximately(newDepth,depth) == false || Mathf.Approximately(newDepth,transform.position.z) == false ) {
-                    depth = newDepth;
-                    transform.position = new Vector3( transform.position.x,
-                                                      transform.position.y,
-                                                      depth );
-                }
+                depth = CalculateDepth( Camera.main );
+                UpdateTransformDepth ();
             }
         }
 #else
-        if ( Mathf.Approximately(depth, transform.position.z) == false ) {
-            transform.position = new Vector3( transform.position.x,
-                                              transform.position.y,
-                                              depth );
-        }
+        UpdateTransformDepth ();
 #endif
     }
 
@@ -107,10 +94,7 @@ public class exLayer2D : MonoBehaviour {
             layer_ = newLayer;
             bias_ = _bias;
 
-            depth = exLayer2D.CalcDepth( Camera.main, layer_, bias_ );
-            transform.position = new Vector3( transform.position.x,
-                                              transform.position.y,
-                                              depth );
+            depth = CalculateDepth( Camera.main );
         }
     }
 

@@ -67,7 +67,7 @@ public class exLayer2DEditor : Editor {
         newBias = (float)bias/100.0f;
         if ( newLayer != curEdit.layer || newBias != curEdit.bias ) {
             curEdit.SetLayer( newLayer, newBias );
-            exSpriteUtility.RecursivelyUpdateLayer(curEdit.transform);
+            exSceneHelper.RecursivelyUpdateLayer(curEdit.transform);
         }
 
         // ======================================================== 

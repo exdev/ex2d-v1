@@ -25,17 +25,6 @@ public static class exSpriteAnimationUtility {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    [MenuItem ("GameObject/Create Other/ex2D/SpriteAnimation Object")]
-    static void CreateSpriteAnimationObject () {
-        GameObject go = new GameObject("SpriteAnimationObject");
-        go.AddComponent<exSpriteAnimation>();
-        Selection.activeObject = go;
-    }
-
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
     public static exSpriteAnimClip CreateSpriteAnimClip ( string _path, string _name ) {
         //
         if ( new DirectoryInfo(_path).Exists == false ) {

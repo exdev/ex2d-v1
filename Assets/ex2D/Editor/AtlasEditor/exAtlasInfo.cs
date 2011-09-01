@@ -309,13 +309,15 @@ public partial class exAtlasInfo : ScriptableObject {
 
     public void RemoveElementAt ( int _idx ) {
         Element el = elements[_idx];
-        elements.RemoveAt(_idx);
 
         // remove element in atlas DB
         exAtlasDB.RemoveElementInfo(exEditorHelper.AssetToGUID(el.texture));
 
         // get sprite animation clip by textureGUID, add them to rebuildAnimClipGUIDs
         AddSpriteAnimClipForRebuilding(el);
+
+        //
+        elements.RemoveAt(_idx);
 
         //
         needRebuild = true;

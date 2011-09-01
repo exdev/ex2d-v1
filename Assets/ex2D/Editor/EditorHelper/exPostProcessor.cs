@@ -38,8 +38,19 @@ class ex2D_PostProcessor : AssetPostprocessor {
                                          string[] _movedFromAssetPaths ) 
     {
         foreach ( string path in _importedAssets ) {
-            Object obj;
-            obj = (Object)AssetDatabase.LoadAssetAtPath ( path, typeof(Object) );
+            // check if we are .ex2D_AtlasDB or .ex2D_SpriteAnimationDB
+            if ( string.Equals(path, exAtlasDB.dbPath, System.StringComparison.CurrentCultureIgnoreCase) || 
+                 string.Equals(path, exSpriteAnimationDB.dbPath, System.StringComparison.CurrentCultureIgnoreCase) )
+            {
+                continue;
+            }
+
+            // check if we are asset
+            if ( Path.GetExtension(path) != ".asset" )
+                continue;
+
+            //
+            Object obj = (Object)AssetDatabase.LoadAssetAtPath ( path, typeof(Object) );
             if ( obj == null )
                 continue;
 
@@ -63,6 +74,7 @@ class ex2D_PostProcessor : AssetPostprocessor {
         }
 
         //
+        List<string> atlasInfoGUIDs = new List<string>();
         foreach ( string path in _deletedAssets ) {
             // check if we are .ex2D_AtlasDB or .ex2D_SpriteAnimationDB
             if ( string.Equals(path, exAtlasDB.dbPath, System.StringComparison.CurrentCultureIgnoreCase) || 
@@ -81,12 +93,14 @@ class ex2D_PostProcessor : AssetPostprocessor {
             // check if we have the guid in the exAtlasInfo
             if ( exAtlasDB.HasAtlasGUID( guid ) ) {
                 exAtlasDB.RemoveAtlas(guid);
+                atlasInfoGUIDs.Add(guid);
             }
             // check if we have the guid in the exSpriteAnimClip
             else if ( exSpriteAnimationDB.HasSpriteAnimClipGUID( guid ) ) {
                 exSpriteAnimationDB.RemoveSpriteAnimClip(guid);
             }
         }
+        exSceneHelper.UpdateSceneSprites(atlasInfoGUIDs);
 
         // DISABLE { 
         // for ( int i = 0; i < _movedAssets.Length; ++i )
@@ -189,7 +203,11 @@ class ex2D_SaveAssetsProcessor : SaveAssetsProcessor {
         // post build 
         // ======================================================== 
 
-        exAtlasInfoUtility.PostBuild (rebuildAtlasInfos);
+        List<string> rebuildAtlasInfoGUIDs = new List<string>();
+        foreach ( exAtlasInfo atlasInfo in rebuildAtlasInfos ) {
+            rebuildAtlasInfoGUIDs.Add( exEditorHelper.AssetToGUID(atlasInfo) );
+        }
+        exSceneHelper.UpdateSceneSprites (rebuildAtlasInfoGUIDs);
 
         // NOTE: without this you will got leaks message
         EditorUtility.UnloadUnusedAssets();

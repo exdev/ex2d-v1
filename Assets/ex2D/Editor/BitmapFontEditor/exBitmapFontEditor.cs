@@ -43,7 +43,7 @@ partial class exBitmapFontEditor : EditorWindow {
 
     [MenuItem ("Window/ex2D/BitmapFont Editor %&f")]
     public static exBitmapFontEditor NewWindow () {
-        exBitmapFontEditor newWindow = (exBitmapFontEditor)EditorWindow.GetWindow(typeof(exBitmapFontEditor));
+        exBitmapFontEditor newWindow = EditorWindow.GetWindow<exBitmapFontEditor>();
         return newWindow;
     }
 

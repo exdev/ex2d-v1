@@ -30,6 +30,13 @@ public class exSpriteAnimClip : ScriptableObject {
         }
     }
 
+    public enum StopAction {
+        DoNothing,
+        DefaultSprite,
+        Hide,
+        Destroy
+    }
+
     [System.Serializable]
     public class FrameInfo {
         public string textureGUID = "";
@@ -61,7 +68,7 @@ public class exSpriteAnimClip : ScriptableObject {
     }
 
     public WrapMode wrapMode = WrapMode.Once;
-    public exAnimStopAction stopAction = exAnimStopAction.DoNothing;
+    public StopAction stopAction = StopAction.DoNothing;
     public float length = 1.0f;
     public List<FrameInfo> frameInfos = new List<FrameInfo>();
     public List<EventInfo> eventInfos = new List<EventInfo>();

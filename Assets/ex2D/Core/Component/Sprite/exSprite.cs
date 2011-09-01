@@ -142,6 +142,18 @@ public class exSprite : exSpriteBase {
     ///////////////////////////////////////////////////////////////////////////////
 
 #if UNITY_EDITOR
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    [MenuItem ("GameObject/Create Other/ex2D/Sprite Object")]
+    static void CreateSpriteObject () {
+        GameObject go = new GameObject("SpriteObject");
+        go.AddComponent<exSprite>();
+        Selection.activeObject = go;
+    }
+
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
@@ -170,6 +182,12 @@ public class exSprite : exSpriteBase {
             GetComponent<MeshFilter>().sharedMesh = null; 
             renderer.sharedMaterial = null;
             return;
+        }
+
+        //
+        if ( useAtlas == false && customSize_ == false && trimTexture == false ) {
+            width_ = _texture.width;
+            height_ = _texture.height;
         }
 
         // NOTE: it is possible user duplicate an GameObject, 
@@ -243,7 +261,6 @@ public class exSprite : exSpriteBase {
             // assign it
             renderer.sharedMaterial = newMaterial;
         }
-
         EditorUtility.UnloadUnusedAssets();
     }
 #endif
@@ -612,18 +629,13 @@ public class exSprite : exSpriteBase {
 
         // NOTE: though we have ExecuteInEditMode, user can Add/Remove layer2d in Editor
 #if UNITY_EDITOR
-        exSpriteAnimation my_spanim = spanim;
-        if ( EditorApplication.isPlaying ) {
-            my_spanim = GetComponent<exSpriteAnimation>(); 
+        if ( EditorApplication.isPlaying == false ) {
+            spanim = GetComponent<exSpriteAnimation>(); 
         }
-        if ( my_spanim ) {
-            my_spanim.enabled = true;
-        }
-#else
+#endif
         if ( spanim ) {
             spanim.enabled = true;
         }
-#endif
     }
 
     // ------------------------------------------------------------------ 
@@ -635,20 +647,14 @@ public class exSprite : exSpriteBase {
 
         // NOTE: though we have ExecuteInEditMode, user can Add/Remove layer2d in Editor
 #if UNITY_EDITOR
-        exSpriteAnimation my_spanim = spanim;
-        if ( EditorApplication.isPlaying ) {
-            my_spanim = GetComponent<exSpriteAnimation>(); 
+        if ( EditorApplication.isPlaying == false ) {
+            spanim = GetComponent<exSpriteAnimation>(); 
         }
-        if ( my_spanim ) {
-            my_spanim.enabled = false;
-            my_spanim.Stop();
-        }
-#else
+#endif
         if ( spanim ) {
             spanim.enabled = false;
             spanim.Stop();
         }
-#endif
     }
 
     // ------------------------------------------------------------------ 
@@ -656,27 +662,39 @@ public class exSprite : exSpriteBase {
     // ------------------------------------------------------------------ 
 
     override protected void Awake () {
-        base.Awake();
 
-        // DELME { 
+// DISABLE { 
 // #if UNITY_EDITOR
 //         if ( EditorApplication.isPlaying == false &&
-//              useAtlas &&
-//              string.IsNullOrEmpty(textureGUID) == false ) 
+//              string.IsNullOrEmpty(textureGUID) == false &&
+//              exAtlasDBBasic.Initialized() ) 
 //         {
-//             exAtlasDB.ElementInfo elInfo = exAtlasDB.GetElementInfo ( textureGUID );
-//             if ( elInfo != null &&
-//                  ( elInfo.indexInAtlas != index_ ||
-//                    elInfo.guidAtlas != exEditorHelper.AssetToGUID(atlas_) ) ) 
-//             {
-//                 SetSprite( exEditorHelper.LoadAssetFromGUID<exAtlas>(elInfo.guidAtlas),
-//                            elInfo.indexInAtlas );
+//             exAtlasDBBasic.ElementInfo elInfo = exAtlasDBBasic.GetElementInfoNoInit ( textureGUID );
+//             string path = AssetDatabase.GetAssetPath(atlas_);
+//             string guid = AssetDatabase.AssetPathToGUID(path);
+
+//             //
+//             if ( elInfo != null ) {
+//                 if ( elInfo.indexInAtlas != index_ || elInfo.guidAtlas != guid ) {
+//                     path = AssetDatabase.GUIDToAssetPath(elInfo.guidAtlas);
+//                     SetSprite( (exAtlas)AssetDatabase.LoadAssetAtPath( path, typeof(exAtlas) ),
+//                                elInfo.indexInAtlas );
+//                     Build(null);
+//                 }
+//             }
+//             else {
+//                 Clear();
+//                 path = AssetDatabase.GUIDToAssetPath(textureGUID);
+//                 Texture2D texture = (Texture2D)AssetDatabase.LoadAssetAtPath( path, typeof(Texture2D) );
+//                 Build(texture);
 //             }
 //         }
 // #endif
-        // } DELME end 
+// } DISABLE end 
 
+        base.Awake();
         spanim = GetComponent<exSpriteAnimation>();
+
         if ( atlas_ != null ||
              ( renderer.sharedMaterial != null && renderer.sharedMaterial.mainTexture != null ) ) 
         {
@@ -692,12 +710,14 @@ public class exSprite : exSpriteBase {
     public void Clear () {
         atlas_ = null;
         index_ = -1;
-        renderer.sharedMaterial = null;
+        if ( renderer != null )
+            renderer.sharedMaterial = null;
 #if UNITY_EDITOR
-        GetComponent<MeshFilter>().sharedMesh = null;
-#else
-        meshFilter.sharedMesh = null;
+        if ( EditorApplication.isPlaying == false )
+            meshFilter = GetComponent<MeshFilter>();
 #endif
+        if ( meshFilter != null )
+            meshFilter.sharedMesh = null;
     }
 
     // ------------------------------------------------------------------ 

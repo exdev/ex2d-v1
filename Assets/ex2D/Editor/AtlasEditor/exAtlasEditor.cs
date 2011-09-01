@@ -503,9 +503,9 @@ partial class exAtlasEditor : EditorWindow {
                     exSpriteAnimationUtility.BuildFromAtlasInfo(curEdit);
 
                     // update scene sprites
-                    List<exAtlasInfo> rebuildAtlasInfos = new List<exAtlasInfo>();
-                    rebuildAtlasInfos.Add(curEdit);
-                    exAtlasInfoUtility.PostBuild (rebuildAtlasInfos);
+                    List<string> rebuildAtlasInfos = new List<string>();
+                    rebuildAtlasInfos.Add(exEditorHelper.AssetToGUID(curEdit));
+                    exSceneHelper.UpdateSceneSprites (rebuildAtlasInfos);
 
                     // NOTE: without this you will got leaks message
                     EditorUtility.UnloadUnusedAssets();
@@ -649,6 +649,17 @@ partial class exAtlasEditor : EditorWindow {
         if ( GUI.changed )
             EditorUtility.SetDirty(curEdit);
     }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void ImportObjects () {
+        EditorUtility.DisplayProgressBar( "Adding Textures...", "Start adding ", 0.2f );
+        curEdit.ImportObjects ( importObjects.ToArray() );
+        importObjects.Clear();
+        EditorUtility.ClearProgressBar();    
+    } 
 
     // ------------------------------------------------------------------ 
     // Desc: 

@@ -44,14 +44,28 @@ public class exAtlasDB : ScriptableObject {
     public bool showData = true;
     public bool showTable = true;
 
+    // FIXME: conflict with CreateDB I doubt. when I delete DB and create it, crash with this { 
+    // // ------------------------------------------------------------------ 
+    // // Desc: 
+    // // ------------------------------------------------------------------ 
+
+    // void OnEnable () {
+    //     Init();
+    // }
+    // } FIXME end 
+
     ///////////////////////////////////////////////////////////////////////////////
     // static
     ///////////////////////////////////////////////////////////////////////////////
 
-    static int version = 2;
-    static bool needSync = false;
-    static exAtlasDB db;
+    protected static int version = 2;
+    protected static bool needSync = false;
+    protected static exAtlasDB db;
     public static string dbPath = "Assets/.ex2D_AtlasDB.asset"; 
+
+    ///////////////////////////////////////////////////////////////////////////////
+    // static
+    ///////////////////////////////////////////////////////////////////////////////
 
     // ------------------------------------------------------------------ 
     // Desc: 
@@ -79,6 +93,15 @@ public class exAtlasDB : ScriptableObject {
             atlasInfo = null;
             EditorUtility.UnloadUnusedAssets();
         }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    static public bool DBExists () {
+        FileInfo fileInfo = new FileInfo(dbPath);
+        return fileInfo.Exists;
     }
 
     // ------------------------------------------------------------------ 
@@ -134,6 +157,11 @@ public class exAtlasDB : ScriptableObject {
             AssetDatabase.CreateAsset( db, dbPath );
             needSync = true;
         }
+        else {
+            db = (exAtlasDB)AssetDatabase.LoadAssetAtPath( dbPath, typeof(exAtlasDB) );
+        }
+
+        //
         if ( version != db.curVersion ) {
             db.curVersion = version;
             needSync = true;
@@ -145,6 +173,7 @@ public class exAtlasDB : ScriptableObject {
     // Desc: 
     // ------------------------------------------------------------------ 
 
+    [MenuItem("Edit/ex2D/Create Atlas DB")]
     static public void Init () {
         // if db not found we need to create it and re-initliaze
         if ( db == null ) {
@@ -161,10 +190,7 @@ public class exAtlasDB : ScriptableObject {
 
                 // create atlas element table
                 foreach ( ElementInfo elInfo in db.elementInfos ) {
-                    AddElementInfo( elInfo.guidTexture, 
-                                    elInfo.guidAtlas,
-                                    elInfo.guidAtlasInfo,
-                                    elInfo.indexInAtlas );
+                    db.texGUIDToElementInfo[elInfo.guidTexture] = elInfo;
                 }
 
                 EditorUtility.SetDirty(db);
@@ -307,19 +333,20 @@ public class exAtlasDB : ScriptableObject {
     static public void UpdateElementInfo ( exAtlasInfo.Element _el, int _index ) {
         Init();
 
-        ElementInfo elInfo = null;
         string textureGUID = exEditorHelper.AssetToGUID(_el.texture);
-        if ( db.texGUIDToElementInfo.ContainsKey(textureGUID) == false ) {
+        ElementInfo elInfo = GetElementInfo(textureGUID);
+        if ( elInfo == null ) {
             elInfo = AddElementInfo (_el, _index);
-            if ( elInfo != null )
+            if ( elInfo != null ) {
                 db.elementInfos.Add(elInfo);
+                EditorUtility.SetDirty(db);
+            }
         }
         else {
-            elInfo = db.texGUIDToElementInfo[textureGUID];
             elInfo.indexInAtlas = _index;
             elInfo.indexInAtlasInfo = _index;
+            EditorUtility.SetDirty(db);
         }
-        EditorUtility.SetDirty(db);
     }
 
     // ------------------------------------------------------------------ 

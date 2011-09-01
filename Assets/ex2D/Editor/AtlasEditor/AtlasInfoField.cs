@@ -96,7 +96,7 @@ partial class exAtlasEditor : EditorWindow {
         // ======================================================== 
 
         List<exAtlasInfo.Element> invalidElements = new List<exAtlasInfo.Element>();
-        foreach ( exAtlasInfo.Element el in curEdit.elements ) {
+        foreach ( exAtlasInfo.Element el in _atlasInfo.elements ) {
             if ( el.texture == null ) {
                 invalidElements.Add(el);
                 continue;
@@ -110,10 +110,10 @@ partial class exAtlasEditor : EditorWindow {
                 continue;
             }
 
-            AtlasElementField ( scaledRect, el );
+            AtlasElementField ( scaledRect, _atlasInfo, el );
         }
         foreach ( exAtlasInfo.Element el in invalidElements ) {
-            curEdit.RemoveElement(el);
+            _atlasInfo.RemoveElement(el);
         }
 
         // ======================================================== 
@@ -181,24 +181,13 @@ partial class exAtlasEditor : EditorWindow {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    void ImportObjects () {
-        EditorUtility.DisplayProgressBar( "Adding Textures...", "Start adding ", 0.2f );
-        curEdit.ImportObjects ( importObjects.ToArray() );
-        importObjects.Clear();
-        EditorUtility.ClearProgressBar();    
-    } 
-
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
-    void AtlasElementField ( Rect _atlasRect, exAtlasInfo.Element _el ) {
+    void AtlasElementField ( Rect _atlasRect, exAtlasInfo _atlasInfo, exAtlasInfo.Element _el ) {
         Color oldBGColor = GUI.backgroundColor;
         Rect srcRect; 
-        Rect rect = new Rect( _el.coord[0] * curEdit.scale, 
-                              _el.coord[1] * curEdit.scale, 
-                              _el.Width() * curEdit.scale, 
-                              _el.Height() * curEdit.scale );
+        Rect rect = new Rect( _el.coord[0] * _atlasInfo.scale, 
+                              _el.coord[1] * _atlasInfo.scale, 
+                              _el.Width() * _atlasInfo.scale, 
+                              _el.Height() * _atlasInfo.scale );
         bool selected = selectedElements.IndexOf(_el) != -1;
 
         // ======================================================== 
@@ -237,17 +226,17 @@ partial class exAtlasEditor : EditorWindow {
                                 _el.trimRect.width, 
                                 _el.trimRect.height );
         }
-        srcRect = new Rect ( srcRect.x * curEdit.scale,
-                             srcRect.y * curEdit.scale,
-                             srcRect.width * curEdit.scale,
-                             srcRect.height * curEdit.scale );
+        srcRect = new Rect ( srcRect.x * _atlasInfo.scale,
+                             srcRect.y * _atlasInfo.scale,
+                             srcRect.width * _atlasInfo.scale,
+                             srcRect.height * _atlasInfo.scale );
 
         // draw texture
         if ( _el.trim ) {
-            Rect rect2 = new Rect( -_el.trimRect.x * curEdit.scale,
-                                   -_el.trimRect.y * curEdit.scale,
-                                   _el.texture.width * curEdit.scale, 
-                                   _el.texture.height * curEdit.scale );
+            Rect rect2 = new Rect( -_el.trimRect.x * _atlasInfo.scale,
+                                   -_el.trimRect.y * _atlasInfo.scale,
+                                   _el.texture.width * _atlasInfo.scale, 
+                                   _el.texture.height * _atlasInfo.scale );
             GUI.BeginGroup( srcRect );
             GUI.DrawTexture( rect2, _el.texture );
             GUI.EndGroup();

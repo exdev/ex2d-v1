@@ -46,9 +46,7 @@ public class exSpriteEditor : exSpriteBaseEditor {
             }
         }
         else {
-            if ( _sprite.atlas ) {
-                _sprite.Clear();
-            }
+            _sprite.Clear();
         }
     }
 

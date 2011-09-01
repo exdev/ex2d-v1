@@ -72,7 +72,7 @@ partial class exSpriteAnimClipEditor : EditorWindow {
 
     [MenuItem ("Window/ex2D/Sprite Animation Editor %&s")]
     public static exSpriteAnimClipEditor NewWindow () {
-        exSpriteAnimClipEditor newWindow = (exSpriteAnimClipEditor)EditorWindow.GetWindow(typeof(exSpriteAnimClipEditor));
+        exSpriteAnimClipEditor newWindow = EditorWindow.GetWindow<exSpriteAnimClipEditor>();
         return newWindow;
     }
 
@@ -136,39 +136,40 @@ partial class exSpriteAnimClipEditor : EditorWindow {
     public void Edit ( Object _obj ) {
         // check if repaint
         if ( curEdit != _obj ) {
-
-            // don't change if we select GameObject
             Object obj = _obj; 
-            if ( obj is GameObject ) {
-                GameObject go = _obj as GameObject;
-                // get exSpriteAnimation from itself, children or root 
-                exSpriteAnimation spAnim = go.GetComponent<exSpriteAnimation>();
-                // DISABLE { 
-                // if ( spAnim == null ) {
-                //     spAnim = go.GetComponentInChildren<exSpriteAnimation>();
-                //     if ( spAnim == null ) {
-                //         spAnim = go.transform.root.GetComponentInChildren<exSpriteAnimation>();
-                //     }
-                // }
-                // } DISABLE end 
-                if ( spAnim ) {
-                    int idx = spAnim.animations.IndexOf(curEdit);
-                    // if curEdit is exists in the selected gameObject, don't do anything
-                    if ( idx != -1 ) {
-                        Repaint ();
-                        return;
-                    }
 
-                    // if we have default animation, use it
-                    if ( spAnim.defaultAnimation != null ) {
-                        obj = spAnim.defaultAnimation;
-                    }
-                    // else we will check if we have animations in our list and use the first one 
-                    else if ( spAnim.animations.Count > 0 ) {
-                        obj = spAnim.animations[0];
-                    }
-                }
-            }
+            // DISABLE { 
+            // if ( obj is GameObject ) {
+            //     GameObject go = obj as GameObject;
+            //     // get exSpriteAnimation from itself, children or root 
+            //     exSpriteAnimation spAnim = go.GetComponent<exSpriteAnimation>();
+            //     // DISABLE { 
+            //     // if ( spAnim == null ) {
+            //     //     spAnim = go.GetComponentInChildren<exSpriteAnimation>();
+            //     //     if ( spAnim == null ) {
+            //     //         spAnim = go.transform.root.GetComponentInChildren<exSpriteAnimation>();
+            //     //     }
+            //     // }
+            //     // } DISABLE end 
+            //     if ( spAnim ) {
+            //         int idx = spAnim.animations.IndexOf(curEdit);
+            //         // if curEdit is exists in the selected gameObject, don't do anything
+            //         if ( idx != -1 ) {
+            //             Repaint ();
+            //             return;
+            //         }
+
+            //         // if we have default animation, use it
+            //         if ( spAnim.defaultAnimation != null ) {
+            //             obj = spAnim.defaultAnimation;
+            //         }
+            //         // else we will check if we have animations in our list and use the first one 
+            //         else if ( spAnim.animations.Count > 0 ) {
+            //             obj = spAnim.animations[0];
+            //         }
+            //     }
+            // }
+            // } DISABLE end 
 
             // if this is another anim clip, swtich to it.
             if ( obj is exSpriteAnimClip && obj != curEdit ) {
@@ -276,7 +277,7 @@ partial class exSpriteAnimClipEditor : EditorWindow {
             curEdit.wrapMode = (WrapMode)EditorGUILayout.EnumPopup ( "Wrap Mode", curEdit.wrapMode, GUILayout.Width(200) );
 
             // Anim Stop Action 
-            curEdit.stopAction = (exAnimStopAction)EditorGUILayout.EnumPopup ( "Stop Action", curEdit.stopAction, GUILayout.Width(200) );
+            curEdit.stopAction = (exSpriteAnimClip.StopAction)EditorGUILayout.EnumPopup ( "Stop Action", curEdit.stopAction, GUILayout.Width(200) );
         GUILayout.EndVertical();
         GUILayout.EndHorizontal();
         GUILayout.Space(20);
