@@ -169,7 +169,7 @@ public class exSpriteAnimationDB : ScriptableObject {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    [MenuItem("Edit/ex2D/Create SpriteAnimation DB")]
+    [MenuItem("Edit/ex2D/Create Sprite Animation DB")]
     static public void Init () {
         // if db not found we need to create it and re-initliaze
         if ( db == null ) {

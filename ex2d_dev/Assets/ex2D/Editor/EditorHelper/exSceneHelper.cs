@@ -40,7 +40,7 @@ public static class exSceneHelper {
             //                                   "Update Sprite Layer " + layerObj.gameObject.name, progress );    
             // } DISABLE end 
 
-            layerObj.UpdateLayer();
+            layerObj.UpdateDepth();
             RecursivelyUpdateLayer(layerObj.transform);
         }
         EditorUtility.ClearProgressBar();
@@ -91,7 +91,7 @@ public static class exSceneHelper {
             // update layer
             exLayer2D layer2d = spBase.GetComponent<exLayer2D>();
             if ( layer2d ) {
-                layer2d.UpdateLayer();
+                layer2d.UpdateDepth();
             }
         }
         EditorUtility.UnloadUnusedAssets(); // NOTE: without this you will got leaks message
@@ -106,7 +106,7 @@ public static class exSceneHelper {
         foreach ( Transform child in _trans ) {
             exLayer2D layer = child.GetComponent<exLayer2D>();
             if ( layer ) {
-                layer.UpdateLayer();
+                layer.UpdateDepth();
                 RecursivelyUpdateLayer ( layer.transform );
             }
         }

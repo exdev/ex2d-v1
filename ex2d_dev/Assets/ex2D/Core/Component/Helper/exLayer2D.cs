@@ -32,7 +32,7 @@ public class exLayer2D : MonoBehaviour {
     ///////////////////////////////////////////////////////////////////////////////
 
     protected float depth_ = 0.0f;
-    public float depth { 
+    protected float depth { 
         get { return depth_; } 
         set {
             if ( Mathf.Approximately(depth_,value) == false ) {
@@ -54,7 +54,7 @@ public class exLayer2D : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     void OnEnable () {
-        depth = CalculateDepth( Camera.main );
+        UpdateDepth ();
     }
 
     // ------------------------------------------------------------------ 
@@ -89,7 +89,7 @@ public class exLayer2D : MonoBehaviour {
             layer_ = newLayer;
             bias_ = _bias;
 
-            depth = CalculateDepth( Camera.main );
+            UpdateDepth ();
         }
     }
 
@@ -97,7 +97,8 @@ public class exLayer2D : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public void UpdateLayer () {
-        SetLayer ( layer_, bias_ );
+    public void UpdateDepth () {
+        depth = CalculateDepth( Camera.main );
     }
+
 }

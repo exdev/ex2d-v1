@@ -100,6 +100,7 @@ public class exSpriteBase : exPlane {
             case exPlane.Plane.XZ: layer2d = gameObject.AddComponent<exLayerXZ>(); break;
             case exPlane.Plane.ZY: layer2d = gameObject.AddComponent<exLayerZY>(); break;
             }
+            layer2d.UpdateDepth();
         }
     }
 

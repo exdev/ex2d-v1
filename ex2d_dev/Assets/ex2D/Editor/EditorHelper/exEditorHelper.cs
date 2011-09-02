@@ -12,6 +12,7 @@
 using UnityEditor;
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -234,6 +235,34 @@ static public class exEditorHelper {
             return path;
         }
         return "Assets";
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // GetAssetsAtPath<exAtlas> ( "Assets", ".asset", )
+    // ------------------------------------------------------------------ 
+
+    public static T[] GetAssetsAtPath<T> ( string _path, string _suffix = "", bool _recursively = true ) {
+        List<T> assets = new List<T>();
+
+        // Process the list of files found in the directory.
+        string [] files = Directory.GetFiles(_path, "*" + _suffix);
+        foreach ( string fileName in files ) {
+            T asset = (T)(object)AssetDatabase.LoadAssetAtPath( fileName, typeof(T) );
+            if ( asset != null ) {
+                assets.Add(asset);
+            }
+        }
+
+        // Recurse into subdirectories of this directory.
+        if ( _recursively ) {
+            string [] dirs = Directory.GetDirectories(_path);
+            foreach( string dirName in dirs ) {
+                assets.AddRange( GetAssetsAtPath<T> ( dirName, _suffix, true ) );
+            }
+        }
+
+        return assets.ToArray();
     }
 
     // ------------------------------------------------------------------ 

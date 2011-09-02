@@ -188,7 +188,7 @@ public class exSprite : exSpriteBase {
             float offsetY = 0.0f;
 
             Vector3[] vertices = new Vector3[4];
-            // Vector3[] normals = new Vector3[4];
+            Vector3[] normals = new Vector3[4]; // TEMP
 
             // calculate anchor offset
             if ( useTextureOffset ) {
@@ -346,21 +346,21 @@ public class exSprite : exSpriteBase {
                     switch ( plane ) {
                     case Plane.XY:
                         vertices[i] = new Vector3( x, y, 0.0f );
-                        // normals[i] = new Vector3( 0.0f, 0.0f, -1.0f );
+                        normals[i] = new Vector3( 0.0f, 0.0f, -1.0f ); // TEMP
                         break;
                     case Plane.XZ:
                         vertices[i] = new Vector3( x, 0.0f, y );
-                        // normals[i] = new Vector3( 0.0f, 1.0f, 0.0f );
+                        normals[i] = new Vector3( 0.0f, 1.0f, 0.0f ); // TEMP
                         break;
                     case Plane.ZY:
                         vertices[i] = new Vector3( 0.0f, y, x );
-                        // normals[i] = new Vector3( 1.0f, 0.0f, 0.0f );
+                        normals[i] = new Vector3( 1.0f, 0.0f, 0.0f ); // TEMP
                         break;
                     }
                 }
             }
             _mesh.vertices = vertices;
-            // _mesh.normals = normals;
+            _mesh.normals = normals; // TEMP
             _mesh.bounds = UpdateBounds ( offsetX, offsetY, halfWidth * 2.0f, halfHeight * 2.0f );
 
             // update box-collider if we have

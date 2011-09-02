@@ -59,7 +59,6 @@ RUNTIME_ARGUMENT = $(RUNTIME_DEFINE) -r:$(UNITY_ENGINE_DLL)
 
 # do the build
 $(RUNTIME_TARGET):
-	$(MKDIR) build
 	$(COMPILER) -target:library -out:$(RUNTIME_TARGET) $(RUNTIME_ARGUMENT) $(RUNTIME_SOURCE)
 
 # /////////////////////////////////////////////////////////////////////////////

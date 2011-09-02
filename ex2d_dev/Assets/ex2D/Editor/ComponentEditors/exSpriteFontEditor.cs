@@ -267,20 +267,19 @@ public class exSpriteFontEditor : exSpriteBaseEditor {
         EditorGUI.indentLevel = 1;
         GUI.enabled = true;
 
-        // DISABLE { 
-        // // ======================================================== 
-        // // Rebuild 
-        // // ======================================================== 
+        // ======================================================== 
+        // Rebuild button
+        // ======================================================== 
 
-        // GUI.enabled = !inAnimMode; 
-        // GUILayout.BeginHorizontal();
-        // GUILayout.FlexibleSpace();
-        // if ( GUILayout.Button("Rebuild...", GUILayout.Width(100), GUILayout.Height(25) ) ) {
-        //     needRebuild = true;
-        // }
-        // GUILayout.EndHorizontal();
-        // GUI.enabled = true;
-        // } DISABLE end 
+        GUI.enabled = !inAnimMode; 
+        GUILayout.BeginHorizontal();
+        GUILayout.FlexibleSpace();
+        if ( GUILayout.Button("Rebuild...", GUILayout.Height(20) ) ) {
+            needRebuild = true;
+        }
+        GUILayout.EndHorizontal();
+        GUI.enabled = true;
+        GUILayout.Space(5);
 
         // if dirty, build it.
         if ( !EditorApplication.isPlaying && !AnimationUtility.InAnimationMode() ) {
