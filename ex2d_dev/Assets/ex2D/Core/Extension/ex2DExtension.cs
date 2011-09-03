@@ -13,13 +13,21 @@ using UnityEngine;
 using System.Collections;
 
 ///////////////////////////////////////////////////////////////////////////////
-// defines
+/// \class ex2DExtension
+/// 
+/// ex2D Extensions
+/// 
 ///////////////////////////////////////////////////////////////////////////////
 
 public static class ex2DExtension {
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \fn MakePixelPerfect
+    /// \param _sp the base sprite
+    /// \param _camera the camera
+    /// \param _screenWidth the screen width
+    /// \param _screenHeight the screen height
+    /// Scale the exSpriteBase.scale to make it have renderer in perfect pixel in _camera
     // ------------------------------------------------------------------ 
 
     public static void MakePixelPerfect ( this exSpriteBase _sp, 
@@ -38,7 +46,13 @@ public static class ex2DExtension {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \fn ScreenToWorldPoint
+    /// \param _plane the in plane
+    /// \param _camera the in camera
+    /// \param _screen_x the screen x position
+    /// \param _screen_y the screen y position
+    /// \return the world position
+    /// Convert the screen position to world position in _camera depends on exPlane.plane
     // ------------------------------------------------------------------ 
 
     public static Vector3 ScreenToWorldPoint ( this exPlane _plane, 
@@ -62,7 +76,13 @@ public static class ex2DExtension {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \fn ScreenToWorldPoint
+    /// \param _plane the in plane
+    /// \param _camera the in camera
+    /// \param _viewport_x the viewport x position
+    /// \param _viewport_y the viewport y position
+    /// \return the world position
+    /// Convert the viewport position to world position in _camera depends on exPlane.plane
     // ------------------------------------------------------------------ 
 
     public static Vector3 ViewportToWorldPoint ( this exPlane _plane, 

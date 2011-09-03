@@ -17,11 +17,22 @@ using System.Collections.Generic;
 // defines
 ///////////////////////////////////////////////////////////////////////////////
 
+///////////////////////////////////////////////////////////////////////////////
+/// \class exSoftClip
+///
+/// A component handles the a list of exPlane GameObjects, clip them
+/// to the boundingRect.
+///
+///////////////////////////////////////////////////////////////////////////////
+
 [ExecuteInEditMode]
 [AddComponentMenu("ex2D Sprite/Soft Clip")]
 public class exSoftClip : exPlane {
 
-    public Vector2 center = Vector2.zero;
+    // ------------------------------------------------------------------ 
+    /// \property width
+    /// the width of the soft-clip
+    // ------------------------------------------------------------------ 
 
     [SerializeField] protected float width_ = 1.0f;
     public float width {
@@ -34,6 +45,11 @@ public class exSoftClip : exPlane {
         }
     }
 
+    // ------------------------------------------------------------------ 
+    /// \property height
+    /// the height of the soft-clip
+    // ------------------------------------------------------------------ 
+
     [SerializeField] protected float height_ = 1.0f;
     public float height {
         get { return height_; }
@@ -45,7 +61,18 @@ public class exSoftClip : exPlane {
         }
     }
 
+    // ------------------------------------------------------------------ 
+    /// \memberof planes
+    /// the list of the planes to clip
+    // ------------------------------------------------------------------ 
+
     public List<exPlane> planes = new List<exPlane>();
+
+    // ------------------------------------------------------------------ 
+    /// \memberof clippedRect 
+    /// the clipped rect, if the soft-clip plane is a child of another soft-clip plane
+    // ------------------------------------------------------------------ 
+
     public Rect clippedRect { get; protected set; }
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -53,7 +80,8 @@ public class exSoftClip : exPlane {
     ///////////////////////////////////////////////////////////////////////////////
     
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \memberof UpdateClipList 
+    /// update the list of planes to clip
     // ------------------------------------------------------------------ 
 
     public void UpdateClipList () {
@@ -87,7 +115,8 @@ public class exSoftClip : exPlane {
     ///////////////////////////////////////////////////////////////////////////////
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \fn Awake
+    /// Awake functoin inherit from exPlane.
     // ------------------------------------------------------------------ 
 
     override protected void Awake () {
@@ -99,7 +128,9 @@ public class exSoftClip : exPlane {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \fn OnEnable
+    /// OnEnable functoin inherit from exPlane.
+    /// When enabled set to true, it will enable all the item in the planes
     // ------------------------------------------------------------------ 
 
     override protected void OnEnable () {
@@ -117,7 +148,9 @@ public class exSoftClip : exPlane {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \fn OnDisable
+    /// OnDisable functoin inherit from exPlane.
+    /// When enabled set to false, it will disable all the item in the planes
     // ------------------------------------------------------------------ 
 
     override protected void OnDisable () {
@@ -287,8 +320,8 @@ public class exSoftClip : exPlane {
         }
 
         //
-        float x = center.x - offsetX;
-        float y = center.y + offsetY;
+        float x = offset_.x - offsetX;
+        float y = offset_.y + offsetY;
         switch ( plane ) {
         case exPlane.Plane.XY:
             center_v3 += new Vector3( x, y, 0.0f );

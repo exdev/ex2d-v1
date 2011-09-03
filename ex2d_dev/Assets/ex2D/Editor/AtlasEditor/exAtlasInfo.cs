@@ -441,7 +441,7 @@ public partial class exAtlasInfo : ScriptableObject {
             }
             else if ( o is exBitmapFont ) {
                 exBitmapFont f = o as exBitmapFont;
-                if ( f.useAtlas ) {
+                if ( f.inAtlas ) {
                     // NOTE: it is still possible we have atlas font in the obj list since we use Selection.GetFiltered().
                     continue;
                 }
@@ -461,7 +461,7 @@ public partial class exAtlasInfo : ScriptableObject {
                                                                                typeof(exBitmapFont) );
                 if ( f2 == null ) {
                     f2 = (exBitmapFont)ScriptableObject.CreateInstance(typeof(exBitmapFont));
-                    f2.useAtlas = true;
+                    f2.inAtlas = true;
                     f2.name = f.name;
                     f2.lineHeight = f.lineHeight;
 

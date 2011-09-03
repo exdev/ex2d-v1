@@ -53,15 +53,17 @@ public class exSoftClipEditor : exPlaneEditor {
         EditorGUIUtility.LookLikeInspector ();
         EditorGUI.indentLevel = 1;
 
-        // ======================================================== 
-        // center
-        // ======================================================== 
+        // DELME { 
+        // // ======================================================== 
+        // // center
+        // // ======================================================== 
 
-        EditorGUIUtility.LookLikeControls ();
-        GUI.enabled = !inAnimMode;
-        curEdit.center = EditorGUILayout.Vector2Field( "Center", curEdit.center );
-        GUI.enabled = true;
-        EditorGUIUtility.LookLikeInspector ();
+        // EditorGUIUtility.LookLikeControls ();
+        // GUI.enabled = !inAnimMode;
+        // curEdit.center = EditorGUILayout.Vector2Field( "Center", curEdit.center );
+        // GUI.enabled = true;
+        // EditorGUIUtility.LookLikeInspector ();
+        // } DELME end 
 
         // ======================================================== 
         // width

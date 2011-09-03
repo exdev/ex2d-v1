@@ -14,56 +14,69 @@ using System.Collections;
 using System.Collections.Generic;
 
 ///////////////////////////////////////////////////////////////////////////////
-// exBitmapFont
+/// \class exBitmapFont
+/// 
+/// The bitmap font asset used in exSpriteFont component. 
 ///////////////////////////////////////////////////////////////////////////////
 
 public class exBitmapFont : ScriptableObject {
 
     ///////////////////////////////////////////////////////////////////////////////
-    // class defines
+    /// \class CharInfo
+    /// A structure to descrip the character in the bitmap font 
     ///////////////////////////////////////////////////////////////////////////////
 
     [System.Serializable]
     public class CharInfo {
-        public int id = -1;
-        public int x = -1;
-        public int y = -1;
-        public int width = -1;
-        public int height = -1;
-        public int xoffset = -1;
-        public int yoffset = -1;
-        public int xadvance = -1;
-        public int page = -1;
-        public Vector2 uv0 = Vector2.zero;
+        public int id = -1;                ///< the character id 
+        public int x = -1;                 ///< the x pos
+        public int y = -1;                 ///< the y pos
+        public int width = -1;             ///< the width
+        public int height = -1;            ///< the height                          
+        public int xoffset = -1;           ///< the xoffset
+        public int yoffset = -1;           ///< the yoffset
+        public int xadvance = -1;          ///< the xadvance
+        public int page = -1;              ///< the number of pages used
+        public Vector2 uv0 = Vector2.zero; ///< the uv
     }
+
+    ///////////////////////////////////////////////////////////////////////////////
+    /// \class KerningInfo
+    /// A structure to descrip the kerning between two character in the bitmap font 
+    ///////////////////////////////////////////////////////////////////////////////
 
     [System.Serializable]
     public class KerningInfo {
-        public int first = -1;
-        public int second = -1;
-        public int amount = -1;
+        public int first = -1;  ///< the id of first character 
+        public int second = -1; ///< the id of second character
+        public int amount = -1; ///< the amount of kerning
     }
+
+    ///////////////////////////////////////////////////////////////////////////////
+    /// \class PageInfo
+    /// A structure to descrip the page used in the bitmap font
+    ///////////////////////////////////////////////////////////////////////////////
 
     [System.Serializable]
     public class PageInfo {
-        public Texture2D texture;
-        public Material material;
+        public Texture2D texture; ///< the texture
+        public Material material; ///< the default material
     }
 
     ///////////////////////////////////////////////////////////////////////////////
     // properties
     ///////////////////////////////////////////////////////////////////////////////
 
-    public int lineHeight;
-    public int size;
+    public int lineHeight; ///< the space of the line
+    public int size;       ///< the size in pixel of the font 
 
-    public List<PageInfo> pageInfos = new List<PageInfo>(); 
-    public List<CharInfo> charInfos = new List<CharInfo>();
-    public List<KerningInfo> kernings = new List<KerningInfo>();
-    public List<string> fontInfoGUIDs = new List<string>();
+    public List<PageInfo> pageInfos = new List<PageInfo>(); ///< the list of the page information
+    public List<CharInfo> charInfos = new List<CharInfo>(); ///< the list of the character information
+    public List<KerningInfo> kernings = new List<KerningInfo>(); ///< the list of the kerning information 
+    // public List<string> fontInfoGUIDs = new List<string>(); // TODO
 
-    public bool useAtlas = false;
-    public bool editorNeedRebuild = false;
+    public bool inAtlas = false; ///< if the font saved in atlas
+    public bool editorNeedRebuild = false; ///< if rebuild the font
 
     protected Dictionary<int,CharInfo> idToCharInfo = null;
 
@@ -72,7 +85,8 @@ public class exBitmapFont : ScriptableObject {
     ///////////////////////////////////////////////////////////////////////////////
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \fn RebuildIdToCharInfoTable 
+    /// Rebuild the table to store key exBitmapFont.CharInfo.id to value exBitmapFont.CharInfo
     // ------------------------------------------------------------------ 
 
     public void RebuildIdToCharInfoTable () {
@@ -86,7 +100,10 @@ public class exBitmapFont : ScriptableObject {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \fn GetCharInfo 
+    /// \param _id the look up key 
+    /// \return the expect character info
+    /// Get the character information by exBitmapFont.CharInfo.id
     // ------------------------------------------------------------------ 
 
     public CharInfo GetCharInfo ( int _id ) {

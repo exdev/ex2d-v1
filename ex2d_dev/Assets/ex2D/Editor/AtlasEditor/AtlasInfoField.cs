@@ -126,7 +126,7 @@ partial class exAtlasEditor : EditorWindow {
                 // Show a copy icon on the drag
                 foreach ( Object o in DragAndDrop.objectReferences ) {
                     if ( o is Texture2D || 
-                         (o is exBitmapFont && (o as exBitmapFont).useAtlas == false) ||
+                         (o is exBitmapFont && (o as exBitmapFont).inAtlas == false) ||
                          exEditorHelper.IsDirectory(o) ) 
                     {
                         DragAndDrop.visualMode = DragAndDropVisualMode.Copy;

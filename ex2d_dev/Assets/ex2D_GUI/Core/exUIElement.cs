@@ -64,7 +64,7 @@ public class exUIElement : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    static public void FindAndAddChild ( exUIElement _el ) {
+    public static void FindAndAddChild ( exUIElement _el ) {
         foreach ( Transform child in _el.transform ) {
             exUIElement child_el = child.GetComponent<exUIElement>();
             if ( child_el ) {

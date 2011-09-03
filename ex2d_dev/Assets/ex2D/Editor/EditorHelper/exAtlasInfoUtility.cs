@@ -19,7 +19,7 @@ using System.IO;
 // exAtlasInfoUtility
 ///////////////////////////////////////////////////////////////////////////////
 
-public class exAtlasInfoUtility {
+public static class exAtlasInfoUtility {
 
     // ------------------------------------------------------------------ 
     // Desc: 

@@ -35,7 +35,7 @@ public class exSpriteEditor : exSpriteBaseEditor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    static public void UpdateAtlas ( exSprite _sprite, exAtlasDB.ElementInfo _elInfo ) {
+    public static void UpdateAtlas ( exSprite _sprite, exAtlasDB.ElementInfo _elInfo ) {
         // get atlas and index from textureGUID
         if ( _elInfo != null ) {
             if ( _elInfo.guidAtlas != exEditorHelper.AssetToGUID(_sprite.atlas) ||

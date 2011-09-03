@@ -20,13 +20,13 @@ using System.Collections;
 // Desc: 
 // ------------------------------------------------------------------ 
 
-public class exStringHelper {
+public static class exStringHelper {
 
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    static public long CountLinesInString ( string _text ) {
+    public static long CountLinesInString ( string _text ) {
         long count = 1;
         int start = 0;
         while ((start = _text.IndexOf('\n', start)) != -1) {

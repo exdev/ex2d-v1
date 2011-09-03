@@ -22,7 +22,7 @@ using System.Collections.Generic;
 // Desc: 
 // ------------------------------------------------------------------ 
 
-public class exTextureHelper {
+public static class exTextureHelper {
 
     public enum RotateDirection {
         None,

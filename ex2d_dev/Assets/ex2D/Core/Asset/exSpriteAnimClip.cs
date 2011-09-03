@@ -1,7 +1,7 @@
 // ======================================================================================
 // File         : exSpriteAnimClip.cs
 // Author       : Wu Jie 
-// Last Change  : 06/15/2011 | 14:46:32 PM | Wednesday,June
+// Last Change  : 09/03/2011 | 18:29:15 PM | Saturday,September
 // Description  : 
 // ======================================================================================
 
@@ -14,7 +14,9 @@ using System.Collections;
 using System.Collections.Generic;
 
 ///////////////////////////////////////////////////////////////////////////////
-// exSpriteAnimClip
+/// \class exSpriteAnimClip
+///
+/// The sprite animation clip asset used in exSpriteAnimation component. 
 ///////////////////////////////////////////////////////////////////////////////
 
 public class exSpriteAnimClip : ScriptableObject {
@@ -30,20 +32,35 @@ public class exSpriteAnimClip : ScriptableObject {
         }
     }
 
+    // ------------------------------------------------------------------ 
+    /// \enum StopAction
+    /// The action type used when animation stpped
+    // ------------------------------------------------------------------ 
+
     public enum StopAction {
-        DoNothing,
-        DefaultSprite,
-        Hide,
-        Destroy
+        DoNothing,      ///< do nothing
+        DefaultSprite,  ///< set to default sprite when the sprite animation stopped
+        Hide,           ///< hide the sprite when the sprite animation stopped
+        Destroy         ///< destroy the GameObject the sprite belongs to when the sprite animation stopped
     }
+
+    // ------------------------------------------------------------------ 
+    /// \class FrameInfo
+    /// The structure to descrip a frame in the sprite animation clip
+    // ------------------------------------------------------------------ 
 
     [System.Serializable]
     public class FrameInfo {
-        public string textureGUID = "";
-        public float length = 0.0f;
-        public exAtlas atlas;
-        public int index;
+        public string textureGUID = ""; ///< the guid of the referenced texture
+        public float length = 0.0f;     ///< the length of the frame in seconds
+        public exAtlas atlas;           ///< the atlas used in this frame
+        public int index;               ///< the index of the atlas used in this frame
     }
+
+    // ------------------------------------------------------------------ 
+    /// \class FrameInfo
+    /// The structure to descrip an event in the sprite animation clip
+    // ------------------------------------------------------------------ 
 
     [System.Serializable]
     public class EventInfo {

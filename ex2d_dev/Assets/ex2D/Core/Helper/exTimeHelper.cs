@@ -16,7 +16,7 @@ using System.Collections;
 // defines
 ///////////////////////////////////////////////////////////////////////////////
 
-public class exTimeHelper {
+public static class exTimeHelper {
 
     // ------------------------------------------------------------------ 
     // Desc: 

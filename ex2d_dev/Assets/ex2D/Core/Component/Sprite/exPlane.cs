@@ -1,7 +1,7 @@
 // ======================================================================================
 // File         : exPlane.cs
 // Author       : Wu Jie 
-// Last Change  : 08/25/2011 | 17:09:53 PM | Thursday,August
+// Last Change  : 09/03/2011 | 11:47:44 AM | Saturday,September
 // Description  : 
 // ======================================================================================
 
@@ -16,47 +16,57 @@ using System.Collections;
 // defines
 ///////////////////////////////////////////////////////////////////////////////
 
+///////////////////////////////////////////////////////////////////////////////
+/// \class exPlane
+///
+/// The base class of sprites in ex2D
+///
+///////////////////////////////////////////////////////////////////////////////
+
 [ExecuteInEditMode]
 public class exPlane : MonoBehaviour {
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \enum UpdateFlags
+    /// The type of update
     // ------------------------------------------------------------------ 
 
 	[System.FlagsAttribute]
 	public enum UpdateFlags {
-		None		= 0,
-		Vertex		= 1,
-		UV	        = 2,
-		Color	    = 4,
-		Text	    = 8,
-		Index	    = 16,
+		None		= 0,  ///< none
+		Vertex		= 1,  ///< update the vertices
+		UV	        = 2,  ///< update the uv coordination
+		Color	    = 4,  ///< update the vertex color
+		Text	    = 8,  ///< update the text
+		Index	    = 16, ///< update the indices
 	};
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \enum Plane
+    /// The 2D plane the exPlane used in 3D space
     // ------------------------------------------------------------------ 
 
     public enum Plane {
-        XY,
-        XZ,
-        ZY
+        XY, ///< the plane in XY space
+        XZ, ///< the plane in XZ space
+        ZY  ///< the plane in ZY space
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \enum Anchor
+    /// The anchor position of the exPlane in 2D space
     // ------------------------------------------------------------------ 
 
     public enum Anchor {
-		TopLeft = 0,
-		TopCenter,
-		TopRight,
-		MidLeft,
-		MidCenter,
-		MidRight,
-		BotLeft,
-		BotCenter,
-		BotRight,
+		TopLeft = 0, ///< the top-left of the plane  
+		TopCenter,   ///< the top-center of the plane
+		TopRight,    ///< the top-right of the plane
+		MidLeft,     ///< the middle-left of the plane
+		MidCenter,   ///< the middle-center of the plane
+		MidRight,    ///< the middle-right of the plane
+		BotLeft,     ///< the bottom-left of the plane
+		BotCenter,   ///< the bottom-center of the plane
+		BotRight,    ///< the bottom-right of the plane
     }
 
     // ------------------------------------------------------------------ 
@@ -66,8 +76,8 @@ public class exPlane : MonoBehaviour {
     [System.Serializable]
     public class ClipInfo {
 
-        static public bool operator == ( ClipInfo _a, ClipInfo _b ) { return _a.Equals(_b); }
-        static public bool operator != ( ClipInfo _a, ClipInfo _b ) { return !_a.Equals(_b); }
+        public static bool operator == ( ClipInfo _a, ClipInfo _b ) { return _a.Equals(_b); }
+        public static bool operator != ( ClipInfo _a, ClipInfo _b ) { return !_a.Equals(_b); }
 
         public bool clipped = false; 
         public float top    = 0.0f; // percentage of clipped top
@@ -105,6 +115,11 @@ public class exPlane : MonoBehaviour {
     // properties
     ///////////////////////////////////////////////////////////////////////////////
 
+    // ------------------------------------------------------------------ 
+    /// \property plane
+    /// the 2D coordination (XY, XZ or ZY) used in this plane 
+    // ------------------------------------------------------------------ 
+
     [SerializeField] protected Plane plane_ = Plane.XY;
     public Plane plane {
         get { return plane_; }
@@ -134,6 +149,11 @@ public class exPlane : MonoBehaviour {
         }
     }
 
+    // ------------------------------------------------------------------ 
+    /// \property anchor
+    /// the anchor position used in this plane
+    // ------------------------------------------------------------------ 
+
     [SerializeField] protected Anchor anchor_ = Anchor.MidCenter;
     public Anchor anchor {
         get { return anchor_; }
@@ -145,13 +165,49 @@ public class exPlane : MonoBehaviour {
         }
     }
 
+    // ------------------------------------------------------------------ 
+    /// \property offset
+    /// the offset based on the anchor, 
+    /// the final position of the plane equals to offset + anchor
+    // ------------------------------------------------------------------ 
+
+    [SerializeField] protected Vector2 offset_ = Vector2.zero;
+    public Vector2 offset {
+        get { return offset_; }
+        set { 
+            if ( offset_ != value ) {
+                offset_ = value;
+                updateFlags |= UpdateFlags.Vertex;
+            }
+        }
+    }
+
     ///////////////////////////////////////////////////////////////////////////////
     // Non Serialized
     ///////////////////////////////////////////////////////////////////////////////
 
+    // ------------------------------------------------------------------ 
+    /// \memberof layer2d
+    /// The cached exLayer2D component
+    // ------------------------------------------------------------------ 
+
     [System.NonSerialized] public exLayer2D layer2d;
-    // NOTE: I only public this for exAnimationHelper, user should not set it
+
+    // ------------------------------------------------------------------ 
+    /// \memberof updateFlags
+    /// The current updateFlags, this value will reset after every LateUpdate()
+    /// 
+    /// \note The only reason I public this is because exAnimationHelper need to asscess it, 
+    /// user should only change this in class derived from exPlane.
+    // ------------------------------------------------------------------ 
+
 	[System.NonSerialized] public UpdateFlags updateFlags = UpdateFlags.None;
+
+    // ------------------------------------------------------------------ 
+    /// \property boundingRect
+    /// The bounding rect of the plane
+    // ------------------------------------------------------------------ 
+
     public Rect boundingRect { get; protected set; }
 
     protected MeshFilter meshFilter;
@@ -189,7 +245,11 @@ public class exPlane : MonoBehaviour {
     ///////////////////////////////////////////////////////////////////////////////
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \fn Awake
+    /// Awake functoin inherit from MonoBehaviour.
+    /// 
+    /// \note if you inherit from exPlane, and implement your own Awake function, 
+    /// you need to override this and call base.Awake() in your Awake block.
     // ------------------------------------------------------------------ 
 
     virtual protected void Awake () {
@@ -198,7 +258,13 @@ public class exPlane : MonoBehaviour {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \fn OnEnable
+    /// OnEnable functoin inherit from MonoBehaviour,
+    /// When exPlane.enabled set to true, this function will be invoked,
+    /// exPlane will enable the renderer and layer2d if they exist. 
+    /// 
+    /// \note if you inherit from exPlane, and implement your own Awake function, 
+    /// you need to override this and call base.OnEnable() in your OnEnable block.
     // ------------------------------------------------------------------ 
 
     virtual protected void OnEnable () {
@@ -215,7 +281,13 @@ public class exPlane : MonoBehaviour {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \fn OnDisable
+    /// OnDisable functoin inherit from MonoBehaviour,
+    /// When exPlane.enabled set to false, this function will be invoked,
+    /// exPlane will disable the renderer and layer2d if they exist. 
+    /// 
+    /// \note if you inherit from exPlane, and implement your own Awake function, 
+    /// you need to override this and call base.OnDisable() in your OnDisable block.
     // ------------------------------------------------------------------ 
 
     virtual protected void OnDisable () {
@@ -243,7 +315,9 @@ public class exPlane : MonoBehaviour {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \fn InternalUpdate
+    /// A virtual for user to override.
+    /// It will be invoked when updateFlags is not UpdateFlags.None
     // ------------------------------------------------------------------ 
 
     virtual protected void InternalUpdate () {
@@ -251,19 +325,36 @@ public class exPlane : MonoBehaviour {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \fn UpdateBoundRect
+    /// \param _offsetX the offset x pos of the plane (normally it is equals to offset.x + anchor_pos.x )  
+    /// \param _offsetY the offset y pos of the plane (normally it is equals to offset.y + anchor_pos.y )  
+    /// \param _width the width of the plane
+    /// \param _height the height of the plane
+    /// 
+    /// Update the boundingRect of the plane.
     // ------------------------------------------------------------------ 
 
-    public Bounds UpdateBounds ( float _offsetX, float _offsetY, float _width, float _height ) {
-        //
+    protected void UpdateBoundRect ( float _offsetX, float _offsetY, float _width, float _height ) {
         float sign_w = Mathf.Sign(_width);
         float sign_h = Mathf.Sign(_height);
         boundingRect = new Rect( -_offsetX - sign_w * _width * 0.5f, 
                                   _offsetY - sign_h * _height * 0.5f, 
                                   sign_w * _width, 
                                   sign_h * _height );
+    }
 
-        //
+    // ------------------------------------------------------------------ 
+    /// \fn GetBounds
+    /// \param _offsetX the offset x pos of the plane (normally it is equals to offset.x + anchor_pos.x )  
+    /// \param _offsetY the offset y pos of the plane (normally it is equals to offset.y + anchor_pos.y )  
+    /// \param _width the width of the plane
+    /// \param _height the height of the plane
+    /// \return the bounds result
+    /// 
+    /// Get the Bounds of the plane, used for BoxCollider 
+    // ------------------------------------------------------------------ 
+
+    protected Bounds GetBounds ( float _offsetX, float _offsetY, float _width, float _height ) {
         switch ( plane ) {
         case exSprite.Plane.XY:
             return new Bounds (  new Vector3( -_offsetX, _offsetY, 0.0f ), 

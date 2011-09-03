@@ -34,8 +34,8 @@ public class exVersion {
     // functions
     ///////////////////////////////////////////////////////////////////////////////
 
-    static public bool operator == ( exVersion _a, exVersion _b ) { return _a.Equals(_b); }
-    static public bool operator != ( exVersion _a, exVersion _b ) { return !_a.Equals(_b); }
+    public static bool operator == ( exVersion _a, exVersion _b ) { return _a.Equals(_b); }
+    public static bool operator != ( exVersion _a, exVersion _b ) { return !_a.Equals(_b); }
 
     // ------------------------------------------------------------------ 
     // Desc: 

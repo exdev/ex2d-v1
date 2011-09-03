@@ -13,25 +13,37 @@ using UnityEngine;
 using System.Collections;
 
 ///////////////////////////////////////////////////////////////////////////////
-// defines
-// NOTE: without ExecuteInEditMode, we can't not drag and create mesh in the scene 
+/// \class exSpriteFont
+/// 
+/// A component to render exBitmapFont in the game 
+/// 
 ///////////////////////////////////////////////////////////////////////////////
 
-[ExecuteInEditMode]
+[ExecuteInEditMode] // NOTE: without ExecuteInEditMode, we can't not drag and create mesh in the scene 
 [RequireComponent (typeof(MeshRenderer))]
 [RequireComponent (typeof(MeshFilter))]
 [AddComponentMenu("ex2D Sprite/Sprite Font")]
 public class exSpriteFont : exSpriteBase {
 
+    // ------------------------------------------------------------------ 
+    /// \enum TextAlign
+    /// The alignment method for text
+    // ------------------------------------------------------------------ 
+
     public enum TextAlign {
-        Left = 0,
-        Center,
-        Right
+        Left = 0, ///< align to left
+        Center,   ///< align to center
+        Right     ///< align to right
     }
 
     ///////////////////////////////////////////////////////////////////////////////
     // properties
     ///////////////////////////////////////////////////////////////////////////////
+
+    // ------------------------------------------------------------------ 
+    /// \property fontInfo
+    /// The referenced bitmap font asset
+    // ------------------------------------------------------------------ 
 
     [SerializeField] protected exBitmapFont fontInfo_;
     public exBitmapFont fontInfo {
@@ -47,6 +59,11 @@ public class exSpriteFont : exSpriteBase {
         }
     }
 
+    // ------------------------------------------------------------------ 
+    /// \property text
+    /// The text to rendered
+    // ------------------------------------------------------------------ 
+
     [SerializeField] protected string text_ = "Hello World!"; 
     public string text {
         get { return text_; }
@@ -57,6 +74,11 @@ public class exSpriteFont : exSpriteBase {
             }
         }
     }
+
+    // ------------------------------------------------------------------ 
+    /// \property useMultiline
+    /// If useMultiline is true, the exSpriteFont.text accept multiline string. 
+    // ------------------------------------------------------------------ 
 
     [SerializeField] protected bool useMultiline_ = false;
     public bool useMultiline {
@@ -69,6 +91,11 @@ public class exSpriteFont : exSpriteBase {
         }
     }
 
+    // ------------------------------------------------------------------ 
+    /// \property textAlign
+    /// The alignment method used in the text
+    // ------------------------------------------------------------------ 
+
     [SerializeField] protected TextAlign textAlign_ = TextAlign.Left;
     public TextAlign textAlign {
         get { return textAlign_; }
@@ -79,6 +106,12 @@ public class exSpriteFont : exSpriteBase {
             }
         }
     }
+
+    // ------------------------------------------------------------------ 
+    /// \property useKerning
+    /// If useKerning is true, the SpriteFont will use the exBitmapFont.KerningInfo in 
+    /// the exSpriteFont.fontInfo to layout the text
+    // ------------------------------------------------------------------ 
 
     [SerializeField] protected bool useKerning_ = false;
     public bool useKerning {
@@ -91,6 +124,11 @@ public class exSpriteFont : exSpriteBase {
         }
     }
 
+    // ------------------------------------------------------------------ 
+    /// \property tracking
+    /// A fixed width applied between two characters in the text. 
+    // ------------------------------------------------------------------ 
+
     [SerializeField] protected float tracking_ = 0.0f;
     public float tracking {
         get { return tracking_; }
@@ -101,6 +139,11 @@ public class exSpriteFont : exSpriteBase {
             }
         }
     }
+
+    // ------------------------------------------------------------------ 
+    /// \property lineSpacing
+    /// A fixed line space applied between two lines.
+    // ------------------------------------------------------------------ 
 
     [SerializeField] protected float lineSpacing_ = 0.0f;
     public float lineSpacing {
@@ -114,6 +157,12 @@ public class exSpriteFont : exSpriteBase {
     }
 
     // color option
+
+    // ------------------------------------------------------------------ 
+    /// \property topColor
+    /// the color of the vertices at top 
+    // ------------------------------------------------------------------ 
+
     [SerializeField] protected Color topColor_ = Color.white;
     public Color topColor {
         get { return topColor_; }
@@ -124,6 +173,11 @@ public class exSpriteFont : exSpriteBase {
             }
         }
     }
+
+    // ------------------------------------------------------------------ 
+    /// \property botColor
+    /// the color of the vertices at bottom 
+    // ------------------------------------------------------------------ 
 
     [SerializeField] protected Color botColor_ = Color.white;
     public Color botColor {
@@ -137,6 +191,12 @@ public class exSpriteFont : exSpriteBase {
     }
 
     // outline option
+
+    // ------------------------------------------------------------------ 
+    /// \property useOutline
+    /// If useOutline is true, the component will render the text with outline
+    // ------------------------------------------------------------------ 
+
     [SerializeField] protected bool useOutline_ = false;
     public bool useOutline {
         get { return useOutline_; }
@@ -147,6 +207,11 @@ public class exSpriteFont : exSpriteBase {
             }
         }
     }
+
+    // ------------------------------------------------------------------ 
+    /// \property outlineWidth
+    /// The width of the outline text
+    // ------------------------------------------------------------------ 
 
     [SerializeField] protected float outlineWidth_ = 1.0f;
     public float outlineWidth {
@@ -159,6 +224,11 @@ public class exSpriteFont : exSpriteBase {
             }
         }
     }
+
+    // ------------------------------------------------------------------ 
+    /// \property outlineColor
+    /// The color of the outline text
+    // ------------------------------------------------------------------ 
 
     [SerializeField] protected Color outlineColor_ = Color.black;
     public Color outlineColor {
@@ -173,6 +243,12 @@ public class exSpriteFont : exSpriteBase {
     }
 
     // shadow option
+
+    // ------------------------------------------------------------------ 
+    /// \property useShadow
+    /// If useShadow is true, the component will render the text with shadow
+    // ------------------------------------------------------------------ 
+
     [SerializeField] protected bool useShadow_ = false;
     public bool useShadow {
         get { return useShadow_; }
@@ -183,6 +259,11 @@ public class exSpriteFont : exSpriteBase {
             }
         }
     }
+
+    // ------------------------------------------------------------------ 
+    /// \property shadowBias
+    /// The bias of the shadow text 
+    // ------------------------------------------------------------------ 
 
     [SerializeField] protected Vector2 shadowBias_ = new Vector2 ( 1.0f, -1.0f );
     public Vector2 shadowBias {
@@ -195,6 +276,11 @@ public class exSpriteFont : exSpriteBase {
             }
         }
     }
+
+    // ------------------------------------------------------------------ 
+    /// \property shadowColor
+    /// The color of the shadow text 
+    // ------------------------------------------------------------------ 
 
     [SerializeField] protected Color shadowColor_ = Color.black;
     public Color shadowColor {
@@ -281,7 +367,7 @@ public class exSpriteFont : exSpriteBase {
         _offsetY = 0.0f;
 
         // calculate anchor offset
-        switch ( anchor ) {
+        switch ( anchor_ ) {
         case Anchor.TopLeft     : _offsetX = -_halfWidth;  _offsetY = -_halfHeight;  break;
         case Anchor.TopCenter   : _offsetX = 0.0f;         _offsetY = -_halfHeight;  break;
         case Anchor.TopRight    : _offsetX = _halfWidth;   _offsetY = -_halfHeight;  break;
@@ -296,6 +382,8 @@ public class exSpriteFont : exSpriteBase {
 
         default                 : _offsetX = 0.0f;         _offsetY = 0.0f;          break;
         }
+        _offsetX -= offset_.x;
+        _offsetY += offset_.y;
     }
 
     // ------------------------------------------------------------------ 
@@ -420,7 +508,10 @@ public class exSpriteFont : exSpriteBase {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \fn UpdateMesh ( Mesh _mesh )
+    /// \param _mesh the mesh to update
+    /// 
+    /// Update the _mesh depends on the exPlane.updateFlags
     // ------------------------------------------------------------------ 
 
     public void UpdateMesh ( Mesh _mesh ) {
@@ -719,10 +810,11 @@ public class exSpriteFont : exSpriteBase {
             // _mesh.normals = normals;
             _mesh.uv = uvs;
             _mesh.triangles = indices; 
-            _mesh.bounds = UpdateBounds( offsetX, offsetY, halfWidth * 2.0f, halfHeight * 2.0f );
+            _mesh.bounds = GetBounds ( offsetX, offsetY, halfWidth * 2.0f, halfHeight * 2.0f );
 
             // update box-collider if we have
             UpdateBoxCollider ( collider as BoxCollider, _mesh );
+            UpdateBoundRect ( offsetX, offsetY, halfWidth * 2.0f, halfHeight * 2.0f );
 
 // #if UNITY_EDITOR
 //             _mesh.RecalculateBounds();
@@ -859,10 +951,11 @@ public class exSpriteFont : exSpriteBase {
             }
 
             _mesh.vertices = vertices;
-            _mesh.bounds = UpdateBounds ( offsetX, offsetY, halfWidth * 2.0f, halfHeight * 2.0f );
+            _mesh.bounds = GetBounds ( offsetX, offsetY, halfWidth * 2.0f, halfHeight * 2.0f );
 
             // update box-collider if we have
             UpdateBoxCollider ( collider as BoxCollider, _mesh );
+            UpdateBoundRect ( offsetX, offsetY, halfWidth * 2.0f, halfHeight * 2.0f );
 
 // #if UNITY_EDITOR
 //             _mesh.RecalculateBounds();
@@ -918,7 +1011,10 @@ public class exSpriteFont : exSpriteBase {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \fn ForceUpdateMesh ( Mesh _mesh )
+    /// \param _mesh the mesh to update
+    /// 
+    /// Force to update the _mesh use the Text flags in exPlane.UpdateFlags
     // ------------------------------------------------------------------ 
 
     public void ForceUpdateMesh ( Mesh _mesh ) {
@@ -962,13 +1058,20 @@ public class exSpriteFont : exSpriteBase {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \fn Clear 
+    /// Clear the text, fontInfo, material and mesh of the sprite font, make it empty
     // ------------------------------------------------------------------ 
 
     public void Clear () {
         text_ = ""; 
         fontInfo_ = null;
-        renderer.sharedMaterial = null;
-        meshFilter.sharedMesh = null;
+
+        if ( renderer != null )
+            renderer.sharedMaterial = null;
+
+        if ( meshFilter == null )
+            meshFilter = GetComponent<MeshFilter>();
+        if ( meshFilter != null )
+            meshFilter.sharedMesh = null;
     }
 }

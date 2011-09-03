@@ -30,7 +30,7 @@ public class exDebugHelper : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    static public void ScreenPrint ( string _text ) {
+    public static void ScreenPrint ( string _text ) {
         instance.debugText.text += "\n" + _text; 
     }
 

@@ -102,7 +102,7 @@ public static class exSceneHelper {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    static public void RecursivelyUpdateLayer ( Transform _trans ) {
+    public static void RecursivelyUpdateLayer ( Transform _trans ) {
         foreach ( Transform child in _trans ) {
             exLayer2D layer = child.GetComponent<exLayer2D>();
             if ( layer ) {
@@ -116,7 +116,7 @@ public static class exSceneHelper {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    static public void UpdateSceneSprites ( List<string> _atlasInfoGUIDs ) {
+    public static void UpdateSceneSprites ( List<string> _atlasInfoGUIDs ) {
         if ( _atlasInfoGUIDs.Count == 0 )
             return;
 

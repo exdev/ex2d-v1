@@ -137,7 +137,7 @@ public class exBitmapFontWizard : ScriptableWizard {
                                           "Check building ...",
                                           0.2f );    
 
-        // if we have enough infomation, try to build the exBitmapFont asset
+        // if we have enough information, try to build the exBitmapFont asset
         bitmapFont.Build ( _fontInfo );
         EditorUtility.ClearProgressBar();    
 

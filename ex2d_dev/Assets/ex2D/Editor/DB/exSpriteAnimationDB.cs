@@ -68,7 +68,7 @@ public class exSpriteAnimationDB : ScriptableObject {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    static public void Sync () {
+    public static void Sync () {
         if ( db == null )
             CreateDB ();
 
@@ -79,7 +79,7 @@ public class exSpriteAnimationDB : ScriptableObject {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    static public void BuildAll () {
+    public static void BuildAll () {
         if ( db == null )
             CreateDB ();
 
@@ -96,7 +96,7 @@ public class exSpriteAnimationDB : ScriptableObject {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    static public bool DBExists () {
+    public static bool DBExists () {
         FileInfo fileInfo = new FileInfo(dbPath);
         return fileInfo.Exists;
     }
@@ -170,7 +170,7 @@ public class exSpriteAnimationDB : ScriptableObject {
     // ------------------------------------------------------------------ 
 
     [MenuItem("Edit/ex2D/Create Sprite Animation DB")]
-    static public void Init () {
+    public static void Init () {
         // if db not found we need to create it and re-initliaze
         if ( db == null ) {
             CreateDB ();
@@ -216,7 +216,7 @@ public class exSpriteAnimationDB : ScriptableObject {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    static public Dictionary<string,List<string> > GetTexGUIDToAnimClipGUIDs () {
+    public static Dictionary<string,List<string> > GetTexGUIDToAnimClipGUIDs () {
         Init();
 
         return db.texGuidToAnimClipGUIDs;
@@ -226,7 +226,7 @@ public class exSpriteAnimationDB : ScriptableObject {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    static public List<string> GetSpriteAnimClipGUIDs ( string _textureGUID ) {
+    public static List<string> GetSpriteAnimClipGUIDs ( string _textureGUID ) {
         Init();
 
         if ( db.texGuidToAnimClipGUIDs.ContainsKey(_textureGUID) ) 
@@ -238,7 +238,7 @@ public class exSpriteAnimationDB : ScriptableObject {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    static public bool HasSpriteAnimClipGUID ( string _guid ) {
+    public static bool HasSpriteAnimClipGUID ( string _guid ) {
         Init();
 
         return db.spAnimClipGUIDs.IndexOf(_guid) != -1;
@@ -248,7 +248,7 @@ public class exSpriteAnimationDB : ScriptableObject {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    static public void AddSpriteAnimClip ( exSpriteAnimClip _animClip ) {
+    public static void AddSpriteAnimClip ( exSpriteAnimClip _animClip ) {
         Init();
 
         string guidAnimClip = exEditorHelper.AssetToGUID (_animClip);
@@ -268,7 +268,7 @@ public class exSpriteAnimationDB : ScriptableObject {
     // // Desc: 
     // // ------------------------------------------------------------------ 
 
-    // static public void RemoveSpriteAnimClip ( exSpriteAnimClip _animClip ) {
+    // public static void RemoveSpriteAnimClip ( exSpriteAnimClip _animClip ) {
     //     Init();
 
     //     string animClipGUID = exEditorHelper.AssetToGUID(_animClip);
@@ -288,7 +288,7 @@ public class exSpriteAnimationDB : ScriptableObject {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    static public void RemoveSpriteAnimClip ( string _guidAnimClip ) {
+    public static void RemoveSpriteAnimClip ( string _guidAnimClip ) {
         Init();
 
         // get ElementInfo that have the same atlasInfo guid to remove list 
@@ -317,7 +317,7 @@ public class exSpriteAnimationDB : ScriptableObject {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    static public void AddFrameInfo ( exSpriteAnimClip _animClip, 
+    public static void AddFrameInfo ( exSpriteAnimClip _animClip, 
                                       exSpriteAnimClip.FrameInfo _fi ) {
         Init();
 
@@ -329,7 +329,7 @@ public class exSpriteAnimationDB : ScriptableObject {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    static public void AddFrameInfo ( string _guidAnimClip, 
+    public static void AddFrameInfo ( string _guidAnimClip, 
                                       string _guidTexture,
                                       bool _addGUIDInfo = true ) {
 
@@ -363,7 +363,7 @@ public class exSpriteAnimationDB : ScriptableObject {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    static public void RemoveFrameInfo ( exSpriteAnimClip _animClip, 
+    public static void RemoveFrameInfo ( exSpriteAnimClip _animClip, 
                                          exSpriteAnimClip.FrameInfo _fi ) {
         Init();
 
@@ -388,7 +388,7 @@ public class exSpriteAnimationDB : ScriptableObject {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    static public void RemoveGUIDInfo ( string _guidAnimClip, 
+    public static void RemoveGUIDInfo ( string _guidAnimClip, 
                                         string _guidTexture ) {
         Init ();
 

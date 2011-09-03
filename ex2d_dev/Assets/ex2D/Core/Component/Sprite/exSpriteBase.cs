@@ -16,12 +16,24 @@ using System.Collections;
 // defines
 ///////////////////////////////////////////////////////////////////////////////
 
+///////////////////////////////////////////////////////////////////////////////
+/// \class exSpriteBase
+///
+/// The base class for rendering sprite by different assets
+///
+///////////////////////////////////////////////////////////////////////////////
+
 [ExecuteInEditMode]
 public class exSpriteBase : exPlane {
 
     ///////////////////////////////////////////////////////////////////////////////
     // properties
     ///////////////////////////////////////////////////////////////////////////////
+
+    // ------------------------------------------------------------------ 
+    /// \property scale
+    /// the scale of the sprite
+    // ------------------------------------------------------------------ 
 
     [SerializeField] protected Vector2 scale_ = Vector2.one;
     public Vector2 scale {
@@ -34,6 +46,11 @@ public class exSpriteBase : exPlane {
         }
     }
 
+    // ------------------------------------------------------------------ 
+    /// \property shear
+    /// the shear of the sprite
+    // ------------------------------------------------------------------ 
+
     [SerializeField] protected Vector2 shear_ = Vector2.zero;
     public Vector2 shear {
         get { return shear_; }
@@ -44,6 +61,13 @@ public class exSpriteBase : exPlane {
             }
         }
     }
+
+    // ------------------------------------------------------------------ 
+    /// \property autoResizeCollision
+    /// if the value is true and we use BoxCollider in the sprite, the 
+    /// width and height of the BoxCollider will be the same as the boundingRect 
+    /// of the sprite, and the thick of it will fix to 0.2f.
+    // ------------------------------------------------------------------ 
 
     [SerializeField] protected bool autoResizeCollision_ = true;
     public bool autoResizeCollision {
@@ -66,7 +90,8 @@ public class exSpriteBase : exPlane {
     ///////////////////////////////////////////////////////////////////////////////
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \fn OnEnable
+    /// OnEnable functoin inherit from exPlane
     // ------------------------------------------------------------------ 
 
     override protected void OnEnable () {
@@ -78,7 +103,8 @@ public class exSpriteBase : exPlane {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \fn OnDisable
+    /// OnDisable functoin inherit from exPlane
     // ------------------------------------------------------------------ 
 
     override protected void OnDisable () {
@@ -105,7 +131,8 @@ public class exSpriteBase : exPlane {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \fn AddMeshCollider
+    /// add a MeshCollider component on the sprite if no collider exists 
     // ------------------------------------------------------------------ 
 
     public void AddMeshCollider () {
@@ -118,7 +145,10 @@ public class exSpriteBase : exPlane {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \fn AddBoxCollider
+    /// add a BoxCollider component on the sprite if no collider exists 
+    /// if the autoResizeCollision is true, it will also update the size 
+    /// BoxCollider to fit the size of sprite
     // ------------------------------------------------------------------ 
 
     public void AddBoxCollider () {
@@ -129,7 +159,12 @@ public class exSpriteBase : exPlane {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \fn UpdateBoxCollider
+    /// \param _boxCol the BoxCollider of the sprite  
+    /// \param _mesh the mesh of the sprite  
+    /// 
+    /// Update the size BoxCollider to fit the size of sprite, only affect 
+    /// when autoResizeCollision is true
     // ------------------------------------------------------------------ 
 
     public void UpdateBoxCollider ( BoxCollider _boxCol, Mesh _mesh ) {

@@ -210,6 +210,14 @@ public class exPlaneEditor : Editor {
         GUI.enabled = true;
 
         // ======================================================== 
+        // offset 
+        // ======================================================== 
+
+        EditorGUIUtility.LookLikeControls ();
+        editPlane.offset = EditorGUILayout.Vector2Field ( "Offset", editPlane.offset );
+        EditorGUIUtility.LookLikeInspector ();
+
+        // ======================================================== 
         // check dirty 
         // ======================================================== 
 

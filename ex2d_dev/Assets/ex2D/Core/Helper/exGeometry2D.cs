@@ -16,7 +16,7 @@ using System.Collections;
 // exIntersection2D
 ///////////////////////////////////////////////////////////////////////////////
 
-public class exIntersection2D {
+public static class exIntersection2D {
 
     // ------------------------------------------------------------------ 
     // Desc: 
@@ -40,7 +40,7 @@ public class exIntersection2D {
 // exContains2D
 ///////////////////////////////////////////////////////////////////////////////
 
-public class exContains2D {
+public static class exContains2D {
 
     // ------------------------------------------------------------------ 
     // Desc: 

@@ -71,7 +71,7 @@ public class exAtlasDB : ScriptableObject {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    static public void ForceSync () {
+    public static void ForceSync () {
         if ( db == null )
             CreateDB ();
 
@@ -82,7 +82,7 @@ public class exAtlasDB : ScriptableObject {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    static public void BuildAll () {
+    public static void BuildAll () {
         if ( db == null )
             CreateDB ();
 
@@ -99,7 +99,7 @@ public class exAtlasDB : ScriptableObject {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    static public bool DBExists () {
+    public static bool DBExists () {
         FileInfo fileInfo = new FileInfo(dbPath);
         return fileInfo.Exists;
     }
@@ -174,7 +174,7 @@ public class exAtlasDB : ScriptableObject {
     // ------------------------------------------------------------------ 
 
     [MenuItem("Edit/ex2D/Create Atlas DB")]
-    static public void Init () {
+    public static void Init () {
         // if db not found we need to create it and re-initliaze
         if ( db == null ) {
             CreateDB ();
@@ -202,7 +202,7 @@ public class exAtlasDB : ScriptableObject {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    static public Dictionary<string,ElementInfo> GetTexGUIDToElementInfo () {
+    public static Dictionary<string,ElementInfo> GetTexGUIDToElementInfo () {
         Init();
 
         return db.texGUIDToElementInfo; 
@@ -212,7 +212,7 @@ public class exAtlasDB : ScriptableObject {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    static public bool HasAtlasGUID ( string _guid ) {
+    public static bool HasAtlasGUID ( string _guid ) {
         Init();
 
         return db.atlasInfoGUIDs.IndexOf(_guid) != -1;
@@ -222,7 +222,7 @@ public class exAtlasDB : ScriptableObject {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    static public void AddAtlas ( exAtlasInfo _a ) {
+    public static void AddAtlas ( exAtlasInfo _a ) {
         Init();
 
         string guid = exEditorHelper.AssetToGUID (_a);
@@ -242,7 +242,7 @@ public class exAtlasDB : ScriptableObject {
     // // Desc: 
     // // ------------------------------------------------------------------ 
 
-    // static public void RemoveAtlas ( exAtlasInfo _a ) {
+    // public static void RemoveAtlas ( exAtlasInfo _a ) {
     //     Init();
 
     //     string guid = exEditorHelper.AssetToGUID (_a);
@@ -258,7 +258,7 @@ public class exAtlasDB : ScriptableObject {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    static public void RemoveAtlas ( string _atlasInfoGUID ) {
+    public static void RemoveAtlas ( string _atlasInfoGUID ) {
         Init();
 
         // get ElementInfo that have the same atlasInfo guid to remove list 
@@ -330,7 +330,7 @@ public class exAtlasDB : ScriptableObject {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    static public void UpdateElementInfo ( exAtlasInfo.Element _el, int _index ) {
+    public static void UpdateElementInfo ( exAtlasInfo.Element _el, int _index ) {
         Init();
 
         string textureGUID = exEditorHelper.AssetToGUID(_el.texture);
@@ -353,7 +353,7 @@ public class exAtlasDB : ScriptableObject {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    static public void RemoveElementInfo ( string _textureGUID ) {
+    public static void RemoveElementInfo ( string _textureGUID ) {
         Init();
 
         if ( db.texGUIDToElementInfo.ContainsKey(_textureGUID) ) {
@@ -367,7 +367,7 @@ public class exAtlasDB : ScriptableObject {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    static public ElementInfo GetElementInfo ( Texture2D _tex ) {
+    public static ElementInfo GetElementInfo ( Texture2D _tex ) {
         Init();
 
         if ( _tex == null )
@@ -380,7 +380,7 @@ public class exAtlasDB : ScriptableObject {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    static public ElementInfo GetElementInfo ( string _textureGUID ) {
+    public static ElementInfo GetElementInfo ( string _textureGUID ) {
         Init();
 
         //

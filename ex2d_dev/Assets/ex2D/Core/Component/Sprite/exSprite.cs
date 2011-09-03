@@ -14,10 +14,16 @@ using System.Collections;
 
 ///////////////////////////////////////////////////////////////////////////////
 // defines
-// NOTE: without ExecuteInEditMode, we can't not drag and create mesh in the scene 
 ///////////////////////////////////////////////////////////////////////////////
 
-[ExecuteInEditMode]
+///////////////////////////////////////////////////////////////////////////////
+/// \class exSprite
+///
+/// A component to render exAtlas in the game
+///
+///////////////////////////////////////////////////////////////////////////////
+
+[ExecuteInEditMode] // NOTE: without ExecuteInEditMode, we can't not drag and create mesh in the scene 
 [RequireComponent (typeof(MeshRenderer))]
 [RequireComponent (typeof(MeshFilter))]
 [AddComponentMenu("ex2D Sprite/Sprite")]
@@ -27,9 +33,36 @@ public class exSprite : exSpriteBase {
     // properties
     ///////////////////////////////////////////////////////////////////////////////
 
+    // ------------------------------------------------------------------ 
+    /// \memberof textureGUID
+    /// the GUID of the raw texture, this only used in Editor
+    // ------------------------------------------------------------------ 
+
     public string textureGUID = ""; 
-    public bool trimTexture = true; // only affect when exSprite is not in atlas
-    public Rect trimUV = new Rect(0,0,1,1); // only affect when exSprite is not in atlas
+
+    // ------------------------------------------------------------------ 
+    /// \memberof trimTexture
+    /// if true, exSprite will cut out the empty color of the texture, render it in trimmed rect.
+    /// 
+    /// \note this value only affect when exSprite.useAtlas is false. 
+    // ------------------------------------------------------------------ 
+
+    public bool trimTexture = true;
+
+    // ------------------------------------------------------------------ 
+    /// \memberof trimUV
+    /// the trimmed uv coordination of the texture exSprite used.
+    /// 
+    /// \note this value only affect when exSprite.useAtlas is false. 
+    // ------------------------------------------------------------------ 
+
+    public Rect trimUV = new Rect(0,0,1,1);
+
+    // ------------------------------------------------------------------ 
+    /// \property useTextureOffset
+    /// if useTextureOffset is true, the sprite calculate the anchor 
+    /// position depends on the original size of texture instead of the trimmed size 
+    // ------------------------------------------------------------------ 
 
     [SerializeField] protected bool useTextureOffset_ = true;
     public bool useTextureOffset {
@@ -42,6 +75,11 @@ public class exSprite : exSpriteBase {
         }
     }
 
+    // ------------------------------------------------------------------ 
+    /// \property color
+    /// the vertex color of the sprite
+    // ------------------------------------------------------------------ 
+
     [SerializeField] protected Color color_ = Color.white;
     public Color color { 
         get { return color_; } 
@@ -52,6 +90,12 @@ public class exSprite : exSpriteBase {
             }
         }
     }
+
+    // ------------------------------------------------------------------ 
+    /// \property customSize
+    /// if customSize set to true, use are free to set the exSprite.width and exSprite.height of the sprite,
+    /// otherwise there is no effect when assign value to width or height.
+    // ------------------------------------------------------------------ 
 
     [SerializeField] protected bool customSize_ = false;
     public bool customSize {
@@ -89,6 +133,13 @@ public class exSprite : exSpriteBase {
         }
     }
 
+    // ------------------------------------------------------------------ 
+    /// \property width
+    /// the width of the sprite
+    /// 
+    /// \note if you want to custom the width of it, you need to set exSprite.customSize to true
+    // ------------------------------------------------------------------ 
+
     [SerializeField] protected float width_ = 1.0f;
     public float width {
         get { return width_; }
@@ -99,6 +150,13 @@ public class exSprite : exSpriteBase {
             }
         }
     }
+
+    // ------------------------------------------------------------------ 
+    /// \property height
+    /// the height of the sprite
+    /// 
+    /// \note if you want to custom the height of it, you need to set exSprite.customSize to true
+    // ------------------------------------------------------------------ 
 
     [SerializeField] protected float height_ = 1.0f;
     public float height {
@@ -111,8 +169,22 @@ public class exSprite : exSpriteBase {
         }
     }
 
+    // ------------------------------------------------------------------ 
+    /// \property atlas
+    /// the atlas referenced in this sprite. (readonly)
+    /// 
+    /// \sa exSprite.SetSprite
+    // ------------------------------------------------------------------ 
+
     [SerializeField] protected exAtlas atlas_ = null;
     public exAtlas atlas { get { return atlas_; } }
+
+    // ------------------------------------------------------------------ 
+    /// \property index
+    /// the index of the element in atlas used in this sprite. (readonly)
+    /// 
+    /// \sa exSprite.SetSprite
+    // ------------------------------------------------------------------ 
 
     [SerializeField] protected int index_ = -1;
     public int index { get { return index_; } }
@@ -130,6 +202,11 @@ public class exSprite : exSpriteBase {
     // non-serialize
     ///////////////////////////////////////////////////////////////////////////////
 
+    // ------------------------------------------------------------------ 
+    /// \memberof spanim
+    /// The cached exSpriteAnimation component
+    // ------------------------------------------------------------------ 
+
     [System.NonSerialized] public exSpriteAnimation spanim;
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -137,7 +214,10 @@ public class exSprite : exSpriteBase {
     ///////////////////////////////////////////////////////////////////////////////
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \fn UpdateMesh ( Mesh _mesh )
+    /// \param _mesh the mesh to update
+    /// 
+    /// Update the _mesh depends on the exPlane.updateFlags
     // ------------------------------------------------------------------ 
 
     public void UpdateMesh ( Mesh _mesh ) {
@@ -217,7 +297,7 @@ public class exSprite : exSpriteBase {
                     }
                 }
 
-                switch ( anchor ) {
+                switch ( anchor_ ) {
                     //
                 case Anchor.TopLeft:
                     offsetX = -halfWidth - trimRect.x;
@@ -273,7 +353,7 @@ public class exSprite : exSpriteBase {
                 }
             }
             else {
-                switch ( anchor ) {
+                switch ( anchor_ ) {
                 case Anchor.TopLeft     : offsetX = -halfWidth;   offsetY = -halfHeight;  break;
                 case Anchor.TopCenter   : offsetX = 0.0f;         offsetY = -halfHeight;  break;
                 case Anchor.TopRight    : offsetX = halfWidth;    offsetY = -halfHeight;  break;
@@ -289,6 +369,8 @@ public class exSprite : exSpriteBase {
                 default                 : offsetX = 0.0f;         offsetY = 0.0f;         break;
                 }
             }
+            offsetX -= offset_.x;
+            offsetY += offset_.y;
 
             //
             float xMinClip = scale_.x * width  * ( -0.5f + clipLeft   );
@@ -361,10 +443,11 @@ public class exSprite : exSpriteBase {
             }
             _mesh.vertices = vertices;
             _mesh.normals = normals; // TEMP
-            _mesh.bounds = UpdateBounds ( offsetX, offsetY, halfWidth * 2.0f, halfHeight * 2.0f );
+            _mesh.bounds = GetBounds ( offsetX, offsetY, halfWidth * 2.0f, halfHeight * 2.0f );
 
             // update box-collider if we have
             UpdateBoxCollider ( collider as BoxCollider, _mesh );
+            UpdateBoundRect ( offsetX, offsetY, halfWidth * 2.0f, halfHeight * 2.0f );
 
 // #if UNITY_EDITOR
 //             _mesh.RecalculateBounds();
@@ -462,7 +545,10 @@ public class exSprite : exSpriteBase {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \fn ForceUpdateMesh ( Mesh _mesh )
+    /// \param _mesh the mesh to update
+    /// 
+    /// Force to update the _mesh use the Vertex, UV, Color and Index flags in exPlane.UpdateFlags
     // ------------------------------------------------------------------ 
 
     public void ForceUpdateMesh ( Mesh _mesh ) {
@@ -571,7 +657,8 @@ public class exSprite : exSpriteBase {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \fn Clear 
+    /// Clear the altas, material and mesh of the sprite, make it empty
     // ------------------------------------------------------------------ 
 
     public void Clear () {
@@ -587,7 +674,10 @@ public class exSprite : exSpriteBase {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \fn GetCurrentElement
+    /// \return the current used atlas element 
+    ///
+    /// Get current element used in exSprite.atlas
     // ------------------------------------------------------------------ 
 
     public exAtlas.Element GetCurrentElement () {
@@ -597,7 +687,10 @@ public class exSprite : exSpriteBase {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \fn SetSprite
+    /// \param _atlas the new atlas
+    /// \param _index the index of the element in the new atlas
+    /// Set a new picture in an atlas to this sprite 
     // ------------------------------------------------------------------ 
 
     public void SetSprite ( exAtlas _atlas, int _index ) {

@@ -218,7 +218,7 @@ partial class exBitmapFontEditor : EditorWindow {
                                           "Check building ...",
                                           0.2f );    
 
-        // if we have enough infomation, try to build the exBitmapFont asset
+        // if we have enough information, try to build the exBitmapFont asset
         curEdit.Build ( _fontInfo );
 
         EditorUtility.ClearProgressBar();    
