@@ -14,7 +14,6 @@ using System.Collections;
 using System.Collections.Generic;
 
 ///////////////////////////////////////////////////////////////////////////////
-/// \class exSpriteAnimState
 ///
 /// The state of the exSpriteAnimClip, a state can be treat as an instance. In 
 /// ex2D, when you play the sprite animation, it will load and reference the data
@@ -24,6 +23,7 @@ using System.Collections.Generic;
 /// The exSpriteAnimState is designed to solve the problems, it initialized self by  
 /// copy the settings in exSpriteAnimClip, and provide identity state for user in 
 /// exSpriteAnimation component.
+///
 ///////////////////////////////////////////////////////////////////////////////
 
 [System.Serializable]
@@ -41,7 +41,6 @@ public class exSpriteAnimState {
     [System.NonSerialized] public float speed = 1.0f; ///< the speed to play the sprite animation clip
 
     // ------------------------------------------------------------------ 
-    /// \fn exSpriteAnimState
     /// \param _animClip the referenced animation clip
     /// Constructor of exSpriteAnimState, it will copy the settings from _animClip. 
     // ------------------------------------------------------------------ 
@@ -63,9 +62,9 @@ public class exSpriteAnimState {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-/// \class exSpriteAnimation
 /// 
 /// A component to help user manipulate exSpriteAnimClip in a sprite 
+/// 
 ///////////////////////////////////////////////////////////////////////////////
 
 [RequireComponent (typeof(exSprite))]
@@ -75,21 +74,18 @@ public class exSpriteAnimState {
 public class exSpriteAnimation : MonoBehaviour {
 
     // ------------------------------------------------------------------ 
-    /// \memberof animations
     /// the list of sprite animation clips used in the component
     // ------------------------------------------------------------------ 
 
     public List<exSpriteAnimClip> animations = new List<exSpriteAnimClip>();
 
     // ------------------------------------------------------------------ 
-    /// \memberof defaultAnimation
     /// the default sprite animation clip
     // ------------------------------------------------------------------ 
 
     public exSpriteAnimClip defaultAnimation;
 
     // ------------------------------------------------------------------ 
-    /// \memberof playAutomatically
     /// When playAutomatically set to true, it will play the 
     /// exSpriteAnimation.defaultAnimation at the start
     // ------------------------------------------------------------------ 
@@ -192,7 +188,6 @@ public class exSpriteAnimation : MonoBehaviour {
     // Unity Animation Editor, it can send message to function that only have one parameter.
 
     // ------------------------------------------------------------------ 
-    /// \fn Play ( string )
     /// \param _name the name of the animation to play
     /// Play the animation by _name 
     // ------------------------------------------------------------------ 
@@ -202,7 +197,6 @@ public class exSpriteAnimation : MonoBehaviour {
     }
 
     // ------------------------------------------------------------------ 
-    /// \fn Play ( string, int )
     /// \param _name the name of the animation to play
     /// \param _index the frame index
     /// Play the animation by _name, start from the _index of frame  
@@ -219,7 +213,6 @@ public class exSpriteAnimation : MonoBehaviour {
     }
 
     // ------------------------------------------------------------------ 
-    /// \fn SetFrame
     /// \param _name the name of the animation
     /// \param _index the frame index
     /// Get the texture used in the _index of frames in the animation by _name,   
@@ -238,7 +231,6 @@ public class exSpriteAnimation : MonoBehaviour {
     }
 
     // ------------------------------------------------------------------ 
-    /// \fn Stop
     /// Stop the playing animation, take the action that setup in the 
     /// exSpriteAnimState.stopAction 
     // ------------------------------------------------------------------ 
@@ -276,7 +268,6 @@ public class exSpriteAnimation : MonoBehaviour {
     }
 
     // ------------------------------------------------------------------ 
-    /// \fn Pause
     /// Pause the playing animation
     // ------------------------------------------------------------------ 
 
@@ -285,7 +276,6 @@ public class exSpriteAnimation : MonoBehaviour {
     }
 
     // ------------------------------------------------------------------ 
-    /// \fn Resume
     /// Resume the paused animation
     // ------------------------------------------------------------------ 
 
@@ -294,7 +284,6 @@ public class exSpriteAnimation : MonoBehaviour {
     }
 
     // ------------------------------------------------------------------ 
-    /// \fn IsPlaying
     /// \param _name the name of the animation
     /// \return the boolean result
     /// Check if the _name of the animation is the current playing animation.
@@ -309,7 +298,6 @@ public class exSpriteAnimation : MonoBehaviour {
     }
 
     // ------------------------------------------------------------------ 
-    /// \fn IsPaused
     /// \param _name the name of the animation
     /// \return the boolean result
     /// Check if the _name of the animation is the current paused animation.
@@ -324,7 +312,6 @@ public class exSpriteAnimation : MonoBehaviour {
     }
 
     // ------------------------------------------------------------------ 
-    /// \fn GetAnimation
     /// \param _name the name of the animation
     /// \return the animation state
     /// Get the animation state by _name
@@ -342,7 +329,6 @@ public class exSpriteAnimation : MonoBehaviour {
     }
 
     // ------------------------------------------------------------------ 
-    /// \fn GetCurFrameInfo
     /// \return the frame info
     /// Get the information of current frame in the playing animation.
     // ------------------------------------------------------------------ 
@@ -361,7 +347,6 @@ public class exSpriteAnimation : MonoBehaviour {
     } 
 
     // ------------------------------------------------------------------ 
-    /// \fn AddAnimation
     /// \param _animClip the sprite animation clip wants to add
     /// \return the instantiate animation state of the added _animClip 
     /// Add a sprite animation clip, create a new animation state and saves 
@@ -385,7 +370,6 @@ public class exSpriteAnimation : MonoBehaviour {
     }
 
     // ------------------------------------------------------------------ 
-    /// \fn RemoveAnimation
     /// \param _animClip the sprite animation clip wants to remove
     /// Remove a sprite animation clip from exSpriteAnimation.animations, 
     // ------------------------------------------------------------------ 

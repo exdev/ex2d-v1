@@ -16,113 +16,152 @@ using UnityEditor;
 using System.IO;
 
 ///////////////////////////////////////////////////////////////////////////////
-// exAtlasInfo
+///
+/// The atlas editor information asset
+///
 ///////////////////////////////////////////////////////////////////////////////
 
 public partial class exAtlasInfo : ScriptableObject {
 
+    // ------------------------------------------------------------------ 
+    /// the algorithm type of texture packer
+    // ------------------------------------------------------------------ 
+
     public enum Algorithm {
-        Basic,
-        // TODO { 
-        // Shelf,
-        Tree,
-        // MaxRect,
-        // } TODO end 
-    }
-
-    public enum SortBy {
-        UseBest,
-        Width,
-        Height,
-        Area,
-        Name
-    }
-
-    public enum SortOrder {
-        UseBest,
-        Accending,
-        Descending
+        Basic, ///< basic algorithm, pack texture by the sort order
+        // Shelf, // TODO
+        Tree,  ///< Pack the textures by binary space, find the most fitable texture in it
+        // MaxRect, // TODO
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// sorting type for sort elements
+    // ------------------------------------------------------------------ 
+
+    public enum SortBy {
+        UseBest, ///< use the best sorting result depends on exAtlasInfo.algorithm
+        Width,   ///< sort by texture width
+        Height,  ///< sort by texture height
+        Area,    ///< sort by texture area 
+        Name     ///< sort by texture name
+    }
+
+    // ------------------------------------------------------------------ 
+    /// sorting the elements in Accending or Descending order
+    // ------------------------------------------------------------------ 
+
+    public enum SortOrder {
+        UseBest,   ///< use the best order depends on the exAtlasInfo.algorithm
+        Accending, ///< use accending order 
+        Descending ///< use descending order
+    }
+
+    // ------------------------------------------------------------------ 
+    /// the structure to store the edit information of each element in atlas 
     // ------------------------------------------------------------------ 
 
     [System.Serializable]
     public class Element {
-        // normal element
-        public exAtlasInfo atlasInfo;
-        public Texture2D texture; // the texture in atlas
-        public int[] coord = new int[] { 0, 0 };
-        public Rect trimRect;
 
+        // ======================================================== 
         // internal state
-        public bool rotated = false;
-        public bool trim = false;
+        // ======================================================== 
+
+        public bool rotated = false; ///< if rotate the texture in atlas 
+        public bool trim = false;    ///< if trimmed the texture
+
+        // ======================================================== 
+        // normal element
+        // ======================================================== 
+
+        public exAtlasInfo atlasInfo; ///< the referernced atlas info 
+        public Texture2D texture;     ///< the raw texture
+        public int[] coord = new int[] { 0, 0 }; ///< the coordination of the element in atlas. start from top-left (0,0) to bottom-right (1,1)
+        public Rect trimRect; ///< the trimed rect of the raw texture
+
+        // ======================================================== 
+        // font element field
+        // ======================================================== 
+
+        public bool isFontElement = false; ///< if is a font element import from exBitmapFont 
+        public exBitmapFont srcFontInfo; ///< the source exBitmapFont
+        public exBitmapFont destFontInfo; ///< the target exBitmapFont
+        public exBitmapFont.CharInfo charInfo; ///< the character information in the atlas
+
+        // ======================================================== 
+        // functions
+        // ======================================================== 
+
+        // ------------------------------------------------------------------ 
+        /// \return the result width
+        /// the width calculated depends on the Element.rotated and Element.trim
+        // ------------------------------------------------------------------ 
 
         public int Width () {
             if ( rotated )
                 return (int)trimRect.height; 
             return (int)trimRect.width; 
         }
+
+        // ------------------------------------------------------------------ 
+        /// \return the result height
+        /// the height calculated depends on the Element.rotated and Element.trim
+        // ------------------------------------------------------------------ 
+
         public int Height () {
             if ( rotated )
                 return (int)trimRect.width; 
             return (int)trimRect.height; 
         }
-
-        // font element field
-        public bool isFontElement = false;
-        public exBitmapFont srcFontInfo;
-        public exBitmapFont destFontInfo;
-        public exBitmapFont.CharInfo charInfo;
     }
 
     //
-    /*[HideInInspector]*/ public string atlasName = "New Atlas"; 
-    /*[HideInInspector]*/ public int width = 512;
-    /*[HideInInspector]*/ public int height = 512;
-    /*[HideInInspector]*/ public List<Element> elements = new List<Element>(); // the atlas texture
-    /*[HideInInspector]*/ public exAtlas atlas; // the exAtlas asset
-    /*[HideInInspector]*/ public Texture2D texture; // the atlas texture
-    /*[HideInInspector]*/ public Material material; // the atlas material
+    public string atlasName = "New Atlas"; ///< the name of the atlas we expect to create 
+    public int width = 512; ///< the width of the atlas texture 
+    public int height = 512; ///< the height of the atlas texture
+    public List<Element> elements = new List<Element>(); ///< the list of atlas info elements
+    public exAtlas atlas; ///< the referenced atlas asset
+    public Texture2D texture; ///< the referenced atlas texture
+    public Material material; ///< the default material we used
 
     // canvas settings
-    /*[HideInInspector]*/ public bool showCanvas = true;
-    /*[HideInInspector]*/ public Color bgColor = Color.white;
-    /*[HideInInspector]*/ public bool showCheckerboard = true;
+    public bool foldCanvas = true; ///< canvas fold option
+    public Color bgColor = Color.white; ///< the canvas background color
+    public bool showCheckerboard = true; ///< if show the checkerboard
 
     // layout settings
-    /*[HideInInspector]*/ public bool showLayout = true;
-    /*[HideInInspector]*/ public Algorithm algorithm = Algorithm.Tree;
-    /*[HideInInspector]*/ public SortBy sortBy = SortBy.UseBest;
-    /*[HideInInspector]*/ public SortOrder sortOrder = SortOrder.UseBest;
-    /*[HideInInspector]*/ public int padding = 2;
-    /*[HideInInspector]*/ public bool allowRotate = false;
+    public bool foldLayout = true; ///< layout fold option
+    public Algorithm algorithm = Algorithm.Tree; ///< the algorithm used for texture packer
+    public SortBy sortBy = SortBy.UseBest; ///< the method to sort the elements in atlas editor info
+    public SortOrder sortOrder = SortOrder.UseBest; ///< the order to sort the elements in atlas editor info
+    public int padding = 2; ///< the padding size between each element
+    public bool allowRotate = false; ///< if allow texture rotated, disabled in current version 
 
-    // sprite settings
-    /*[HideInInspector]*/ public bool showSprites = true;
-    /*[HideInInspector]*/ public Color spriteBgColor = new Color( 1.0f, 1.0f, 1.0f, 0.0f );
-    /*[HideInInspector]*/ public Color spriteSelectColor = new Color( 0.0f, 0.0f, 1.0f, 1.0f );
-    // TODO: it would be nice if we have AtlasBuilder that including a "Edit" button to open exAtlasEditor
+    // element settings
+    public bool foldElement = true; ///< element fold option
+    public Color elementBgColor = new Color( 1.0f, 1.0f, 1.0f, 0.0f ); ///< the background color of each element
+    public Color elementSelectColor = new Color( 0.0f, 0.0f, 1.0f, 1.0f ); ///< the select rect color of each element
 
     //
-    /*[HideInInspector]*/ public float scale = 1.0f;
+    public float scale = 1.0f; ///< the zoom value of the atlas
 
     // bitmap fonts
-    /*[HideInInspector]*/ public List<exBitmapFont> bitmapFonts = new List<exBitmapFont>(); 
+    public List<exBitmapFont> bitmapFonts = new List<exBitmapFont>(); ///< the list of bitmap fonts in the atlas
 
     //
-    /*[HideInInspector]*/ public List<string> rebuildAnimClipGUIDs = new List<string>();
-    /*[HideInInspector]*/ public bool needUpdateAnimClips = false;
-    /*[HideInInspector]*/ public bool needRebuild = false;
+    public List<string> rebuildAnimClipGUIDs = new List<string>(); ///< the sprite animation clip guid list for rebuilding
+    public bool needUpdateAnimClips = false; ///< if need update anim clips
+    public bool needRebuild = false; ///< if need rebuild the atlas
 
     ///////////////////////////////////////////////////////////////////////////////
     // static
     ///////////////////////////////////////////////////////////////////////////////
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _path the path of the directory you expect to save the atlas info
+    /// \param _name the name of the atlas without extension you expect to save
+    /// \return the new atlas info
+    /// Create and save the atlas, atlas textures, atlas material and atlas info in the expect path then return it. 
     // ------------------------------------------------------------------ 
 
     public static exAtlasInfo Create ( string _path, string _name ) {
@@ -195,7 +234,10 @@ public partial class exAtlasInfo : ScriptableObject {
     ///////////////////////////////////////////////////////////////////////////////
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _tex the raw texture you want to add
+    /// \param _trim if trim the texture
+    /// \return the new element
+    /// add the element by raw texture 
     // ------------------------------------------------------------------ 
 
     public Element AddElement ( Texture2D _tex, bool _trim ) {
@@ -229,7 +271,8 @@ public partial class exAtlasInfo : ScriptableObject {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _fontInfo the font info you want to remove
+    /// Find and remove the font info from the atlas
     // ------------------------------------------------------------------ 
 
     public void RemoveBitmapFont ( exBitmapFont _fontInfo ) {
@@ -251,7 +294,7 @@ public partial class exAtlasInfo : ScriptableObject {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public Element AddFontElement ( exBitmapFont _srcFontInfo, exBitmapFont _destFontInfo, exBitmapFont.CharInfo _charInfo ) {
+    protected Element AddFontElement ( exBitmapFont _srcFontInfo, exBitmapFont _destFontInfo, exBitmapFont.CharInfo _charInfo ) {
         exAtlasInfo.Element el = new exAtlasInfo.Element();
         el.isFontElement = true;
 
@@ -293,7 +336,8 @@ public partial class exAtlasInfo : ScriptableObject {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _el the element you expect to remove
+    /// remove an element from the atlas info
     // ------------------------------------------------------------------ 
 
     public void RemoveElement ( Element _el ) {
@@ -304,7 +348,8 @@ public partial class exAtlasInfo : ScriptableObject {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _idx the index of the element 
+    /// remove an element from the atlas info by index
     // ------------------------------------------------------------------ 
 
     public void RemoveElementAt ( int _idx ) {
@@ -337,7 +382,7 @@ public partial class exAtlasInfo : ScriptableObject {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// Sort the elemtns in atlas info by the exAtlasInfo.SortBy and exAtlasInfo.SortOrder 
     // ------------------------------------------------------------------ 
 
     public void SortElements () {
@@ -392,7 +437,7 @@ public partial class exAtlasInfo : ScriptableObject {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// Clear the all pixels in atlas texture, and fill with white color
     // ------------------------------------------------------------------ 
 
     public void ClearAtlasTexture () {
@@ -403,7 +448,8 @@ public partial class exAtlasInfo : ScriptableObject {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _el
+    /// Add the sprite animation clip for rebuild by checking if clip contains the in element's exAtlasInfo.Element.texture
     // ------------------------------------------------------------------ 
 
     public void AddSpriteAnimClipForRebuilding ( Element _el ) {
@@ -420,7 +466,8 @@ public partial class exAtlasInfo : ScriptableObject {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _objects 
+    /// get the Texture2D and exBitmapFont from a list of objects, import them into atlas
     // ------------------------------------------------------------------ 
 
     public void ImportObjects ( Object[] _objects ) {

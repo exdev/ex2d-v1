@@ -18,7 +18,6 @@ using System.Collections.Generic;
 ///////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
-/// \class exSoftClip
 ///
 /// A component handles the a list of exPlane GameObjects, clip them
 /// to the boundingRect.
@@ -30,11 +29,10 @@ using System.Collections.Generic;
 public class exSoftClip : exPlane {
 
     // ------------------------------------------------------------------ 
-    /// \property width
+    [SerializeField] protected float width_ = 1.0f;
     /// the width of the soft-clip
     // ------------------------------------------------------------------ 
 
-    [SerializeField] protected float width_ = 1.0f;
     public float width {
         get { return width_; }
         set {
@@ -46,11 +44,10 @@ public class exSoftClip : exPlane {
     }
 
     // ------------------------------------------------------------------ 
-    /// \property height
+    [SerializeField] protected float height_ = 1.0f;
     /// the height of the soft-clip
     // ------------------------------------------------------------------ 
 
-    [SerializeField] protected float height_ = 1.0f;
     public float height {
         get { return height_; }
         set {
@@ -62,14 +59,12 @@ public class exSoftClip : exPlane {
     }
 
     // ------------------------------------------------------------------ 
-    /// \memberof planes
     /// the list of the planes to clip
     // ------------------------------------------------------------------ 
 
     public List<exPlane> planes = new List<exPlane>();
 
     // ------------------------------------------------------------------ 
-    /// \memberof clippedRect 
     /// the clipped rect, if the soft-clip plane is a child of another soft-clip plane
     // ------------------------------------------------------------------ 
 
@@ -80,7 +75,6 @@ public class exSoftClip : exPlane {
     ///////////////////////////////////////////////////////////////////////////////
     
     // ------------------------------------------------------------------ 
-    /// \memberof UpdateClipList 
     /// update the list of planes to clip
     // ------------------------------------------------------------------ 
 
@@ -115,7 +109,6 @@ public class exSoftClip : exPlane {
     ///////////////////////////////////////////////////////////////////////////////
 
     // ------------------------------------------------------------------ 
-    /// \fn Awake
     /// Awake functoin inherit from exPlane.
     // ------------------------------------------------------------------ 
 
@@ -128,7 +121,6 @@ public class exSoftClip : exPlane {
     }
 
     // ------------------------------------------------------------------ 
-    /// \fn OnEnable
     /// OnEnable functoin inherit from exPlane.
     /// When enabled set to true, it will enable all the item in the planes
     // ------------------------------------------------------------------ 
@@ -148,7 +140,6 @@ public class exSoftClip : exPlane {
     }
 
     // ------------------------------------------------------------------ 
-    /// \fn OnDisable
     /// OnDisable functoin inherit from exPlane.
     /// When enabled set to false, it will disable all the item in the planes
     // ------------------------------------------------------------------ 

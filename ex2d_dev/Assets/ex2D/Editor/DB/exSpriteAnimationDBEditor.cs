@@ -38,7 +38,7 @@ public class exSpriteAnimationDBEditor : Editor {
         // sync button
         EditorGUI.indentLevel = 1;
         if ( GUILayout.Button ("Sync", GUILayout.Width(100)) ) {
-            exSpriteAnimationDB.Sync();
+            exSpriteAnimationDB.ForceSync();
         }
 
         // rebuild all

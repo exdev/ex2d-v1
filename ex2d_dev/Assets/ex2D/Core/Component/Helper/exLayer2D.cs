@@ -17,7 +17,6 @@ using System.Collections;
 ///////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
-/// \class exLayer2D
 ///
 /// The base layer class
 ///
@@ -26,12 +25,24 @@ using System.Collections;
 [AddComponentMenu("ex2D Helper/2D Layer")]
 public class exLayer2D : MonoBehaviour {
 
+    // ------------------------------------------------------------------ 
+    /// \memberof MAX_LAYER
+    // ------------------------------------------------------------------ 
+
     public static int MAX_LAYER = 32;
 
-    [SerializeField] protected int layer_ = 0; // there have 32 layer
+    // ------------------------------------------------------------------ 
+    [SerializeField] protected int layer_ = 0;
+    /// layer is a value from 0 to exLayer2D.MAX_LAYER
+    // ------------------------------------------------------------------ 
+
     public int layer { get { return layer_; } }
 
-    [SerializeField] protected float bias_ = 0.0f; // bias is a value from 0.0f to 1.0f
+    // ------------------------------------------------------------------ 
+    [SerializeField] protected float bias_ = 0.0f;
+    /// bias is a value from 0.0f to 1.0f
+    // ------------------------------------------------------------------ 
+
     public float bias { get { return bias_; } }
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -53,8 +64,8 @@ public class exLayer2D : MonoBehaviour {
     // functions
     ///////////////////////////////////////////////////////////////////////////////
 
-    virtual public float CalculateDepth ( Camera _cam ) { return 0.0f; }
-    virtual public void UpdateTransformDepth () {}
+    virtual protected float CalculateDepth ( Camera _cam ) { return 0.0f; }
+    virtual protected void UpdateTransformDepth () {}
 
     // ------------------------------------------------------------------ 
     // Desc: 
@@ -86,7 +97,9 @@ public class exLayer2D : MonoBehaviour {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _layer the expect layer
+    /// \param _bias the expect bias
+    /// set the layer and bias of the sprite
     // ------------------------------------------------------------------ 
 
     public void SetLayer ( int _layer, float _bias ) {
@@ -101,7 +114,7 @@ public class exLayer2D : MonoBehaviour {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// Calculate and update the depth manually, useful in editor
     // ------------------------------------------------------------------ 
 
     public void UpdateDepth () {

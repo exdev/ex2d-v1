@@ -16,17 +16,19 @@ using System.Collections.Generic;
 using System.IO;
 
 ///////////////////////////////////////////////////////////////////////////////
-// functions
+/// 
+/// a helper class to operate scene objects 
+/// 
 ///////////////////////////////////////////////////////////////////////////////
 
 public static class exSceneHelper {
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// update GameObject with exLayer2D component in the current scene
     // ------------------------------------------------------------------ 
 
     [MenuItem ("Edit/ex2D/Update Scene Sprite Layers %&l")]
-    static void UpdateSceneSpriteLayers () {
+    public static void UpdateSceneSpriteLayers () {
         EditorUtility.DisplayProgressBar( "Update Scene Sprite Layers...", 
                                           "Update Scene Sprite Layers...", 
                                           0.5f );    
@@ -47,17 +49,17 @@ public static class exSceneHelper {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// rebuild the sprites in the current scene
     // ------------------------------------------------------------------ 
 
     [MenuItem ("Edit/ex2D/Rebuild Scene Sprites %&b")]
-    static void RebuildSceneSprites () {
+    public static void RebuildSceneSprites () {
         exSpriteBase[] sprites = GameObject.FindObjectsOfType(typeof(exSpriteBase)) as exSpriteBase[];
         RebuildSprites (sprites);
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    // Desc:
     // ------------------------------------------------------------------ 
 
     static void RebuildSprites ( exSpriteBase[] _sprites ) {
@@ -99,7 +101,8 @@ public static class exSceneHelper {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _trans the in transform
+    /// recursively update the layer by the transform of the GameObject
     // ------------------------------------------------------------------ 
 
     public static void RecursivelyUpdateLayer ( Transform _trans ) {
@@ -113,7 +116,8 @@ public static class exSceneHelper {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _atlasInfoGUIDs the list of atlas info guid
+    /// update scene sprites by atlas info list
     // ------------------------------------------------------------------ 
 
     public static void UpdateSceneSprites ( List<string> _atlasInfoGUIDs ) {

@@ -13,13 +13,18 @@ using UnityEngine;
 using System.Collections;
 
 ///////////////////////////////////////////////////////////////////////////////
-// exIntersection2D
+///
+/// rect intersects helper class 
+///
 ///////////////////////////////////////////////////////////////////////////////
 
 public static class exIntersection2D {
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _a rect a
+    /// \param _b rect b
+    /// \result the intersect result
+    /// check if two rect intersection
     // ------------------------------------------------------------------ 
 
     public static bool RectRect ( Rect _a, Rect _b ) {
@@ -37,13 +42,18 @@ public static class exIntersection2D {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// exContains2D
+///
+/// rect contains helper class 
+///
 ///////////////////////////////////////////////////////////////////////////////
 
 public static class exContains2D {
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _a rect a
+    /// \param _b rect b
+    /// \result the contains result
+    /// check if rect contains, 1 is _a contains _b, -1 is _b contains _a, 0 is no contains 
     // ------------------------------------------------------------------ 
 
     public static int RectRect ( Rect _a, Rect _b ) {

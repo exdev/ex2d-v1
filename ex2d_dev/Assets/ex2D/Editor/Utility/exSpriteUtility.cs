@@ -16,7 +16,9 @@ using UnityEditor;
 using System.IO;
 
 ///////////////////////////////////////////////////////////////////////////////
-// exSpriteUtility
+///
+/// the sprite utility
+///
 ///////////////////////////////////////////////////////////////////////////////
 
 public static class exSpriteUtility {
@@ -42,7 +44,9 @@ public static class exSpriteUtility {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _sprite the sprite
+    /// \param _texture the raw texture used in the sprite
+    /// build the sprite by texture
     // ------------------------------------------------------------------ 
 
     public static void Build ( this exSprite _sprite, Texture2D _texture = null ) {

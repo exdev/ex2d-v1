@@ -60,7 +60,7 @@ class ex2D_PostProcessor : AssetPostprocessor {
 
             if ( obj is exAtlasInfo ) {
                 exAtlasInfo atlasInfo = obj as exAtlasInfo;
-                exAtlasDB.AddAtlas(atlasInfo);
+                exAtlasDB.AddAtlasInfo(atlasInfo);
             }
 
             // ======================================================== 
@@ -91,8 +91,8 @@ class ex2D_PostProcessor : AssetPostprocessor {
             string guid = AssetDatabase.AssetPathToGUID(path);
 
             // check if we have the guid in the exAtlasInfo
-            if ( exAtlasDB.HasAtlasGUID( guid ) ) {
-                exAtlasDB.RemoveAtlas(guid);
+            if ( exAtlasDB.HasAtlasInfoGUID( guid ) ) {
+                exAtlasDB.RemoveAtlasInfo(guid);
                 atlasInfoGUIDs.Add(guid);
             }
             // check if we have the guid in the exSpriteAnimClip
@@ -188,7 +188,7 @@ class ex2D_SaveAssetsProcessor : SaveAssetsProcessor {
         foreach ( exAtlasInfo atlasInfo in rebuildAtlasInfos ) {
             exAtlasInfoUtility.Build(atlasInfo);
             // build sprite animclip that used this atlasInfo
-            exSpriteAnimationUtility.BuildFromAtlasInfo(atlasInfo);
+            exAtlasInfoUtility.BuildSpAnimClipsFromRebuildList(atlasInfo);
         }
 
         // ======================================================== 

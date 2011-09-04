@@ -26,7 +26,6 @@ using System.Collections;
 public class exSpriteFont : exSpriteBase {
 
     // ------------------------------------------------------------------ 
-    /// \enum TextAlign
     /// The alignment method for text
     // ------------------------------------------------------------------ 
 
@@ -41,11 +40,10 @@ public class exSpriteFont : exSpriteBase {
     ///////////////////////////////////////////////////////////////////////////////
 
     // ------------------------------------------------------------------ 
-    /// \property fontInfo
+    [SerializeField] protected exBitmapFont fontInfo_;
     /// The referenced bitmap font asset
     // ------------------------------------------------------------------ 
 
-    [SerializeField] protected exBitmapFont fontInfo_;
     public exBitmapFont fontInfo {
         get { return fontInfo_; }
         set {
@@ -60,11 +58,10 @@ public class exSpriteFont : exSpriteBase {
     }
 
     // ------------------------------------------------------------------ 
-    /// \property text
+    [SerializeField] protected string text_ = "Hello World!"; 
     /// The text to rendered
     // ------------------------------------------------------------------ 
 
-    [SerializeField] protected string text_ = "Hello World!"; 
     public string text {
         get { return text_; }
         set {
@@ -76,11 +73,10 @@ public class exSpriteFont : exSpriteBase {
     }
 
     // ------------------------------------------------------------------ 
-    /// \property useMultiline
+    [SerializeField] protected bool useMultiline_ = false;
     /// If useMultiline is true, the exSpriteFont.text accept multiline string. 
     // ------------------------------------------------------------------ 
 
-    [SerializeField] protected bool useMultiline_ = false;
     public bool useMultiline {
         get { return useMultiline_; }
         set {
@@ -92,11 +88,10 @@ public class exSpriteFont : exSpriteBase {
     }
 
     // ------------------------------------------------------------------ 
-    /// \property textAlign
+    [SerializeField] protected TextAlign textAlign_ = TextAlign.Left;
     /// The alignment method used in the text
     // ------------------------------------------------------------------ 
 
-    [SerializeField] protected TextAlign textAlign_ = TextAlign.Left;
     public TextAlign textAlign {
         get { return textAlign_; }
         set {
@@ -108,12 +103,11 @@ public class exSpriteFont : exSpriteBase {
     }
 
     // ------------------------------------------------------------------ 
-    /// \property useKerning
+    [SerializeField] protected bool useKerning_ = false;
     /// If useKerning is true, the SpriteFont will use the exBitmapFont.KerningInfo in 
     /// the exSpriteFont.fontInfo to layout the text
     // ------------------------------------------------------------------ 
 
-    [SerializeField] protected bool useKerning_ = false;
     public bool useKerning {
         get { return useKerning_; }
         set {
@@ -125,11 +119,10 @@ public class exSpriteFont : exSpriteBase {
     }
 
     // ------------------------------------------------------------------ 
-    /// \property tracking
+    [SerializeField] protected float tracking_ = 0.0f;
     /// A fixed width applied between two characters in the text. 
     // ------------------------------------------------------------------ 
 
-    [SerializeField] protected float tracking_ = 0.0f;
     public float tracking {
         get { return tracking_; }
         set {
@@ -141,11 +134,10 @@ public class exSpriteFont : exSpriteBase {
     }
 
     // ------------------------------------------------------------------ 
-    /// \property lineSpacing
+    [SerializeField] protected float lineSpacing_ = 0.0f;
     /// A fixed line space applied between two lines.
     // ------------------------------------------------------------------ 
 
-    [SerializeField] protected float lineSpacing_ = 0.0f;
     public float lineSpacing {
         get { return lineSpacing_; }
         set {
@@ -159,11 +151,10 @@ public class exSpriteFont : exSpriteBase {
     // color option
 
     // ------------------------------------------------------------------ 
-    /// \property topColor
+    [SerializeField] protected Color topColor_ = Color.white;
     /// the color of the vertices at top 
     // ------------------------------------------------------------------ 
 
-    [SerializeField] protected Color topColor_ = Color.white;
     public Color topColor {
         get { return topColor_; }
         set {
@@ -175,11 +166,10 @@ public class exSpriteFont : exSpriteBase {
     }
 
     // ------------------------------------------------------------------ 
-    /// \property botColor
+    [SerializeField] protected Color botColor_ = Color.white;
     /// the color of the vertices at bottom 
     // ------------------------------------------------------------------ 
 
-    [SerializeField] protected Color botColor_ = Color.white;
     public Color botColor {
         get { return botColor_; }
         set {
@@ -193,11 +183,10 @@ public class exSpriteFont : exSpriteBase {
     // outline option
 
     // ------------------------------------------------------------------ 
-    /// \property useOutline
+    [SerializeField] protected bool useOutline_ = false;
     /// If useOutline is true, the component will render the text with outline
     // ------------------------------------------------------------------ 
 
-    [SerializeField] protected bool useOutline_ = false;
     public bool useOutline {
         get { return useOutline_; }
         set {
@@ -209,11 +198,10 @@ public class exSpriteFont : exSpriteBase {
     }
 
     // ------------------------------------------------------------------ 
-    /// \property outlineWidth
+    [SerializeField] protected float outlineWidth_ = 1.0f;
     /// The width of the outline text
     // ------------------------------------------------------------------ 
 
-    [SerializeField] protected float outlineWidth_ = 1.0f;
     public float outlineWidth {
         get { return outlineWidth_; }
         set {
@@ -226,11 +214,10 @@ public class exSpriteFont : exSpriteBase {
     }
 
     // ------------------------------------------------------------------ 
-    /// \property outlineColor
+    [SerializeField] protected Color outlineColor_ = Color.black;
     /// The color of the outline text
     // ------------------------------------------------------------------ 
 
-    [SerializeField] protected Color outlineColor_ = Color.black;
     public Color outlineColor {
         get { return outlineColor_; }
         set {
@@ -245,11 +232,10 @@ public class exSpriteFont : exSpriteBase {
     // shadow option
 
     // ------------------------------------------------------------------ 
-    /// \property useShadow
+    [SerializeField] protected bool useShadow_ = false;
     /// If useShadow is true, the component will render the text with shadow
     // ------------------------------------------------------------------ 
 
-    [SerializeField] protected bool useShadow_ = false;
     public bool useShadow {
         get { return useShadow_; }
         set {
@@ -261,11 +247,10 @@ public class exSpriteFont : exSpriteBase {
     }
 
     // ------------------------------------------------------------------ 
-    /// \property shadowBias
+    [SerializeField] protected Vector2 shadowBias_ = new Vector2 ( 1.0f, -1.0f );
     /// The bias of the shadow text 
     // ------------------------------------------------------------------ 
 
-    [SerializeField] protected Vector2 shadowBias_ = new Vector2 ( 1.0f, -1.0f );
     public Vector2 shadowBias {
         get { return shadowBias_; }
         set {
@@ -278,11 +263,10 @@ public class exSpriteFont : exSpriteBase {
     }
 
     // ------------------------------------------------------------------ 
-    /// \property shadowColor
+    [SerializeField] protected Color shadowColor_ = Color.black;
     /// The color of the shadow text 
     // ------------------------------------------------------------------ 
 
-    [SerializeField] protected Color shadowColor_ = Color.black;
     public Color shadowColor {
         get { return shadowColor_; }
         set {
@@ -508,7 +492,6 @@ public class exSpriteFont : exSpriteBase {
     }
 
     // ------------------------------------------------------------------ 
-    /// \fn UpdateMesh ( Mesh _mesh )
     /// \param _mesh the mesh to update
     /// 
     /// Update the _mesh depends on the exPlane.updateFlags
@@ -1011,7 +994,6 @@ public class exSpriteFont : exSpriteBase {
     }
 
     // ------------------------------------------------------------------ 
-    /// \fn ForceUpdateMesh ( Mesh _mesh )
     /// \param _mesh the mesh to update
     /// 
     /// Force to update the _mesh use the Text flags in exPlane.UpdateFlags
@@ -1058,7 +1040,6 @@ public class exSpriteFont : exSpriteBase {
     }
 
     // ------------------------------------------------------------------ 
-    /// \fn Clear 
     /// Clear the text, fontInfo, material and mesh of the sprite font, make it empty
     // ------------------------------------------------------------------ 
 

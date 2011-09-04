@@ -13,11 +13,6 @@ using UnityEngine;
 using System.Collections;
 
 ///////////////////////////////////////////////////////////////////////////////
-// defines
-///////////////////////////////////////////////////////////////////////////////
-
-///////////////////////////////////////////////////////////////////////////////
-/// \class exPlane
 ///
 /// The base class of sprites in ex2D
 ///
@@ -27,7 +22,6 @@ using System.Collections;
 public class exPlane : MonoBehaviour {
 
     // ------------------------------------------------------------------ 
-    /// \enum UpdateFlags
     /// The type of update
     // ------------------------------------------------------------------ 
 
@@ -42,7 +36,6 @@ public class exPlane : MonoBehaviour {
 	};
 
     // ------------------------------------------------------------------ 
-    /// \enum Plane
     /// The 2D plane the exPlane used in 3D space
     // ------------------------------------------------------------------ 
 
@@ -53,7 +46,6 @@ public class exPlane : MonoBehaviour {
     }
 
     // ------------------------------------------------------------------ 
-    /// \enum Anchor
     /// The anchor position of the exPlane in 2D space
     // ------------------------------------------------------------------ 
 
@@ -116,11 +108,10 @@ public class exPlane : MonoBehaviour {
     ///////////////////////////////////////////////////////////////////////////////
 
     // ------------------------------------------------------------------ 
-    /// \property plane
+    [SerializeField] protected Plane plane_ = Plane.XY;
     /// the 2D coordination (XY, XZ or ZY) used in this plane 
     // ------------------------------------------------------------------ 
 
-    [SerializeField] protected Plane plane_ = Plane.XY;
     public Plane plane {
         get { return plane_; }
         set {
@@ -150,11 +141,10 @@ public class exPlane : MonoBehaviour {
     }
 
     // ------------------------------------------------------------------ 
-    /// \property anchor
+    [SerializeField] protected Anchor anchor_ = Anchor.MidCenter;
     /// the anchor position used in this plane
     // ------------------------------------------------------------------ 
 
-    [SerializeField] protected Anchor anchor_ = Anchor.MidCenter;
     public Anchor anchor {
         get { return anchor_; }
         set {
@@ -166,12 +156,10 @@ public class exPlane : MonoBehaviour {
     }
 
     // ------------------------------------------------------------------ 
-    /// \property offset
-    /// the offset based on the anchor, 
-    /// the final position of the plane equals to offset + anchor
+    [SerializeField] protected Vector2 offset_ = Vector2.zero;
+    /// the offset based on the anchor, the final position of the plane equals to offset + anchor
     // ------------------------------------------------------------------ 
 
-    [SerializeField] protected Vector2 offset_ = Vector2.zero;
     public Vector2 offset {
         get { return offset_; }
         set { 
@@ -187,14 +175,12 @@ public class exPlane : MonoBehaviour {
     ///////////////////////////////////////////////////////////////////////////////
 
     // ------------------------------------------------------------------ 
-    /// \memberof layer2d
     /// The cached exLayer2D component
     // ------------------------------------------------------------------ 
 
     [System.NonSerialized] public exLayer2D layer2d;
 
     // ------------------------------------------------------------------ 
-    /// \memberof updateFlags
     /// The current updateFlags, this value will reset after every LateUpdate()
     /// 
     /// \note The only reason I public this is because exAnimationHelper need to asscess it, 
@@ -204,7 +190,6 @@ public class exPlane : MonoBehaviour {
 	[System.NonSerialized] public UpdateFlags updateFlags = UpdateFlags.None;
 
     // ------------------------------------------------------------------ 
-    /// \property boundingRect
     /// The bounding rect of the plane
     // ------------------------------------------------------------------ 
 
@@ -245,7 +230,6 @@ public class exPlane : MonoBehaviour {
     ///////////////////////////////////////////////////////////////////////////////
 
     // ------------------------------------------------------------------ 
-    /// \fn Awake
     /// Awake functoin inherit from MonoBehaviour.
     /// 
     /// \note if you inherit from exPlane, and implement your own Awake function, 
@@ -258,7 +242,6 @@ public class exPlane : MonoBehaviour {
     }
 
     // ------------------------------------------------------------------ 
-    /// \fn OnEnable
     /// OnEnable functoin inherit from MonoBehaviour,
     /// When exPlane.enabled set to true, this function will be invoked,
     /// exPlane will enable the renderer and layer2d if they exist. 
@@ -281,7 +264,6 @@ public class exPlane : MonoBehaviour {
     }
 
     // ------------------------------------------------------------------ 
-    /// \fn OnDisable
     /// OnDisable functoin inherit from MonoBehaviour,
     /// When exPlane.enabled set to false, this function will be invoked,
     /// exPlane will disable the renderer and layer2d if they exist. 
@@ -315,7 +297,6 @@ public class exPlane : MonoBehaviour {
     }
 
     // ------------------------------------------------------------------ 
-    /// \fn InternalUpdate
     /// A virtual for user to override.
     /// It will be invoked when updateFlags is not UpdateFlags.None
     // ------------------------------------------------------------------ 
@@ -325,7 +306,6 @@ public class exPlane : MonoBehaviour {
     }
 
     // ------------------------------------------------------------------ 
-    /// \fn UpdateBoundRect
     /// \param _offsetX the offset x pos of the plane (normally it is equals to offset.x + anchor_pos.x )  
     /// \param _offsetY the offset y pos of the plane (normally it is equals to offset.y + anchor_pos.y )  
     /// \param _width the width of the plane
@@ -344,7 +324,6 @@ public class exPlane : MonoBehaviour {
     }
 
     // ------------------------------------------------------------------ 
-    /// \fn GetBounds
     /// \param _offsetX the offset x pos of the plane (normally it is equals to offset.x + anchor_pos.x )  
     /// \param _offsetY the offset y pos of the plane (normally it is equals to offset.y + anchor_pos.y )  
     /// \param _width the width of the plane

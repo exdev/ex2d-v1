@@ -14,16 +14,17 @@ using System.Collections;
 using System.Collections.Generic;
 
 ///////////////////////////////////////////////////////////////////////////////
-/// \class exBitmapFont
 /// 
 /// The bitmap font asset used in exSpriteFont component. 
+/// 
 ///////////////////////////////////////////////////////////////////////////////
 
 public class exBitmapFont : ScriptableObject {
 
     ///////////////////////////////////////////////////////////////////////////////
-    /// \class CharInfo
+    ///
     /// A structure to descrip the character in the bitmap font 
+    ///
     ///////////////////////////////////////////////////////////////////////////////
 
     [System.Serializable]
@@ -41,8 +42,9 @@ public class exBitmapFont : ScriptableObject {
     }
 
     ///////////////////////////////////////////////////////////////////////////////
-    /// \class KerningInfo
+    ///
     /// A structure to descrip the kerning between two character in the bitmap font 
+    ///
     ///////////////////////////////////////////////////////////////////////////////
 
     [System.Serializable]
@@ -53,8 +55,9 @@ public class exBitmapFont : ScriptableObject {
     }
 
     ///////////////////////////////////////////////////////////////////////////////
-    /// \class PageInfo
+    ///
     /// A structure to descrip the page used in the bitmap font
+    ///
     ///////////////////////////////////////////////////////////////////////////////
 
     [System.Serializable]
@@ -85,7 +88,6 @@ public class exBitmapFont : ScriptableObject {
     ///////////////////////////////////////////////////////////////////////////////
 
     // ------------------------------------------------------------------ 
-    /// \fn RebuildIdToCharInfoTable 
     /// Rebuild the table to store key exBitmapFont.CharInfo.id to value exBitmapFont.CharInfo
     // ------------------------------------------------------------------ 
 
@@ -100,7 +102,6 @@ public class exBitmapFont : ScriptableObject {
     }
 
     // ------------------------------------------------------------------ 
-    /// \fn GetCharInfo 
     /// \param _id the look up key 
     /// \return the expect character info
     /// Get the character information by exBitmapFont.CharInfo.id

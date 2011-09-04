@@ -15,24 +15,27 @@ using System.Collections;
 using System.Collections.Generic;
 
 ///////////////////////////////////////////////////////////////////////////////
-// defines
+/// 
+/// the texture helper class
+/// 
 ///////////////////////////////////////////////////////////////////////////////
-
-// ------------------------------------------------------------------ 
-// Desc: 
-// ------------------------------------------------------------------ 
 
 public static class exTextureHelper {
 
+    // ------------------------------------------------------------------ 
+    /// the direction of rotation
+    // ------------------------------------------------------------------ 
+
     public enum RotateDirection {
-        None,
-        RotRight, // >>
-        Flip,
-        RotLeft, // <<
+        None, ///< none
+        RotRight, ///< rotate 90 degrees to right (clock-wise) >>
+        Flip, ///< rotate 180 degrees
+        RotLeft, ///< rotate 90 degrees to left (clock-wise) <<
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _tex
+    /// change the import texture settings to make it fit for atlas 
     // ------------------------------------------------------------------ 
 
     public static void ImportTextureForAtlas ( Texture2D _tex ) {
@@ -54,7 +57,12 @@ public static class exTextureHelper {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _dest the target texture
+    /// \param _pos the fill start position in target texture
+    /// \param _src the src texture
+    /// \param _rect the rect to fill
+    /// \param _rotDir rotation direction
+    /// fill the source texture to target texture
     // ------------------------------------------------------------------ 
 
     public static void Fill ( Texture2D _dest, Vector2 _pos, Texture2D _src, Rect _rect, RotateDirection _rotDir ) {
@@ -83,7 +91,9 @@ public static class exTextureHelper {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _tex the texture to trim
+    /// \return the trimmed rect
+    /// get the trimmed texture rect 
     // ------------------------------------------------------------------ 
 
     public static Rect GetTrimTextureRect ( Texture2D _tex ) {

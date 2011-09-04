@@ -71,8 +71,9 @@ EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/BitmapFontEditor/
 EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/ComponentEditors/
 EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/DB/
 EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/GroupImportEditor/
-EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/EditorHelper/
+EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/Helper/
 EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/SpriteAnimationEditor/
+EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/Utility/
 EDITOR_SOURCE = $(wildcard $(addsuffix *.cs,$(EDITOR_SOURCE_DIRS)))
 
 # defines

@@ -14,9 +14,9 @@ using System.Collections;
 using System.Collections.Generic;
 
 ///////////////////////////////////////////////////////////////////////////////
-/// \class exSpriteAnimClip
 ///
 /// The sprite animation clip asset used in exSpriteAnimation component. 
+///
 ///////////////////////////////////////////////////////////////////////////////
 
 public class exSpriteAnimClip : ScriptableObject {
@@ -33,7 +33,6 @@ public class exSpriteAnimClip : ScriptableObject {
     }
 
     // ------------------------------------------------------------------ 
-    /// \enum StopAction
     /// The action type used when animation stpped
     // ------------------------------------------------------------------ 
 
@@ -45,7 +44,6 @@ public class exSpriteAnimClip : ScriptableObject {
     }
 
     // ------------------------------------------------------------------ 
-    /// \class FrameInfo
     /// The structure to descrip a frame in the sprite animation clip
     // ------------------------------------------------------------------ 
 
@@ -58,43 +56,70 @@ public class exSpriteAnimClip : ScriptableObject {
     }
 
     // ------------------------------------------------------------------ 
-    /// \class FrameInfo
     /// The structure to descrip an event in the sprite animation clip
     // ------------------------------------------------------------------ 
 
     [System.Serializable]
     public class EventInfo {
+        // ------------------------------------------------------------------ 
+        /// the type of the parameter
+        // ------------------------------------------------------------------ 
+
         public enum ParamType {
-            NONE,
-            STRING,
-            FLOAT,
-            INT,
-            BOOL,
-            OBJECT
+            NONE,   ///< none
+            STRING, ///< string
+            FLOAT,  ///< float
+            INT,    ///< int
+            BOOL,   ///< bool
+            OBJECT  ///< object
         }
 
-        public float time = 0.0f;
-        public string methodName = "";
-        public ParamType paramType = ParamType.NONE;
-        public string stringParam = "";
-        public float floatParam = 0.0f;
-        public int intParam = -1;
-        public bool boolParam = false;
-        public Object objectParam = null;
-        public SendMessageOptions msgOptions = SendMessageOptions.RequireReceiver;
+        public float time = 0.0f; ///< the time in seconds to trigger the event
+        public string methodName = ""; ///< the name of method to invoke 
+        public ParamType paramType = ParamType.NONE; ///< the first parameter type 
+        public string stringParam = ""; ///< the value of the string parameter
+        public float floatParam = 0.0f; ///< the value of the float parameter
+        public int intParam = -1; ///< the value of the int parameter
+        public bool boolParam = false; ///< the value of the boolean parameter
+        public Object objectParam = null; ///< the value of the object parameter
+        public SendMessageOptions msgOptions = SendMessageOptions.RequireReceiver; ///< the SendMessage option
     }
 
-    public WrapMode wrapMode = WrapMode.Once;
-    public StopAction stopAction = StopAction.DoNothing;
-    public float length = 1.0f;
-    public List<FrameInfo> frameInfos = new List<FrameInfo>();
-    public List<EventInfo> eventInfos = new List<EventInfo>();
+    public WrapMode wrapMode = WrapMode.Once; ///< default wrap mode
+    public StopAction stopAction = StopAction.DoNothing; ///< the default type of action used when the animation stopped 
+
+    // ------------------------------------------------------------------ 
+    [SerializeField] protected float length_ = 1.0f;
+    /// the length of the animation clip in seconds
+    // ------------------------------------------------------------------ 
+
+    public float length {
+        get { return length_; }
+        set {  
+            if ( value != 0.0f && value != length_ ) {
+                float totalLength = 0.0f;
+                float delta = value - length_;
+                foreach ( exSpriteAnimClip.FrameInfo fi in frameInfos) {
+                    float ratio = fi.length/length;
+                    fi.length = Mathf.Max(1.0f/60.0f, fi.length + delta * ratio);
+                    totalLength += fi.length;
+                }
+                foreach ( exSpriteAnimClip.EventInfo ei in eventInfos) {
+                    ei.time = ei.time/length_ * value;
+                }
+                length_ = totalLength;
+            }
+        }
+    }
+
+    public List<FrameInfo> frameInfos = new List<FrameInfo>(); ///< the list of frame info 
+    public List<EventInfo> eventInfos = new List<EventInfo>(); ///< the list of event info
 
     // editor only
-    public float editorScale = 1.0f;
-    public float editorOffset = 0.0f;
-    public float editorSpeed = 1.0f;
-    public bool editorNeedRebuild = false;
+    public float editorScale = 1.0f; ///< the scale used in editor timeline view
+    public float editorOffset = 0.0f; ///< the offset used in editor timeline view
+    public float editorSpeed = 1.0f; ///< the preview speed in sprite animation editor 
+    public bool editorNeedRebuild = false; ///< check if the sprite animation clip need rebuild
 
     private EventInfoComparer eventInfoComparer = new EventInfoComparer();
     private EventInfo tmpEventInfo = new EventInfo();
@@ -104,7 +129,8 @@ public class exSpriteAnimClip : ScriptableObject {
     ///////////////////////////////////////////////////////////////////////////////
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _e the event information wants to add
+    /// add an event information
     // ------------------------------------------------------------------ 
 
     public void AddEvent ( EventInfo _e ) {
@@ -118,7 +144,8 @@ public class exSpriteAnimClip : ScriptableObject {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _e the event information wants to remove
+    /// remove an event information
     // ------------------------------------------------------------------ 
 
     public void RemoveEvent ( EventInfo _e ) {
@@ -126,7 +153,9 @@ public class exSpriteAnimClip : ScriptableObject {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _seconds the in seconds used for wrapping
+    /// \param _wrapMode the wrap mode used for wrapping
+    /// wrap the seconds of the anim clip by the wrap mode
     // ------------------------------------------------------------------ 
 
     public float WrapSeconds ( float _seconds, WrapMode _wrapMode ) {
@@ -148,7 +177,11 @@ public class exSpriteAnimClip : ScriptableObject {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _gameObject send message to target _gameObject
+    /// \param _start the start time in seconds 
+    /// \param _delta the delta time in seconds
+    /// \param _wrapMode  the wrap mode
+    /// Trigger events locate between the start and start+_delta time span
     // ------------------------------------------------------------------ 
 
     public void TriggerEvents ( GameObject _gameObject, 
@@ -219,11 +252,11 @@ public class exSpriteAnimClip : ScriptableObject {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public void ForwardTriggerEvents ( GameObject _gameObject, 
-                                       int _index, 
-                                       float _start, 
-                                       float _end,
-                                       bool _includeStart ) 
+    void ForwardTriggerEvents ( GameObject _gameObject, 
+                                int _index, 
+                                float _start, 
+                                float _end,
+                                bool _includeStart ) 
     {
         for ( int i = _index; i < eventInfos.Count; ++i ) {
             EventInfo ei = eventInfos[i];
@@ -240,11 +273,11 @@ public class exSpriteAnimClip : ScriptableObject {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public void BackwardTriggerEvents ( GameObject _gameObject, 
-                                       int _index, 
-                                       float _start, 
-                                       float _end,
-                                       bool _includeStart )
+    void BackwardTriggerEvents ( GameObject _gameObject, 
+                                 int _index, 
+                                 float _start, 
+                                 float _end,
+                                 bool _includeStart )
     {
         for ( int i = _index; i > eventInfos.Count; --i ) {
             EventInfo ei = eventInfos[i];

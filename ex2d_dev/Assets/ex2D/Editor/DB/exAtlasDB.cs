@@ -16,33 +16,39 @@ using UnityEditor;
 using System.IO;
 
 ///////////////////////////////////////////////////////////////////////////////
-// exAtlasDB
+///
+/// atlas database 
+///
 ///////////////////////////////////////////////////////////////////////////////
 
 public class exAtlasDB : ScriptableObject {
 
+    // ------------------------------------------------------------------ 
+    /// the element information in atlas database
+    // ------------------------------------------------------------------ 
+
     [System.Serializable]
     public class ElementInfo {
-        public int indexInAtlas;
-        public int indexInAtlasInfo;
-        public string guidTexture;
-        public string guidAtlas;
-        public string guidAtlasInfo;
+        public int indexInAtlas;      ///< the index of the element info in atlas
+        public int indexInAtlasInfo;  ///< the index of the element info in atlas info
+        public string guidTexture;    ///< the raw texture guid
+        public string guidAtlas;      ///< the atlas guid
+        public string guidAtlasInfo;  ///< the atlas info guid
     }
 
     ///////////////////////////////////////////////////////////////////////////////
     // properties
     ///////////////////////////////////////////////////////////////////////////////
 
-    public int curVersion = version;
-    public List<string> atlasInfoGUIDs = new List<string>();
-    public List<ElementInfo> elementInfos = new List<ElementInfo>();
-    public Dictionary<string,ElementInfo> 
-        texGUIDToElementInfo = new Dictionary<string,ElementInfo>();
+    public int curVersion = version; ///< the current version of the atlas db
+    public List<string> atlasInfoGUIDs = new List<string>(); ///< the guid list of atlas info
+    public List<ElementInfo> elementInfos = new List<ElementInfo>(); ///< the element info list
+    public Dictionary<string,ElementInfo>
+        texGUIDToElementInfo = new Dictionary<string,ElementInfo>(); ///< the texture guid to element info table
 
     // editor
-    public bool showData = true;
-    public bool showTable = true;
+    public bool showData = true; ///< fold data option in Inspector
+    public bool showTable = true; ///< fold table option in Inspector
 
     // FIXME: conflict with CreateDB I doubt. when I delete DB and create it, crash with this { 
     // // ------------------------------------------------------------------ 
@@ -58,17 +64,17 @@ public class exAtlasDB : ScriptableObject {
     // static
     ///////////////////////////////////////////////////////////////////////////////
 
-    protected static int version = 2;
-    protected static bool needSync = false;
-    protected static exAtlasDB db;
-    public static string dbPath = "Assets/.ex2D_AtlasDB.asset"; 
+    static int version = 2;
+    static bool needSync = false;
+    static exAtlasDB db;
+    public static string dbPath = "Assets/.ex2D_AtlasDB.asset"; ///< the fullpath of the atlas db we use 
 
     ///////////////////////////////////////////////////////////////////////////////
     // static
     ///////////////////////////////////////////////////////////////////////////////
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// force sync the atlas db
     // ------------------------------------------------------------------ 
 
     public static void ForceSync () {
@@ -79,7 +85,7 @@ public class exAtlasDB : ScriptableObject {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// rebuild all atlas in the project
     // ------------------------------------------------------------------ 
 
     public static void BuildAll () {
@@ -96,7 +102,7 @@ public class exAtlasDB : ScriptableObject {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// check if the file in exAtlasDB.dbPath exists 
     // ------------------------------------------------------------------ 
 
     public static bool DBExists () {
@@ -105,7 +111,7 @@ public class exAtlasDB : ScriptableObject {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// sync the atlas db file from the Assets directory
     // ------------------------------------------------------------------ 
 
     static void SyncRoot () {
@@ -122,7 +128,8 @@ public class exAtlasDB : ScriptableObject {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _path the path start sync
+    /// sync the atlas db file from the _path directory
     // ------------------------------------------------------------------ 
 
     static void SyncDirectory ( string _path ) {
@@ -131,7 +138,7 @@ public class exAtlasDB : ScriptableObject {
         foreach ( string fileName in files ) {
             exAtlasInfo atlasInfo = (exAtlasInfo)AssetDatabase.LoadAssetAtPath( fileName, typeof(exAtlasInfo) );
             if ( atlasInfo ) {
-                AddAtlas(atlasInfo);
+                AddAtlasInfo(atlasInfo);
 
                 atlasInfo = null;
                 EditorUtility.UnloadUnusedAssets();
@@ -170,7 +177,7 @@ public class exAtlasDB : ScriptableObject {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// init the atlas db file, if it doesn't exists, create it.
     // ------------------------------------------------------------------ 
 
     [MenuItem("Edit/ex2D/Create Atlas DB")]
@@ -199,7 +206,7 @@ public class exAtlasDB : ScriptableObject {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// get texture guid to element info table
     // ------------------------------------------------------------------ 
 
     public static Dictionary<string,ElementInfo> GetTexGUIDToElementInfo () {
@@ -209,20 +216,23 @@ public class exAtlasDB : ScriptableObject {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _guid the atlas info guid
+    /// \return the result
+    /// check if the db have the _guid in its exAtlasDB.atlasInfoGUIDs list
     // ------------------------------------------------------------------ 
 
-    public static bool HasAtlasGUID ( string _guid ) {
+    public static bool HasAtlasInfoGUID ( string _guid ) {
         Init();
 
         return db.atlasInfoGUIDs.IndexOf(_guid) != -1;
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _a the atlas info you want to add
+    /// add the atlas info to the atlas db
     // ------------------------------------------------------------------ 
 
-    public static void AddAtlas ( exAtlasInfo _a ) {
+    public static void AddAtlasInfo ( exAtlasInfo _a ) {
         Init();
 
         string guid = exEditorHelper.AssetToGUID (_a);
@@ -242,7 +252,7 @@ public class exAtlasDB : ScriptableObject {
     // // Desc: 
     // // ------------------------------------------------------------------ 
 
-    // public static void RemoveAtlas ( exAtlasInfo _a ) {
+    // public static void RemoveAtlasInfo ( exAtlasInfo _a ) {
     //     Init();
 
     //     string guid = exEditorHelper.AssetToGUID (_a);
@@ -255,10 +265,11 @@ public class exAtlasDB : ScriptableObject {
     // } DISABLE end 
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _atlasInfoGUID the atlas info guid
+    /// remove atlas info from atlas db by guid
     // ------------------------------------------------------------------ 
 
-    public static void RemoveAtlas ( string _atlasInfoGUID ) {
+    public static void RemoveAtlasInfo ( string _atlasInfoGUID ) {
         Init();
 
         // get ElementInfo that have the same atlasInfo guid to remove list 
@@ -327,7 +338,9 @@ public class exAtlasDB : ScriptableObject {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _el the element in atlas info
+    /// \param _index the index of the element
+    /// update the index of the element info in atlas db
     // ------------------------------------------------------------------ 
 
     public static void UpdateElementInfo ( exAtlasInfo.Element _el, int _index ) {
@@ -350,7 +363,8 @@ public class exAtlasDB : ScriptableObject {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _textureGUID the raw texture guid
+    /// remove element info by raw texture guid
     // ------------------------------------------------------------------ 
 
     public static void RemoveElementInfo ( string _textureGUID ) {
@@ -364,7 +378,9 @@ public class exAtlasDB : ScriptableObject {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _tex the raw texture
+    /// \return ElementInfo the result element info
+    /// find and return element info by raw texture, if not found, it will return null 
     // ------------------------------------------------------------------ 
 
     public static ElementInfo GetElementInfo ( Texture2D _tex ) {
@@ -377,7 +393,9 @@ public class exAtlasDB : ScriptableObject {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _textureGUID the raw texture guid
+    /// \return ElementInfo the result element info
+    /// find and return element info by raw texture guid, if not found, it will return null 
     // ------------------------------------------------------------------ 
 
     public static ElementInfo GetElementInfo ( string _textureGUID ) {

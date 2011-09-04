@@ -17,7 +17,6 @@ using System.Collections;
 ///////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
-/// \class exSprite
 ///
 /// A component to render exAtlas in the game
 ///
@@ -34,14 +33,12 @@ public class exSprite : exSpriteBase {
     ///////////////////////////////////////////////////////////////////////////////
 
     // ------------------------------------------------------------------ 
-    /// \memberof textureGUID
     /// the GUID of the raw texture, this only used in Editor
     // ------------------------------------------------------------------ 
 
     public string textureGUID = ""; 
 
     // ------------------------------------------------------------------ 
-    /// \memberof trimTexture
     /// if true, exSprite will cut out the empty color of the texture, render it in trimmed rect.
     /// 
     /// \note this value only affect when exSprite.useAtlas is false. 
@@ -50,7 +47,6 @@ public class exSprite : exSpriteBase {
     public bool trimTexture = true;
 
     // ------------------------------------------------------------------ 
-    /// \memberof trimUV
     /// the trimmed uv coordination of the texture exSprite used.
     /// 
     /// \note this value only affect when exSprite.useAtlas is false. 
@@ -59,12 +55,11 @@ public class exSprite : exSpriteBase {
     public Rect trimUV = new Rect(0,0,1,1);
 
     // ------------------------------------------------------------------ 
-    /// \property useTextureOffset
+    [SerializeField] protected bool useTextureOffset_ = true;
     /// if useTextureOffset is true, the sprite calculate the anchor 
     /// position depends on the original size of texture instead of the trimmed size 
     // ------------------------------------------------------------------ 
 
-    [SerializeField] protected bool useTextureOffset_ = true;
     public bool useTextureOffset {
         get { return useTextureOffset_; }
         set {
@@ -76,11 +71,10 @@ public class exSprite : exSpriteBase {
     }
 
     // ------------------------------------------------------------------ 
-    /// \property color
+    [SerializeField] protected Color color_ = Color.white;
     /// the vertex color of the sprite
     // ------------------------------------------------------------------ 
 
-    [SerializeField] protected Color color_ = Color.white;
     public Color color { 
         get { return color_; } 
         set {
@@ -92,12 +86,11 @@ public class exSprite : exSpriteBase {
     }
 
     // ------------------------------------------------------------------ 
-    /// \property customSize
+    [SerializeField] protected bool customSize_ = false;
     /// if customSize set to true, use are free to set the exSprite.width and exSprite.height of the sprite,
     /// otherwise there is no effect when assign value to width or height.
     // ------------------------------------------------------------------ 
 
-    [SerializeField] protected bool customSize_ = false;
     public bool customSize {
         get { return customSize_; }
         set {
@@ -134,13 +127,12 @@ public class exSprite : exSpriteBase {
     }
 
     // ------------------------------------------------------------------ 
-    /// \property width
+    [SerializeField] protected float width_ = 1.0f;
     /// the width of the sprite
     /// 
     /// \note if you want to custom the width of it, you need to set exSprite.customSize to true
     // ------------------------------------------------------------------ 
 
-    [SerializeField] protected float width_ = 1.0f;
     public float width {
         get { return width_; }
         set {
@@ -152,13 +144,12 @@ public class exSprite : exSpriteBase {
     }
 
     // ------------------------------------------------------------------ 
-    /// \property height
+    [SerializeField] protected float height_ = 1.0f;
     /// the height of the sprite
     /// 
     /// \note if you want to custom the height of it, you need to set exSprite.customSize to true
     // ------------------------------------------------------------------ 
 
-    [SerializeField] protected float height_ = 1.0f;
     public float height {
         get { return height_; }
         set {
@@ -170,24 +161,26 @@ public class exSprite : exSpriteBase {
     }
 
     // ------------------------------------------------------------------ 
-    /// \property atlas
+    [SerializeField] protected exAtlas atlas_ = null;
     /// the atlas referenced in this sprite. (readonly)
     /// 
     /// \sa exSprite.SetSprite
     // ------------------------------------------------------------------ 
 
-    [SerializeField] protected exAtlas atlas_ = null;
     public exAtlas atlas { get { return atlas_; } }
 
     // ------------------------------------------------------------------ 
-    /// \property index
+    [SerializeField] protected int index_ = -1;
     /// the index of the element in atlas used in this sprite. (readonly)
     /// 
     /// \sa exSprite.SetSprite
     // ------------------------------------------------------------------ 
 
-    [SerializeField] protected int index_ = -1;
     public int index { get { return index_; } }
+
+    // ------------------------------------------------------------------ 
+    /// if the sprite use atlas
+    // ------------------------------------------------------------------ 
 
     public bool useAtlas { 
         get { 
@@ -214,7 +207,6 @@ public class exSprite : exSpriteBase {
     ///////////////////////////////////////////////////////////////////////////////
 
     // ------------------------------------------------------------------ 
-    /// \fn UpdateMesh ( Mesh _mesh )
     /// \param _mesh the mesh to update
     /// 
     /// Update the _mesh depends on the exPlane.updateFlags
@@ -545,7 +537,6 @@ public class exSprite : exSpriteBase {
     }
 
     // ------------------------------------------------------------------ 
-    /// \fn ForceUpdateMesh ( Mesh _mesh )
     /// \param _mesh the mesh to update
     /// 
     /// Force to update the _mesh use the Vertex, UV, Color and Index flags in exPlane.UpdateFlags
@@ -657,7 +648,6 @@ public class exSprite : exSpriteBase {
     }
 
     // ------------------------------------------------------------------ 
-    /// \fn Clear 
     /// Clear the altas, material and mesh of the sprite, make it empty
     // ------------------------------------------------------------------ 
 
@@ -674,7 +664,6 @@ public class exSprite : exSpriteBase {
     }
 
     // ------------------------------------------------------------------ 
-    /// \fn GetCurrentElement
     /// \return the current used atlas element 
     ///
     /// Get current element used in exSprite.atlas
@@ -687,7 +676,6 @@ public class exSprite : exSpriteBase {
     }
 
     // ------------------------------------------------------------------ 
-    /// \fn SetSprite
     /// \param _atlas the new atlas
     /// \param _index the index of the element in the new atlas
     /// Set a new picture in an atlas to this sprite 

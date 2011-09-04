@@ -16,34 +16,43 @@ using UnityEditor;
 using System.IO;
 
 ///////////////////////////////////////////////////////////////////////////////
-// exSpriteAnimationDB
+///
+/// sprite animation clip database
+///
 ///////////////////////////////////////////////////////////////////////////////
 
 public class exSpriteAnimationDB : ScriptableObject {
 
+    // ------------------------------------------------------------------ 
+    /// the guid information
+    // ------------------------------------------------------------------ 
+
     [System.Serializable]
     public class GUIDInfo {
+        /// \param _guidAnimClip the sprite animation clip guid
+        /// \param _guidTexture the raw texture guid
+        /// constructor
         public GUIDInfo( string _guidAnimClip, string _guidTexture ) {
             guidAnimClip = _guidAnimClip;
             guidTexture = _guidTexture;
         }
-        public string guidAnimClip;
-        public string guidTexture;
+        public string guidAnimClip; ///< the sprite animation clip guid
+        public string guidTexture; ///< the raw texture guid
     }
 
     ///////////////////////////////////////////////////////////////////////////////
     // properties
     ///////////////////////////////////////////////////////////////////////////////
 
-    public int curVersion = version;
-    public List<string> spAnimClipGUIDs = new List<string>();
-    public List<GUIDInfo> guidInfos = new List<GUIDInfo>();
+    public int curVersion = version; ///< the current version of the sprite animation db
+    public List<string> spAnimClipGUIDs = new List<string>(); ///< the guid list of sprite animation clip
+    public List<GUIDInfo> guidInfos = new List<GUIDInfo>(); ///< the list of guid information 
     public Dictionary<string,List<string> > 
-        texGuidToAnimClipGUIDs = new Dictionary<string,List<string> >();
+        texGuidToAnimClipGUIDs = new Dictionary<string,List<string> >(); ///< the texture guid to sprite animation clip guid list table
 
     // editor
-    public bool showData = true;
-    public bool showTable = true;
+    public bool showData = true; ///< fold data option in Inspector
+    public bool showTable = true; ///< fold table option in Inspector
 
     // FIXME: conflict with CreateDB I doubt. when I delete DB and create it, crash with this { 
     // // ------------------------------------------------------------------ 
@@ -62,13 +71,13 @@ public class exSpriteAnimationDB : ScriptableObject {
     static int version = 1;
     static bool needSync = false;
     static exSpriteAnimationDB db;
-    public static string dbPath = "Assets/.ex2D_SpriteAnimationDB.asset";
+    public static string dbPath = "Assets/.ex2D_SpriteAnimationDB.asset"; ///< the fullpath of the sprite animation clip db we use
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// force sync the sprite animation db
     // ------------------------------------------------------------------ 
 
-    public static void Sync () {
+    public static void ForceSync () {
         if ( db == null )
             CreateDB ();
 
@@ -76,7 +85,7 @@ public class exSpriteAnimationDB : ScriptableObject {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// rebuild all sprite animations in the project
     // ------------------------------------------------------------------ 
 
     public static void BuildAll () {
@@ -93,7 +102,7 @@ public class exSpriteAnimationDB : ScriptableObject {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// check if the file in exSpriteAnimationDB.dbPath exists 
     // ------------------------------------------------------------------ 
 
     public static bool DBExists () {
@@ -102,7 +111,7 @@ public class exSpriteAnimationDB : ScriptableObject {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// sync the sprite animation db file from the Assets directory
     // ------------------------------------------------------------------ 
 
     static void SyncRoot () {
@@ -166,7 +175,7 @@ public class exSpriteAnimationDB : ScriptableObject {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// init the sprite animation db file, if it doesn't exists, create it.
     // ------------------------------------------------------------------ 
 
     [MenuItem("Edit/ex2D/Create Sprite Animation DB")]
@@ -180,28 +189,9 @@ public class exSpriteAnimationDB : ScriptableObject {
                 needSync = false;
                 SyncRoot();
             }
+            // update guid info in db.
             else {
-                // DELME { 
-                // // create atlas element table
-                // for ( int i = 0; i < db.spAnimClipGUIDs.Count; ++i ) {
-                //     string animClipGUID = db.spAnimClipGUIDs[i];
-                //     exSpriteAnimClip spAnimClip = exEditorHelper.LoadAssetFromGUID<exSpriteAnimClip>(animClipGUID);
-
-                //     if ( spAnimClip == null ) {
-                //         db.spAnimClipGUIDs.RemoveAt(i);
-                //         --i;
-                //         continue;
-                //     }
-
-                //     // update sprite anim clip
-                //     foreach ( exSpriteAnimClip.FrameInfo fi in spAnimClip.frameInfos ) {
-                //         AddFrameInfo ( spAnimClip, fi );
-                //     }
-
-                //     spAnimClip = null;
-                //     EditorUtility.UnloadUnusedAssets();
-                // }
-                // } DELME end 
+                db.texGuidToAnimClipGUIDs.Clear();
 
                 foreach ( GUIDInfo gi in db.guidInfos ) {
                     AddFrameInfo ( gi.guidAnimClip, gi.guidTexture, false );
@@ -213,7 +203,7 @@ public class exSpriteAnimationDB : ScriptableObject {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// get texture guid to sprite animation guid list
     // ------------------------------------------------------------------ 
 
     public static Dictionary<string,List<string> > GetTexGUIDToAnimClipGUIDs () {
@@ -223,7 +213,9 @@ public class exSpriteAnimationDB : ScriptableObject {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _textureGUID the texture guid key
+    /// \return the list of sprite animation guid
+    /// sprite animations contains the texture by its guid, return the guid of animation
     // ------------------------------------------------------------------ 
 
     public static List<string> GetSpriteAnimClipGUIDs ( string _textureGUID ) {
@@ -235,7 +227,9 @@ public class exSpriteAnimationDB : ScriptableObject {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _guid the sprite animation clip guid
+    /// \return the result
+    /// check if the db have the _guid in its exSpriteAnimationDB.spAnimClipGUIDs list
     // ------------------------------------------------------------------ 
 
     public static bool HasSpriteAnimClipGUID ( string _guid ) {
@@ -245,7 +239,8 @@ public class exSpriteAnimationDB : ScriptableObject {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _animClip the sprite animation clip
+    /// add the sprite animation clip to the sprite animation db
     // ------------------------------------------------------------------ 
 
     public static void AddSpriteAnimClip ( exSpriteAnimClip _animClip ) {
@@ -285,7 +280,8 @@ public class exSpriteAnimationDB : ScriptableObject {
     // } DISABLE end 
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _guidAnimClip the sprite animation clip guid
+    /// remove the sprite animation clip in the db by its guid
     // ------------------------------------------------------------------ 
 
     public static void RemoveSpriteAnimClip ( string _guidAnimClip ) {
@@ -314,7 +310,9 @@ public class exSpriteAnimationDB : ScriptableObject {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _animClip the animation clip
+    /// \param _fi the frame info in the animation clip
+    /// add frame info by animation clip and frame info to sprite animation clip db
     // ------------------------------------------------------------------ 
 
     public static void AddFrameInfo ( exSpriteAnimClip _animClip, 
@@ -326,7 +324,10 @@ public class exSpriteAnimationDB : ScriptableObject {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _guidAnimClip the sprite animation clip guid
+    /// \param _guidTexture the texture guid
+    /// \param _addGUIDInfo if add guid info
+    /// add frame info by animation clip and frame info to sprite animation clip db
     // ------------------------------------------------------------------ 
 
     public static void AddFrameInfo ( string _guidAnimClip, 
@@ -360,7 +361,9 @@ public class exSpriteAnimationDB : ScriptableObject {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _animClip the animation clip
+    /// \param _fi the frame info in the _animClip
+    /// remove frame info from sprite animation cip db
     // ------------------------------------------------------------------ 
 
     public static void RemoveFrameInfo ( exSpriteAnimClip _animClip, 
@@ -385,7 +388,9 @@ public class exSpriteAnimationDB : ScriptableObject {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _guidAnimClip the animation clip guid
+    /// \param _guidTexture the texture guid
+    /// remove guid info from sprite animation db
     // ------------------------------------------------------------------ 
 
     public static void RemoveGUIDInfo ( string _guidAnimClip, 

@@ -16,13 +16,18 @@ using System.Collections.Generic;
 using System.IO;
 
 ///////////////////////////////////////////////////////////////////////////////
-// exAtlasInfoUtility
+///
+/// the atlas info utility
+///
 ///////////////////////////////////////////////////////////////////////////////
 
 public static class exAtlasInfoUtility {
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _path the directory path to save the atlas
+    /// \param _name the name of the atlas
+    /// \return the atlas
+    /// create the atlas in the _path, save it as _name.
     // ------------------------------------------------------------------ 
 
     public static exAtlas CreateAtlas ( string _path, string _name ) {
@@ -44,7 +49,12 @@ public static class exAtlasInfoUtility {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _path the directory path to save the atlas info
+    /// \param _name the name of the atlas info
+    /// \param _width the width of the atlas texture
+    /// \param _height the height of the atlas texture
+    /// \return the atlas info
+    /// create the atlas info in the _path, save it as _name.
     // ------------------------------------------------------------------ 
 
     public static exAtlasInfo CreateAtlasInfo ( string _path, string _name, int _width, int _height ) {
@@ -129,7 +139,8 @@ public static class exAtlasInfoUtility {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _atlasInfo the atlas info
+    /// build the atlas info to atlas 
     // ------------------------------------------------------------------ 
 
     public static void Build ( exAtlasInfo _atlasInfo ) {
@@ -242,5 +253,28 @@ public static class exAtlasInfoUtility {
         // save the needRebuild setting
         _atlasInfo.needRebuild = false;
         EditorUtility.SetDirty(_atlasInfo);
+    }
+
+    // ------------------------------------------------------------------ 
+    /// \param _atlasInfo the atlas info
+    /// build sprite animation clips from the exAtlasInfo.rebuildAnimClipGUIDs
+    // ------------------------------------------------------------------ 
+
+    public static void BuildSpAnimClipsFromRebuildList ( exAtlasInfo _atlasInfo ) {
+
+        EditorUtility.DisplayProgressBar( "Building Sprite Animation Clips...",
+                                          "Building Sprite Animation Clips...",
+                                          0.5f );    
+        for ( int i = 0; i < _atlasInfo.rebuildAnimClipGUIDs.Count; ++i ) {
+            string guidAnimClip = _atlasInfo.rebuildAnimClipGUIDs[i];
+            exSpriteAnimClip sp = 
+                exEditorHelper.LoadAssetFromGUID<exSpriteAnimClip>(guidAnimClip);
+            if ( sp ) {
+                sp.editorNeedRebuild = true;
+                sp.Build();
+            }
+        }
+        _atlasInfo.rebuildAnimClipGUIDs.Clear();
+        EditorUtility.ClearProgressBar();
     }
 }

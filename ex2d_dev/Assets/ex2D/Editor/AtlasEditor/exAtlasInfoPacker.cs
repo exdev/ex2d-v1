@@ -28,7 +28,7 @@ partial class exAtlasInfo {
     // 
     ///////////////////////////////////////////////////////////////////////////////
 
-    public class Node {
+    class Node {
         public Rect rect;
         public Node[] child;
 
@@ -85,7 +85,7 @@ partial class exAtlasInfo {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public void TreePack () {
+    void TreePack () {
         int i = 0; 
         Node root = new Node( new Rect( 0,
                                         0,
@@ -107,7 +107,7 @@ partial class exAtlasInfo {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public void BasicPack () {
+    void BasicPack () {
         int curX = padding;
         int curY = padding;
         int maxY = 0; 
@@ -135,7 +135,7 @@ partial class exAtlasInfo {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// Layout elements by the exAtlasInfo.algorithm
     // ------------------------------------------------------------------ 
 
     public void LayoutElements () {

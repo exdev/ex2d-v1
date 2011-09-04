@@ -16,7 +16,9 @@ using UnityEditor;
 using System.IO;
 
 ///////////////////////////////////////////////////////////////////////////////
-// exSpriteUtility
+///
+/// the sprite font utility
+///
 ///////////////////////////////////////////////////////////////////////////////
 
 public static class exSpriteFontUtility {
@@ -26,7 +28,7 @@ public static class exSpriteFontUtility {
     // ------------------------------------------------------------------ 
 
     [MenuItem ("GameObject/Create Other/ex2D/SpriteFont Object")]
-    public static void CreateSpriteFontObject () {
+    static void CreateSpriteFontObject () {
         GameObject go = new GameObject("SpriteFontObject");
         go.AddComponent<exSpriteFont>();
         Selection.activeObject = go;
@@ -36,13 +38,13 @@ public static class exSpriteFontUtility {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    [ContextMenu ("Rebuild")]
     public static void Rebuild ( this exSpriteFont _spriteFont ) {
         _spriteFont.Build ();
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _spriteFont the sprite font
+    /// build the sprite font
     // ------------------------------------------------------------------ 
 
     public static void Build ( this exSpriteFont _spriteFont ) {

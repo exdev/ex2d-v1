@@ -16,7 +16,9 @@ using System.Collections;
 using System.Collections.Generic;
 
 ///////////////////////////////////////////////////////////////////////////////
-//
+///
+/// exSpriteAnimClipEditor
+///
 ///////////////////////////////////////////////////////////////////////////////
 
 partial class exSpriteAnimClipEditor : EditorWindow {
@@ -67,7 +69,8 @@ partial class exSpriteAnimClipEditor : EditorWindow {
         = new exSpriteAnimClip.EventInfoComparer(); 
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \return the sprite animation editor
+    /// Open the sprite animation editor window
     // ------------------------------------------------------------------ 
 
     [MenuItem ("Window/ex2D/Sprite Animation Editor %&s")]
@@ -130,7 +133,8 @@ partial class exSpriteAnimClipEditor : EditorWindow {
     // } DISABLE end 
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _obj
+    /// Check if the object is valid sprite animation clip and open it in sprite animation clip editor.
     // ------------------------------------------------------------------ 
 
     public void Edit ( Object _obj ) {
@@ -258,20 +262,7 @@ partial class exSpriteAnimClipEditor : EditorWindow {
                 Selection.activeObject = newClip;
 
             // length
-            GUILayout.BeginHorizontal();
-                float newLength = EditorGUILayout.FloatField( "Animation Length", curEdit.length, GUILayout.MaxWidth(200) );
-                if ( newLength != curEdit.length && newLength != 0.0f ) {
-                    float delta = newLength - curEdit.length;
-                    foreach ( exSpriteAnimClip.FrameInfo fi in curEdit.frameInfos) {
-                        float ratio = fi.length/curEdit.length;
-                        fi.length = Mathf.Max(1.0f/60.0f, fi.length + delta * ratio);
-                    }
-                    curEdit.length = newLength;
-                    curEdit.UpdateLength();
-                    curEdit.editorNeedRebuild = true;
-                }
-                GUI.enabled = true;
-            GUILayout.EndHorizontal();
+            curEdit.length = EditorGUILayout.FloatField( "Animation Length", curEdit.length, GUILayout.MaxWidth(200) );
 
             // Wrap Mode enum popup
             curEdit.wrapMode = (WrapMode)EditorGUILayout.EnumPopup ( "Wrap Mode", curEdit.wrapMode, GUILayout.Width(200) );

@@ -16,7 +16,9 @@ using System.Collections;
 using System.Collections.Generic;
 
 ///////////////////////////////////////////////////////////////////////////////
-//
+///
+/// Bitmap font editor 
+///
 ///////////////////////////////////////////////////////////////////////////////
 
 partial class exBitmapFontEditor : EditorWindow {
@@ -38,7 +40,8 @@ partial class exBitmapFontEditor : EditorWindow {
     ///////////////////////////////////////////////////////////////////////////////
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \return the bitmap font editor 
+    /// Open the atlas editor window
     // ------------------------------------------------------------------ 
 
     [MenuItem ("Window/ex2D/BitmapFont Editor %&f")]
@@ -76,7 +79,8 @@ partial class exBitmapFontEditor : EditorWindow {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _obj
+    /// Check if the object is valid bitmap font and open it in bitmap font editor.
     // ------------------------------------------------------------------ 
 
     public void Edit ( Object _obj ) {

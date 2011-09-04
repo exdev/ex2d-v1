@@ -16,13 +16,18 @@ using UnityEditor;
 using System.IO;
 
 ///////////////////////////////////////////////////////////////////////////////
-// exBitmapFontUtility
+///
+/// the bitmap font utility
+///
 ///////////////////////////////////////////////////////////////////////////////
 
 public static class exBitmapFontUtility {
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _path the directory path to save the atlas
+    /// \param _name the name of the atlas
+    /// \return the bitmap font
+    /// create the bitmap font in the _path, save it as _name.
     // ------------------------------------------------------------------ 
 
     public static exBitmapFont Create ( string _path, string _name ) {
@@ -45,11 +50,12 @@ public static class exBitmapFontUtility {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _bitmapFont the bitmap font asset
+    /// \param _fontInfo the font info txt file
+    /// build the bitmap font
     // ------------------------------------------------------------------ 
 
-    public static void Build ( this exBitmapFont _bitmapFont, 
-                               Object _fontInfo ) {
+    public static void Build ( this exBitmapFont _bitmapFont, Object _fontInfo ) {
 
         EditorUtility.DisplayProgressBar( "Building BitmapFont...",
                                           "Build BitmapFont " + _bitmapFont.name, 
@@ -70,7 +76,7 @@ public static class exBitmapFontUtility {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    // Desc:
     // ------------------------------------------------------------------ 
 
     static void ParseFontInfo ( exBitmapFont _bitmapFont, Object _fontInfo ) {

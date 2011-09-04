@@ -16,7 +16,9 @@ using System.Collections.Generic;
 using System.IO;
 
 ///////////////////////////////////////////////////////////////////////////////
-// functions
+///
+/// editor helper class
+///
 ///////////////////////////////////////////////////////////////////////////////
 
 public static class exEditorHelper {
@@ -43,7 +45,7 @@ public static class exEditorHelper {
     ///////////////////////////////////////////////////////////////////////////////
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    // Desc:
     // ------------------------------------------------------------------ 
 
     public static void RenameProjectWindowItem ( string _guid, string _defaultName ) {
@@ -87,7 +89,8 @@ public static class exEditorHelper {
     ///////////////////////////////////////////////////////////////////////////////
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \return the white texture
+    /// return a small white texture
     // ------------------------------------------------------------------ 
 
     public static Texture2D WhiteTexture () {
@@ -103,7 +106,8 @@ public static class exEditorHelper {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \return the checkerboard texture
+    /// return a checkerboard texture
     // ------------------------------------------------------------------ 
 
     public static Texture2D CheckerboardTexture () {
@@ -120,7 +124,11 @@ public static class exEditorHelper {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _path the path to save the box texture
+    /// \param _fillColor the fill color
+    /// \param _borderColor the border color
+    /// \return the box texture
+    /// create a box texture
     // ------------------------------------------------------------------ 
 
     public static Texture2D NewBoxTexture ( string _path, Color _fillColor, Color _borderColor ) {
@@ -171,7 +179,8 @@ public static class exEditorHelper {
     ///////////////////////////////////////////////////////////////////////////////
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \return the new gui style
+    /// create rect border gui style
     // ------------------------------------------------------------------ 
 
     public static GUIStyle RectBorderStyle () {
@@ -194,7 +203,8 @@ public static class exEditorHelper {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \return the new gui style
+    /// create rect select box gui style
     // ------------------------------------------------------------------ 
 
     public static GUIStyle RectSelectBoxStyle () {
@@ -223,7 +233,8 @@ public static class exEditorHelper {
     ///////////////////////////////////////////////////////////////////////////////
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \return the result path
+    /// get the current directory of the active selected object
     // ------------------------------------------------------------------ 
 
     public static string GetCurrentDirectory () {
@@ -238,8 +249,13 @@ public static class exEditorHelper {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
-    // GetAssetsAtPath<exAtlas> ( "Assets", ".asset", )
+    /// \param _path the save path
+    /// \param _suffix the suffix you would like to search 
+    /// \param _recursively if recursively search the directory
+    /// \return get all assets at _path
+    /// \code
+    /// exAtlas[] atlasList = GetAssetsAtPath<exAtlas> ( "Assets", ".asset", true );
+    /// \endcode
     // ------------------------------------------------------------------ 
 
     public static T[] GetAssetsAtPath<T> ( string _path, string _suffix = "", bool _recursively = true ) {
@@ -266,7 +282,9 @@ public static class exEditorHelper {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _o the asset object
+    /// \return the guid
+    /// get the guid of the asset path, if not found, return empty string
     // ------------------------------------------------------------------ 
 
     public static string AssetToGUID ( Object _o ) {
@@ -276,7 +294,9 @@ public static class exEditorHelper {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _guid asset path guid
+    /// \return the asset
+    /// load the asset from path guid
     // ------------------------------------------------------------------ 
 
     public static T LoadAssetFromGUID<T> ( string _guid ) {
@@ -287,7 +307,9 @@ public static class exEditorHelper {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _o the asset object
+    /// \return the result
+    /// check if the asset is a directory
     // ------------------------------------------------------------------ 
 
     public static bool IsDirectory ( Object _o ) {
@@ -304,7 +326,10 @@ public static class exEditorHelper {
     ///////////////////////////////////////////////////////////////////////////////
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _a object one
+    /// \param _b object two
+    /// \return the compare result
+    /// compare object by name, 0 = equal, -1 = _a < _b, 1 = _a > _b
     // ------------------------------------------------------------------ 
 
     public static int CompareObjectByName ( Object _a, Object _b ) {
@@ -316,7 +341,11 @@ public static class exEditorHelper {
     ///////////////////////////////////////////////////////////////////////////////
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _a the start point
+    /// \param _b the end point
+    /// \param _color the color of the line
+    /// \param _width the width of the line
+    /// draw a line in editor
     // ------------------------------------------------------------------ 
 
     public static void DrawLine ( Vector2 _a, Vector2 _b, Color _color, float _width ) {
@@ -356,7 +385,10 @@ public static class exEditorHelper {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _rect the rect
+    /// \param _backgroundColor the background color of the rect
+    /// \param _borderColor the border color of the rect
+    /// draw a rect in editor
     // ------------------------------------------------------------------ 
 
     public static void DrawRect ( Rect _rect, Color _backgroundColor, Color _borderColor ) {
@@ -381,7 +413,6 @@ public static class exEditorHelper {
     // Desc: 
     // copy from: http://forum.unity3d.com/threads/55434-Custom-inspector-resize-array-intfield-problems
     // ------------------------------------------------------------------ 
-
 
     public static string s_EditedValue = string.Empty;
     public static string s_LastTooltip = string.Empty;

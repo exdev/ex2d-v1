@@ -1,7 +1,7 @@
 // ======================================================================================
-// File         : Basic.cs
+// File         : Version.cs
 // Author       : Wu Jie 
-// Last Change  : 08/27/2011 | 12:02:59 PM | Saturday,August
+// Last Change  : 09/04/2011 | 14:09:39 PM | Sunday,September
 // Description  : 
 // ======================================================================================
 
@@ -13,9 +13,9 @@ using UnityEngine;
 using System.Collections;
 
 ///////////////////////////////////////////////////////////////////////////////
-// class exVersion
+// exVersion
 // 
-// Purpose: 
+// a structure descrip the version in ex2D
 // 
 ///////////////////////////////////////////////////////////////////////////////
 

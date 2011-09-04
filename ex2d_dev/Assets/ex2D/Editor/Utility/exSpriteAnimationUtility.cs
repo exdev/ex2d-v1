@@ -16,7 +16,9 @@ using UnityEditor;
 using System.IO;
 
 ///////////////////////////////////////////////////////////////////////////////
-// exSpriteAnimationUtility
+///
+/// the sprite animation utility
+///
 ///////////////////////////////////////////////////////////////////////////////
 
 public static class exSpriteAnimationUtility {
@@ -33,7 +35,10 @@ public static class exSpriteAnimationUtility {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _path the directory path to save the atlas
+    /// \param _name the name of the atlas
+    /// \return the sprite animation clip asset
+    /// create the sprite animation clip in the _path, save it as _name.
     // ------------------------------------------------------------------ 
 
     public static exSpriteAnimClip CreateSpriteAnimClip ( string _path, string _name ) {
@@ -56,7 +61,8 @@ public static class exSpriteAnimationUtility {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _animClip the sprite animatoin clip
+    /// build the sprite animation clip
     // ------------------------------------------------------------------ 
 
     public static void Build ( this exSpriteAnimClip _animClip ) {
@@ -90,35 +96,9 @@ public static class exSpriteAnimationUtility {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
-    public static void BuildFromAtlasInfo ( exAtlasInfo _atlasInfo ) {
-        EditorUtility.DisplayProgressBar( "Building Sprite Animation Clips...",
-                                          "Building Sprite Animation Clips...",
-                                          0.5f );    
-
-
-        for ( int i = 0; i < _atlasInfo.rebuildAnimClipGUIDs.Count; ++i ) {
-            string guidAnimClip = _atlasInfo.rebuildAnimClipGUIDs[i];
-            exSpriteAnimClip sp = 
-                exEditorHelper.LoadAssetFromGUID<exSpriteAnimClip>(guidAnimClip);
-            if ( sp ) {
-                // DISABLE: it is too slow { 
-                // EditorUtility.DisplayProgressBar( "Building Sprite Animation Clips...",
-                //                                   "Building Sprite Animation Clips " + sp.name,
-                //                                   (float)i/(float)_atlasInfo.rebuildAnimClipGUIDs.Count );    
-                // } DISABLE end 
-                sp.editorNeedRebuild = true;
-                sp.Build();
-            }
-        }
-        _atlasInfo.rebuildAnimClipGUIDs.Clear();
-        EditorUtility.ClearProgressBar();
-    }
-
-    // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _animClip the sprite animatoin clip
+    /// \param _objects the texture objects
+    /// add textures to sprite animation clip as new frames
     // ------------------------------------------------------------------ 
 
     public static void AddFrames ( this exSpriteAnimClip _animClip, Object[] _objects ) {
@@ -131,7 +111,9 @@ public static class exSpriteAnimationUtility {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _animClip the sprite animatoin clip
+    /// \param _tex the texture
+    /// add texture to sprite animation clip as new frame
     // ------------------------------------------------------------------ 
 
     public static void AddFrame ( this exSpriteAnimClip _animClip, Texture2D _tex ) {
@@ -156,7 +138,9 @@ public static class exSpriteAnimationUtility {
     } 
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _animClip the sprite animatoin clip
+    /// \param _fi frame info
+    /// remove frame info from sprite animation clip
     // ------------------------------------------------------------------ 
 
     public static void RemoveFrame ( this exSpriteAnimClip _animClip, exSpriteAnimClip.FrameInfo _fi ) {
@@ -169,7 +153,8 @@ public static class exSpriteAnimationUtility {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _animClip the sprite animatoin clip
+    /// update the length of the sprite animation clip by frameinfo list
     // ------------------------------------------------------------------ 
 
     public static void UpdateLength ( this exSpriteAnimClip _animClip ) {
@@ -180,7 +165,10 @@ public static class exSpriteAnimationUtility {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _animClip the sprite animatoin clip
+    /// \param _seconds the expect seconds
+    /// \param _wrapMode the wrap mode
+    /// get frame info in _animClip by the input seconds
     // ------------------------------------------------------------------ 
 
     public static exSpriteAnimClip.FrameInfo GetFrameInfoBySeconds ( this exSpriteAnimClip _animClip, 

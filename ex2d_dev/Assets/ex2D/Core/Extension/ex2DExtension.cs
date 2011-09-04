@@ -13,7 +13,6 @@ using UnityEngine;
 using System.Collections;
 
 ///////////////////////////////////////////////////////////////////////////////
-/// \class ex2DExtension
 /// 
 /// ex2D Extensions
 /// 
@@ -22,7 +21,6 @@ using System.Collections;
 public static class ex2DExtension {
 
     // ------------------------------------------------------------------ 
-    /// \fn MakePixelPerfect
     /// \param _sp the base sprite
     /// \param _camera the camera
     /// \param _screenWidth the screen width
@@ -46,7 +44,6 @@ public static class ex2DExtension {
     }
 
     // ------------------------------------------------------------------ 
-    /// \fn ScreenToWorldPoint
     /// \param _plane the in plane
     /// \param _camera the in camera
     /// \param _screen_x the screen x position
@@ -60,23 +57,29 @@ public static class ex2DExtension {
                                                float _screen_x,
                                                float _screen_y ) 
     {
+        Vector3 result = Vector3.zero;
+
         switch ( _plane.plane ) {
         case exPlane.Plane.XY:
-            return _camera.ScreenToWorldPoint( new Vector3(_screen_x, _screen_y, _plane.transform.position.z) );
+            result = _camera.ScreenToWorldPoint( new Vector3(_screen_x, _screen_y, _plane.transform.position.z) );
+            result.z = _plane.transform.position.z;
+            break;
 
         case exPlane.Plane.XZ:
-            return _camera.ScreenToWorldPoint( new Vector3(_screen_x, _plane.transform.position.y, _screen_y) );
+            result = _camera.ScreenToWorldPoint( new Vector3(_screen_x, _plane.transform.position.y, _screen_y) );
+            result.y = _plane.transform.position.y;
+            break;
 
         case exPlane.Plane.ZY:
-            return _camera.ScreenToWorldPoint( new Vector3(_plane.transform.position.x, _screen_y, _screen_x) );
-
-        default:
-            return _camera.ScreenToWorldPoint( new Vector3(_screen_x, _screen_y, _plane.transform.position.z) );
+            result = _camera.ScreenToWorldPoint( new Vector3(_plane.transform.position.x, _screen_y, _screen_x) );
+            result.x = _plane.transform.position.x;
+            break;
         }
+
+        return result;
     }
 
     // ------------------------------------------------------------------ 
-    /// \fn ScreenToWorldPoint
     /// \param _plane the in plane
     /// \param _camera the in camera
     /// \param _viewport_x the viewport x position
@@ -90,18 +93,25 @@ public static class ex2DExtension {
                                                  float _viewport_x,
                                                  float _viewport_y ) 
     {
+        Vector3 result = Vector3.zero;
+
         switch ( _plane.plane ) {
         case exPlane.Plane.XY:
-            return _camera.ViewportToWorldPoint( new Vector3(_viewport_x, _viewport_y, _plane.transform.position.z) );
+            result = _camera.ViewportToWorldPoint( new Vector3(_viewport_x, _viewport_y, _plane.transform.position.z) );
+            result.z = _plane.transform.position.z;
+            break;
 
         case exPlane.Plane.XZ:
-            return _camera.ViewportToWorldPoint( new Vector3(_viewport_x, _plane.transform.position.y, _viewport_y) );
+            result = _camera.ViewportToWorldPoint( new Vector3(_viewport_x, _plane.transform.position.y, _viewport_y) );
+            result.y = _plane.transform.position.y;
+            break;
 
         case exPlane.Plane.ZY:
-            return _camera.ViewportToWorldPoint( new Vector3(_plane.transform.position.x, _viewport_y, _viewport_x) );
-
-        default:
-            return _camera.ViewportToWorldPoint( new Vector3(_viewport_x, _viewport_y, _plane.transform.position.z) );
+            result = _camera.ViewportToWorldPoint( new Vector3(_plane.transform.position.x, _viewport_y, _viewport_x) );
+            result.x = _plane.transform.position.x;
+            break;
         }
+
+        return result; 
     }
 }

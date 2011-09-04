@@ -195,7 +195,7 @@ partial class exAtlasEditor : EditorWindow {
         // ======================================================== 
 
         GUI.BeginGroup(_atlasRect);
-            GUI.color = _el.atlasInfo.spriteBgColor;
+            GUI.color = _el.atlasInfo.elementBgColor;
                 GUI.DrawTexture( rect, exEditorHelper.WhiteTexture() );
             GUI.color = oldBGColor;
         GUI.EndGroup();
@@ -256,7 +256,7 @@ partial class exAtlasEditor : EditorWindow {
 
         GUI.BeginGroup(_atlasRect);
         if ( selected ) {
-            GUI.backgroundColor = _el.atlasInfo.spriteSelectColor;
+            GUI.backgroundColor = _el.atlasInfo.elementSelectColor;
                 GUI.Box ( rect, GUIContent.none, exEditorHelper.RectBorderStyle() );
             GUI.backgroundColor = oldBGColor;
         }

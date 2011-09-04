@@ -13,13 +13,17 @@ using UnityEngine;
 using System.Collections;
 
 ///////////////////////////////////////////////////////////////////////////////
-// defines
+///
+/// time helper
+///
 ///////////////////////////////////////////////////////////////////////////////
 
 public static class exTimeHelper {
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _seconds input seoncds
+    /// \return the minutes
+    /// get minutes from input seconds
     // ------------------------------------------------------------------ 
 
     public static int GetMinutes ( float _seconds ) {
@@ -27,7 +31,9 @@ public static class exTimeHelper {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _seconds input seoncds
+    /// \return the minutes in string
+    /// get minutes in string from input seconds
     // ------------------------------------------------------------------ 
 
     public static string ToString_Minutes ( float _seconds ) {
@@ -37,7 +43,9 @@ public static class exTimeHelper {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _seconds input seoncds
+    /// \return the seconds in string
+    /// get seconds in string from input seconds
     // ------------------------------------------------------------------ 
 
     public static string ToString_Seconds ( float _seconds ) {

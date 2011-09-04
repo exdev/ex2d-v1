@@ -16,7 +16,9 @@ using System.Collections;
 using System.Collections.Generic;
 
 ///////////////////////////////////////////////////////////////////////////////
-//
+///
+/// the atlas editor
+///
 ///////////////////////////////////////////////////////////////////////////////
 
 partial class exAtlasEditor : EditorWindow {
@@ -60,7 +62,8 @@ partial class exAtlasEditor : EditorWindow {
     ///////////////////////////////////////////////////////////////////////////////
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \return the editor
+    /// Open the atlas editor window
     // ------------------------------------------------------------------ 
 
     [MenuItem ("Window/ex2D/Atlas Editor %&a")]
@@ -98,7 +101,8 @@ partial class exAtlasEditor : EditorWindow {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _obj
+    /// Check if the object is valid atlas and open it in atlas editor.
     // ------------------------------------------------------------------ 
 
     public void Edit ( Object _obj ) {
@@ -199,8 +203,8 @@ partial class exAtlasEditor : EditorWindow {
             // canvas
             // ======================================================== 
 
-            curEdit.showCanvas = EditorGUILayout.Foldout(curEdit.showCanvas, "Canvas");
-            if ( curEdit.showCanvas ) {
+            curEdit.foldCanvas = EditorGUILayout.Foldout(curEdit.foldCanvas, "Canvas");
+            if ( curEdit.foldCanvas ) {
 
                 GUILayout.BeginHorizontal();
                 GUILayout.Space(20);
@@ -256,8 +260,8 @@ partial class exAtlasEditor : EditorWindow {
             // layout
             // ======================================================== 
 
-            curEdit.showLayout = EditorGUILayout.Foldout(curEdit.showLayout, "Layout");
-            if ( curEdit.showLayout ) {
+            curEdit.foldLayout = EditorGUILayout.Foldout(curEdit.foldLayout, "Layout");
+            if ( curEdit.foldLayout ) {
                 GUILayout.BeginHorizontal();
                 GUILayout.Space(20);
                 GUILayout.BeginVertical();
@@ -295,18 +299,18 @@ partial class exAtlasEditor : EditorWindow {
             GUILayout.Space(20);
 
             // ======================================================== 
-            // sprites
+            // Element
             // ======================================================== 
 
-            curEdit.showSprites = EditorGUILayout.Foldout(curEdit.showSprites, "Sprites");
-            if ( curEdit.showSprites ) {
+            curEdit.foldElement = EditorGUILayout.Foldout(curEdit.foldElement, "Element");
+            if ( curEdit.foldElement ) {
                 GUILayout.BeginHorizontal();
                 GUILayout.Space(20);
                 GUILayout.BeginVertical();
 
                 // sprite background color
-                curEdit.spriteBgColor = EditorGUILayout.ColorField( "Sprite BgColor", curEdit.spriteBgColor );
-                curEdit.spriteSelectColor = EditorGUILayout.ColorField( "Select Color", curEdit.spriteSelectColor );
+                curEdit.elementBgColor = EditorGUILayout.ColorField( "Bg Color", curEdit.elementBgColor );
+                curEdit.elementSelectColor = EditorGUILayout.ColorField( "Select Color", curEdit.elementSelectColor );
 
                 GUILayout.EndVertical();
                 GUILayout.EndHorizontal();
@@ -500,7 +504,7 @@ partial class exAtlasEditor : EditorWindow {
                     exAtlasInfoUtility.Build(curEdit);
 
                     // build sprite animclip that used this atlasInfo
-                    exSpriteAnimationUtility.BuildFromAtlasInfo(curEdit);
+                    exAtlasInfoUtility.BuildSpAnimClipsFromRebuildList(curEdit);
 
                     // update scene sprites
                     List<string> rebuildAtlasInfos = new List<string>();

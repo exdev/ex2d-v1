@@ -17,7 +17,6 @@ using System.Collections;
 ///////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
-/// \class exSpriteBase
 ///
 /// The base class for rendering sprite by different assets
 ///
@@ -31,11 +30,10 @@ public class exSpriteBase : exPlane {
     ///////////////////////////////////////////////////////////////////////////////
 
     // ------------------------------------------------------------------ 
-    /// \property scale
+    [SerializeField] protected Vector2 scale_ = Vector2.one;
     /// the scale of the sprite
     // ------------------------------------------------------------------ 
 
-    [SerializeField] protected Vector2 scale_ = Vector2.one;
     public Vector2 scale {
         get { return scale_; }
         set { 
@@ -47,11 +45,10 @@ public class exSpriteBase : exPlane {
     }
 
     // ------------------------------------------------------------------ 
-    /// \property shear
+    [SerializeField] protected Vector2 shear_ = Vector2.zero;
     /// the shear of the sprite
     // ------------------------------------------------------------------ 
 
-    [SerializeField] protected Vector2 shear_ = Vector2.zero;
     public Vector2 shear {
         get { return shear_; }
         set { 
@@ -63,13 +60,12 @@ public class exSpriteBase : exPlane {
     }
 
     // ------------------------------------------------------------------ 
-    /// \property autoResizeCollision
+    [SerializeField] protected bool autoResizeCollision_ = true;
     /// if the value is true and we use BoxCollider in the sprite, the 
     /// width and height of the BoxCollider will be the same as the boundingRect 
     /// of the sprite, and the thick of it will fix to 0.2f.
     // ------------------------------------------------------------------ 
 
-    [SerializeField] protected bool autoResizeCollision_ = true;
     public bool autoResizeCollision {
         get { return autoResizeCollision_; }
         set {
@@ -90,7 +86,6 @@ public class exSpriteBase : exPlane {
     ///////////////////////////////////////////////////////////////////////////////
 
     // ------------------------------------------------------------------ 
-    /// \fn OnEnable
     /// OnEnable functoin inherit from exPlane
     // ------------------------------------------------------------------ 
 
@@ -103,7 +98,6 @@ public class exSpriteBase : exPlane {
     }
 
     // ------------------------------------------------------------------ 
-    /// \fn OnDisable
     /// OnDisable functoin inherit from exPlane
     // ------------------------------------------------------------------ 
 
@@ -131,7 +125,6 @@ public class exSpriteBase : exPlane {
     }
 
     // ------------------------------------------------------------------ 
-    /// \fn AddMeshCollider
     /// add a MeshCollider component on the sprite if no collider exists 
     // ------------------------------------------------------------------ 
 
@@ -145,7 +138,6 @@ public class exSpriteBase : exPlane {
     }
 
     // ------------------------------------------------------------------ 
-    /// \fn AddBoxCollider
     /// add a BoxCollider component on the sprite if no collider exists 
     /// if the autoResizeCollision is true, it will also update the size 
     /// BoxCollider to fit the size of sprite
@@ -159,7 +151,6 @@ public class exSpriteBase : exPlane {
     }
 
     // ------------------------------------------------------------------ 
-    /// \fn UpdateBoxCollider
     /// \param _boxCol the BoxCollider of the sprite  
     /// \param _mesh the mesh of the sprite  
     /// 

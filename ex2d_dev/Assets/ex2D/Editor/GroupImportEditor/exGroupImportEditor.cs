@@ -14,9 +14,11 @@ using UnityEngine;
 using System.IO;
 using System.Collections;
 
-// ------------------------------------------------------------------ 
-// Desc: 
-// ------------------------------------------------------------------ 
+///////////////////////////////////////////////////////////////////////////////
+/// 
+/// Group import editor 
+/// 
+///////////////////////////////////////////////////////////////////////////////
 
 class exGroupImportEditor : EditorWindow {
 
@@ -31,11 +33,12 @@ class exGroupImportEditor : EditorWindow {
     ///////////////////////////////////////////////////////////////////////////////
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \return the group import editor
+    /// Open the group import editor window
     // ------------------------------------------------------------------ 
 
     [MenuItem ("Window/ex2D/Group Import Editor %&g")]
-    static exGroupImportEditor NewWindow () {
+    public static exGroupImportEditor NewWindow () {
         exGroupImportEditor newWindow = EditorWindow.GetWindow<exGroupImportEditor>();
         newWindow.wantsMouseMove = true;
         newWindow.autoRepaintOnSceneChange = true;

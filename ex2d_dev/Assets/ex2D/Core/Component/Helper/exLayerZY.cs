@@ -16,6 +16,12 @@ using System.Collections;
 // defines
 ///////////////////////////////////////////////////////////////////////////////
 
+///////////////////////////////////////////////////////////////////////////////
+///
+/// The layer calculated in zy 2D space
+///
+///////////////////////////////////////////////////////////////////////////////
+
 [AddComponentMenu("ex2D Helper/2D Layer ZY")]
 public class exLayerZY : exLayer2D {
 
@@ -27,7 +33,7 @@ public class exLayerZY : exLayer2D {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    override public float CalculateDepth ( Camera _cam ) {
+    override protected float CalculateDepth ( Camera _cam ) {
         if ( _cam == null )
             return 0.0f;
         float dist = _cam.farClipPlane - _cam.nearClipPlane;
@@ -39,7 +45,7 @@ public class exLayerZY : exLayer2D {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    override public void UpdateTransformDepth () { 
+    override protected void UpdateTransformDepth () { 
         if ( Mathf.Approximately(depth_, transform.position.x) == false ) {
             transform.position = new Vector3( depth_,
                                               transform.position.y,

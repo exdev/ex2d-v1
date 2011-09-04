@@ -17,6 +17,12 @@ using System.Collections.Generic;
 // defines
 ///////////////////////////////////////////////////////////////////////////////
 
+///////////////////////////////////////////////////////////////////////////////
+/// 
+/// A component to position a plane in viewport space
+/// 
+///////////////////////////////////////////////////////////////////////////////
+
 [ExecuteInEditMode]
 [AddComponentMenu("ex2D Helper/Viewport Position")]
 public class exViewportPosition : MonoBehaviour {
@@ -25,7 +31,11 @@ public class exViewportPosition : MonoBehaviour {
     // properties
     ///////////////////////////////////////////////////////////////////////////////
 
+    // ------------------------------------------------------------------ 
     [SerializeField] protected Camera camera_;
+    /// the camera used in screen position
+    // ------------------------------------------------------------------ 
+
     public Camera renderCamera {
         get { return camera_; }
         set {
@@ -36,7 +46,11 @@ public class exViewportPosition : MonoBehaviour {
         }
     }
 
+    // ------------------------------------------------------------------ 
     [SerializeField] protected float x_;
+    /// the screen position x
+    // ------------------------------------------------------------------ 
+
     public float x {
         get { return x_; }
         set {
@@ -45,7 +59,11 @@ public class exViewportPosition : MonoBehaviour {
         }
     }
 
+    // ------------------------------------------------------------------ 
     [SerializeField] protected float y_;
+    /// the screen position y
+    // ------------------------------------------------------------------ 
+
     public float y {
         get { return y_; }
         set {
@@ -105,11 +123,13 @@ public class exViewportPosition : MonoBehaviour {
         Vector3 newPos = Vector3.zero;
 
         //
-        if ( plane )
+        if ( plane ) {
             newPos = plane.ViewportToWorldPoint ( camera_, x_, y_ );
-        else 
+        }
+        else {
             newPos = camera_.ViewportToWorldPoint( new Vector3(x_, y_, transform.position.z) );
-        newPos.z = transform.position.z;
+            newPos.z = transform.position.z;
+        }
 
         //
         if ( newPos != transform.position ) {
