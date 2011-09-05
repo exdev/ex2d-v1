@@ -71,12 +71,8 @@ public class exSpriteBase : exPlane {
         set {
             if ( autoResizeCollision_ != value ) {
                 autoResizeCollision_ = value;
-
-                BoxCollider boxCol = gameObject.GetComponent<BoxCollider>();
-                MeshFilter meshFilter = gameObject.GetComponent<MeshFilter>();
-                if ( meshFilter != null ) {
-                    UpdateBoxCollider ( boxCol, meshFilter.sharedMesh );
-                }
+                if ( meshFilter != null )
+                    UpdateBoxCollider ( meshFilter.sharedMesh );
             }
         }
     }
@@ -110,30 +106,14 @@ public class exSpriteBase : exPlane {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
-    void Reset() {
-        if ( GetComponent<exLayer2D>() == null ) {
-            switch ( plane ) {
-            case exPlane.Plane.XY: layer2d = gameObject.AddComponent<exLayerXY>(); break;
-            case exPlane.Plane.XZ: layer2d = gameObject.AddComponent<exLayerXZ>(); break;
-            case exPlane.Plane.ZY: layer2d = gameObject.AddComponent<exLayerZY>(); break;
-            }
-            layer2d.UpdateDepth();
-        }
-    }
-
-    // ------------------------------------------------------------------ 
     /// add a MeshCollider component on the sprite if no collider exists 
     // ------------------------------------------------------------------ 
 
     public void AddMeshCollider () {
         if ( collider == null ) {
-            MeshCollider meshCol = gameObject.AddComponent<MeshCollider>();
-            if ( meshCol && meshFilter ) {
-                meshCol.sharedMesh = meshFilter.sharedMesh;
-            }
+            gameObject.AddComponent<MeshCollider>();
+            if ( meshFilter != null )
+                UpdateBoxCollider ( meshFilter.sharedMesh );
         }
     }
 
@@ -145,25 +125,39 @@ public class exSpriteBase : exPlane {
 
     public void AddBoxCollider () {
         if ( collider == null ) {
-            BoxCollider boxCol = gameObject.AddComponent<BoxCollider>();
-            UpdateBoxCollider ( boxCol, meshFilter.sharedMesh );
+            gameObject.AddComponent<BoxCollider>();
+            if ( meshFilter != null )
+                UpdateBoxCollider ( meshFilter.sharedMesh );
         }
     }
 
     // ------------------------------------------------------------------ 
-    /// \param _boxCol the BoxCollider of the sprite  
     /// \param _mesh the mesh of the sprite  
-    /// 
+    ///
     /// Update the size BoxCollider to fit the size of sprite, only affect 
     /// when autoResizeCollision is true
     // ------------------------------------------------------------------ 
 
-    public void UpdateBoxCollider ( BoxCollider _boxCol, Mesh _mesh ) {
-        if ( _boxCol == null || _mesh == null || autoResizeCollision == false )
+    public void UpdateBoxCollider ( Mesh _mesh ) {
+        if ( _mesh == null || 
+             collider == null || 
+             autoResizeCollision == false )
             return;
 
-        _boxCol.center = _mesh.bounds.center;
-        _boxCol.size = _mesh.bounds.size;
+        if ( collider is BoxCollider ) {
+            BoxCollider boxCollider = collider as BoxCollider;
+            boxCollider.center = _mesh.bounds.center;
+            boxCollider.size = _mesh.bounds.size;
+            return;
+        }
+
+        if ( collider is MeshCollider ) {
+            MeshCollider meshCollider = collider as MeshCollider;
+            // NOTE: only in this way, mesh collider changes
+            meshCollider.sharedMesh = null;
+            meshCollider.sharedMesh = _mesh;
+            return;
+        }
     }
 }
 

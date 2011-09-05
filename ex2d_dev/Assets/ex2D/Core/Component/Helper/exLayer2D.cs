@@ -11,10 +11,11 @@
 
 using UnityEngine;
 using System.Collections;
-
-///////////////////////////////////////////////////////////////////////////////
-// defines
-///////////////////////////////////////////////////////////////////////////////
+// DISABLE { 
+// #if UNITY_EDITOR
+// using UnityEditor;
+// #endif
+// } DISABLE end 
 
 ///////////////////////////////////////////////////////////////////////////////
 ///
@@ -22,8 +23,11 @@ using System.Collections;
 ///
 ///////////////////////////////////////////////////////////////////////////////
 
+// DISABLE { 
+// [ExecuteInEditMode]
+// } DISABLE end 
 [AddComponentMenu("ex2D Helper/2D Layer")]
-public class exLayer2D : MonoBehaviour {
+public partial class exLayer2D : MonoBehaviour {
 
     // ------------------------------------------------------------------ 
     /// \memberof MAX_LAYER
@@ -61,6 +65,16 @@ public class exLayer2D : MonoBehaviour {
     }
 
     ///////////////////////////////////////////////////////////////////////////////
+    // none-serialize
+    ///////////////////////////////////////////////////////////////////////////////
+
+    // ------------------------------------------------------------------ 
+    /// the cached plane
+    // ------------------------------------------------------------------ 
+
+    [System.NonSerialized] public exPlane plane;
+
+    ///////////////////////////////////////////////////////////////////////////////
     // functions
     ///////////////////////////////////////////////////////////////////////////////
 
@@ -71,7 +85,18 @@ public class exLayer2D : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
+    void Awake () {
+        plane = GetComponent<exPlane>();
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
     void OnEnable () {
+        if ( plane == null ) {
+            plane = GetComponent<exPlane>(); 
+        }
         UpdateDepth ();
     }
 
@@ -80,19 +105,22 @@ public class exLayer2D : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     void LateUpdate () {
-// DELME: we will use OnSceneGUI solve this { 
+// DISABLE: just use Edit/ex2D/Update Scene Layers { 
 // #if UNITY_EDITOR
-//         if ( AnimationUtility.InAnimationMode() == false ) {
-//             if ( EditorApplication.isPlaying ) {
-//                 UpdateTransformDepth ();
-//             }
-//             else {
-//                 depth = CalculateDepth( Camera.main );
-//                 UpdateTransformDepth ();
-//             }
+//         if ( EditorApplication.isPlaying == false && 
+//              AnimationUtility.InAnimationMode() == false ) 
+//         {
+//             UpdateDepth();
+//             UpdateTransformDepth ();
 //         }
-// #else
-// } DELME end 
+//         else {
+// #endif
+//         UpdateTransformDepth ();
+
+// #if UNITY_EDITOR
+//         }
+// #endif
+// } DISABLE end 
         UpdateTransformDepth ();
     }
 
@@ -118,7 +146,10 @@ public class exLayer2D : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     public void UpdateDepth () {
-        depth = CalculateDepth( Camera.main );
+        if ( plane != null )
+            depth = CalculateDepth( plane.renderCamera );
+        else 
+            depth = CalculateDepth( Camera.main );
     }
 
 }

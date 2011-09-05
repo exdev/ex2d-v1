@@ -82,6 +82,9 @@ public class exPlaneEditor : Editor {
         EditorGUILayout.Space ();
         EditorGUI.indentLevel = 1;
 
+        editPlane.layer2d = editPlane.GetComponent<exLayer2D>();
+        editPlane.meshFilter = editPlane.GetComponent<MeshFilter>();
+
         // TODO: I do not know how to do it. { 
         // // ======================================================== 
         // // Script 
@@ -135,18 +138,21 @@ public class exPlaneEditor : Editor {
         GUILayout.BeginHorizontal();
         GUILayout.Space(15);
             GUI.enabled = !inAnimMode;
-            exLayer2D compLayer2D = editPlane.GetComponent<exLayer2D>();
-            bool hasLayer2D = compLayer2D != null; 
+            bool hasLayer2D = editPlane.layer2d != null; 
             bool useLayer2D = GUILayout.Toggle ( hasLayer2D, "Use Layer 2D" ); 
             if ( useLayer2D != hasLayer2D ) {
-                if ( useLayer2D )
+                if ( useLayer2D ) {
                     switch ( editPlane.plane ) {
                     case exPlane.Plane.XY: editPlane.layer2d = editPlane.gameObject.AddComponent<exLayerXY>(); break;
                     case exPlane.Plane.XZ: editPlane.layer2d = editPlane.gameObject.AddComponent<exLayerXZ>(); break;
                     case exPlane.Plane.ZY: editPlane.layer2d = editPlane.gameObject.AddComponent<exLayerZY>(); break;
                     }
+                    editPlane.layer2d.plane = editPlane;
+                    editPlane.layer2d.UpdateDepth();
+                }
                 else {
-                    Object.DestroyImmediate(compLayer2D);
+                    Object.DestroyImmediate(editPlane.layer2d);
+                    editPlane.layer2d = null;
                 }
                 GUI.changed = true;
             }
@@ -173,6 +179,21 @@ public class exPlaneEditor : Editor {
             }
             GUI.enabled = true;
         GUILayout.EndHorizontal();
+
+        // ======================================================== 
+        // camera type 
+        // ======================================================== 
+
+        GUI.enabled = !inAnimMode;
+        EditorGUIUtility.LookLikeControls ();
+        editPlane.renderCamera = (Camera)EditorGUILayout.ObjectField( "Camera"
+                                                                      , editPlane.renderCamera 
+                                                                      , typeof(Camera) 
+#if !UNITY_3_0 && !UNITY_3_1 && !UNITY_3_3
+                                                                      , true 
+#endif
+                                                                      , GUILayout.Width(300) );
+        EditorGUIUtility.LookLikeInspector ();
 
         // ======================================================== 
         // plane type

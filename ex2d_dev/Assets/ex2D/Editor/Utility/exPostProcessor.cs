@@ -37,6 +37,12 @@ class ex2D_PostProcessor : AssetPostprocessor {
                                          string[] _movedAssets,
                                          string[] _movedFromAssetPaths ) 
     {
+        List<exAtlasInfo> updateAtlasInfos = new List<exAtlasInfo>();
+
+        // ======================================================== 
+        // import assets 
+        // ======================================================== 
+
         foreach ( string path in _importedAssets ) {
             // check if we are .ex2D_AtlasDB or .ex2D_SpriteAnimationDB
             if ( string.Equals(path, exAtlasDB.dbPath, System.StringComparison.CurrentCultureIgnoreCase) || 
@@ -46,13 +52,33 @@ class ex2D_PostProcessor : AssetPostprocessor {
             }
 
             // check if we are asset
-            if ( Path.GetExtension(path) != ".asset" )
+            string ext = Path.GetExtension(path);
+            if ( ext != ".asset" &&
+                 ext != ".png" &&
+                 ext != ".jpg" )
                 continue;
 
             //
             Object obj = (Object)AssetDatabase.LoadAssetAtPath ( path, typeof(Object) );
             if ( obj == null )
                 continue;
+
+            // ======================================================== 
+            // Texture2D 
+            // ======================================================== 
+
+            if ( obj is Texture2D ) {
+                Texture2D tex2d = obj as Texture2D;
+                exAtlasDB.ElementInfo ei = exAtlasDB.GetElementInfo(tex2d);
+                if ( ei != null ) {
+                    exAtlasInfo atlasInfo = exEditorHelper.LoadAssetFromGUID<exAtlasInfo>(ei.guidAtlasInfo);
+                    if ( atlasInfo && updateAtlasInfos.IndexOf(atlasInfo) == -1 ) 
+                    {
+                        updateAtlasInfos.Add(atlasInfo);
+                    }
+                }
+                continue;
+            }
 
             // ======================================================== 
             // exAtlasInfo
@@ -73,7 +99,16 @@ class ex2D_PostProcessor : AssetPostprocessor {
             }
         }
 
-        //
+        // build exAtlasInfo first
+        foreach ( exAtlasInfo atlasInfo in updateAtlasInfos ) {
+            exAtlasInfoUtility.Build(atlasInfo);
+            // NOTE: no need to update scene sprite and sprite animation clip, because we didn't change index
+        }
+
+        // ======================================================== 
+        // deleted assets
+        // ======================================================== 
+
         List<string> atlasInfoGUIDs = new List<string>();
         foreach ( string path in _deletedAssets ) {
             // check if we are .ex2D_AtlasDB or .ex2D_SpriteAnimationDB
@@ -149,7 +184,9 @@ class ex2D_SaveAssetsProcessor : SaveAssetsProcessor {
 
             if ( obj is exAtlasInfo ) {
                 exAtlasInfo atlasInfo = obj as exAtlasInfo;
-                if ( atlasInfo.needRebuild ) {
+                if ( atlasInfo.needRebuild &&
+                     rebuildAtlasInfos.IndexOf(atlasInfo) == -1 ) 
+                {
                     rebuildAtlasInfos.Add(atlasInfo);
                 }
             }

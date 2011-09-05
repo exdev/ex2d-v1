@@ -68,7 +68,7 @@ public class exSpriteEditor : exSpriteBaseEditor {
 	override public void OnInspectorGUI () {
 
         // ======================================================== 
-        // exSprite Base GUI 
+        // Base GUI 
         // ======================================================== 
 
         base.OnInspectorGUI();
@@ -80,7 +80,7 @@ public class exSpriteEditor : exSpriteBaseEditor {
 
         // 
         bool needRebuild = false;
-        MeshFilter meshFilter = editSprite.GetComponent<MeshFilter>();
+        editSprite.spanim = editSprite.GetComponent<exSpriteAnimation>();
 
         // get ElementInfo first
         Texture2D editTexture = exEditorHelper.LoadAssetFromGUID<Texture2D>(editSprite.textureGUID); 
@@ -152,7 +152,7 @@ public class exSpriteEditor : exSpriteBaseEditor {
                 if ( editSprite.renderer.sharedMaterial == null ) {
                     needRebuild = true;
                 }
-                else if ( meshFilter.sharedMesh == null ) {
+                else if ( editSprite.meshFilter.sharedMesh == null ) {
                     bool isPrefab = (EditorUtility.GetPrefabType(target) == PrefabType.Prefab); 
                     if ( isPrefab == false ) {
                         needRebuild = true;
@@ -299,8 +299,8 @@ public class exSpriteEditor : exSpriteBaseEditor {
                 editSprite.Build( editTexture );
             }
             else if ( GUI.changed ) {
-                if ( meshFilter.sharedMesh != null )
-                    editSprite.UpdateMesh( meshFilter.sharedMesh );
+                if ( editSprite.meshFilter.sharedMesh != null )
+                    editSprite.UpdateMesh( editSprite.meshFilter.sharedMesh );
                 EditorUtility.SetDirty(editSprite);
             }
         }
@@ -312,13 +312,13 @@ public class exSpriteEditor : exSpriteBaseEditor {
 
     void OnSceneGUI () {
         //
-        MeshFilter meshFilter = editSprite.GetComponent<MeshFilter>();
-        if ( meshFilter == null || meshFilter.sharedMesh == null ) {
+        editSprite.meshFilter = editSprite.GetComponent<MeshFilter>();
+        if ( editSprite.meshFilter == null || editSprite.meshFilter.sharedMesh == null ) {
             return;
         }
 
         //
-        Vector3[] vertices = meshFilter.sharedMesh.vertices;
+        Vector3[] vertices = editSprite.meshFilter.sharedMesh.vertices;
         if ( vertices.Length > 0 ) {
             Transform trans = editSprite.transform;
 

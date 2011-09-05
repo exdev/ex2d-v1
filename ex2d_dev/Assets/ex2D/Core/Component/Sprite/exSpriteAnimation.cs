@@ -158,21 +158,22 @@ public class exSpriteAnimation : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    void Update () {
+    void LateUpdate () {
         if ( !paused && playing && (curAnimation != null) ) {
             // advance the time and check if we trigger any animation events
             float delta = Time.deltaTime * curAnimation.speed;
-            float nextTime = curAnimation.time + delta;
             curAnimation.clip.TriggerEvents( gameObject, 
                                              curAnimation.time,
                                              delta,
                                              curAnimation.wrapMode );
-            curAnimation.time = nextTime;
 
-            //
+            // set sprite to current time
             exSpriteAnimClip.FrameInfo fi = GetCurFrameInfo();
             if ( fi != null )
                 sprite.SetSprite ( fi.atlas, fi.index );
+
+            // advance the time
+            curAnimation.time += delta;
 
             // check if stop
             if ( ( curAnimation.wrapMode == WrapMode.Once ||

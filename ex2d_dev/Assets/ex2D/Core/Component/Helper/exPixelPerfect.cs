@@ -14,10 +14,6 @@ using System.Collections;
 using System.Collections.Generic;
 
 ///////////////////////////////////////////////////////////////////////////////
-// defines
-///////////////////////////////////////////////////////////////////////////////
-
-///////////////////////////////////////////////////////////////////////////////
 /// 
 /// A component to handle pixel perfect process
 /// 
@@ -27,29 +23,14 @@ using System.Collections.Generic;
 public class exPixelPerfect : MonoBehaviour {
 
     ///////////////////////////////////////////////////////////////////////////////
-    // properties
-    ///////////////////////////////////////////////////////////////////////////////
-
-    // ------------------------------------------------------------------ 
-    /// The camera you used to calculate the pixel perfect scale
-    // ------------------------------------------------------------------ 
-
-    [SerializeField] protected Camera camera_;
-    public Camera renderCamera {
-        get { return camera_; }
-        set {
-            if ( value == null )
-                camera_ = Camera.main;
-            else
-                camera_ = value;
-        }
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////
     // private data
     ///////////////////////////////////////////////////////////////////////////////
 
-    exSpriteBase sprite;
+    // ------------------------------------------------------------------ 
+    /// The cached sprite base component
+    // ------------------------------------------------------------------ 
+
+    [System.NonSerialized] public exSpriteBase sprite;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -61,8 +42,16 @@ public class exPixelPerfect : MonoBehaviour {
 
     void Awake () {
         sprite = GetComponent<exSpriteBase>();
-        if ( camera_ == null )
-            camera_ = Camera.main;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void OnEnable () {
+        if ( sprite == null ) {
+            sprite = GetComponent<exSpriteBase>();
+        }
     }
 
     // ------------------------------------------------------------------ 
@@ -71,7 +60,7 @@ public class exPixelPerfect : MonoBehaviour {
 
     void Update () {
         if ( sprite ) {
-            sprite.MakePixelPerfect ( camera_, Screen.width, Screen.height );
+            sprite.MakePixelPerfect ( sprite.renderCamera, Screen.width, Screen.height );
         }
     }
 }

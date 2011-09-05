@@ -61,17 +61,17 @@ public static class ex2DExtension {
 
         switch ( _plane.plane ) {
         case exPlane.Plane.XY:
-            result = _camera.ScreenToWorldPoint( new Vector3(_screen_x, _screen_y, _plane.transform.position.z) );
+            result = _camera.ScreenToWorldPoint( new Vector3(_screen_x, _screen_y, 0.0f) );
             result.z = _plane.transform.position.z;
             break;
 
         case exPlane.Plane.XZ:
-            result = _camera.ScreenToWorldPoint( new Vector3(_screen_x, _plane.transform.position.y, _screen_y) );
+            result = _camera.ScreenToWorldPoint( new Vector3(_screen_x, _screen_y, 0.0f) );
             result.y = _plane.transform.position.y;
             break;
 
         case exPlane.Plane.ZY:
-            result = _camera.ScreenToWorldPoint( new Vector3(_plane.transform.position.x, _screen_y, _screen_x) );
+            result = _camera.ScreenToWorldPoint( new Vector3(_screen_x, _screen_y, 0.0f) );
             result.x = _plane.transform.position.x;
             break;
         }
@@ -97,17 +97,17 @@ public static class ex2DExtension {
 
         switch ( _plane.plane ) {
         case exPlane.Plane.XY:
-            result = _camera.ViewportToWorldPoint( new Vector3(_viewport_x, _viewport_y, _plane.transform.position.z) );
+            result = _camera.ViewportToWorldPoint( new Vector3(_viewport_x, _viewport_y, 0.0f) );
             result.z = _plane.transform.position.z;
             break;
 
         case exPlane.Plane.XZ:
-            result = _camera.ViewportToWorldPoint( new Vector3(_viewport_x, _plane.transform.position.y, _viewport_y) );
+            result = _camera.ViewportToWorldPoint( new Vector3(_viewport_x, _viewport_y, 0.0f) );
             result.y = _plane.transform.position.y;
             break;
 
         case exPlane.Plane.ZY:
-            result = _camera.ViewportToWorldPoint( new Vector3(_plane.transform.position.x, _viewport_y, _viewport_x) );
+            result = _camera.ViewportToWorldPoint( new Vector3(_viewport_x, _viewport_y, 0.0f) );
             result.x = _plane.transform.position.x;
             break;
         }

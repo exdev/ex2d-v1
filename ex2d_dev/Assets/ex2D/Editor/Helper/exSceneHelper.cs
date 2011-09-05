@@ -27,21 +27,15 @@ public static class exSceneHelper {
     /// update GameObject with exLayer2D component in the current scene
     // ------------------------------------------------------------------ 
 
-    [MenuItem ("Edit/ex2D/Update Scene Sprite Layers %&l")]
+    [MenuItem ("Edit/ex2D/Update Scene Layers %&l")]
     public static void UpdateSceneSpriteLayers () {
-        EditorUtility.DisplayProgressBar( "Update Scene Sprite Layers...", 
-                                          "Update Scene Sprite Layers...", 
+        EditorUtility.DisplayProgressBar( "Update Scene Layers...", 
+                                          "Update Scene Layers...", 
                                           0.5f );    
 
         exLayer2D[] layerObjs = GameObject.FindObjectsOfType(typeof(exLayer2D)) as exLayer2D[];
         for ( int i = 0; i < layerObjs.Length; ++i ) {
             exLayer2D layerObj = layerObjs[i]; 
-            // DISABLE: it is too slow { 
-            // float progress = (float)i/(float)layerObjs.Length;
-            // EditorUtility.DisplayProgressBar( "Update Scene Sprite Layers...", 
-            //                                   "Update Sprite Layer " + layerObj.gameObject.name, progress );    
-            // } DISABLE end 
-
             layerObj.UpdateDepth();
             RecursivelyUpdateLayer(layerObj.transform);
         }

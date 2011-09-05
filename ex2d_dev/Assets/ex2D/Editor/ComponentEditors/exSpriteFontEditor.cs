@@ -56,7 +56,7 @@ public class exSpriteFontEditor : exSpriteBaseEditor {
 	override public void OnInspectorGUI () {
 
         // ======================================================== 
-        // exSprite Base GUI 
+        // Base GUI 
         // ======================================================== 
 
         base.OnInspectorGUI();
@@ -67,7 +67,6 @@ public class exSpriteFontEditor : exSpriteBaseEditor {
         // ======================================================== 
 
         bool needRebuild = false;
-        MeshFilter meshFilter = editSpriteFont.GetComponent<MeshFilter>();
 
         EditorGUIUtility.LookLikeInspector ();
         EditorGUI.indentLevel = 1;
@@ -157,13 +156,13 @@ public class exSpriteFontEditor : exSpriteBaseEditor {
         // check if fontInfo change to null
         if ( editSpriteFont.fontInfo == null ) 
         {
-            if ( meshFilter.sharedMesh != null || 
+            if ( editSpriteFont.meshFilter.sharedMesh != null || 
                  editSpriteFont.renderer.sharedMaterial != null )
             {
                 needRebuild = true;
             }
         }
-        else if ( meshFilter.sharedMesh == null || 
+        else if ( editSpriteFont.meshFilter.sharedMesh == null || 
                   editSpriteFont.renderer.sharedMaterial == null ) 
         {
             needRebuild = true;
@@ -288,8 +287,8 @@ public class exSpriteFontEditor : exSpriteBaseEditor {
                 editSpriteFont.Build();
             }
             else if ( GUI.changed ) {
-                if ( meshFilter.sharedMesh != null )
-                    editSpriteFont.UpdateMesh( meshFilter.sharedMesh );
+                if ( editSpriteFont.meshFilter.sharedMesh != null )
+                    editSpriteFont.UpdateMesh( editSpriteFont.meshFilter.sharedMesh );
                 EditorUtility.SetDirty(editSpriteFont);
             }
         }
@@ -301,8 +300,8 @@ public class exSpriteFontEditor : exSpriteBaseEditor {
 
     void OnSceneGUI () {
         //
-        MeshFilter meshFilter = editSpriteFont.GetComponent<MeshFilter>();
-        if ( meshFilter == null || meshFilter.sharedMesh == null ) {
+        editSpriteFont.meshFilter = editSpriteFont.GetComponent<MeshFilter>();
+        if ( editSpriteFont.meshFilter == null || editSpriteFont.meshFilter.sharedMesh == null ) {
             return;
         }
 
@@ -318,7 +317,7 @@ public class exSpriteFontEditor : exSpriteBaseEditor {
         int vertexStartAt = vertexCount;
 
         //
-        Vector3[] vertices = meshFilter.sharedMesh.vertices;
+        Vector3[] vertices = editSpriteFont.meshFilter.sharedMesh.vertices;
         Vector3[] w_vertices = new Vector3[5];
         if ( vertices.Length > 0 ) {
             Transform trans = editSpriteFont.transform;

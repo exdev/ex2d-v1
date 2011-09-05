@@ -52,6 +52,8 @@ public class exLayer2DEditor : Editor {
         EditorGUILayout.Space ();
         EditorGUI.indentLevel = 1;
 
+        curEdit.plane = curEdit.GetComponent<exPlane>();
+
         // ======================================================== 
         // layer & bias 
         // ======================================================== 

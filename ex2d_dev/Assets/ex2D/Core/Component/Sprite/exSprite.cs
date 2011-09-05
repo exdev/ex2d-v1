@@ -437,8 +437,8 @@ public class exSprite : exSpriteBase {
             _mesh.normals = normals; // TEMP
             _mesh.bounds = GetBounds ( offsetX, offsetY, halfWidth * 2.0f, halfHeight * 2.0f );
 
-            // update box-collider if we have
-            UpdateBoxCollider ( collider as BoxCollider, _mesh );
+            // update collider if we have
+            UpdateBoxCollider (_mesh);
             UpdateBoundRect ( offsetX, offsetY, halfWidth * 2.0f, halfHeight * 2.0f );
 
 // #if UNITY_EDITOR

@@ -108,6 +108,25 @@ public class exPlane : MonoBehaviour {
     ///////////////////////////////////////////////////////////////////////////////
 
     // ------------------------------------------------------------------ 
+    [SerializeField] protected Camera camera_;
+    /// The camera you used to calculate the pixel perfect scale
+    // ------------------------------------------------------------------ 
+
+    public Camera renderCamera {
+        get { return camera_; }
+        set {
+            Camera newCamera = value;
+            if ( newCamera == null )
+                newCamera = Camera.main;
+            if ( newCamera != camera_ ) {
+                camera_ = newCamera;
+                if ( layer2d != null )
+                    layer2d.UpdateDepth();
+            }
+        }
+    }
+
+    // ------------------------------------------------------------------ 
     [SerializeField] protected Plane plane_ = Plane.XY;
     /// the 2D coordination (XY, XZ or ZY) used in this plane 
     // ------------------------------------------------------------------ 
@@ -181,6 +200,12 @@ public class exPlane : MonoBehaviour {
     [System.NonSerialized] public exLayer2D layer2d;
 
     // ------------------------------------------------------------------ 
+    /// The cached MeshFilter component
+    // ------------------------------------------------------------------ 
+
+    [System.NonSerialized] public MeshFilter meshFilter;
+
+    // ------------------------------------------------------------------ 
     /// The current updateFlags, this value will reset after every LateUpdate()
     /// 
     /// \note The only reason I public this is because exAnimationHelper need to asscess it, 
@@ -194,8 +219,6 @@ public class exPlane : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     public Rect boundingRect { get; protected set; }
-
-    protected MeshFilter meshFilter;
 
     protected ClipInfo clipInfo_ = new ClipInfo();
     public ClipInfo clipInfo { 
@@ -230,6 +253,22 @@ public class exPlane : MonoBehaviour {
     ///////////////////////////////////////////////////////////////////////////////
 
     // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void Reset() {
+        if ( GetComponent<exLayer2D>() == null ) {
+            switch ( plane ) {
+            case exPlane.Plane.XY: layer2d = gameObject.AddComponent<exLayerXY>(); break;
+            case exPlane.Plane.XZ: layer2d = gameObject.AddComponent<exLayerXZ>(); break;
+            case exPlane.Plane.ZY: layer2d = gameObject.AddComponent<exLayerZY>(); break;
+            }
+            layer2d.plane = this;
+            layer2d.UpdateDepth();
+        }
+    }
+
+    // ------------------------------------------------------------------ 
     /// Awake functoin inherit from MonoBehaviour.
     /// 
     /// \note if you inherit from exPlane, and implement your own Awake function, 
@@ -239,6 +278,8 @@ public class exPlane : MonoBehaviour {
     virtual protected void Awake () {
         meshFilter = GetComponent<MeshFilter>();
         layer2d = GetComponent<exLayer2D>();
+        if ( camera_ == null )
+            camera_ = Camera.main;
     }
 
     // ------------------------------------------------------------------ 

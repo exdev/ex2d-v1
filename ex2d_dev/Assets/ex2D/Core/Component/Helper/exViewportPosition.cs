@@ -14,10 +14,6 @@ using System.Collections;
 using System.Collections.Generic;
 
 ///////////////////////////////////////////////////////////////////////////////
-// defines
-///////////////////////////////////////////////////////////////////////////////
-
-///////////////////////////////////////////////////////////////////////////////
 /// 
 /// A component to position a plane in viewport space
 /// 
@@ -30,21 +26,6 @@ public class exViewportPosition : MonoBehaviour {
     ///////////////////////////////////////////////////////////////////////////////
     // properties
     ///////////////////////////////////////////////////////////////////////////////
-
-    // ------------------------------------------------------------------ 
-    [SerializeField] protected Camera camera_;
-    /// the camera used in screen position
-    // ------------------------------------------------------------------ 
-
-    public Camera renderCamera {
-        get { return camera_; }
-        set {
-            if ( value == null )
-                camera_ = Camera.main;
-            else
-                camera_ = value;
-        }
-    }
 
     // ------------------------------------------------------------------ 
     [SerializeField] protected float x_;
@@ -76,7 +57,11 @@ public class exViewportPosition : MonoBehaviour {
     //
     ///////////////////////////////////////////////////////////////////////////////
 
-    exPlane plane;
+    // ------------------------------------------------------------------ 
+    /// The cached plane component
+    // ------------------------------------------------------------------ 
+
+    [System.NonSerialized] public exPlane plane;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -85,21 +70,21 @@ public class exViewportPosition : MonoBehaviour {
     // DISABLE { 
     // // ------------------------------------------------------------------ 
     // // Desc: 
-    // //  example: CalculateWorldPosition(Screen.width, Screen.height) 
+    // //  example: CalculateWorldPosition(Camera.main,Screen.width, Screen.height) 
     // // ------------------------------------------------------------------ 
 
-    // Vector3 CalculateWorldPosition ( float _screenWidth, float _screenHeight ) {
+    // Vector3 CalculateWorldPosition ( Camera _camera, float _screenWidth, float _screenHeight ) {
     //     float s = 1.0f;
-    //     if ( camera_.orthographic ) {
-    //         s =  2.0f * camera_.orthographicSize / _screenHeight;
+    //     if ( _camera.orthographic ) {
+    //         s =  2.0f * _camera.orthographicSize / _screenHeight;
     //     }
     //     else {
-    //         float ratio = 2.0f * Mathf.Tan(Mathf.Deg2Rad * camera_.fov * 0.5f) / _screenHeight;
-    //         s = ratio * ( transform.position.z - camera_.transform.position.z );
+    //         float ratio = 2.0f * Mathf.Tan(Mathf.Deg2Rad * _camera.fov * 0.5f) / _screenHeight;
+    //         s = ratio * ( transform.position.z - _camera.transform.position.z );
     //     }
 
-    //     return new Vector3( (x_ - 0.5f) * _screenWidth * s + camera_.transform.position.x,
-    //                         (y_ - 0.5f) * _screenHeight * s + camera_.transform.position.y,
+    //     return new Vector3( (x_ - 0.5f) * _screenWidth * s + _camera.transform.position.x,
+    //                         (y_ - 0.5f) * _screenHeight * s + _camera.transform.position.y,
     //                         transform.position.z );
     // }
     // } DISABLE end 
@@ -109,9 +94,17 @@ public class exViewportPosition : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     void Awake () {
-        if ( camera_ == null )
-            camera_ = Camera.main;
         plane = GetComponent<exPlane>();
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void OnEnable () {
+        if ( plane == null ) {
+            plane = GetComponent<exPlane>();
+        }
     }
 
     // ------------------------------------------------------------------ 
@@ -124,10 +117,10 @@ public class exViewportPosition : MonoBehaviour {
 
         //
         if ( plane ) {
-            newPos = plane.ViewportToWorldPoint ( camera_, x_, y_ );
+            newPos = plane.ViewportToWorldPoint ( plane.renderCamera, x_, y_ );
         }
         else {
-            newPos = camera_.ViewportToWorldPoint( new Vector3(x_, y_, transform.position.z) );
+            newPos = Camera.main.ViewportToWorldPoint( new Vector3(x_, y_, transform.position.z) );
             newPos.z = transform.position.z;
         }
 

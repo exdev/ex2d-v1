@@ -13,10 +13,6 @@ using UnityEngine;
 using System.Collections;
 
 ///////////////////////////////////////////////////////////////////////////////
-// defines
-///////////////////////////////////////////////////////////////////////////////
-
-///////////////////////////////////////////////////////////////////////////////
 ///
 /// The layer calculated in xz 2D space
 ///
@@ -38,7 +34,7 @@ public class exLayerXZ : exLayer2D {
             return 0.0f;
         float dist = _cam.farClipPlane - _cam.nearClipPlane;
         float unitLayer = dist/MAX_LAYER;
-        return -(((float)layer_ + bias_) * unitLayer + _cam.transform.position.y + _cam.nearClipPlane);
+        return -(((float)layer_ + bias_) * unitLayer - _cam.transform.position.y + _cam.nearClipPlane);
     }
 
     // ------------------------------------------------------------------ 

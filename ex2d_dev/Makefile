@@ -20,8 +20,9 @@ MKDIR = mkdir -p
 RM = rm -f
 
 # Target
-RUNTIME_TARGET = ../ex2d_submit/Assets/ex2D/Core/ex2D.Runtime.dll
-EDITOR_TARGET = ../ex2d_submit/Assets/ex2D/Editor/ex2D.Editor.dll
+TARGET_DIR = ../ex2d_submit/Assets/ex2D
+RUNTIME_TARGET = $(TARGET_DIR)/Core/ex2D.Runtime.dll
+EDITOR_TARGET = $(TARGET_DIR)/Editor/ex2D.Editor.dll
 
 # /////////////////////////////////////////////////////////////////////////////
 # do build
@@ -59,6 +60,7 @@ RUNTIME_ARGUMENT = $(RUNTIME_DEFINE) -r:$(UNITY_ENGINE_DLL)
 
 # do the build
 $(RUNTIME_TARGET):
+	$(MKDIR) $(TARGET_DIR)/Core/NoAssembly/
 	$(COMPILER) -target:library -out:$(RUNTIME_TARGET) $(RUNTIME_ARGUMENT) $(RUNTIME_SOURCE)
 
 # /////////////////////////////////////////////////////////////////////////////

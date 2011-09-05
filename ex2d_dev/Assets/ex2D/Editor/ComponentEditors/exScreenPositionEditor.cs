@@ -51,17 +51,7 @@ public class exScreenPositionEditor : Editor {
         EditorGUILayout.Space ();
         EditorGUI.indentLevel = 1;
 
-        // ======================================================== 
-        // Camera
-        // ======================================================== 
-
-        curEdit.renderCamera = (Camera)EditorGUILayout.ObjectField( "Render Camera"
-                                                                    , curEdit.renderCamera
-                                                                    , typeof(Camera)
-#if !UNITY_3_0 && !UNITY_3_1 && !UNITY_3_3
-                                                                    , true 
-#endif
-                                                                  );
+        curEdit.plane = curEdit.GetComponent<exPlane>();
 
         // ======================================================== 
         // screen x 

@@ -146,16 +146,6 @@ public class exSoftClip : exPlane {
 
     override protected void OnDisable () {
         base.OnDisable();
-
-        for ( int i = 0; i < planes.Count; ++i ) {
-            exPlane p = planes[i];
-            if ( p == null ) {
-                planes.RemoveAt(i);
-                --i;
-                continue;
-            }
-            p.enabled = false;
-        }
     }
 
     // ------------------------------------------------------------------ 
