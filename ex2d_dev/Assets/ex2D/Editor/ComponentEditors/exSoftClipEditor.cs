@@ -101,7 +101,13 @@ class exSoftClipEditor : exPlaneEditor {
                 --i;
             }
             else {
-                EditorGUILayout.ObjectField ( p.name, p, typeof(exPlane), true );
+                EditorGUILayout.ObjectField ( p.name
+                                            , p
+                                            , typeof(exPlane)
+#if !UNITY_3_0 && !UNITY_3_1 && !UNITY_3_3
+                                            , true
+#endif
+                                            );
             }
         }
         GUI.enabled = true;

@@ -355,7 +355,20 @@ partial class exSpriteAnimClipEditor : EditorWindow {
                 Selection.activeObject = newClip;
 
             // length
-            curEdit.length = EditorGUILayout.FloatField( "Animation Length", curEdit.length, GUILayout.MaxWidth(200) );
+            float newLength = EditorGUILayout.FloatField( "Animation Length", curEdit.length, GUILayout.MaxWidth(200) );
+            if ( newLength != curEdit.length ) {
+                float totalLength = 0.0f;
+                float delta = newLength - curEdit.length;
+                foreach ( exSpriteAnimClip.FrameInfo fi in curEdit.frameInfos) {
+                    float ratio = fi.length/curEdit.length;
+                    fi.length = Mathf.Max(1.0f/60.0f, fi.length + delta * ratio);
+                    totalLength += fi.length;
+                }
+                curEdit.length = totalLength;
+                foreach ( exSpriteAnimClip.EventInfo ei in curEdit.eventInfos) {
+                    ei.time = ei.time/curEdit.length * curEdit.length;
+                }
+            }
 
             // Wrap Mode enum popup
             curEdit.wrapMode = (WrapMode)EditorGUILayout.EnumPopup ( "Wrap Mode", curEdit.wrapMode, GUILayout.Width(200) );
@@ -475,22 +488,12 @@ partial class exSpriteAnimClipEditor : EditorWindow {
 
             GUILayout.Space(5);
             lastRect = GUILayoutUtility.GetLastRect ();
-            if ( Application.platform == RuntimePlatform.WindowsEditor  ) {
-                exEditorHelper.DrawLine( new Vector2(position.width - lastRect.xMax, lastRect.yMax), 
-                                       new Vector2(40, lastRect.yMax), 
-                                       Color.gray, 1.0f );
-                exEditorHelper.DrawLine( new Vector2(position.width - lastRect.xMax, lastRect.yMax+1), 
-                                       new Vector2(40, lastRect.yMax+1), 
-                                       Color.white, 1.0f );
-            }
-            else {
                 exEditorHelper.DrawLine( new Vector2( lastRect.xMax, lastRect.yMax), 
                                        new Vector2(position.width-40, lastRect.yMax), 
                                        Color.gray, 1.0f );
                 exEditorHelper.DrawLine( new Vector2( lastRect.xMax, lastRect.yMax+1), 
                                        new Vector2(position.width-40, lastRect.yMax+1), 
                                        Color.white, 1.0f );
-            }
             GUILayout.Space(5+2);
 
             FrameInfoEditField ();

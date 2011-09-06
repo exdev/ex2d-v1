@@ -157,7 +157,8 @@ public class exSpriteAnimationDB : ScriptableObject {
 
     static void CreateDB () {
         // get sprite animation clip db, if not found, create one
-        if ( DBExists() == false ) {
+        db = (exSpriteAnimationDB)AssetDatabase.LoadAssetAtPath( dbPath, typeof(exSpriteAnimationDB) );
+        if ( db == null ) {
             db = ScriptableObject.CreateInstance<exSpriteAnimationDB>();
             AssetDatabase.CreateAsset( db, dbPath );
             needSync = true;

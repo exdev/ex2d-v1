@@ -87,30 +87,33 @@ public class exSpriteAnimClip : ScriptableObject {
 
     public WrapMode wrapMode = WrapMode.Once; ///< default wrap mode
     public StopAction stopAction = StopAction.DoNothing; ///< the default type of action used when the animation stopped 
+    public float length = 1.0f; ///< the length of the animation clip in seconds
 
-    // ------------------------------------------------------------------ 
-    [SerializeField] protected float length_ = 1.0f;
-    /// the length of the animation clip in seconds
-    // ------------------------------------------------------------------ 
+    // DELME { 
+    // // ------------------------------------------------------------------ 
+    // [SerializeField] protected float length_ = 1.0f;
+    // /// the length of the animation clip in seconds
+    // // ------------------------------------------------------------------ 
 
-    public float length {
-        get { return length_; }
-        set {  
-            if ( value != 0.0f && Mathf.Approximately (value, length_) == false ) {
-                float totalLength = 0.0f;
-                float delta = value - length_;
-                foreach ( exSpriteAnimClip.FrameInfo fi in frameInfos) {
-                    float ratio = fi.length/length_;
-                    fi.length = Mathf.Max(1.0f/60.0f, fi.length + delta * ratio);
-                    totalLength += fi.length;
-                }
-                length_ = totalLength;
-                foreach ( exSpriteAnimClip.EventInfo ei in eventInfos) {
-                    ei.time = ei.time/length_ * length_;
-                }
-            }
-        }
-    }
+    // public float length {
+    //     get { return length_; }
+    //     set {  
+    //         if ( value != 0.0f && Mathf.Approximately (value, length_) == false ) {
+    //             float totalLength = 0.0f;
+    //             float delta = value - length_;
+    //             foreach ( exSpriteAnimClip.FrameInfo fi in frameInfos) {
+    //                 float ratio = fi.length/length_;
+    //                 fi.length = Mathf.Max(1.0f/60.0f, fi.length + delta * ratio);
+    //                 totalLength += fi.length;
+    //             }
+    //             length_ = totalLength;
+    //             foreach ( exSpriteAnimClip.EventInfo ei in eventInfos) {
+    //                 ei.time = ei.time/length_ * length_;
+    //             }
+    //         }
+    //     }
+    // }
+    // } DELME end 
 
     public List<FrameInfo> frameInfos = new List<FrameInfo>(); ///< the list of frame info 
     public List<EventInfo> eventInfos = new List<EventInfo>(); ///< the list of event info

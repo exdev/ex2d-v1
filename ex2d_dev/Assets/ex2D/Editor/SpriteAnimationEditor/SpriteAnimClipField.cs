@@ -202,18 +202,10 @@ partial class exSpriteAnimClipEditor {
         // draw unused block
         // ======================================================== 
 
-        if ( Application.platform == RuntimePlatform.WindowsEditor  ) {
-            exEditorHelper.DrawLine ( new Vector2( boxWidth/2,            yStart + eventViewHeight ), 
-                                    new Vector2( boxWidth/2 + boxWidth, yStart + eventViewHeight ), 
-                                    new Color( 0.8f, 0.8f, 0.8f, 1.0f ),
-                                    1.0f );
-        }
-        else {
-            exEditorHelper.DrawLine ( new Vector2( 0,        yStart + eventViewHeight ), 
-                                    new Vector2( boxWidth, yStart + eventViewHeight ), 
-                                    new Color( 0.8f, 0.8f, 0.8f, 1.0f ),
-                                    1.0f );
-        }
+        exEditorHelper.DrawLine ( new Vector2( 0, yStart + eventViewHeight ), 
+                                  new Vector2( boxWidth, yStart + eventViewHeight ), 
+                                  new Color( 0.8f, 0.8f, 0.8f, 1.0f ),
+                                  1.0f );
 
         Color oldBGColor;
         if ( boxWidth > _animClip.editorOffset + totalWidth ) {
