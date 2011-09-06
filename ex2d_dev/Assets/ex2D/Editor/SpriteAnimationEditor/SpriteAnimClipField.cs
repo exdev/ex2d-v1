@@ -114,7 +114,7 @@ partial class exSpriteAnimClipEditor {
         int iStartFrom = Mathf.CeilToInt( -_animClip.editorOffset/cellWidth ); 
         int cellCount = Mathf.CeilToInt( (boxWidth - _animClip.editorOffset)/cellWidth );
         for ( int i = iStartFrom; i < cellCount; ++i ) {
-            float x = xStart + _animClip.editorOffset + i * cellWidth;
+            float x = xStart + _animClip.editorOffset + i * cellWidth + 1;
             int idx = idxFrom;
 
             while ( idx >= 0) {
@@ -123,8 +123,8 @@ partial class exSpriteAnimClipEditor {
 
                     // draw scalar
                     if ( heightRatio >= 1.0f ) {
-                        exEditorHelper.DrawLine ( new Vector2(x+1, yStart ), 
-                                                new Vector2(x+1, yStart - _scalarHeight), 
+                        exEditorHelper.DrawLine ( new Vector2(x, yStart ), 
+                                                new Vector2(x, yStart - _scalarHeight), 
                                                 Color.black, 
                                                 2.0f );
                     }

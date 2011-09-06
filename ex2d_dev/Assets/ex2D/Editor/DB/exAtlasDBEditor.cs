@@ -20,7 +20,7 @@ using System.IO;
 ///////////////////////////////////////////////////////////////////////////////
 
 [CustomEditor(typeof(exAtlasDB))]
-public class exAtlasDBEditor : Editor {
+class exAtlasDBEditor : Editor {
 
     private exAtlasDB curEditTarget;
 

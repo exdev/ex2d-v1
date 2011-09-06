@@ -20,7 +20,7 @@ using System.IO;
 ///////////////////////////////////////////////////////////////////////////////
 
 [CustomEditor(typeof(exSpriteAnimClip))]
-public class exSpriteAnimClipInspector : Editor {
+class exSpriteAnimClipInspector : Editor {
 
     // ------------------------------------------------------------------ 
     // Desc: 

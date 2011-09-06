@@ -179,18 +179,95 @@ partial class exAtlasEditor : EditorWindow {
         }
 
         // ======================================================== 
-        // if we have curEdit
+        // toolbar 
         // ======================================================== 
 
-        Rect lastRect = new Rect( 10, 0, 1, 1 );
+        EditorGUILayout.BeginHorizontal ( EditorStyles.toolbar );
+
+            GUILayout.FlexibleSpace();
+
+            // ======================================================== 
+            // Select 
+            // ======================================================== 
+
+            if ( GUILayout.Button( "Select Sprites...", EditorStyles.toolbarButton ) ) {
+                List<Object> selects = new List<Object>(curEdit.elements.Count);
+                foreach ( exAtlasInfo.Element el in selectedElements ) {
+                    selects.Add(el.texture);
+                }
+
+                if ( selects.Count != 0 ) {
+                    selectIdx = (selectIdx + 1) % selects.Count;  
+                    Selection.objects = selects.ToArray();
+                    EditorGUIUtility.PingObject(Selection.objects[selectIdx]);
+                }
+            }
+            GUILayout.Space(5);
+
+            // ======================================================== 
+            // zoom in/out slider 
+            // ======================================================== 
+
+            GUILayout.Label ("Zoom");
+            GUILayout.Space(5);
+            curEdit.scale = GUILayout.HorizontalSlider ( curEdit.scale, 
+                                                         0.1f, 
+                                                         2.0f, 
+                                                         GUILayout.MaxWidth(150) );
+            GUILayout.Space(5);
+            curEdit.scale = EditorGUILayout.FloatField( curEdit.scale,
+                                                        EditorStyles.toolbarTextField,
+                                                        GUILayout.Width(50) );
+            curEdit.scale = Mathf.Clamp( curEdit.scale, 0.1f, 2.0f );
+
+            // ======================================================== 
+            // Build 
+            // ======================================================== 
+
+            GUI.enabled = curEdit.needRebuild;
+            if ( GUILayout.Button( "Build", EditorStyles.toolbarButton, GUILayout.Width(80) ) ) {
+                // build atlas info to atals
+                exAtlasInfoUtility.Build(curEdit);
+
+                // build sprite animclip that used this atlasInfo
+                exAtlasInfoUtility.BuildSpAnimClipsFromRebuildList(curEdit);
+
+                // update scene sprites
+                List<string> rebuildAtlasInfos = new List<string>();
+                rebuildAtlasInfos.Add(exEditorHelper.AssetToGUID(curEdit));
+                exSceneHelper.UpdateSceneSprites (rebuildAtlasInfos);
+
+                // NOTE: without this you will got leaks message
+                EditorUtility.UnloadUnusedAssets();
+            }
+            GUI.enabled = true;
+
+            // ======================================================== 
+            // Help
+            // ======================================================== 
+
+            if ( GUILayout.Button( exEditorHelper.HelpTexture(), EditorStyles.toolbarButton ) ) {
+                Help.BrowseURL("http://www.ex-dev.com/ex2d/wiki/doku.php?id=manual:atlas_editor_guide");
+            }
+
+        EditorGUILayout.EndHorizontal ();
+
+        // ======================================================== 
+        // scroll view
+        // ======================================================== 
+
+        float toolbarHeight = EditorStyles.toolbar.CalcHeight( new GUIContent(""), 0 );
         scrollPos = EditorGUILayout.BeginScrollView ( scrollPos, 
                                                       GUILayout.Width(position.width),
-                                                      GUILayout.Height(position.height) );
+                                                      GUILayout.Height(position.height-toolbarHeight) );
 
-        // draw label
-        GUILayout.Space(10);
-        GUILayout.Label ( AssetDatabase.GetAssetPath(curEdit) );
-        lastRect = GUILayoutUtility.GetLastRect ();  
+        Rect lastRect = new Rect( 10, 0, 1, 1 );
+        GUILayout.Space(5);
+
+        // DISABLE { 
+        // // draw label
+        // GUILayout.Label ( AssetDatabase.GetAssetPath(curEdit) );
+        // } DISABLE end 
 
         // ======================================================== 
         // settings area 
@@ -453,12 +530,13 @@ partial class exAtlasEditor : EditorWindow {
                                                                  );
                 if ( newAtlasInfo != curEdit ) 
                     Selection.activeObject = newAtlasInfo;
-                // GUILayout.Space(5);
 
                 // ======================================================== 
                 // bitmap fonts 
                 // ======================================================== 
 
+                GUILayout.Space(20);
+                GUILayout.Label ( "Atlas Fonts" );
                 for ( int i = 0; i < curEdit.bitmapFonts.Count; ++i ) {
                     GUILayout.BeginHorizontal();
                         exBitmapFont bmfont = curEdit.bitmapFonts[i];
@@ -476,46 +554,6 @@ partial class exAtlasEditor : EditorWindow {
                     GUILayout.EndHorizontal();
                 }
 
-                // ======================================================== 
-                // Select 
-                // ======================================================== 
-
-                GUILayout.Space(10);
-                if ( GUILayout.Button("Select Sprites...", GUILayout.MaxWidth(100) ) ) {
-                    List<Object> selects = new List<Object>(curEdit.elements.Count);
-                    foreach ( exAtlasInfo.Element el in selectedElements ) {
-                        selects.Add(el.texture);
-                    }
-
-                    if ( selects.Count != 0 ) {
-                        selectIdx = (selectIdx + 1) % selects.Count;  
-                        Selection.objects = selects.ToArray();
-                        EditorGUIUtility.PingObject(Selection.objects[selectIdx]);
-                    }
-                }
-
-                // ======================================================== 
-                // Build 
-                // ======================================================== 
-
-                GUI.enabled = curEdit.needRebuild;
-                if ( GUILayout.Button("Build", GUILayout.MaxWidth(100) ) ) {
-                    // build atlas info to atals
-                    exAtlasInfoUtility.Build(curEdit);
-
-                    // build sprite animclip that used this atlasInfo
-                    exAtlasInfoUtility.BuildSpAnimClipsFromRebuildList(curEdit);
-
-                    // update scene sprites
-                    List<string> rebuildAtlasInfos = new List<string>();
-                    rebuildAtlasInfos.Add(exEditorHelper.AssetToGUID(curEdit));
-                    exSceneHelper.UpdateSceneSprites (rebuildAtlasInfos);
-
-                    // NOTE: without this you will got leaks message
-                    EditorUtility.UnloadUnusedAssets();
-                }
-                GUI.enabled = true;
-
             GUILayout.EndVertical();
             GUILayout.EndHorizontal();
 
@@ -525,7 +563,7 @@ partial class exAtlasEditor : EditorWindow {
         // space 
         // ======================================================== 
 
-        GUILayout.Space(20);
+        GUILayout.Space(40);
         lastRect = GUILayoutUtility.GetLastRect ();  
 
         // ======================================================== 
@@ -533,13 +571,7 @@ partial class exAtlasEditor : EditorWindow {
         // ======================================================== 
 
         GUILayout.BeginVertical();
-
-            // ======================================================== 
-            // zoom in/out slider 
-            // ======================================================== 
-
-            curEdit.scale = EditorGUILayout.Slider ( "Zoom", curEdit.scale, 0.1f, 2.0f, GUILayout.MaxWidth(300) );
-            GUILayout.Space(10);
+        GUILayout.Space(10);
 
             // exAtlas Border and Background
             lastRect = GUILayoutUtility.GetLastRect ();  

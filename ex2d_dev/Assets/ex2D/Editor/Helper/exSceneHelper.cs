@@ -36,8 +36,7 @@ public static class exSceneHelper {
         exLayer2D[] layerObjs = GameObject.FindObjectsOfType(typeof(exLayer2D)) as exLayer2D[];
         for ( int i = 0; i < layerObjs.Length; ++i ) {
             exLayer2D layerObj = layerObjs[i]; 
-            layerObj.UpdateDepth();
-            RecursivelyUpdateLayer(layerObj.transform);
+            layerObj.RecursivelyUpdateLayer ();
         }
         EditorUtility.ClearProgressBar();
     }
@@ -87,26 +86,11 @@ public static class exSceneHelper {
             // update layer
             exLayer2D layer2d = spBase.GetComponent<exLayer2D>();
             if ( layer2d ) {
-                layer2d.UpdateDepth();
+                layer2d.RecursivelyUpdateLayer ();
             }
         }
         EditorUtility.UnloadUnusedAssets(); // NOTE: without this you will got leaks message
         EditorUtility.ClearProgressBar();    
-    }
-
-    // ------------------------------------------------------------------ 
-    /// \param _trans the in transform
-    /// recursively update the layer by the transform of the GameObject
-    // ------------------------------------------------------------------ 
-
-    public static void RecursivelyUpdateLayer ( Transform _trans ) {
-        foreach ( Transform child in _trans ) {
-            exLayer2D layer = child.GetComponent<exLayer2D>();
-            if ( layer ) {
-                layer.UpdateDepth();
-                RecursivelyUpdateLayer ( layer.transform );
-            }
-        }
     }
 
     // ------------------------------------------------------------------ 

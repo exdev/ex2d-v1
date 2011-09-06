@@ -19,7 +19,7 @@ using System.IO;
 ///////////////////////////////////////////////////////////////////////////////
 
 [CustomEditor(typeof(exLayer2D))]
-public class exLayer2DEditor : Editor {
+class exLayer2DEditor : Editor {
 
     ///////////////////////////////////////////////////////////////////////////////
     // properties
@@ -69,7 +69,6 @@ public class exLayer2DEditor : Editor {
         newBias = (float)bias/100.0f;
         if ( newLayer != curEdit.layer || newBias != curEdit.bias ) {
             curEdit.SetLayer( newLayer, newBias );
-            exSceneHelper.RecursivelyUpdateLayer(curEdit.transform);
         }
 
         // ======================================================== 

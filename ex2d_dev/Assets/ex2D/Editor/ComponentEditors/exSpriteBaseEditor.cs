@@ -19,7 +19,7 @@ using System.IO;
 ///////////////////////////////////////////////////////////////////////////////
 
 [CustomEditor(typeof(exSpriteBase))]
-public class exSpriteBaseEditor : exPlaneEditor {
+class exSpriteBaseEditor : exPlaneEditor {
 
     protected enum Physics {
         None,

@@ -158,7 +158,7 @@ public class exSpriteAnimation : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    void LateUpdate () {
+    void Update () {
         if ( !paused && playing && (curAnimation != null) ) {
             // advance the time and check if we trigger any animation events
             float delta = Time.deltaTime * curAnimation.speed;

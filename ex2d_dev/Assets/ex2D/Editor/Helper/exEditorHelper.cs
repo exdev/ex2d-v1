@@ -27,9 +27,15 @@ public static class exEditorHelper {
     //
     ///////////////////////////////////////////////////////////////////////////////
 
-    static Texture2D texLine;
+    // DISABLE { 
+    // static Texture2D texLine;
+    // } DISABLE end 
     static Texture2D texWhite;
     static Texture2D texCheckerboard;
+    static Texture2D texHelp;
+    static Texture2D texAnimPlay;
+    static Texture2D texAnimNext;
+    static Texture2D texAnimPrev;
 
     static GUIStyle styleRectBorder = null;
     static GUIStyle styleRectSelectBox = null;
@@ -87,6 +93,73 @@ public static class exEditorHelper {
     ///////////////////////////////////////////////////////////////////////////////
     // special texture
     ///////////////////////////////////////////////////////////////////////////////
+
+    // ------------------------------------------------------------------ 
+    /// \return the helper texture
+    /// return a help texture
+    // ------------------------------------------------------------------ 
+
+    public static Texture2D HelpTexture () {
+        // NOTE: hack from "unity editor resources" in Unity3D Contents
+        if ( texHelp == null ) {
+            texHelp = EditorGUIUtility.FindTexture("_help");
+            if ( texHelp == null ) {
+                Debug.LogError ( "can't find help texture" );
+                return null;
+            }
+        }
+        return texHelp;
+    }
+
+    // ------------------------------------------------------------------ 
+    /// \return the animation play texture
+    /// return a animation play texture
+    // ------------------------------------------------------------------ 
+
+    public static Texture2D AnimationPlayTexture () {
+        // NOTE: hack from "unity editor resources" in Unity3D Contents
+        if ( texAnimPlay == null ) {
+            texAnimPlay = EditorGUIUtility.FindTexture("d_animation.play");
+            if ( texAnimPlay == null ) {
+                Debug.LogError ( "can't find animation play texture" );
+                return null;
+            }
+        }
+        return texAnimPlay;
+    }
+
+    // ------------------------------------------------------------------ 
+    /// \return the animation next texture
+    /// return a animation next texture
+    // ------------------------------------------------------------------ 
+
+    public static Texture2D AnimationNextTexture () {
+        // NOTE: hack from "unity editor resources" in Unity3D Contents
+        if ( texAnimNext == null ) {
+            texAnimNext = EditorGUIUtility.FindTexture("d_animation.nextkey");
+            if ( texAnimNext == null ) {
+                Debug.LogError ( "can't find animation next texture" );
+                return null;
+            }
+        }
+        return texAnimNext;
+    }
+
+    // ------------------------------------------------------------------ 
+    /// \return the animation prev texture
+    /// return a animation prev texture
+    // ------------------------------------------------------------------ 
+
+    public static Texture2D AnimationPrevTexture () {
+        if ( texAnimPrev == null ) {
+            texAnimPrev = EditorGUIUtility.FindTexture("d_animation.prevkey");
+            if ( texAnimPrev == null ) {
+                Debug.LogError ( "can't find animation prev texture" );
+                return null;
+            }
+        }
+        return texAnimPrev;
+    }
 
     // ------------------------------------------------------------------ 
     /// \return the white texture
@@ -349,39 +422,63 @@ public static class exEditorHelper {
     // ------------------------------------------------------------------ 
 
     public static void DrawLine ( Vector2 _a, Vector2 _b, Color _color, float _width ) {
+
+        // DISABLE { 
+        // if ( (_b - _a).sqrMagnitude <= 0.0001f )
+        //     return;
+
+        // _a.x = Mathf.FloorToInt(_a.x); _a.y = Mathf.FloorToInt(_a.y);
+        // _b.x = Mathf.FloorToInt(_b.x); _b.y = Mathf.FloorToInt(_b.y);
+
+        // Matrix4x4 matrix = GUI.matrix;
+        // if ( texLine == null ) { 
+        //     string path = "Assets/ex2D/Editor/Resource/pixel.png";
+        //     texLine = (Texture2D)AssetDatabase.LoadAssetAtPath( path, typeof(Texture2D) );
+        //     if ( texLine == null )
+        //         Debug.LogError("Can't find pixel.png at Assets/ex2D/Editor/Resource/");
+        // }
+
+        // //
+        // Color savedColor = GUI.color;
+        // GUI.color = _color;
+
+        // // 
+        // float angle = Vector3.Angle(_b - _a, Vector2.right);
+        // if ( _a.y > _b.y ) { 
+        //     angle = -angle; 
+        // }
+        // GUIUtility.ScaleAroundPivot( new Vector2((_b - _a).magnitude, _width), 
+        //                              new Vector2(_a.x, _a.y + 0.5f) ); // NOTE: +0.5f can let the line stay in the center
+        // GUIUtility.RotateAroundPivot(angle, _a);
+
+        // // 
+        // GUI.DrawTexture(new Rect(_a.x, _a.y, 1.0f, 1.0f), texLine);
+
+        // // 
+        // GUI.matrix = matrix;
+        // GUI.color = savedColor;
+        // } DISABLE end 
+
         if ( (_b - _a).sqrMagnitude <= 0.0001f )
             return;
 
         _a.x = Mathf.FloorToInt(_a.x); _a.y = Mathf.FloorToInt(_a.y);
         _b.x = Mathf.FloorToInt(_b.x); _b.y = Mathf.FloorToInt(_b.y);
 
-        Matrix4x4 matrix = GUI.matrix;
-        if ( texLine == null ) { 
-            string path = "Assets/ex2D/Editor/Resource/pixel.png";
-            texLine = (Texture2D)AssetDatabase.LoadAssetAtPath( path, typeof(Texture2D) );
-            if ( texLine == null )
-                Debug.LogError("Can't find pixel.png at Assets/ex2D/Editor/Resource/");
-        }
-
         //
-        Color savedColor = GUI.color;
-        GUI.color = _color;
+        Color savedColor = Handles.color;
+        Handles.color = _color;
 
         // 
-        float angle = Vector3.Angle(_b - _a, Vector2.right);
-        if ( _a.y > _b.y ) { 
-            angle = -angle; 
+        if ( _width > 1.0f ) {
+            Handles.DrawAAPolyLine(_width, new Vector3[] { _a, _b } );
         }
-        GUIUtility.ScaleAroundPivot( new Vector2((_b - _a).magnitude, _width), 
-                                     new Vector2(_a.x, _a.y + 0.5f) ); // NOTE: +0.5f can let the line stay in the center
-        GUIUtility.RotateAroundPivot(angle, _a);
+        else {
+            Handles.DrawLine( _a, _b );
+        }
 
         // 
-        GUI.DrawTexture(new Rect(_a.x, _a.y, 1.0f, 1.0f), texLine);
-
-        // 
-        GUI.matrix = matrix;
-        GUI.color = savedColor;
+        Handles.color = savedColor;
     }
 
     // ------------------------------------------------------------------ 

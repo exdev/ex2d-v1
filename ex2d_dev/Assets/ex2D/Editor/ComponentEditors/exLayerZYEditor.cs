@@ -19,5 +19,5 @@ using System.IO;
 ///////////////////////////////////////////////////////////////////////////////
 
 [CustomEditor(typeof(exLayerZY))]
-public class exLayerZYEditor : exLayer2DEditor {
+class exLayerZYEditor : exLayer2DEditor {
 }

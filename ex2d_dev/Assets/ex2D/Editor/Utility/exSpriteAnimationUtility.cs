@@ -80,10 +80,9 @@ public static class exSpriteAnimationUtility {
             else {
                 string texturePath = AssetDatabase.GUIDToAssetPath(fi.textureGUID);
                 Texture2D tex2D = (Texture2D)AssetDatabase.LoadAssetAtPath( texturePath, typeof(Texture2D));
-
                 Debug.LogError ( "Failed to build sprite animation clip: can't find texture " 
-                                 + tex2D.name 
-                                 + "in exAtlasInfo." );
+                                 + ((tex2D != null) ? tex2D.name : "null") 
+                                 + " in exAtlasInfo." );
                 fi.atlas = null;
                 fi.index = -1;
                 hasError = true;
@@ -158,10 +157,11 @@ public static class exSpriteAnimationUtility {
     // ------------------------------------------------------------------ 
 
     public static void UpdateLength ( this exSpriteAnimClip _animClip ) {
-        _animClip.length = 0.0f;
+        float totalLength = 0.0f;
         foreach ( exSpriteAnimClip.FrameInfo fi in _animClip.frameInfos ) {
-            _animClip.length += fi.length;
+            totalLength += fi.length;
         }
+        _animClip.length = totalLength;
     }
 
     // ------------------------------------------------------------------ 

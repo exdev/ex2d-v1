@@ -19,7 +19,7 @@ using System.IO;
 ///////////////////////////////////////////////////////////////////////////////
 
 [CustomEditor(typeof(exPlane))]
-public class exPlaneEditor : Editor {
+class exPlaneEditor : Editor {
 
     protected static string[] anchorTexts = new string[] {
         "", "", "", 

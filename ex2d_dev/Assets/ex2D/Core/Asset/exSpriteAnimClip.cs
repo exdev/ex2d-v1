@@ -96,18 +96,18 @@ public class exSpriteAnimClip : ScriptableObject {
     public float length {
         get { return length_; }
         set {  
-            if ( value != 0.0f && value != length_ ) {
+            if ( value != 0.0f && Mathf.Approximately (value, length_) == false ) {
                 float totalLength = 0.0f;
                 float delta = value - length_;
                 foreach ( exSpriteAnimClip.FrameInfo fi in frameInfos) {
-                    float ratio = fi.length/length;
+                    float ratio = fi.length/length_;
                     fi.length = Mathf.Max(1.0f/60.0f, fi.length + delta * ratio);
                     totalLength += fi.length;
                 }
-                foreach ( exSpriteAnimClip.EventInfo ei in eventInfos) {
-                    ei.time = ei.time/length_ * value;
-                }
                 length_ = totalLength;
+                foreach ( exSpriteAnimClip.EventInfo ei in eventInfos) {
+                    ei.time = ei.time/length_ * length_;
+                }
             }
         }
     }

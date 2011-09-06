@@ -19,7 +19,7 @@ using System.IO;
 ///////////////////////////////////////////////////////////////////////////////
 
 [CustomEditor(typeof(exSpriteFont))]
-public class exSpriteFontEditor : exSpriteBaseEditor {
+class exSpriteFontEditor : exSpriteBaseEditor {
 
     private static string[] textAlignStrings = new string[] { "Left", "Center", "Right" };
 

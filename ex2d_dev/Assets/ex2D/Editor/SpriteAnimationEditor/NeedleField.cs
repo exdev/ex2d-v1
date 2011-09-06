@@ -27,23 +27,32 @@ partial class exSpriteAnimClipEditor {
 
     void NeedleField ( float yStart, float yEnd ) {
         float xStart = spriteAnimClipRect.x;
-        Rect rect = new Rect ( -4, spriteAnimClipRect.y - 10.0f, 4, 30.0f );
+        // float width = 4.0f;
         float offset = curSeconds * totalWidth / curEdit.length;
-        float xPos = curEdit.editorOffset + offset - rect.width/2.0f;
-        rect.x = xPos + xStart;
-        xPos = xStart + xPos + rect.width/2.0f;
+        // float xPos = curEdit.editorOffset + offset - width * 0.5f;
+        // xPos = xStart + xPos + width * 0.5f + 1;
+        float xPos = curEdit.editorOffset + offset;
+        xPos = xStart + xPos + 1;
 
         if ( xPos >= spriteAnimClipRect.x && xPos <= spriteAnimClipRect.xMax ) {
 
             // rect
-            exEditorHelper.DrawRect ( rect,
-                                      // inDraggingNeedleState ? new Color( 1.0f, 0.0f, 0.0f, 0.6f ) : new Color( 1.0f, 0.0f, 0.0f, 0.2f ),
-                                      new Color( 1.0f, 0.0f, 0.0f, 1.0f ),
-                                      Color.red );
+            exEditorHelper.DrawLine ( new Vector2( xPos, spriteAnimClipRect.y - 10.0f ),
+                                      new Vector2( xPos, spriteAnimClipRect.y + 20.0f ),
+                                      new Color ( 1.0f, 0.0f, 0.0f, 1.0f ),
+                                      1.0f );
+            exEditorHelper.DrawLine ( new Vector2( xPos+1, spriteAnimClipRect.y - 10.0f ),
+                                      new Vector2( xPos+1, spriteAnimClipRect.y + 20.0f ),
+                                      new Color ( 1.0f, 0.0f, 0.0f, 1.0f ),
+                                      1.0f );
 
             exEditorHelper.DrawLine ( new Vector2( xPos, yStart ),
                                       new Vector2( xPos, yEnd ),
-                                      new Color ( 0.8f, 0.0f, 0.0f, 1.0f ),
+                                      new Color ( 1.0f, 0.0f, 0.0f, 0.5f ),
+                                      1.0f );
+            exEditorHelper.DrawLine ( new Vector2( xPos+1, yStart ),
+                                      new Vector2( xPos+1, yEnd ),
+                                      new Color ( 1.0f, 0.0f, 0.0f, 0.5f ),
                                       1.0f );
             // show label
             if ( inDraggingNeedleState ) {

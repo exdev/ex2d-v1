@@ -26,6 +26,7 @@ partial class exSpriteAnimClipEditor {
     // ------------------------------------------------------------------ 
 
     void FrameInfoViewField ( Rect _rect, exSpriteAnimClip _animClip ) {
+
         float curX = 0.0f;
         int oldDepth = GUI.depth;
         GUI.BeginGroup(_rect);

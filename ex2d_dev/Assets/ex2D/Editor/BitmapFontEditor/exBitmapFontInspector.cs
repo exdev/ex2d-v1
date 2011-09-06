@@ -20,7 +20,7 @@ using System.IO;
 ///////////////////////////////////////////////////////////////////////////////
 
 [CustomEditor(typeof(exBitmapFont))]
-public class exBitmapFontInspector : Editor {
+class exBitmapFontInspector : Editor {
 
     // ------------------------------------------------------------------ 
     // Desc: 

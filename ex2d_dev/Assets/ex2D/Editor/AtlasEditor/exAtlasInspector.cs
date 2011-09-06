@@ -20,7 +20,7 @@ using System.IO;
 ///////////////////////////////////////////////////////////////////////////////
 
 [CustomEditor(typeof(exAtlas))]
-public class exAtlasInspector : Editor {
+class exAtlasInspector : Editor {
 
     // ------------------------------------------------------------------ 
     // Desc: 

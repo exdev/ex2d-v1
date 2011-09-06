@@ -142,38 +142,36 @@ partial class exSpriteAnimClipEditor : EditorWindow {
         if ( curEdit != _obj ) {
             Object obj = _obj; 
 
-            // DISABLE { 
-            // if ( obj is GameObject ) {
-            //     GameObject go = obj as GameObject;
-            //     // get exSpriteAnimation from itself, children or root 
-            //     exSpriteAnimation spAnim = go.GetComponent<exSpriteAnimation>();
-            //     // DISABLE { 
-            //     // if ( spAnim == null ) {
-            //     //     spAnim = go.GetComponentInChildren<exSpriteAnimation>();
-            //     //     if ( spAnim == null ) {
-            //     //         spAnim = go.transform.root.GetComponentInChildren<exSpriteAnimation>();
-            //     //     }
-            //     // }
-            //     // } DISABLE end 
-            //     if ( spAnim ) {
-            //         int idx = spAnim.animations.IndexOf(curEdit);
-            //         // if curEdit is exists in the selected gameObject, don't do anything
-            //         if ( idx != -1 ) {
-            //             Repaint ();
-            //             return;
-            //         }
+            if ( obj is GameObject ) {
+                GameObject go = obj as GameObject;
+                // get exSpriteAnimation from itself, children or root 
+                exSpriteAnimation spAnim = go.GetComponent<exSpriteAnimation>();
+                // DISABLE { 
+                // if ( spAnim == null ) {
+                //     spAnim = go.GetComponentInChildren<exSpriteAnimation>();
+                //     if ( spAnim == null ) {
+                //         spAnim = go.transform.root.GetComponentInChildren<exSpriteAnimation>();
+                //     }
+                // }
+                // } DISABLE end 
+                if ( spAnim ) {
+                    int idx = spAnim.animations.IndexOf(curEdit);
+                    // if curEdit is exists in the selected gameObject, don't do anything
+                    if ( idx != -1 ) {
+                        Repaint ();
+                        return;
+                    }
 
-            //         // if we have default animation, use it
-            //         if ( spAnim.defaultAnimation != null ) {
-            //             obj = spAnim.defaultAnimation;
-            //         }
-            //         // else we will check if we have animations in our list and use the first one 
-            //         else if ( spAnim.animations.Count > 0 ) {
-            //             obj = spAnim.animations[0];
-            //         }
-            //     }
-            // }
-            // } DISABLE end 
+                    // if we have default animation, use it
+                    if ( spAnim.defaultAnimation != null ) {
+                        obj = spAnim.defaultAnimation;
+                    }
+                    // else we will check if we have animations in our list and use the first one 
+                    else if ( spAnim.animations.Count > 0 ) {
+                        obj = spAnim.animations[0];
+                    }
+                }
+            }
 
             // if this is another anim clip, swtich to it.
             if ( obj is exSpriteAnimClip && obj != curEdit ) {
@@ -218,36 +216,131 @@ partial class exSpriteAnimClipEditor : EditorWindow {
         }
 
         // ======================================================== 
-        // if we have curEdit
+        // toolbar 
         // ======================================================== 
 
-        Rect lastRect = new Rect( 10, 0, 1, 1 );
-        scrollPos = EditorGUILayout.BeginScrollView ( scrollPos, 
-                                                      GUILayout.Width(position.width),
-                                                      GUILayout.Height(position.height) );
+        EditorGUILayout.BeginHorizontal ( EditorStyles.toolbar );
 
-        // ======================================================== 
-        // draw label
-        // ======================================================== 
+            // ======================================================== 
+            // Play 
+            // ======================================================== 
 
-        GUILayout.Space(20);
+            playing = GUILayout.Toggle ( playing, 
+                                         exEditorHelper.AnimationPlayTexture(),
+                                         EditorStyles.toolbarButton );
+            if ( playing == false ) {
+                startPlaying = false;
+                playingSeconds = 0.0f;
+            }
+            else if ( startPlaying == false ) {
+                startPlaying = true;
+                curSeconds = 0.0f;
+                playingSeconds = playingSelects ? playingStart : 0.0f;
+            }
 
-        GUILayout.BeginHorizontal();
-        GUILayout.Space(20);
-        GUILayout.BeginVertical( GUILayout.MaxWidth(500) );
+            //
+            if ( playing &&
+                 curEdit.wrapMode == WrapMode.Once &&
+                 curSeconds >= curEdit.length ) {
+                playing = false;
+            }
+
+            // ======================================================== 
+            // prev frame 
+            // ======================================================== 
+
+            if ( GUILayout.Button ( exEditorHelper.AnimationPrevTexture(), EditorStyles.toolbarButton ) ) {
+                exSpriteAnimClip.FrameInfo fi = curEdit.GetFrameInfoBySeconds ( curSeconds, WrapMode.Once );
+                int i = curEdit.frameInfos.IndexOf(fi) - 1;
+                if ( i >= 0  ) {
+                    curSeconds = 0.0f;
+                    for ( int j = 0; j < i; ++j ) {
+                        curSeconds += curEdit.frameInfos[j].length; 
+                    } 
+                    curSeconds += 0.1f/totalWidth * curEdit.length;
+                }
+            }
+
+            // ======================================================== 
+            // next frame 
+            // ======================================================== 
+
+            if ( GUILayout.Button ( exEditorHelper.AnimationNextTexture(), EditorStyles.toolbarButton ) ) {
+                exSpriteAnimClip.FrameInfo fi = curEdit.GetFrameInfoBySeconds ( curSeconds, WrapMode.Once );
+                int i = curEdit.frameInfos.IndexOf(fi) + 1;
+                if ( i < curEdit.frameInfos.Count ) {
+                    curSeconds = 0.0f;
+                    for ( int j = 0; j < i; ++j ) {
+                        curSeconds += curEdit.frameInfos[j].length; 
+                    } 
+                    curSeconds += 0.1f/totalWidth * curEdit.length;
+                }
+            }
+
+            // ======================================================== 
+            // draw preview speed
+            // ======================================================== 
+
+            GUILayout.Space(10);
+            curEdit.editorSpeed = EditorGUILayout.FloatField( "Preview Speed", 
+                                                              curEdit.editorSpeed,
+                                                              EditorStyles.toolbarTextField,
+                                                              GUILayout.Width(150) );
+
+            // ======================================================== 
+            // preview length
+            // ======================================================== 
+
+            GUILayout.Space(10);
+            EditorGUILayout.SelectableLabel( "Preview Length = " + curEdit.length / curEdit.editorSpeed, 
+                                             GUILayout.Width(160) );
 
             // ======================================================== 
             // Build
             // ======================================================== 
 
+            GUILayout.FlexibleSpace();
             GUI.enabled = curEdit.editorNeedRebuild; 
-            if ( GUILayout.Button("Build", GUILayout.MaxWidth(100) ) ) {
+            if ( GUILayout.Button( "Build", EditorStyles.toolbarButton, GUILayout.Width(80) ) ) 
+            {
                 curEdit.Build();
             }
             GUI.enabled = true; 
 
-            // asset path
-            EditorGUILayout.LabelField ( "Path", AssetDatabase.GetAssetPath(curEdit) );
+            // ======================================================== 
+            // Help
+            // ======================================================== 
+
+            if ( GUILayout.Button( exEditorHelper.HelpTexture(), EditorStyles.toolbarButton ) ) {
+                Help.BrowseURL("http://www.ex-dev.com/ex2d/wiki/doku.php?id=manual:sprite_anim_editor_guide");
+            }
+
+        EditorGUILayout.EndHorizontal ();
+
+        // ======================================================== 
+        // Scroll View
+        // ======================================================== 
+
+        float toolbarHeight = EditorStyles.toolbar.CalcHeight( new GUIContent(""), 0 );
+        scrollPos = EditorGUILayout.BeginScrollView ( scrollPos, 
+                                                      GUILayout.Width(position.width),
+                                                      GUILayout.Height(position.height-toolbarHeight) );
+
+        Rect lastRect = new Rect( 10, 0, 1, 1 );
+        GUILayout.Space(5);
+
+        // ======================================================== 
+        // draw label
+        // ======================================================== 
+
+        GUILayout.BeginHorizontal();
+        GUILayout.Space(20);
+        GUILayout.BeginVertical( GUILayout.MaxWidth(500) );
+
+            // DISABLE { 
+            // // asset path
+            // EditorGUILayout.LabelField ( "Path", AssetDatabase.GetAssetPath(curEdit) );
+            // } DISABLE end 
 
             // animclip field
             Object newClip = EditorGUILayout.ObjectField( "Sprite Animation"
@@ -361,46 +454,6 @@ partial class exSpriteAnimClipEditor : EditorWindow {
         // left panel
         GUILayout.BeginVertical( GUILayout.MaxWidth(300) );
         // ======================================================== 
-
-            GUILayout.BeginHorizontal();
-
-            // ======================================================== 
-            // draw preview speed
-            // ======================================================== 
-
-            curEdit.editorSpeed = EditorGUILayout.FloatField( "Preview Speed", curEdit.editorSpeed, GUILayout.Width(150) );
-
-            // ======================================================== 
-            // Play 
-            // ======================================================== 
-
-            playing = GUILayout.Toggle ( playing, "Play", GUI.skin.button, GUILayout.Width(80) ); 
-            if ( playing == false ) {
-                startPlaying = false;
-                playingSeconds = 0.0f;
-            }
-            else if ( startPlaying == false ) {
-                startPlaying = true;
-                curSeconds = 0.0f;
-                playingSeconds = playingSelects ? playingStart : 0.0f;
-            }
-
-            //
-            if ( playing &&
-                 curEdit.wrapMode == WrapMode.Once &&
-                 curSeconds >= curEdit.length ) {
-                playing = false;
-            }
-
-            GUILayout.EndHorizontal();
-
-            // ======================================================== 
-            // preview length
-            // ======================================================== 
-
-            EditorGUILayout.FloatField( "Preview Length", 
-                                        curEdit.length / curEdit.editorSpeed,
-                                        GUILayout.Width(150) );
 
             // ======================================================== 
             // PreviewField 

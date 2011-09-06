@@ -26,7 +26,6 @@ using System.Collections;
 // DISABLE { 
 // [ExecuteInEditMode]
 // } DISABLE end 
-[AddComponentMenu("ex2D Helper/2D Layer")]
 public partial class exLayer2D : MonoBehaviour {
 
     // ------------------------------------------------------------------ 
@@ -59,7 +58,7 @@ public partial class exLayer2D : MonoBehaviour {
         set {
             if ( Mathf.Approximately(depth_,value) == false ) {
                 depth_ = value;
-                UpdateTransformDepth ();
+                RecursivelyUpdateTransformDepth ();
             }
         }
     }
@@ -104,8 +103,8 @@ public partial class exLayer2D : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    void LateUpdate () {
 // DISABLE: just use Edit/ex2D/Update Scene Layers { 
+//     void LateUpdate () {
 // #if UNITY_EDITOR
 //         if ( EditorApplication.isPlaying == false && 
 //              AnimationUtility.InAnimationMode() == false ) 
@@ -120,9 +119,8 @@ public partial class exLayer2D : MonoBehaviour {
 // #if UNITY_EDITOR
 //         }
 // #endif
+//     }
 // } DISABLE end 
-        UpdateTransformDepth ();
-    }
 
     // ------------------------------------------------------------------ 
     /// \param _layer the expect layer
@@ -152,4 +150,35 @@ public partial class exLayer2D : MonoBehaviour {
             depth = CalculateDepth( Camera.main );
     }
 
+
+    // ------------------------------------------------------------------ 
+    /// recursively update the transform depth in child layers 
+    // ------------------------------------------------------------------ 
+
+    public void RecursivelyUpdateTransformDepth () {
+        UpdateTransformDepth ();
+
+        foreach ( Transform child in transform ) {
+            exLayer2D layer = child.GetComponent<exLayer2D>();
+            if ( layer ) {
+                layer.RecursivelyUpdateTransformDepth ();
+            }
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    /// recursively update child layers, this will recalculate depth, and update the transform
+    // ------------------------------------------------------------------ 
+
+    public void RecursivelyUpdateLayer () {
+        UpdateDepth();
+        UpdateTransformDepth();
+
+        foreach ( Transform child in transform ) {
+            exLayer2D layer = child.GetComponent<exLayer2D>();
+            if ( layer ) {
+                layer.RecursivelyUpdateLayer();
+            }
+        }
+    }
 }

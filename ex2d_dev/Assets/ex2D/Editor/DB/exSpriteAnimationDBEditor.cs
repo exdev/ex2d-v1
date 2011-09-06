@@ -20,7 +20,7 @@ using System.IO;
 ///////////////////////////////////////////////////////////////////////////////
 
 [CustomEditor(typeof(exSpriteAnimationDB))]
-public class exSpriteAnimationDBEditor : Editor {
+class exSpriteAnimationDBEditor : Editor {
 
     private exSpriteAnimationDB curEditTarget;
 

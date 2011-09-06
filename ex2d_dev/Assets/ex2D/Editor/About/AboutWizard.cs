@@ -17,7 +17,7 @@ using System.IO;
 // defines
 ///////////////////////////////////////////////////////////////////////////////
 
-public class AboutWizard : ScriptableWizard {
+class AboutWizard : ScriptableWizard {
 
     // ------------------------------------------------------------------ 
     // Desc: 
