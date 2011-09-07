@@ -94,7 +94,7 @@ class exSpriteBaseEditor : exPlaneEditor {
 
             Collider myCollider = editSpriteBase.GetComponent<Collider>();
             if ( myCollider != null ) {
-                Object.DestroyImmediate(myCollider);
+                Object.DestroyImmediate(myCollider,true);
             }
 
             switch ( physics ) {
@@ -127,7 +127,7 @@ class exSpriteBaseEditor : exPlaneEditor {
                 if ( usePixelPerfect )
                     editSpriteBase.gameObject.AddComponent<exPixelPerfect>();
                 else {
-                    Object.DestroyImmediate(compPixelPerfect);
+                    Object.DestroyImmediate(compPixelPerfect,true);
                 }
                 GUI.changed = true;
             }

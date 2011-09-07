@@ -88,6 +88,7 @@ public class exSpriteAnimClip : ScriptableObject {
     public WrapMode wrapMode = WrapMode.Once; ///< default wrap mode
     public StopAction stopAction = StopAction.DoNothing; ///< the default type of action used when the animation stopped 
     public float length = 1.0f; ///< the length of the animation clip in seconds
+    public float sampleRate = 60.0f; ///< the sample rate used in this animation clip
 
     // DELME { 
     // // ------------------------------------------------------------------ 
@@ -297,7 +298,9 @@ public class exSpriteAnimClip : ScriptableObject {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    void Trigger ( GameObject _gameObject, EventInfo _eventInfo ) {
+    void Trigger ( GameObject _gameObject, 
+                   EventInfo _eventInfo ) {
+
         if ( _eventInfo.methodName == "" )
             return;
 

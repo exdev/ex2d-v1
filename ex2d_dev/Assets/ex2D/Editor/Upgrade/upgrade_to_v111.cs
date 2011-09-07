@@ -35,7 +35,7 @@ public static class upgrade_to_v111 {
             if ( layer2d ) {
                 layer = layer2d.layer; 
                 bias = layer2d.bias; 
-                Object.DestroyImmediate(layer2d);
+                Object.DestroyImmediate(layer2d,true);
             }
             switch ( plane.plane ) {
             case exPlane.Plane.XY: plane.layer2d = plane.gameObject.AddComponent<exLayerXY>(); break;

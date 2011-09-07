@@ -143,7 +143,7 @@ public class exPlane : MonoBehaviour {
                 if ( layer2d ) {
                     layer = layer2d.layer; 
                     bias = layer2d.bias; 
-                    Object.DestroyImmediate(layer2d);
+                    Object.DestroyImmediate(layer2d,true);
 
                     switch ( plane_ ) {
                     case exPlane.Plane.XY: layer2d = gameObject.AddComponent<exLayerXY>(); break;
@@ -276,10 +276,10 @@ public class exPlane : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     virtual protected void Awake () {
-        meshFilter = GetComponent<MeshFilter>();
-        layer2d = GetComponent<exLayer2D>();
         if ( camera_ == null )
             camera_ = Camera.main;
+        meshFilter = GetComponent<MeshFilter>();
+        layer2d = GetComponent<exLayer2D>();
     }
 
     // ------------------------------------------------------------------ 

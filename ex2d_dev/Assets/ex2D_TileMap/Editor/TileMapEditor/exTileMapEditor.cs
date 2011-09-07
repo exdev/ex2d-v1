@@ -45,7 +45,7 @@ partial class exTileMapEditor : exPlaneEditor {
     // ------------------------------------------------------------------ 
 
     void OnDisable () {
-        Object.DestroyImmediate(mouseTile); 
+        Object.DestroyImmediate(mouseTile,true); 
         mouseTile = null;
     }
 

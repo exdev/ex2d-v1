@@ -35,31 +35,36 @@ partial class exSpriteAnimClipEditor {
         float boxWidth = _rect.width;
         float boxHeight = _rect.height - _topHeight - _botHeight;
 
-        //
+        // NOTE: a protection to prevent while dead loop
+        _animClip.editorScale = Mathf.Clamp( _animClip.editorScale, 0.01f, 10.0f );
+
+        // constant
         float widthToShowLabel = 40.0f;
         float minWidth = 10.0f;
         float maxWidth = 80.0f;
-        float unitWidth = 1000.0f; 
-        float cellWidth = unitWidth * _animClip.editorScale;
-        float curUnitSecond = 1.0f;
-        float minUnitSecond = 1.0f/60.0f;
+        float unitWidth = minWidth;
+        float minUnitSecond = 1.0f/_animClip.sampleRate;
+
+        // variable
         int curIdx = 0;
+        float curCellWidth = unitWidth * _animClip.editorScale;
+        float curUnitSecond = 1.0f/_animClip.sampleRate;
 
         // get curUnitSecond and curIdx
-        if ( cellWidth < minWidth ) {
-            while ( cellWidth < minWidth ) {
+        if ( curCellWidth < minWidth ) {
+            while ( curCellWidth < minWidth ) {
                 curUnitSecond = curUnitSecond * lodScales[curIdx];
-                cellWidth = cellWidth * lodScales[curIdx];
+                curCellWidth = curCellWidth * lodScales[curIdx];
                 curIdx = (curIdx + 1) % lodScales.Length;
             }
         }
-        else if ( cellWidth > maxWidth ) {
-            while ( (cellWidth > maxWidth) && (curUnitSecond > minUnitSecond) ) {
+        else if ( curCellWidth > maxWidth ) {
+            while ( (curCellWidth > maxWidth) && (curUnitSecond > minUnitSecond) ) {
                 curIdx = curIdx - 1;
                 if ( curIdx < 0 )
                     curIdx = lodScales.Length - 1;
                 curUnitSecond = curUnitSecond / lodScales[curIdx];
-                cellWidth = cellWidth / lodScales[curIdx];
+                curCellWidth = curCellWidth / lodScales[curIdx];
             }
         }
 
@@ -68,17 +73,17 @@ partial class exSpriteAnimClipEditor {
             int prev = curIdx - 1;
             if ( prev < 0 )
                 prev = lodScales.Length - 1;
-            float prevCellWidth = cellWidth / lodScales[prev];
+            float prevCellWidth = curCellWidth / lodScales[prev];
             float prevUnitSecond = curUnitSecond / lodScales[prev];
             if ( prevCellWidth >= minWidth ) {
                 curIdx = prev;
                 curUnitSecond = prevUnitSecond;
-                cellWidth = prevCellWidth;
+                curCellWidth = prevCellWidth;
             }
         }
 
         // init total width and cell-count
-        totalWidth = unitWidth * _animClip.length * _animClip.editorScale;
+        totalWidth = unitWidth * _animClip.editorScale * (_animClip.length / minUnitSecond);
         if ( totalWidth > boxWidth/2.0f ) {
             _animClip.editorOffset = Mathf.Clamp( _animClip.editorOffset, boxWidth - totalWidth - boxWidth/2.0f, 0 );
         }
@@ -90,7 +95,7 @@ partial class exSpriteAnimClipEditor {
         int idxFrom = 3;
         float[] lodWidthList = new float[5];
         int[] lodIntervalList = new int[5];
-        lodWidthList[0] = cellWidth;
+        lodWidthList[0] = curCellWidth;
         lodIntervalList[0] = 1;
         for ( int i = 1; i < lodScales.Length+1; ++i ) {
             lodWidthList[i] = lodWidthList[i-1] * lodScales[(curIdx+i-1)%lodScales.Length];
@@ -111,10 +116,11 @@ partial class exSpriteAnimClipEditor {
         //
         float xStart = 0.0f;
         float yStart = _topHeight;
-        int iStartFrom = Mathf.CeilToInt( -_animClip.editorOffset/cellWidth ); 
-        int cellCount = Mathf.CeilToInt( (boxWidth - _animClip.editorOffset)/cellWidth );
+        // NOTE: +50 here can avoid us clip text so early 
+        int iStartFrom = Mathf.CeilToInt( -(_animClip.editorOffset + 50.0f)/curCellWidth );
+        int cellCount = Mathf.CeilToInt( (boxWidth - _animClip.editorOffset)/curCellWidth );
         for ( int i = iStartFrom; i < cellCount; ++i ) {
-            float x = xStart + _animClip.editorOffset + i * cellWidth + 1;
+            float x = xStart + _animClip.editorOffset + i * curCellWidth + 1;
             int idx = idxFrom;
 
             while ( idx >= 0) {
@@ -182,7 +188,7 @@ partial class exSpriteAnimClipEditor {
         // ======================================================== 
 
         for ( int i = iStartFrom; i < cellCount; ++i ) {
-            float x = _animClip.editorOffset + i * cellWidth + 1;
+            float x = _animClip.editorOffset + i * curCellWidth + 1;
             int idx = idxFrom;
 
             while ( idx >= 0) {
@@ -226,7 +232,7 @@ partial class exSpriteAnimClipEditor {
                                       yStart + eventViewHeight,
                                       totalWidth, 
                                       boxHeight - eventViewHeight );
-        FrameInfoViewField ( frameInfoViewRect, curEdit );
+        FrameInfoViewField ( frameInfoViewRect, _animClip );
 
         // ======================================================== 
         // draw border
@@ -256,18 +262,14 @@ partial class exSpriteAnimClipEditor {
         GUILayoutUtility.GetRect ( _rect.width, _rect.height + _scalarHeight );
 
         // DEBUG { 
-        // GUILayout.Space(20);
-        // if ( curElement != null )
-        //     GUILayout.Label ( "Current GUI Element: " + curElement.name );
-        // else
-        //     GUILayout.Label ( "Current GUI Element: none" );
         // GUILayout.Label ( "editorScale: " + _animClip.editorScale );
-        // GUILayout.Label ( "cellWidth: " + cellWidth );
+        // GUILayout.Label ( "curCellWidth: " + curCellWidth );
         // GUILayout.Label ( "curUnitSecond: " + curUnitSecond );
-        // for ( int i = 0; i < 5; ++i ) {
-        //     GUILayout.Label ( "lod width " + i + " = " + lodWidthList[i] );
-        //     GUILayout.Label ( "lod interval " + i + " = " + lodIntervalList[i] );
-        // }
+        // GUILayout.Label ( "totalWidth: " + totalWidth );
+        // // for ( int i = 0; i < 5; ++i ) {
+        // //     GUILayout.Label ( "lod width " + i + " = " + lodWidthList[i] );
+        // //     GUILayout.Label ( "lod interval " + i + " = " + lodIntervalList[i] );
+        // // }
         // } DEBUG end 
 
         // ======================================================== 
@@ -281,7 +283,7 @@ partial class exSpriteAnimClipEditor {
                     s /= 10.0f;
                 }
                 _animClip.editorScale -= e.delta.y * s * 0.05f;
-                _animClip.editorScale = Mathf.Clamp( _animClip.editorScale, 0.01f, 1000.0f );
+                _animClip.editorScale = Mathf.Clamp( _animClip.editorScale, 0.001f, 100.0f );
                 Repaint();
 
                 e.Use();

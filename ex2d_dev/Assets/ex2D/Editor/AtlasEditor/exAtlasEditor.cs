@@ -193,7 +193,9 @@ partial class exAtlasEditor : EditorWindow {
             if ( GUILayout.Button( "Select Sprites...", EditorStyles.toolbarButton ) ) {
                 List<Object> selects = new List<Object>(curEdit.elements.Count);
                 foreach ( exAtlasInfo.Element el in selectedElements ) {
-                    selects.Add(el.texture);
+                    if ( selects.IndexOf(el.texture) == -1 ) {
+                        selects.Add(el.texture);
+                    }
                 }
 
                 if ( selects.Count != 0 ) {

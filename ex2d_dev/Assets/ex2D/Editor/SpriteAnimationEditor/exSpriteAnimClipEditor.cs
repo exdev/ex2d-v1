@@ -292,14 +292,30 @@ partial class exSpriteAnimClipEditor : EditorWindow {
             // ======================================================== 
 
             GUILayout.Space(10);
-            EditorGUILayout.SelectableLabel( "Preview Length = " + curEdit.length / curEdit.editorSpeed, 
-                                             GUILayout.Width(160) );
+            EditorGUILayout.SelectableLabel( "Preview Length = " + curEdit.length / curEdit.editorSpeed + " secs", 
+                                             GUILayout.Width(200) );
+
+            GUILayout.FlexibleSpace();
+            // ======================================================== 
+            // editor scale 
+            // ======================================================== 
+
+            GUILayout.Label ("Zoom");
+            GUILayout.Space(5);
+            curEdit.editorScale = GUILayout.HorizontalSlider ( curEdit.editorScale, 
+                                                               0.01f, 
+                                                               10.0f, 
+                                                               GUILayout.MaxWidth(150) );
+            GUILayout.Space(5);
+            curEdit.editorScale = EditorGUILayout.FloatField( curEdit.editorScale,
+                                                              EditorStyles.toolbarTextField,
+                                                              GUILayout.Width(50) );
+            curEdit.editorScale = Mathf.Clamp( curEdit.editorScale, 0.01f, 10.0f );
 
             // ======================================================== 
             // Build
             // ======================================================== 
 
-            GUILayout.FlexibleSpace();
             GUI.enabled = curEdit.editorNeedRebuild; 
             if ( GUILayout.Button( "Build", EditorStyles.toolbarButton, GUILayout.Width(80) ) ) 
             {
@@ -355,7 +371,9 @@ partial class exSpriteAnimClipEditor : EditorWindow {
                 Selection.activeObject = newClip;
 
             // length
-            float newLength = EditorGUILayout.FloatField( "Animation Length", curEdit.length, GUILayout.MaxWidth(200) );
+            float newLength = EditorGUILayout.FloatField( "Animation Length", 
+                                                          curEdit.length, 
+                                                          GUILayout.MaxWidth(200) );
             if ( newLength != curEdit.length ) {
                 float totalLength = 0.0f;
                 float delta = newLength - curEdit.length;
@@ -370,11 +388,20 @@ partial class exSpriteAnimClipEditor : EditorWindow {
                 }
             }
 
+            // sample rate
+            curEdit.sampleRate = EditorGUILayout.FloatField( "Sample Rate", 
+                                                             curEdit.sampleRate, 
+                                                             GUILayout.MaxWidth(200) );
+
             // Wrap Mode enum popup
-            curEdit.wrapMode = (WrapMode)EditorGUILayout.EnumPopup ( "Wrap Mode", curEdit.wrapMode, GUILayout.Width(200) );
+            curEdit.wrapMode = (WrapMode)EditorGUILayout.EnumPopup ( "Wrap Mode", 
+                                                                     curEdit.wrapMode, 
+                                                                     GUILayout.Width(200) );
 
             // Anim Stop Action 
-            curEdit.stopAction = (exSpriteAnimClip.StopAction)EditorGUILayout.EnumPopup ( "Stop Action", curEdit.stopAction, GUILayout.Width(200) );
+            curEdit.stopAction = (exSpriteAnimClip.StopAction)EditorGUILayout.EnumPopup ( "Stop Action", 
+                                                                                          curEdit.stopAction, 
+                                                                                          GUILayout.Width(200) );
         GUILayout.EndVertical();
         GUILayout.EndHorizontal();
         GUILayout.Space(20);

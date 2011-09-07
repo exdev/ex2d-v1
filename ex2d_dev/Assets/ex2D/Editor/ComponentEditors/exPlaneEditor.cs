@@ -110,11 +110,11 @@ class exPlaneEditor : Editor {
 
             exScreenPosition screenPos = editPlane.GetComponent<exScreenPosition>();
             if ( screenPos != null ) {
-                Object.DestroyImmediate(screenPos);
+                Object.DestroyImmediate(screenPos,true);
             }
             exViewportPosition vpPos = editPlane.GetComponent<exViewportPosition>();
             if ( vpPos != null ) {
-                Object.DestroyImmediate(vpPos);
+                Object.DestroyImmediate(vpPos,true);
             }
 
             switch ( trans2d ) {
@@ -151,7 +151,7 @@ class exPlaneEditor : Editor {
                     editPlane.layer2d.UpdateDepth();
                 }
                 else {
-                    Object.DestroyImmediate(editPlane.layer2d);
+                    Object.DestroyImmediate(editPlane.layer2d,true);
                     editPlane.layer2d = null;
                 }
                 GUI.changed = true;
@@ -173,7 +173,7 @@ class exPlaneEditor : Editor {
                 if ( useAnimHelper )
                     AddAnimationHelper();
                 else {
-                    Object.DestroyImmediate(compAnimHelper);
+                    Object.DestroyImmediate(compAnimHelper,true);
                 }
                 GUI.changed = true;
             }
