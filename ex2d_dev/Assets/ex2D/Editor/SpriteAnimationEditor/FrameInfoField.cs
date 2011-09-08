@@ -297,7 +297,7 @@ partial class exSpriteAnimClipEditor {
                                     Color.yellow, 
                                     1.0f );
             GUI.Label ( new Rect( lineAt-15.0f, yStart + height, 30.0f, 20.0f ),
-                        exTimeHelper.ToString_Seconds(curSeconds) );
+                        exTimeHelper.ToString_Frames(curSeconds,curEdit.sampleRate) );
         }
 
         Rect rect = new Rect ( _rect.x + curEdit.editorOffset, _rect.y + frameInfoViewRect.y, _rect.width, _rect.height );
@@ -366,25 +366,32 @@ partial class exSpriteAnimClipEditor {
         GUILayout.Label( "FrameInfo Inspector", style );
 
         float newLength = 0.0f;
+        int curFrame = 0;
+        int newFrame = 0;
         bool needUpdate = false;
         bool hasSelects = selectedFrameInfos.Count != 0;
 
         // ======================================================== 
-        // each frame length
+        // each frames
         // ======================================================== 
 
         GUI.enabled = hasSelects; 
         float length = hasSelects ? selectedFrameInfos[0].length : -1.0f;
-        newLength = EditorGUILayout.FloatField("Each Frame Length", length );
-        if ( newLength != length ) {
-            foreach ( exSpriteAnimClip.FrameInfo fi in selectedFrameInfos ) {
-                fi.length = newLength;
+        GUILayout.BeginHorizontal();
+            curFrame = curEdit.SnapToFrames(length);
+            newFrame = EditorGUILayout.IntField( "Each Frames", curFrame, GUILayout.Width(200) );
+            if ( newFrame != curFrame ) {
+                newLength = curEdit.FrameToSeconds(Mathf.Max(1,newFrame));
+                foreach ( exSpriteAnimClip.FrameInfo fi in selectedFrameInfos ) {
+                    fi.length = newLength;
+                }
+                needUpdate = true;
             }
-            needUpdate = true;
-        }
+            GUILayout.Label( length.ToString("f3") + " secs" );
+        GUILayout.EndHorizontal();
 
         // ======================================================== 
-        // total frame length
+        // total frames
         // ======================================================== 
 
         GUI.enabled = hasSelects; 
@@ -392,15 +399,15 @@ partial class exSpriteAnimClipEditor {
         foreach ( exSpriteAnimClip.FrameInfo fi in selectedFrameInfos ) {
             total += fi.length;
         }
-        newLength = EditorGUILayout.FloatField("Total Frame Length", total );
-        if ( newLength != total ) {
-            float delta = newLength - total;
-            foreach ( exSpriteAnimClip.FrameInfo fi in selectedFrameInfos) {
-                float ratio = fi.length/total;
-                fi.length = Mathf.Max(1.0f/60.0f, fi.length + delta * ratio);
+        GUILayout.BeginHorizontal();
+            curFrame = curEdit.SnapToFrames(total);
+            newFrame = EditorGUILayout.IntField( "Total Frames", curFrame, GUILayout.Width(200) );
+            if ( newFrame != curFrame ) {
+                newLength = curEdit.FrameToSeconds(Mathf.Max(1,newFrame));
+                ResizeSelectedFrames (newLength);
             }
-            needUpdate = true;
-        }
+            GUILayout.Label( total.ToString("f3") + " secs" );
+        GUILayout.EndHorizontal();
 
         // ======================================================== 
         // Select 
@@ -439,15 +446,19 @@ partial class exSpriteAnimClipEditor {
 #if !UNITY_3_0 && !UNITY_3_1 && !UNITY_3_3
                                              , false 
 #endif
-                                           );
+                                             , GUILayout.Width(300) );
                 GUI.enabled = true; 
 
                 GUI.enabled = selectedFrameInfos.IndexOf(fi) != -1;
-                newLength = EditorGUILayout.FloatField("Length", fi.length );
-                if ( newLength != fi.length ) {
-                    fi.length = newLength;
-                    needUpdate = true;
-                }
+                GUILayout.BeginHorizontal();
+                    curFrame = curEdit.SnapToFrames(fi.length);
+                    newFrame = EditorGUILayout.IntField( "Frames", curEdit.SnapToFrames(fi.length), GUILayout.Width(200) );
+                    if ( newFrame != curFrame ) {
+                        fi.length = curEdit.FrameToSeconds(Mathf.Max(1,newFrame));
+                        needUpdate = true;
+                    }
+                    GUILayout.Label( fi.length.ToString("f3") + " secs" );
+                GUILayout.EndHorizontal();
                 GUI.enabled = true; 
             GUILayout.EndHorizontal();
         }

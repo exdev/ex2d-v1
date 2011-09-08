@@ -50,6 +50,8 @@ partial class exSpriteAnimClipEditor : EditorWindow {
     private bool inDraggingNeedleState = false;
     private bool inRectSelectEventState = false;
 
+    private exSpriteAnimClip.EventInfo activeEventInfo = null;
+
     private float yFrameInfoOffset = 10.0f;
     private Rect frameInfoViewRect = new Rect( 0, 0, 1, 1 );
     private Rect eventInfoViewRect = new Rect( 0, 0, 1, 1 );
@@ -86,7 +88,7 @@ partial class exSpriteAnimClipEditor : EditorWindow {
     void OnEnable () {
         name = "Sprite Animation Editor";
         wantsMouseMove = true;
-        autoRepaintOnSceneChange = true;
+        autoRepaintOnSceneChange = false;
         // position = new Rect ( 50, 50, 800, 600 );
     }
 
@@ -278,7 +280,16 @@ partial class exSpriteAnimClipEditor : EditorWindow {
             }
 
             // ======================================================== 
-            // draw preview speed
+            // frames
+            // ======================================================== 
+
+            GUILayout.Space(5);
+            EditorGUILayout.SelectableLabel( curEdit.SnapToFrames(curEdit.length) + " frames | "
+                                             + curEdit.length.ToString("f3") + " secs",
+                                             GUILayout.Width(150) );
+
+            // ======================================================== 
+            // preview speed
             // ======================================================== 
 
             GUILayout.Space(10);
@@ -291,8 +302,8 @@ partial class exSpriteAnimClipEditor : EditorWindow {
             // preview length
             // ======================================================== 
 
-            GUILayout.Space(10);
-            EditorGUILayout.SelectableLabel( "Preview Length = " + curEdit.length / curEdit.editorSpeed + " secs", 
+            GUILayout.Space(5);
+            EditorGUILayout.SelectableLabel( (curEdit.length / curEdit.editorSpeed).ToString("f3") + " secs", 
                                              GUILayout.Width(200) );
 
             GUILayout.FlexibleSpace();
@@ -370,23 +381,26 @@ partial class exSpriteAnimClipEditor : EditorWindow {
             if ( newClip != curEdit )
                 Selection.activeObject = newClip;
 
-            // length
-            float newLength = EditorGUILayout.FloatField( "Animation Length", 
-                                                          curEdit.length, 
-                                                          GUILayout.MaxWidth(200) );
-            if ( newLength != curEdit.length ) {
-                float totalLength = 0.0f;
-                float delta = newLength - curEdit.length;
-                foreach ( exSpriteAnimClip.FrameInfo fi in curEdit.frameInfos) {
-                    float ratio = fi.length/curEdit.length;
-                    fi.length = Mathf.Max(1.0f/60.0f, fi.length + delta * ratio);
-                    totalLength += fi.length;
-                }
-                curEdit.length = totalLength;
-                foreach ( exSpriteAnimClip.EventInfo ei in curEdit.eventInfos) {
-                    ei.time = ei.time/curEdit.length * curEdit.length;
-                }
-            }
+            // DELME { 
+            // // length
+            // float newLength = EditorGUILayout.FloatField( "Animation Length", 
+            //                                               curEdit.length, 
+            //                                               GUILayout.MaxWidth(200) );
+            // if ( newLength != curEdit.length ) {
+            //     float totalLength = 0.0f;
+            //     float delta = newLength - curEdit.length;
+            //     foreach ( exSpriteAnimClip.FrameInfo fi in curEdit.frameInfos) {
+            //         float ratio = fi.length/curEdit.length;
+            //         fi.length = Mathf.Max(1.0f/60.0f, fi.length + delta * ratio);
+            //         totalLength += fi.length;
+            //     }
+            //     foreach ( exSpriteAnimClip.EventInfo ei in curEdit.eventInfos) {
+            //         ei.time = ei.time/curEdit.length * totalLength;
+            //     }
+            //     curEdit.length = totalLength;
+            //     GUI.changed = true;
+            // }
+            // } DELME end 
 
             // sample rate
             curEdit.sampleRate = EditorGUILayout.FloatField( "Sample Rate", 
@@ -446,8 +460,7 @@ partial class exSpriteAnimClipEditor : EditorWindow {
                                             Color.yellow, 
                                             1.0f );
                     GUI.Label ( new Rect( lineAt-15.0f, yStart + height, 30.0f, 20.0f ),
-                                ei.time.ToString()
-                                // exTimeHelper.ToString_Seconds(ei.time)
+                                exTimeHelper.ToString_Frames(ei.time,curEdit.sampleRate)
                               );
                 }
             }
@@ -534,10 +547,10 @@ partial class exSpriteAnimClipEditor : EditorWindow {
 
         if ( selectRect.width != 0.0f || selectRect.height != 0.0f ) {
             if ( inRectSelectFrameState ) {
-                exEditorHelper.DrawRect( selectRect, new Color( 0.0f, 0.5f, 1.0f, 0.2f ), Color.black );
+                exEditorHelper.DrawRect( selectRect, new Color( 0.0f, 0.5f, 1.0f, 0.2f ), new Color( 0.2f, 0.5f, 1.0f, 1.0f ) );
             }
             else if ( inRectSelectEventState ) {
-                exEditorHelper.DrawRect( selectRect, new Color( 1.0f, 0.0f, 0.0f, 0.2f ), Color.black );
+                exEditorHelper.DrawRect( selectRect, new Color( 1.0f, 0.0f, 0.0f, 0.2f ), new Color( 1.0f, 0.0f, 0.0f, 1.0f ) );
             }
         }
 
@@ -612,7 +625,7 @@ partial class exSpriteAnimClipEditor : EditorWindow {
         // resize frame info state
         if ( inResizeFrameInfoState ) {
             if ( e.type == EventType.MouseDrag ) {
-                ResizeSelectedFrames ( e.delta );
+                ResizeSelectedFrames ( e.mousePosition );
 
                 Repaint();
                 e.Use();
@@ -658,7 +671,7 @@ partial class exSpriteAnimClipEditor : EditorWindow {
         // dragging selected event
         if ( inDraggingEventInfoState ) {
             if ( e.type == EventType.MouseDrag ) {
-                MoveSelectedEventInfo ( e.delta );
+                MoveSelectedEventInfo ( e.mousePosition );
 
                 Repaint();
                 e.Use();
@@ -924,21 +937,59 @@ partial class exSpriteAnimClipEditor : EditorWindow {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    void ResizeSelectedFrames ( Vector2 _delta ) {
-        //
-        float secondToWidth = totalWidth/curEdit.length;
-        float deltaWidth = _delta.x / secondToWidth;
-        float total = 0.0f;
+    void ResizeSelectedFrames ( Vector2 _pos ) {
+        // float pos = Mathf.Clamp( _pos.x - spriteAnimClipRect.x, 0.0f, totalWidth + curEdit.editorOffset );
+        float pos = Mathf.Max( _pos.x - spriteAnimClipRect.x, 0.0f );
+        float expectSeconds = (pos - curEdit.editorOffset) * curEdit.length / totalWidth;
+        expectSeconds = curEdit.SnapToSeconds (expectSeconds);
 
-        //
-        foreach ( exSpriteAnimClip.FrameInfo frameInfo in selectedFrameInfos) {
-            total += frameInfo.length;
+        // get start seconds
+        float startSeconds = 0.0f;
+        foreach ( exSpriteAnimClip.FrameInfo frameInfo in curEdit.frameInfos ) {
+            if ( frameInfo == selectedFrameInfos[0] )
+                break;
+            startSeconds += frameInfo.length;
         }
+        float newLength = expectSeconds - startSeconds;
 
         //
-        foreach ( exSpriteAnimClip.FrameInfo frameInfo in selectedFrameInfos) {
-            float ratio = frameInfo.length/total;
-            frameInfo.length = Mathf.Max(1.0f/60.0f, frameInfo.length + deltaWidth * ratio);
+        ResizeSelectedFrames (newLength);
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void ResizeSelectedFrames ( float _newLength ) {
+        // get total length
+        float unitSeconds = 1.0f/curEdit.sampleRate;
+        float total = 0.0f;
+        int[] frames = new int[selectedFrameInfos.Count]; 
+        float minSeconds = 99999.0f;
+        for ( int i = 0; i < selectedFrameInfos.Count; ++i ) {
+            exSpriteAnimClip.FrameInfo frameInfo = selectedFrameInfos[i];
+            total += frameInfo.length;
+            frames[i] = curEdit.SnapToFrames(frameInfo.length);
+
+            if ( frameInfo.length < minSeconds ) {
+                minSeconds = frameInfo.length;
+            }
+        }
+        int gcd = exMathHelper.GetGCD(frames);
+
+        // get delta
+        float delta = _newLength - total;
+        float minTotal = total/gcd;
+
+        // check if resize
+        if ( (delta < 0.0f && gcd == 1) || 
+             (Mathf.Abs(delta) <= minTotal - unitSeconds * 0.5f) )
+            return;
+
+        //
+        foreach ( exSpriteAnimClip.FrameInfo fi in selectedFrameInfos) {
+            float ratio = fi.length/total;
+            fi.length = curEdit.SnapToSeconds( Mathf.Max(unitSeconds, fi.length + (delta - (delta % minTotal)) * ratio) );
         }
 
         // re-calculate the animclip length
@@ -1055,10 +1106,13 @@ partial class exSpriteAnimClipEditor : EditorWindow {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    void MoveSelectedEventInfo ( Vector2 _delta ) {
-        selectedEventInfos.Sort(eventInfoSorter);
+    void MoveSelectedEventInfo ( Vector2 _pos ) {
+        float pos = Mathf.Clamp( _pos.x - spriteAnimClipRect.x, 0.0f, totalWidth + curEdit.editorOffset );
+        float expectSeconds = (pos - curEdit.editorOffset) * curEdit.length / totalWidth;
+        expectSeconds = curEdit.SnapToSeconds (expectSeconds);
 
-        float deltaSeconds = _delta.x * curEdit.length / totalWidth;
+        selectedEventInfos.Sort(eventInfoSorter);
+        float deltaSeconds = expectSeconds - activeEventInfo.time;
 
         //
         if ( selectedEventInfos[0].time + deltaSeconds <= 0.0f ) 
@@ -1072,8 +1126,7 @@ partial class exSpriteAnimClipEditor : EditorWindow {
 
         //
         foreach ( exSpriteAnimClip.EventInfo ei in selectedEventInfos ) {
-            // ei.time = Mathf.Clamp ( ei.time + deltaSeconds, 0.0f, curEdit.length );
-            ei.time = ei.time + deltaSeconds;
+            ei.time = curEdit.SnapToSeconds(ei.time + deltaSeconds);
         }
         curEdit.eventInfos.Sort(eventInfoSorter);
         EditorUtility.SetDirty(curEdit);
@@ -1086,6 +1139,7 @@ partial class exSpriteAnimClipEditor : EditorWindow {
     void MoveNeedle ( Vector2 _pos ) {
         float pos = Mathf.Clamp( _pos.x - spriteAnimClipRect.x, 0.0f, totalWidth + curEdit.editorOffset );
         curSeconds = (pos - curEdit.editorOffset) * curEdit.length / totalWidth;
+        curSeconds = curEdit.SnapToSeconds (curSeconds);
     }
 
     // ------------------------------------------------------------------ 

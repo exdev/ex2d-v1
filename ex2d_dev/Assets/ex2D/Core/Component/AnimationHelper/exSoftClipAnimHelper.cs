@@ -16,6 +16,7 @@ using System.Collections;
 // defines
 ///////////////////////////////////////////////////////////////////////////////
 
+[ExecuteInEditMode]
 public class exSoftClipAnimHelper : exSpriteBaseAnimHelper {
 
     exSoftClip softClip;

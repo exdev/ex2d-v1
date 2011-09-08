@@ -185,4 +185,45 @@ public static class exSpriteAnimationUtility {
         }
         return null;
     }
+
+    // ------------------------------------------------------------------ 
+    /// \param _animClip the sprite animation clip
+    /// \param _seconds the expect seconds
+    /// \return the snapped seconds
+    // ------------------------------------------------------------------ 
+
+    public static float SnapToSeconds ( this exSpriteAnimClip _animClip, 
+                                        float _seconds ) {
+
+        float unitSeconds = 1.0f/_animClip.sampleRate;
+        float fraction = _seconds % unitSeconds;
+        if ( fraction > 0.5f * unitSeconds )
+            _seconds = _seconds - fraction + unitSeconds;
+        else
+            _seconds = _seconds - fraction; 
+        return _seconds;
+    }
+
+    // ------------------------------------------------------------------ 
+    /// \param _animClip the sprite animation clip
+    /// \param _seconds the expect seconds
+    /// \return the snapped frames
+    // ------------------------------------------------------------------ 
+
+    public static int SnapToFrames ( this exSpriteAnimClip _animClip, 
+                                     float _seconds ) {
+
+        float unitSeconds = 1.0f/_animClip.sampleRate;
+        return Mathf.RoundToInt(_seconds/unitSeconds);
+    }
+
+    // ------------------------------------------------------------------ 
+    /// \param _animClip the sprite animation clip
+    /// \param _frames the frames
+    /// \return the seconds
+    // ------------------------------------------------------------------ 
+
+    public static float FrameToSeconds ( this exSpriteAnimClip _animClip, int _frames ) {
+        return _frames / _animClip.sampleRate;
+    } 
 }

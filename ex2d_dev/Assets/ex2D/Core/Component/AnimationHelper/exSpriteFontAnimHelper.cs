@@ -16,6 +16,7 @@ using System.Collections;
 // defines
 ///////////////////////////////////////////////////////////////////////////////
 
+[ExecuteInEditMode]
 public class exSpriteFontAnimHelper : exSpriteBaseAnimHelper {
 
     exSpriteFont spriteFont;

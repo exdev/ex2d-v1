@@ -88,7 +88,20 @@ public class exSpriteAnimClip : ScriptableObject {
     public WrapMode wrapMode = WrapMode.Once; ///< default wrap mode
     public StopAction stopAction = StopAction.DoNothing; ///< the default type of action used when the animation stopped 
     public float length = 1.0f; ///< the length of the animation clip in seconds
-    public float sampleRate = 60.0f; ///< the sample rate used in this animation clip
+
+    // ------------------------------------------------------------------ 
+    [SerializeField] protected float sampleRate_ = 60.0f;
+    /// the sample rate used in this animation clip
+    // ------------------------------------------------------------------ 
+
+    public float sampleRate {
+        get { return sampleRate_; }
+        set {
+            if ( value != sampleRate_ ) {
+                sampleRate_ = Mathf.RoundToInt(Mathf.Max(value,1.0f)); 
+            }
+        }
+    }
 
     // DELME { 
     // // ------------------------------------------------------------------ 

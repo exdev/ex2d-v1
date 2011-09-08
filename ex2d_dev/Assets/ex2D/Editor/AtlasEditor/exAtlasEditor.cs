@@ -79,7 +79,7 @@ partial class exAtlasEditor : EditorWindow {
     void OnEnable () {
         name = "Atlas Editor";
         wantsMouseMove = true;
-        autoRepaintOnSceneChange = true;
+        autoRepaintOnSceneChange = false;
         // position = new Rect ( 50, 50, 800, 600 );
     }
 
@@ -175,6 +175,7 @@ partial class exAtlasEditor : EditorWindow {
         if ( curEdit == null ) {
             GUILayout.Space(10);
             GUILayout.Label ( "Please select an Atlas Info" );
+            // DISABLE: this.ShowNotification( new GUIContent("Please select an Atlas Info"));
             return;
         }
 
@@ -592,7 +593,7 @@ partial class exAtlasEditor : EditorWindow {
 
         if ( inRectSelectState && (selectRect.width != 0.0f || selectRect.height != 0.0f) ) {
             // GUI.Box ( selectRect, GUIContent.none, exEditorHelper.RectSelectBoxStyle() );
-            exEditorHelper.DrawRect( selectRect, new Color( 0.0f, 0.5f, 1.0f, 0.2f ), Color.black );
+            exEditorHelper.DrawRect( selectRect, new Color( 0.0f, 0.5f, 1.0f, 0.2f ), new Color( 0.0f, 0.5f, 1.0f, 1.0f ) );
         }
 
         // ======================================================== 

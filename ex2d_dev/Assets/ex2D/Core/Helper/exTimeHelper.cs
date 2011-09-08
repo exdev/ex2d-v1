@@ -53,4 +53,24 @@ public static class exTimeHelper {
         int sec2 = Mathf.FloorToInt((_seconds - sec1) * 60.0f % 60.0f);
         return sec1 + ":" + sec2.ToString("d2");
     }
+
+    // ------------------------------------------------------------------ 
+    /// \param _seconds input seoncds
+    /// \param _sampleRate input sample rate
+    /// \return the frame in string
+    /// get seconds in string from input seconds
+    // ------------------------------------------------------------------ 
+
+    public static string ToString_Frames ( float _seconds, float _sampleRate ) {
+        int sec1 = Mathf.FloorToInt(_seconds);
+        int sec2 = Mathf.FloorToInt((_seconds - sec1) * _sampleRate % _sampleRate);
+
+        int d = 1;
+        int dd = 10;
+        while ( _sampleRate / dd >= 1.0f ) {
+            d += 1;
+            dd *= 10;
+        }
+        return sec1 + ":" + sec2.ToString("d"+d);
+    }
 }

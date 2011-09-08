@@ -56,6 +56,7 @@ partial class exSpriteAnimClipEditor {
             }
             else {
                 inDraggingEventInfoState = true;
+                activeEventInfo = lastClicked;
                 bool selected = selectedEventInfos.IndexOf(lastClicked) != -1;
                 if ( selected == false ) {
                     if ( e.command == false && e.control == false ) {
@@ -98,7 +99,7 @@ partial class exSpriteAnimClipEditor {
                      && e.command == false ) 
                 {
                     exSpriteAnimClip.EventInfo eventInfo = new exSpriteAnimClip.EventInfo();
-                    eventInfo.time = ((e.mousePosition.x - _rect.x) * _animClip.length) / totalWidth; 
+                    eventInfo.time = curEdit.SnapToSeconds( ((e.mousePosition.x - _rect.x) * _animClip.length) / totalWidth ); 
                     _animClip.AddEvent (eventInfo);
                     EditorUtility.SetDirty(_animClip);
                     e.Use();
@@ -166,8 +167,21 @@ partial class exSpriteAnimClipEditor {
 
         if ( selectedEventInfos.Count == 1 ) {
             exSpriteAnimClip.EventInfo ei = selectedEventInfos[0];
-            float newTime = EditorGUILayout.FloatField( "Time", ei.time, GUILayout.Width(200) );
-            ei.time = Mathf.Clamp( newTime, 0.0f, curEdit.length );
+
+            // DISABLE { 
+            // float newTime = EditorGUILayout.FloatField( "Time", ei.time, GUILayout.Width(200) );
+            // ei.time = Mathf.Clamp( newTime, 0.0f, curEdit.length );
+            // } DISABLE end 
+
+            GUILayout.BeginHorizontal();
+                int curFrame = curEdit.SnapToFrames(ei.time);
+                int newFrame = EditorGUILayout.IntField( "At Frame", curEdit.SnapToFrames(ei.time), GUILayout.Width(200) );
+                if ( newFrame != curFrame ) {
+                    ei.time = Mathf.Clamp( curEdit.FrameToSeconds(newFrame), 0.0f, curEdit.length );
+                }
+                GUILayout.Label( ei.time.ToString("f3") + " secs" );
+            GUILayout.EndHorizontal();
+
             // TODO: we can use MethodInfo in C# when select a GameObject with exSpriteAnimation.cs in it { 
             ei.methodName = EditorGUILayout.TextField ( "Method Name", ei.methodName, GUILayout.Width(300) );
             ei.paramType = (exSpriteAnimClip.EventInfo.ParamType)EditorGUILayout.EnumPopup ( "Param Type", 
@@ -205,9 +219,14 @@ partial class exSpriteAnimClipEditor {
         else {
             for ( int i = 0; i < selectedEventInfos.Count; ++i ) {
                 exSpriteAnimClip.EventInfo ei = selectedEventInfos[i];
-                string text = "Time [" + i + "]"; 
-                float newTime = EditorGUILayout.FloatField( text, ei.time, GUILayout.Width(200) );
-                ei.time = Mathf.Clamp( newTime, 0.0f, curEdit.length );
+                GUILayout.BeginHorizontal();
+                    int curFrame = curEdit.SnapToFrames(ei.time);
+                    int newFrame = EditorGUILayout.IntField( "[" + i + "]" + "At Frame", curEdit.SnapToFrames(ei.time), GUILayout.Width(200) );
+                    if ( newFrame != curFrame ) {
+                        ei.time = curEdit.FrameToSeconds(newFrame);
+                    }
+                    GUILayout.Label( ei.time.ToString("f3") + " secs" );
+                GUILayout.EndHorizontal();
             }
         }
     }

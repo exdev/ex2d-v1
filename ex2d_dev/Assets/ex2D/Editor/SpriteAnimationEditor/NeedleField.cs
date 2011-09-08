@@ -57,8 +57,7 @@ partial class exSpriteAnimClipEditor {
             // show label
             if ( inDraggingNeedleState ) {
                 GUI.Label ( new Rect( xPos - 15.0f, yEnd, 30.0f, 20.0f ),
-                            // exTimeHelper.ToString_Seconds(curSeconds) );
-                            curSeconds.ToString() );
+                            exTimeHelper.ToString_Frames(curSeconds,curEdit.sampleRate) );
             }
         }
     }

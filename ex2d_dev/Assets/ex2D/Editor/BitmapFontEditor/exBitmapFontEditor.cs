@@ -57,7 +57,7 @@ partial class exBitmapFontEditor : EditorWindow {
     void OnEnable () {
         name = "BitmapFont Editor";
         wantsMouseMove = true;
-        autoRepaintOnSceneChange = true;
+        autoRepaintOnSceneChange = false;
         // position = new Rect ( 50, 50, 800, 600 );
     }
 
