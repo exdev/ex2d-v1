@@ -35,10 +35,11 @@ public static class exTextureHelper {
 
     // ------------------------------------------------------------------ 
     /// \param _tex
-    /// change the import texture settings to make it fit for atlas 
+    /// \return is valid or not
+    /// check if the texture settings is valid for atlas build
     // ------------------------------------------------------------------ 
 
-    public static void ImportTextureForAtlas ( Texture2D _tex ) {
+    public static bool IsValidForAtlas ( Texture2D _tex ) {
         string path = AssetDatabase.GetAssetPath(_tex);
         TextureImporter importer = TextureImporter.GetAtPath(path) as TextureImporter;
         if ( importer.textureType != TextureImporterType.Advanced ||
@@ -47,13 +48,26 @@ public static class exTextureHelper {
              importer.isReadable != true ||
              importer.mipmapEnabled != false )
         {
-            importer.textureFormat = TextureImporterFormat.AutomaticTruecolor;
-            importer.textureType = TextureImporterType.Advanced;
-            importer.npotScale = TextureImporterNPOTScale.None;
-            importer.isReadable = true;
-            importer.mipmapEnabled = false;
-            AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate|ImportAssetOptions.ForceSynchronousImport);
+            return false;
         }
+        return true;
+    }
+
+    // ------------------------------------------------------------------ 
+    /// \param _tex
+    /// change the import texture settings to make it fit for atlas 
+    // ------------------------------------------------------------------ 
+
+    public static void ImportTextureForAtlas ( Texture2D _tex ) {
+        string path = AssetDatabase.GetAssetPath(_tex);
+        TextureImporter importer = TextureImporter.GetAtPath(path) as TextureImporter;
+
+        importer.textureFormat = TextureImporterFormat.AutomaticTruecolor;
+        importer.textureType = TextureImporterType.Advanced;
+        importer.npotScale = TextureImporterNPOTScale.None;
+        importer.isReadable = true;
+        importer.mipmapEnabled = false;
+        AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate|ImportAssetOptions.ForceSynchronousImport);
     }
 
     // ------------------------------------------------------------------ 
@@ -98,7 +112,7 @@ public static class exTextureHelper {
 
     public static Rect GetTrimTextureRect ( Texture2D _tex ) {
         Rect rect = new Rect( 0, 0, 0, 0 );
-        Color[] pixels = _tex.GetPixels(0);
+        Color32[] pixels = _tex.GetPixels32(0);
 
         for ( int x = 0; x < _tex.width; ++x ) {
             for ( int y = 0; y < _tex.height; ++y ) {

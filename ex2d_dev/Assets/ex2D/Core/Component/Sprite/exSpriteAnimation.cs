@@ -206,7 +206,9 @@ public class exSpriteAnimation : MonoBehaviour {
     public void Play ( string _name, int _index ) {
         curAnimation = GetAnimation(_name);
         if ( curAnimation != null ) {
-            if ( _index >= 0 && _index < curAnimation.frameTimes.Count )
+            if ( _index == 0 )
+                curAnimation.time = 0.0f;
+            else if ( _index > 0 && _index < curAnimation.frameTimes.Count )
                 curAnimation.time = curAnimation.frameTimes[_index];
             playing = true;
             paused = false;

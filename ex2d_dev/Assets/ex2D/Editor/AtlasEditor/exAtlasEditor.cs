@@ -535,6 +535,17 @@ partial class exAtlasEditor : EditorWindow {
                     Selection.activeObject = newAtlasInfo;
 
                 // ======================================================== 
+                // build color 
+                // ======================================================== 
+
+                Color newBuildColor = EditorGUILayout.ColorField( "Build Color", curEdit.buildColor );
+                if ( newBuildColor != curEdit.buildColor ) {
+                    curEdit.buildColor = newBuildColor;
+                    curEdit.needRebuild = true;
+                    GUI.changed = true;
+                }
+
+                // ======================================================== 
                 // bitmap fonts 
                 // ======================================================== 
 

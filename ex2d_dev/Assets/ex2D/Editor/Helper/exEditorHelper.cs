@@ -14,6 +14,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 
 ///////////////////////////////////////////////////////////////////////////////
 ///
@@ -302,7 +303,7 @@ public static class exEditorHelper {
 
 
     ///////////////////////////////////////////////////////////////////////////////
-    // asset path
+    // Assets
     ///////////////////////////////////////////////////////////////////////////////
 
     // ------------------------------------------------------------------ 
@@ -392,6 +393,72 @@ public static class exEditorHelper {
             return info.Exists;
         }
         return false;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////
+    // load assembly resource
+    ///////////////////////////////////////////////////////////////////////////////
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    static Stream GetResourceStream ( string _resourceName, Assembly _assembly ) {
+
+        if ( _assembly == null ) {
+            _assembly = Assembly.GetExecutingAssembly ();
+        }
+
+        return _assembly.GetManifestResourceStream (_resourceName);
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    static Stream GetResourceStream ( string _resourceName ) {
+        return GetResourceStream (_resourceName, null);
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    static byte[] GetByteResource ( string _resourceName, Assembly _assembly ) {
+
+        Stream byteStream = GetResourceStream (_resourceName, _assembly);
+        byte[] buffer = new byte[byteStream.Length];
+        byteStream.Read (buffer, 0, (int)byteStream.Length);
+        byteStream.Close ();
+
+        return buffer;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    static byte[] GetByteResource ( string _resourceName ) {
+        return GetByteResource (_resourceName, null);
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public static Texture2D GetTextureResource ( string _resourceName, Assembly _assembly ) {
+        Texture2D texture = new Texture2D (4, 4);
+        texture.LoadImage (GetByteResource (_resourceName, _assembly));
+
+        return texture;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public static Texture2D GetTextureResource ( string _resourceName ) {
+        return GetTextureResource (_resourceName, null);
     }
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -500,6 +567,14 @@ public static class exEditorHelper {
         GUI.backgroundColor = _borderColor;
             GUI.Box ( _rect, GUIContent.none, exEditorHelper.RectBorderStyle() );
         GUI.backgroundColor = old;
+
+        // Vector3[] verts = new Vector3 [] {
+        //     new Vector3( _rect.x,    _rect.y,    0.0f ), 
+        //     new Vector3( _rect.xMax, _rect.y,    0.0f ), 
+        //     new Vector3( _rect.xMax, _rect.yMax, 0.0f ), 
+        //     new Vector3( _rect.x,    _rect.yMax, 0.0f ),
+        // };
+        // Handles.DrawSolidRectangleWithOutline ( verts, _backgroundColor, _borderColor );
     }
 
     ///////////////////////////////////////////////////////////////////////////////

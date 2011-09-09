@@ -72,8 +72,7 @@ class ex2D_PostProcessor : AssetPostprocessor {
                 exAtlasDB.ElementInfo ei = exAtlasDB.GetElementInfo(tex2d);
                 if ( ei != null ) {
                     exAtlasInfo atlasInfo = exEditorHelper.LoadAssetFromGUID<exAtlasInfo>(ei.guidAtlasInfo);
-                    if ( atlasInfo && updateAtlasInfos.IndexOf(atlasInfo) == -1 ) 
-                    {
+                    if ( atlasInfo && updateAtlasInfos.IndexOf(atlasInfo) == -1 ) {
                         updateAtlasInfos.Add(atlasInfo);
                     }
                 }
@@ -101,7 +100,8 @@ class ex2D_PostProcessor : AssetPostprocessor {
 
         // build exAtlasInfo first
         foreach ( exAtlasInfo atlasInfo in updateAtlasInfos ) {
-            exAtlasInfoUtility.Build(atlasInfo);
+            //  NOTE: Build atlas without import texture, without this, we will crash when changing import settings of a texture and rebuild it.
+            exAtlasInfoUtility.Build(atlasInfo,true);
             // NOTE: no need to update scene sprite and sprite animation clip, because we didn't change index
         }
 

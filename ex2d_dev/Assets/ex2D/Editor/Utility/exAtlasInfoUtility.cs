@@ -74,9 +74,13 @@ public static class exAtlasInfoUtility {
                                        newAtlasInfo.height, 
                                        TextureFormat.ARGB32, 
                                        false );
+        Color buildColor = new Color ( newAtlasInfo.buildColor.r,
+                                       newAtlasInfo.buildColor.g,
+                                       newAtlasInfo.buildColor.b,
+                                       0.0f );
         for ( int i = 0; i < newAtlasInfo.width; ++i ) {
             for ( int j = 0; j < newAtlasInfo.height; ++j ) {
-                tex.SetPixel(i, j, new Color(1.0f, 1.0f, 1.0f, 0.0f) );
+                tex.SetPixel(i, j, buildColor );
             }
         }
         tex.Apply(false);
@@ -143,7 +147,7 @@ public static class exAtlasInfoUtility {
     /// build the atlas info to atlas 
     // ------------------------------------------------------------------ 
 
-    public static void Build ( exAtlasInfo _atlasInfo ) {
+    public static void Build ( exAtlasInfo _atlasInfo, bool _noImport = false ) {
 
         exAtlas atlas = _atlasInfo.atlas;
         Texture2D texture = _atlasInfo.texture;
@@ -165,11 +169,15 @@ public static class exAtlasInfoUtility {
 
 
         // create temp texture
+        Color buildColor = new Color ( _atlasInfo.buildColor.r,
+                                       _atlasInfo.buildColor.g,
+                                       _atlasInfo.buildColor.b,
+                                       0.0f );
         string path = AssetDatabase.GetAssetPath(texture);
         Texture2D tex = new Texture2D(_atlasInfo.width, _atlasInfo.height, TextureFormat.ARGB32, false);
         for ( int x = 0; x < _atlasInfo.width; ++x ) {
             for ( int y = 0; y < _atlasInfo.height; ++y ) {
-                tex.SetPixel(x, y, new Color(0.0f, 0.0f, 0.0f, 0.0f) );
+                tex.SetPixel(x, y, buildColor );
             }
         }
 
@@ -197,7 +205,14 @@ public static class exAtlasInfoUtility {
             }
 
             // make the src texture readable
-            exTextureHelper.ImportTextureForAtlas(srcTexture);
+            if ( exTextureHelper.IsValidForAtlas (srcTexture) == false ) {
+                if ( _noImport ) {
+                    Debug.LogError( "The texture import settings of [" + AssetDatabase.GetAssetPath(srcTexture) + "] is invalid for atlas build" );
+                }
+                else {
+                    exTextureHelper.ImportTextureForAtlas(srcTexture);
+                }
+            }
 
             //
             exTextureHelper.Fill( tex, 
@@ -205,6 +220,16 @@ public static class exAtlasInfoUtility {
                                   srcTexture,
                                   el.trimRect,
                                   el.rotated ? exTextureHelper.RotateDirection.RotRight : exTextureHelper.RotateDirection.None ); 
+            // TODO { 
+            // Color32[] colors = srcTexture.GetPixels32();
+            // Color32[] colors_d = new Color32[tex.width * tex.height];
+            // for ( int r = 0; r < srcTexture.width; ++r ) {
+            //     for ( int c = 0; c < srcTexture.height; ++c ) {
+            //         colors_d[r+c*tex.width] = colors[r+c*srcTexture.width];
+            //     }
+            // }
+            // tex.SetPixels32( colors_d );
+            // } TODO end 
             ++i;
         }
         tex.Apply(false);

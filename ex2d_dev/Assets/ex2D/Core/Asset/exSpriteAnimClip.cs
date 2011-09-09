@@ -219,9 +219,8 @@ public class exSpriteAnimClip : ScriptableObject {
         // start index
         tmpEventInfo.time = t;
         index = eventInfos.BinarySearch( tmpEventInfo, eventInfoComparer );
-        if ( index < 0 ) {
+        if ( index < 0 )
             index = ~index;
-        }
 
         // forward
         if ( _delta > 0.0f ) {
@@ -229,18 +228,39 @@ public class exSpriteAnimClip : ScriptableObject {
                 float rest = t + _delta - length;
                 if ( _wrapMode == WrapMode.Loop ) {
                     ForwardTriggerEvents ( _gameObject, index, t, length, false );
+                        tmpEventInfo.time = 0.0f;
+                        index = eventInfos.BinarySearch( tmpEventInfo, eventInfoComparer );
+                        if ( index < 0 )
+                            index = ~index;
                     ForwardTriggerEvents ( _gameObject, index, 0.0f, rest, true );
                 }
                 else if ( _wrapMode == WrapMode.PingPong ) {
-                    ForwardTriggerEvents ( _gameObject, index, t, length, false );
-                    BackwardTriggerEvents ( _gameObject, index, length, length - rest, false );
+                    // FIXME: it looks like the backward trigger didn't work at all { 
+                    int cnt = (int)(_start/length);
+                    if ( cnt % 2 == 1 ) {
+                        BackwardTriggerEvents ( _gameObject, index, t, 0.0f, false );
+                            tmpEventInfo.time = 0.0f;
+                            index = eventInfos.BinarySearch( tmpEventInfo, eventInfoComparer );
+                            if ( index < 0 )
+                                index = ~index;
+                        ForwardTriggerEvents ( _gameObject, index, 0.0f, rest, false );
+                    }
+                    else {
+                        ForwardTriggerEvents ( _gameObject, index, t, length, false );
+                            tmpEventInfo.time = length;
+                            index = eventInfos.BinarySearch( tmpEventInfo, eventInfoComparer );
+                            if ( index < 0 )
+                                index = ~index;
+                        BackwardTriggerEvents ( _gameObject, index, length, length - rest, false );
+                    }
+                    // } FIXME end 
                 }
                 else {
                     ForwardTriggerEvents ( _gameObject, index, t, length, false );
                 }
             }
             else {
-                ForwardTriggerEvents ( _gameObject, index, t, t + _delta, false );
+                ForwardTriggerEvents ( _gameObject, index, t, t + _delta, true );
             }
         }
         // backward
@@ -249,18 +269,28 @@ public class exSpriteAnimClip : ScriptableObject {
                 float rest = 0.0f - (t + _delta);
                 if ( _wrapMode == WrapMode.Loop ) {
                     BackwardTriggerEvents ( _gameObject, index, t, 0.0f, false );
+                        tmpEventInfo.time = length;
+                        index = eventInfos.BinarySearch( tmpEventInfo, eventInfoComparer );
+                        if ( index < 0 )
+                            index = ~index;
                     BackwardTriggerEvents ( _gameObject, index, length, length - rest, true );
                 }
                 else if ( _wrapMode == WrapMode.PingPong ) {
+                    // FIXME { 
                     BackwardTriggerEvents ( _gameObject, index, t, 0.0f, false );
+                        tmpEventInfo.time = 0.0f;
+                        index = eventInfos.BinarySearch( tmpEventInfo, eventInfoComparer );
+                        if ( index < 0 )
+                            index = ~index;
                     ForwardTriggerEvents ( _gameObject, index, 0.0f, rest, false );
+                    // } FIXME end 
                 }
                 else {
                     BackwardTriggerEvents ( _gameObject, index, t, 0.0f, false );
                 }
             }
             else {
-                BackwardTriggerEvents ( _gameObject, index, t, t + _delta, false );
+                BackwardTriggerEvents ( _gameObject, index, t, t + _delta, true );
             }
         }
     }
@@ -296,12 +326,12 @@ public class exSpriteAnimClip : ScriptableObject {
                                  float _end,
                                  bool _includeStart )
     {
-        for ( int i = _index; i > eventInfos.Count; --i ) {
+        for ( int i = _index-1; i >= 0; --i ) {
             EventInfo ei = eventInfos[i];
             if ( ei.time == _start && _includeStart == false )
                 continue;
 
-            if ( ei.time <= _end ) {
+            if ( ei.time >= _end ) {
                 Trigger ( _gameObject, ei );
             }
         }

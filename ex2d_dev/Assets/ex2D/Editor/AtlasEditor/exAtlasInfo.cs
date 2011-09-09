@@ -123,6 +123,7 @@ public partial class exAtlasInfo : ScriptableObject {
     public exAtlas atlas; ///< the referenced atlas asset
     public Texture2D texture; ///< the referenced atlas texture
     public Material material; ///< the default material we used
+    public Color buildColor = new Color(1.0f, 1.0f, 1.0f, 0.0f); ///< the color of transparent pixels in atlas texture
 
     // canvas settings
     public bool foldCanvas = true; ///< canvas fold option
@@ -241,7 +242,8 @@ public partial class exAtlasInfo : ScriptableObject {
     // ------------------------------------------------------------------ 
 
     public Element AddElement ( Texture2D _tex, bool _trim ) {
-        exTextureHelper.ImportTextureForAtlas(_tex);
+        if ( exTextureHelper.IsValidForAtlas (_tex) == false )
+            exTextureHelper.ImportTextureForAtlas(_tex);
 
         //
         exAtlasInfo.Element el = new exAtlasInfo.Element();

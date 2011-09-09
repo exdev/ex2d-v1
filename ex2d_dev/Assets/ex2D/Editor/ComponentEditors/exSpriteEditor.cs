@@ -176,7 +176,8 @@ class exSpriteEditor : exSpriteBaseEditor {
             if ( editTexture != null ) {
                 
                 if ( editSprite.trimTexture ) {
-                    exTextureHelper.ImportTextureForAtlas(editTexture);
+                    if ( exTextureHelper.IsValidForAtlas (editTexture) == false )
+                        exTextureHelper.ImportTextureForAtlas(editTexture);
                     trimUV = exTextureHelper.GetTrimTextureRect(editTexture);
                     trimUV = new Rect( trimUV.x/editTexture.width,
                                        (editTexture.height - trimUV.height - trimUV.y)/editTexture.height,
