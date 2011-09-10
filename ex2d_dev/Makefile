@@ -9,10 +9,13 @@
 #  general
 # /////////////////////////////////////////////////////////////////////////////
 
+# settings
+UNITY_PATH = /Applications/Unity/Unity.app/Contents/Frameworks
+
 # unit essential
-COMPILER = /Applications/Unity/Unity.app/Contents/Frameworks/Mono/bin/gmcs
-UNITY_ENGINE_DLL = /Applications/Unity/Unity.app/Contents/Frameworks/Managed/UnityEngine.dll
-UNITY_EDITOR_DLL = /Applications/Unity/Unity.app/Contents/Frameworks/Managed/UnityEditor.dll
+COMPILER = $(UNITY_PATH)/Mono/bin/gmcs
+UNITY_ENGINE_DLL = $(UNITY_PATH)/Managed/UnityEngine.dll
+UNITY_EDITOR_DLL = $(UNITY_PATH)/Managed/UnityEditor.dll
 UNITY_VER = UNITY_3_4 
 
 # Utilities.
@@ -60,7 +63,6 @@ RUNTIME_ARGUMENT = $(RUNTIME_DEFINE) -r:$(UNITY_ENGINE_DLL)
 
 # do the build
 $(RUNTIME_TARGET):
-	$(MKDIR) $(TARGET_DIR)/Core/NoAssembly/
 	$(COMPILER) -target:library -out:$(RUNTIME_TARGET) $(RUNTIME_ARGUMENT) $(RUNTIME_SOURCE)
 
 # /////////////////////////////////////////////////////////////////////////////
@@ -68,6 +70,7 @@ $(RUNTIME_TARGET):
 # /////////////////////////////////////////////////////////////////////////////
 
 # get sources 
+EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/About/
 EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/AtlasEditor/
 EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/BitmapFontEditor/
 EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/ComponentEditors/
@@ -78,13 +81,19 @@ EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/SpriteAnimationEditor/
 EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/Utility/
 EDITOR_SOURCE = $(wildcard $(addsuffix *.cs,$(EDITOR_SOURCE_DIRS)))
 
+# resources
+#  RESOURCES += -resource:Assets/ex2D/Editor/Resource/pixel.png
+#  RESOURCES += -resource:Assets/ex2D/Editor/Resource/checkerboard_64x64.png
+#  RESOURCES += -resource:Assets/ex2D/Editor/Resource/border.png
+#  RESOURCES += -resource:Assets/ex2D/Editor/Resource/rect_select.png
+
 # defines
 EDITOR_DEFINE = -d:UNITY_EDITOR -d:UNITY_3_4
 
 # deubg argument
 # EDITOR_ARGUMENT = $(EDITOR_DEFINE) -d:DEBUG -r:$(RUNTIME_TARGET),$(UNITY_ENGINE_DLL),$(UNITY_EDITOR_DLL)
 # release argument
-EDITOR_ARGUMENT = $(EDITOR_DEFINE) -r:$(RUNTIME_TARGET),$(UNITY_ENGINE_DLL),$(UNITY_EDITOR_DLL)
+EDITOR_ARGUMENT = $(EDITOR_DEFINE) $(RESOURCES) -r:$(RUNTIME_TARGET),$(UNITY_ENGINE_DLL),$(UNITY_EDITOR_DLL)
 
 # do the build
 $(EDITOR_TARGET): 

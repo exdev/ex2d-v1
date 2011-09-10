@@ -603,7 +603,6 @@ partial class exAtlasEditor : EditorWindow {
         // ======================================================== 
 
         if ( inRectSelectState && (selectRect.width != 0.0f || selectRect.height != 0.0f) ) {
-            // GUI.Box ( selectRect, GUIContent.none, exEditorHelper.RectSelectBoxStyle() );
             exEditorHelper.DrawRect( selectRect, new Color( 0.0f, 0.5f, 1.0f, 0.2f ), new Color( 0.0f, 0.5f, 1.0f, 1.0f ) );
         }
 

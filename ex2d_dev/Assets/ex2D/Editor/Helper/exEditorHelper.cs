@@ -28,9 +28,7 @@ public static class exEditorHelper {
     //
     ///////////////////////////////////////////////////////////////////////////////
 
-    // DISABLE { 
-    // static Texture2D texLine;
-    // } DISABLE end 
+    // static Texture2D texLine; // DISABLE
     static Texture2D texWhite;
     static Texture2D texCheckerboard;
     static Texture2D texHelp;
@@ -39,7 +37,7 @@ public static class exEditorHelper {
     static Texture2D texAnimPrev;
 
     static GUIStyle styleRectBorder = null;
-    static GUIStyle styleRectSelectBox = null;
+    // static GUIStyle styleRectSelectBox = null; // DISABLE
 
     // project
     static bool projectCallbackRegistered = false;
@@ -171,8 +169,13 @@ public static class exEditorHelper {
         if ( texWhite == null ) {
             string path = "Assets/ex2D/Editor/Resource/pixel.png";
             texWhite = (Texture2D)AssetDatabase.LoadAssetAtPath( path, typeof(Texture2D) );
+            // DISABLE: found leak problem { 
+            // if ( texWhite == null )
+            //     texWhite = GetTextureResource ( Path.GetFileName(path) );
+            // } DISABLE end 
+
             if ( texWhite == null ) {
-                Debug.LogError ( "can't find texture " + path );
+                Debug.LogError ( "can't find texture " + Path.GetFileNameWithoutExtension(path) );
                 return null;
             }
         }
@@ -188,8 +191,13 @@ public static class exEditorHelper {
         if ( texCheckerboard == null ) {
             string path = "Assets/ex2D/Editor/Resource/checkerboard_64x64.png";
             texCheckerboard = (Texture2D)AssetDatabase.LoadAssetAtPath( path, typeof(Texture2D) );
+            // DISABLE: found leak problem { 
+            // if ( texCheckerboard == null ) 
+            //     texCheckerboard = GetTextureResource ( Path.GetFileName(path) );
+            // } DISABLE end 
+
             if ( texCheckerboard == null ) {
-                Debug.LogError ( "can't find checkerboard_64x64.png" );
+                Debug.LogError ( "can't find texture " + Path.GetFileNameWithoutExtension(path) );
                 return null;
             }
 
@@ -263,8 +271,13 @@ public static class exEditorHelper {
             // find box texture
             string path = "Assets/ex2D/Editor/Resource/border.png";
             Texture2D tex = (Texture2D)AssetDatabase.LoadAssetAtPath( path, typeof(Texture2D) );
+            // DISABLE: found leak problem { 
+            // if ( tex == null )
+            //     tex = GetTextureResource ( Path.GetFileName(path) );
+            // } DISABLE end 
+
             if ( tex == null ) {
-                Debug.LogError ( "can't find texture " + path );
+                Debug.LogError ( "can't find texture " + Path.GetFileNameWithoutExtension(path) );
                 return null;
             }
 
@@ -276,31 +289,42 @@ public static class exEditorHelper {
         return styleRectBorder; 
     }
 
-    // ------------------------------------------------------------------ 
-    /// \return the new gui style
-    /// create rect select box gui style
-    // ------------------------------------------------------------------ 
+    // DISABLE { 
+    // // ------------------------------------------------------------------ 
+    // /// \return the new gui style
+    // /// create rect select box gui style
+    // /// \code
+    // /// GUI.Box ( selectRect, GUIContent.none, exEditorHelper.RectSelectBoxStyle() );
+    // /// \endcode
+    // // ------------------------------------------------------------------ 
 
-    public static GUIStyle RectSelectBoxStyle () {
-        // create rect select box style
-        if ( styleRectSelectBox == null ) {
-            // find box texture
-            string path = "Assets/ex2D/Editor/Resource/RectSelect.png";
-            Texture2D tex = (Texture2D)AssetDatabase.LoadAssetAtPath( path, typeof(Texture2D) );
-            if ( tex == null ) {
-                tex = exEditorHelper.NewBoxTexture ( path, 
-                                                   new Color(0.0f, 0.6f, 1.0f, 0.2f),
-                                                   new Color(0.2f, 0.2f, 0.2f, 1.0f) );
-            }
+    // public static GUIStyle RectSelectBoxStyle () {
+    //     // create rect select box style
+    //     if ( styleRectSelectBox == null ) {
+    //         // find box texture
+    //         string path = "Assets/ex2D/Editor/Resource/rect_select.png";
+    //         Texture2D tex = (Texture2D)AssetDatabase.LoadAssetAtPath( path, typeof(Texture2D) );
+    //         if ( tex == null )
+    //             tex = GetTextureResource ( Path.GetFileName(path) );
 
-            styleRectSelectBox = new GUIStyle();
-            styleRectSelectBox.normal.background = tex;
-            styleRectSelectBox.border = new RectOffset( 2, 2, 2, 2 );
-            styleRectSelectBox.alignment = TextAnchor.MiddleCenter;
-        }
-        return styleRectSelectBox; 
-    }
+    //         if ( tex == null ) {
+    //             // DISABLE { 
+    //             // tex = exEditorHelper.NewBoxTexture ( path, 
+    //             //                                    new Color(0.0f, 0.6f, 1.0f, 0.2f),
+    //             //                                    new Color(0.2f, 0.2f, 0.2f, 1.0f) );
+    //             // } DISABLE end 
+    //             Debug.LogError ( "can't find texture " + Path.GetFileNameWithoutExtension(path) );
+    //             return null;
+    //         }
 
+    //         styleRectSelectBox = new GUIStyle();
+    //         styleRectSelectBox.normal.background = tex;
+    //         styleRectSelectBox.border = new RectOffset( 2, 2, 2, 2 );
+    //         styleRectSelectBox.alignment = TextAnchor.MiddleCenter;
+    //     }
+    //     return styleRectSelectBox; 
+    // }
+    // } DISABLE end 
 
     ///////////////////////////////////////////////////////////////////////////////
     // Assets
@@ -403,30 +427,30 @@ public static class exEditorHelper {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    static Stream GetResourceStream ( string _resourceName, Assembly _assembly ) {
+    static Stream GetResourceStream ( string _name, Assembly _assembly ) {
 
         if ( _assembly == null ) {
             _assembly = Assembly.GetExecutingAssembly ();
         }
 
-        return _assembly.GetManifestResourceStream (_resourceName);
+        return _assembly.GetManifestResourceStream (_name);
     }
 
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    static Stream GetResourceStream ( string _resourceName ) {
-        return GetResourceStream (_resourceName, null);
+    static Stream GetResourceStream ( string _name ) {
+        return GetResourceStream (_name, null);
     }
 
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    static byte[] GetByteResource ( string _resourceName, Assembly _assembly ) {
+    static byte[] GetByteResource ( string _name, Assembly _assembly ) {
 
-        Stream byteStream = GetResourceStream (_resourceName, _assembly);
+        Stream byteStream = GetResourceStream (_name, _assembly);
         byte[] buffer = new byte[byteStream.Length];
         byteStream.Read (buffer, 0, (int)byteStream.Length);
         byteStream.Close ();
@@ -438,27 +462,32 @@ public static class exEditorHelper {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    static byte[] GetByteResource ( string _resourceName ) {
-        return GetByteResource (_resourceName, null);
+    static byte[] GetByteResource ( string _name ) {
+        return GetByteResource (_name, null);
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _name the name of assembled resource
+    /// \param _assembly assembly
+    /// \return loaded texture2d
+    /// load texture from assembly
     // ------------------------------------------------------------------ 
 
-    public static Texture2D GetTextureResource ( string _resourceName, Assembly _assembly ) {
+    public static Texture2D GetTextureResource ( string _name, Assembly _assembly ) {
         Texture2D texture = new Texture2D (4, 4);
-        texture.LoadImage (GetByteResource (_resourceName, _assembly));
+        texture.LoadImage (GetByteResource (_name, _assembly));
 
         return texture;
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _name the name of assembled resource
+    /// \return loaded texture2d
+    /// load texture from assembly
     // ------------------------------------------------------------------ 
 
-    public static Texture2D GetTextureResource ( string _resourceName ) {
-        return GetTextureResource (_resourceName, null);
+    public static Texture2D GetTextureResource ( string _name ) {
+        return GetTextureResource (_name, null);
     }
 
     ///////////////////////////////////////////////////////////////////////////////

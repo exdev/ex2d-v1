@@ -21,7 +21,7 @@ using System.IO;
 ///
 ///////////////////////////////////////////////////////////////////////////////
 
-public static class exAtlasInfoUtility {
+public static partial class exAtlasInfoUtility {
 
     // ------------------------------------------------------------------ 
     /// \param _path the directory path to save the atlas
@@ -184,56 +184,8 @@ public static class exAtlasInfoUtility {
         EditorUtility.DisplayProgressBar( "Building Atlas " + _atlasInfo.name, "Building Atlas...", 0.1f );    
 
         // build atlas texture
-        int i = 0;
         _atlasInfo.elements.Sort( exAtlasInfo.CompareByName );
-        foreach ( exAtlasInfo.Element el in _atlasInfo.elements ) {
-            // DISABLE: it is too slow { 
-            // EditorUtility.DisplayProgressBar( "Building Atlas...",
-            //                                   "Building Texture " + el.texture.name,
-            //                                   (float)i/(float)_atlasInfo.elements.Count - 0.1f );    
-            // } DISABLE end 
-
-            Texture2D srcTexture = el.texture;
-            if ( el.isFontElement ) {
-                // build the font
-                exBitmapFont.CharInfo charInfo = el.destFontInfo.GetCharInfo(el.charInfo.id);
-                if ( charInfo != null ) {
-                    charInfo.uv0 = new Vector2 ( (float)el.coord[0] / tex.width,
-                                                 (tex.height - (float)el.coord[1] - charInfo.height) / tex.height );
-                    EditorUtility.SetDirty(el.destFontInfo);
-                }
-            }
-
-            // make the src texture readable
-            if ( exTextureHelper.IsValidForAtlas (srcTexture) == false ) {
-                if ( _noImport ) {
-                    Debug.LogError( "The texture import settings of [" + AssetDatabase.GetAssetPath(srcTexture) + "] is invalid for atlas build" );
-                }
-                else {
-                    exTextureHelper.ImportTextureForAtlas(srcTexture);
-                }
-            }
-
-            //
-            exTextureHelper.Fill( tex, 
-                                  new Vector2 (el.coord[0], tex.height - el.coord[1] - el.Height() ),  
-                                  srcTexture,
-                                  el.trimRect,
-                                  el.rotated ? exTextureHelper.RotateDirection.RotRight : exTextureHelper.RotateDirection.None ); 
-            // TODO { 
-            // Color32[] colors = srcTexture.GetPixels32();
-            // Color32[] colors_d = new Color32[tex.width * tex.height];
-            // for ( int r = 0; r < srcTexture.width; ++r ) {
-            //     for ( int c = 0; c < srcTexture.height; ++c ) {
-            //         colors_d[r+c*tex.width] = colors[r+c*srcTexture.width];
-            //     }
-            // }
-            // tex.SetPixels32( colors_d );
-            // } TODO end 
-            ++i;
-        }
-        tex.Apply(false);
-
+        FillAtlasTexture ( tex, _atlasInfo, _noImport );
         EditorUtility.DisplayProgressBar( "Building Atlas " + _atlasInfo.name,
                                           "Import Atlas",
                                           0.9f );    
@@ -247,7 +199,7 @@ public static class exAtlasInfoUtility {
 
         //
         atlas.elements = new exAtlas.Element[_atlasInfo.elements.Count];
-        for ( i = 0; i < _atlasInfo.elements.Count; ++i ) {
+        for ( int i = 0; i < _atlasInfo.elements.Count; ++i ) {
             exAtlasInfo.Element el = _atlasInfo.elements[i];
             exAtlas.Element el2 = new exAtlas.Element ();
 
@@ -301,5 +253,107 @@ public static class exAtlasInfoUtility {
         }
         _atlasInfo.rebuildAnimClipGUIDs.Clear();
         EditorUtility.ClearProgressBar();
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    static void FillAtlasTexture ( Texture2D _tex, exAtlasInfo _atlasInfo, bool _noImport ) {
+        foreach ( exAtlasInfo.Element el in _atlasInfo.elements ) {
+            // DISABLE: it is too slow { 
+            // EditorUtility.DisplayProgressBar( "Building Atlas...",
+            //                                   "Building Texture " + el.texture.name,
+            //                                   (float)i/(float)_atlasInfo.elements.Count - 0.1f );    
+            // } DISABLE end 
+
+            Texture2D srcTexture = el.texture;
+            if ( el.isFontElement ) {
+                // build the font
+                exBitmapFont.CharInfo charInfo = el.destFontInfo.GetCharInfo(el.charInfo.id);
+                if ( charInfo != null ) {
+                    charInfo.uv0 = new Vector2 ( (float)el.coord[0] / _tex.width,
+                                                 (_tex.height - (float)el.coord[1] - charInfo.height) / _tex.height );
+                    EditorUtility.SetDirty(el.destFontInfo);
+                }
+            }
+
+            // make the src texture readable
+            if ( exTextureHelper.IsValidForAtlas (srcTexture) == false ) {
+                if ( _noImport ) {
+                    Debug.LogError( "The texture import settings of [" + AssetDatabase.GetAssetPath(srcTexture) + "] is invalid for atlas build" );
+                }
+                else {
+                    exTextureHelper.ImportTextureForAtlas(srcTexture);
+                }
+            }
+
+            //
+            exTextureHelper.Fill( _tex, 
+                                  new Vector2 (el.coord[0], _tex.height - el.coord[1] - el.Height() ),  
+                                  srcTexture,
+                                  el.trimRect,
+                                  el.rotated ? exTextureHelper.RotateDirection.RotRight : exTextureHelper.RotateDirection.None ); 
+            // TODO { 
+            // Color32[] colors = srcTexture.GetPixels32();
+            // Color32[] colors_d = new Color32[_tex.width * _tex.height];
+            // for ( int r = 0; r < srcTexture.width; ++r ) {
+            //     for ( int c = 0; c < srcTexture.height; ++c ) {
+            //         colors_d[r+c*_tex.width] = colors[r+c*srcTexture.width];
+            //     }
+            // }
+            // _tex.SetPixels32( colors_d );
+            // } TODO end 
+        }
+
+        // ======================================================== 
+        // Add water mark
+        // ======================================================== 
+
+        // DISABLE: onlly open it in evaluate version { 
+        // Make Water Make { 
+        // Texture2D texWaterMark = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/ex2D/Editor/Resource/water_mark.png", typeof(Texture2D));
+        // exTextureHelper.ImportTextureForAtlas(texWaterMark);
+        // Color[] colors = texWaterMark.GetPixels();
+        // StreamWriter sw = new StreamWriter("Assets/TestFile.txt");
+        // Color32[] colors32 = texWaterMark.GetPixels32();
+        // for ( int r = 0; r < texWaterMark.height; ++r ) {
+        //     for ( int c = 0; c < texWaterMark.width; ++c ) {
+        //         Color32 cc = colors32[r*texWaterMark.width+c];
+        //         sw.Write( "0x" + cc.r.ToString("X2") 
+        //                   + ", 0x" + cc.g.ToString("X2")
+        //                   + ", 0x" + cc.b.ToString("X2")
+        //                   + ", 0x" + cc.a.ToString("X2")
+        //                   + ", " );
+        //     }
+        //     sw.WriteLine("");
+        // }
+        // sw.Close();
+        // } Make Water Make end 
+
+        // int wa_width = 392;
+        // int wa_height = 40;
+        // Color[] colors = new Color[wa_width*wa_height];
+        // for ( int r = 0; r < wa_height; ++r ) {
+        //     for ( int c = 0; c < wa_width; ++c ) {
+        //         colors[r*wa_width+c] = new Color ( waterMark[(r*wa_width+c)*4]/255.0f,
+        //                                            waterMark[(r*wa_width+c)*4+1]/255.0f, 
+        //                                            waterMark[(r*wa_width+c)*4+2]/255.0f, 
+        //                                            waterMark[(r*wa_width+c)*4+3]/255.0f );
+        //     }
+        // }
+        // Color[] colors_d = _tex.GetPixels();
+        // for ( int r = 0; r < wa_height; ++r ) {
+        //     for ( int c = 0; c < wa_width; ++c ) {
+        //         Color color_d = colors_d[r*_tex.width+c];
+        //         Color color = colors[r*wa_width+c];
+        //         // colors_d[r*_tex.width+(c+_tex.height-wa_height)] = 
+        //         colors_d[r*_tex.width+c] = color_d * ( 1.0f - color.a ) + color * color.a;
+        //     }
+        // }
+        // _tex.SetPixels( colors_d );
+        // } DISABLE end 
+
+        _tex.Apply(false);
     }
 }
