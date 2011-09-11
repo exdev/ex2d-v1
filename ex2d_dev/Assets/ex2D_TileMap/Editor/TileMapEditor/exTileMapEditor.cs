@@ -45,7 +45,10 @@ partial class exTileMapEditor : exPlaneEditor {
     // ------------------------------------------------------------------ 
 
     void OnDisable () {
-        Object.DestroyImmediate(mouseTile,true); 
+        if ( mouseTile != null ) {
+            Object.DestroyImmediate(mouseTile.GetComponent<MeshFilter>().sharedMesh,true); 
+            Object.DestroyImmediate(mouseTile,true); 
+        }
         mouseTile = null;
     }
 
@@ -118,7 +121,7 @@ partial class exTileMapEditor : exPlaneEditor {
         base.OnInspectorGUI();
 
         bool needRebuild = false;
-        MeshFilter meshFilter = editTileMap.GetComponent<MeshFilter>();
+        editTileMap.meshFilter = editTileMap.GetComponent<MeshFilter>();
 
         //
         EditorGUILayout.Space ();
@@ -183,14 +186,25 @@ partial class exTileMapEditor : exPlaneEditor {
         // ======================================================== 
 
         TileInfoField ( editTileMap.tileInfo ); 
-        if ( editTileMap.tileInfo != null && meshFilter.sharedMesh == null ) {
+        if ( editTileMap.tileInfo != null && editTileMap.meshFilter.sharedMesh == null ) {
             needRebuild = true;
         }
 
         // ======================================================== 
-        // if dirty, build it.
+        // Rebuild button
         // ======================================================== 
 
+        GUI.enabled = !inAnimMode; 
+        GUILayout.BeginHorizontal();
+        GUILayout.FlexibleSpace();
+        if ( GUILayout.Button("Rebuild...", GUILayout.Height(20) ) ) {
+            needRebuild = true;
+        }
+        GUILayout.EndHorizontal();
+        GUI.enabled = true;
+        GUILayout.Space(5);
+
+        // if dirty, build it.
         if ( !EditorApplication.isPlaying && !AnimationUtility.InAnimationMode() ) {
             if ( needRebuild ) {
                 // Debug.Log("rebuild mesh...");
@@ -198,8 +212,8 @@ partial class exTileMapEditor : exPlaneEditor {
             }
             else if ( GUI.changed ) {
                 // Debug.Log("update mesh...");
-                if ( meshFilter.sharedMesh != null )
-                    editTileMap.UpdateMesh( meshFilter.sharedMesh );
+                if ( editTileMap.meshFilter.sharedMesh != null )
+                    editTileMap.UpdateMesh( editTileMap.meshFilter.sharedMesh );
                 EditorUtility.SetDirty(editTileMap);
             }
 
@@ -314,28 +328,54 @@ partial class exTileMapEditor : exPlaneEditor {
         EditorGUILayout.Space ();
         Rect lastRect = GUILayoutUtility.GetLastRect ();  
 
-        //
+        // ======================================================== 
+        // draw field 
+        // ======================================================== 
+
         Rect filedRect = new Rect( 30, 
                                    lastRect.yMax,
                                    (tileInfo.tileWidth + interval + 2 * borderSize) * col + interval,
                                    (tileInfo.tileHeight + interval + 2 * borderSize) * row + interval );
         GUI.BeginGroup(filedRect);
-
             while ( (uvY + tileInfo.tileHeight + tileInfo.padding) <= tileInfo.texture.height ) {
                 while ( (uvX + tileInfo.tileWidth + tileInfo.padding) <= tileInfo.texture.width ) {
+
+                    // ======================================================== 
+                    // draw grid 
+                    // ======================================================== 
+
                     Rect rect = new Rect( curX, 
                                           curY, 
                                           tileInfo.tileWidth + 2 * borderSize, 
                                           tileInfo.tileHeight + 2 * borderSize );
-                    GUI.BeginGroup( rect );
-                        GUI.DrawTexture( new Rect( -uvX + 1, 
-                                                   -uvY + 1, 
-                                                   tileInfo.texture.width, 
-                                                   tileInfo.texture.height ), 
-                                         tileInfo.texture );
-                        exEditorHelper.DrawRect ( new Rect( 0, 0, rect.width, rect.height ),
+
+                    // ======================================================== 
+                    Event e = Event.current;
+                    // ======================================================== 
+
+                    // TODO { 
+                    if ( rect.Contains(e.mousePosition) ) {
+                        exEditorHelper.DrawRect ( rect,
+                                                  new Color ( 1.0f, 1.0f, 1.0f, 0.2f ),
+                                                  new Color ( 0.0f, 0.5f, 1.0f, 1.0f ) );
+                    }
+                    else {
+                        exEditorHelper.DrawRect ( rect,
                                                   new Color ( 1.0f, 1.0f, 1.0f, 0.0f ),
                                                   Color.gray );
+                    }
+                    // } TODO end 
+
+                    // draw the texture
+                    GUI.BeginGroup( new Rect ( rect.x + 1,
+                                               rect.y + 1,
+                                               rect.width - 2,
+                                               rect.height - 2 ) );
+                        Rect cellRect = new Rect( -uvX,
+                                                  -uvY,
+                                                  tileInfo.texture.width, 
+                                                  tileInfo.texture.height );
+                        GUI.DrawTexture( cellRect, tileInfo.texture );
                     GUI.EndGroup();
 
                     uvX = uvX + tileInfo.tileWidth + tileInfo.padding; 
@@ -387,16 +427,6 @@ partial class exTileMapEditor : exPlaneEditor {
         isMouseInside = false;
         if ( tileMapRect.Contains(worldMousePos) ) {
             isMouseInside = true;
-            if ( mouseTile == null ) {
-                mouseTile = new GameObject(".temp_mouse_tile");
-                mouseTile.transform.parent = editTileMap.transform;
-                EditorUtility.SetSelectedWireframeHidden(mouseTile.renderer, true);
-
-                exTileMap tm = mouseTile.AddComponent<exTileMap>();
-                tm.Resize(1,1);
-                tm.tileInfo = editTileMap.tileInfo;
-                tm.Build();
-            }
         }
 
         return (startPos + deltaPos);
@@ -410,51 +440,72 @@ partial class exTileMapEditor : exPlaneEditor {
         if ( editTileMap.tileInfo == null )
             return;
 
-        Handles.color = Color.white;
-        Color faceColor = new Color( 1.0f, 1.0f, 1.0f, 0.2f );
-        Color lineColor = new Color( 0.0f, 0.0f, 0.0f, 1.0f );
-        float width = editTileMap.tileInfo.tileWidth;
-        float height = editTileMap.tileInfo.tileHeight;
+        if ( mouseTile == null ) {
+            mouseTile = new GameObject(".temp_mouse_tile");
+            // mouseTile.hideFlags = HideFlags.HideAndDontSave;
+            // mouseTile.hideFlags = HideFlags.HideInHierarchy;
+            mouseTile.hideFlags = HideFlags.DontSave;
+            // DELME { 
+            // mouseTile.transform.parent = editTileMap.transform;
+            // EditorUtility.SetSelectedWireframeHidden(mouseTile.renderer, true);
+            // } DELME end 
 
-        switch ( editTileMap.plane ) {
-        case exPlane.Plane.XY:
-            Handles.DrawSolidRectangleWithOutline( new Vector3[] {
-                                                   _pos + new Vector3( 0.0f,   0.0f,   0.0f ), 
-                                                   _pos + new Vector3( 0.0f,   height, 0.0f ),
-                                                   _pos + new Vector3( width,  height, 0.0f ),
-                                                   _pos + new Vector3( width,  0.0f,   0.0f ),
-                                                   _pos + new Vector3( 0.0f,   0.0f,   0.0f )
-                                                   },
-                                                   faceColor, 
-                                                   lineColor );
-            break;
-
-        case exPlane.Plane.XZ:
-            Handles.DrawSolidRectangleWithOutline( new Vector3[] {
-                                                   _pos + new Vector3( 0.0f,   0.0f, 0.0f   ), 
-                                                   _pos + new Vector3( 0.0f,   0.0f, height ),
-                                                   _pos + new Vector3( width,  0.0f, height ),
-                                                   _pos + new Vector3( width,  0.0f, 0.0f   ),
-                                                   _pos + new Vector3( 0.0f,   0.0f, 0.0f   )
-                                                   },
-                                                   faceColor, 
-                                                   lineColor );
-            break;
-
-        case exPlane.Plane.ZY:
-            Handles.DrawSolidRectangleWithOutline( new Vector3[] {
-                                                   _pos + new Vector3( 0.0f,   0.0f, 0.0f  ), 
-                                                   _pos + new Vector3( height, 0.0f, 0.0f  ),
-                                                   _pos + new Vector3( height, 0.0f, width ),
-                                                   _pos + new Vector3( 0.0f,   0.0f, width ),
-                                                   _pos + new Vector3( 0.0f,   0.0f, 0.0f  )
-                                                   },
-                                                   faceColor, 
-                                                   lineColor );
-            break;
+            exTileMap tm = mouseTile.AddComponent<exTileMap>();
+            tm.tileInfo = editTileMap.tileInfo;
+            tm.tileWidth = editTileMap.tileInfo.tileWidth;
+            tm.tileHeight = editTileMap.tileInfo.tileHeight;
+            tm.Resize(1,1);
+            tm.Build();
+            tm.meshFilter.sharedMesh.hideFlags = HideFlags.DontSave;
         }
 
         if ( mouseTile != null )
             mouseTile.transform.position = _pos;
+
+        // DELME { 
+        // Handles.color = Color.white;
+        // Color faceColor = new Color( 1.0f, 1.0f, 1.0f, 0.2f );
+        // Color lineColor = new Color( 0.0f, 0.0f, 0.0f, 1.0f );
+        // float width = editTileMap.tileInfo.tileWidth;
+        // float height = editTileMap.tileInfo.tileHeight;
+
+        // switch ( editTileMap.plane ) {
+        // case exPlane.Plane.XY:
+        //     Handles.DrawSolidRectangleWithOutline( new Vector3[] {
+        //                                            _pos + new Vector3( 0.0f,   0.0f,   0.0f ), 
+        //                                            _pos + new Vector3( 0.0f,   height, 0.0f ),
+        //                                            _pos + new Vector3( width,  height, 0.0f ),
+        //                                            _pos + new Vector3( width,  0.0f,   0.0f ),
+        //                                            _pos + new Vector3( 0.0f,   0.0f,   0.0f )
+        //                                            },
+        //                                            faceColor, 
+        //                                            lineColor );
+        //     break;
+
+        // case exPlane.Plane.XZ:
+        //     Handles.DrawSolidRectangleWithOutline( new Vector3[] {
+        //                                            _pos + new Vector3( 0.0f,   0.0f, 0.0f   ), 
+        //                                            _pos + new Vector3( 0.0f,   0.0f, height ),
+        //                                            _pos + new Vector3( width,  0.0f, height ),
+        //                                            _pos + new Vector3( width,  0.0f, 0.0f   ),
+        //                                            _pos + new Vector3( 0.0f,   0.0f, 0.0f   )
+        //                                            },
+        //                                            faceColor, 
+        //                                            lineColor );
+        //     break;
+
+        // case exPlane.Plane.ZY:
+        //     Handles.DrawSolidRectangleWithOutline( new Vector3[] {
+        //                                            _pos + new Vector3( 0.0f,   0.0f, 0.0f  ), 
+        //                                            _pos + new Vector3( height, 0.0f, 0.0f  ),
+        //                                            _pos + new Vector3( height, 0.0f, width ),
+        //                                            _pos + new Vector3( 0.0f,   0.0f, width ),
+        //                                            _pos + new Vector3( 0.0f,   0.0f, 0.0f  )
+        //                                            },
+        //                                            faceColor, 
+        //                                            lineColor );
+        //     break;
+        // }
+        // } DELME end 
     }
 }

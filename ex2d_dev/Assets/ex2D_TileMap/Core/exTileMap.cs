@@ -49,13 +49,13 @@ public class exTileMap : exPlane {
     [SerializeField] protected int row_ = 50;
     public int row { 
         get { return row_; } 
-        // NOTE: we not allow run time changes
+        // NOTE: we not allow runtime changes
     }
 
     [SerializeField] protected int col_ = 50;
     public int col { 
         get { return col_; } 
-        // NOTE: we not allow run time changes
+        // NOTE: we not allow runtime changes
     }
 
     [SerializeField] protected int tileWidth_ = 32;

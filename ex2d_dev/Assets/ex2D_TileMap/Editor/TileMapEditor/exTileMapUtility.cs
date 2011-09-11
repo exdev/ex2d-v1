@@ -52,12 +52,12 @@ public static class exTileMapUtility {
         newMesh.Clear();
 
         // build vertices, normals, uvs and colors.
-        MeshFilter meshFilter = _tileMap.GetComponent<MeshFilter>();
+        _tileMap.meshFilter = _tileMap.GetComponent<MeshFilter>();
         _tileMap.ForceUpdateMesh( newMesh );
         newMesh.uv = new Vector2[_tileMap.row * _tileMap.col * 4]; 
 
         //
-        meshFilter.sharedMesh = newMesh;
+        _tileMap.meshFilter.sharedMesh = newMesh;
     }
 }
 

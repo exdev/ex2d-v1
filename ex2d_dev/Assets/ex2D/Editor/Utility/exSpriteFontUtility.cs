@@ -66,11 +66,11 @@ public static class exSpriteFontUtility {
         _spriteFont.renderer.sharedMaterial = _spriteFont.fontInfo.pageInfos[0].material;
 
         // update mesh
-        MeshFilter meshFilter = _spriteFont.GetComponent<MeshFilter>();
+        _spriteFont.meshFilter = _spriteFont.GetComponent<MeshFilter>();
         _spriteFont.ForceUpdateMesh (newMesh);
 
         //
-        meshFilter.sharedMesh = newMesh;
+        _spriteFont.meshFilter.sharedMesh = newMesh;
 
         // if we have mesh collider, update it.
         MeshCollider meshCol = _spriteFont.GetComponent<MeshCollider>();

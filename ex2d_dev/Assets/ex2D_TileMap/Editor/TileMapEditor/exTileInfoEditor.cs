@@ -279,6 +279,9 @@ partial class exTileInfoEditor : EditorWindow {
         int uvX = _tileInfo.padding;
         int uvY = _tileInfo.padding;
 
+        if ( _tileInfo.texture == null )
+            return;
+
         // count the col
         while ( (uvX + _tileInfo.tileWidth + _tileInfo.padding) <= _tileInfo.texture.width ) {
             uvX = uvX + _tileInfo.tileWidth + _tileInfo.padding; 
