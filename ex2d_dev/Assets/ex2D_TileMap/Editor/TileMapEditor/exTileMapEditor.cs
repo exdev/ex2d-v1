@@ -12,6 +12,7 @@
 using UnityEditor;
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 ///////////////////////////////////////////////////////////////////////////////
 // exTileMapEditor
@@ -20,6 +21,27 @@ using System.Collections;
 [CustomEditor(typeof(exTileMap))]
 partial class exTileMapEditor : exPlaneEditor {
 
+    struct GridID {
+        public int x;
+        public int y;
+
+        public GridID ( int _x, int _y ) { x = _x; y = _y; }
+        public static bool operator == ( GridID _a, GridID _b ) { return _a.Equals(_b); }
+        public static bool operator != ( GridID _a, GridID _b ) { return !_a.Equals(_b); }
+        public override int GetHashCode() { return x ^ y; }
+        public override bool Equals ( object _obj ) {
+            if ( !(_obj is GridID) )
+                return false;
+            return Equals((GridID)_obj);
+        }
+        public bool Equals ( GridID _other ) {
+            if ( x != _other.x || y != _other.y ) {
+                return false;
+            }
+            return true;
+        }
+    }
+
     private exTileMap editTileMap;
     private Plane plane;
     private Vector2 mousePos = Vector2.zero;
@@ -27,6 +49,12 @@ partial class exTileMapEditor : exPlaneEditor {
     private Rect tileMapRect;
     private bool isMouseInside = false;
     private GameObject mouseTile = null;
+
+    private bool inRectSelectState = false;
+    private List<GridID> selectedGrids = new List<GridID>();
+    private List<GridID> rectSelectedGrids = new List<GridID>();
+    private Rect selectRect = new Rect( 0, 0, 1, 1 );
+    private Vector2 mouseDownPos = Vector2.zero;
 
     // ------------------------------------------------------------------ 
     // Desc: 
@@ -323,10 +351,14 @@ partial class exTileMapEditor : exPlaneEditor {
         int borderSize = 1;
         uvX = tileInfo.padding;
         uvY = tileInfo.padding;
+        int x = 0;
+        int y = 0;
 
         //
         EditorGUILayout.Space ();
         Rect lastRect = GUILayoutUtility.GetLastRect ();  
+        Event e = Event.current;
+        rectSelectedGrids.Clear();
 
         // ======================================================== 
         // draw field 
@@ -334,37 +366,20 @@ partial class exTileMapEditor : exPlaneEditor {
 
         Rect filedRect = new Rect( 30, 
                                    lastRect.yMax,
-                                   (tileInfo.tileWidth + interval + 2 * borderSize) * col + interval,
-                                   (tileInfo.tileHeight + interval + 2 * borderSize) * row + interval );
+                                   (tileInfo.tileWidth + interval + 2 * borderSize) * col - interval,
+                                   (tileInfo.tileHeight + interval + 2 * borderSize) * row - interval );
         GUI.BeginGroup(filedRect);
             while ( (uvY + tileInfo.tileHeight + tileInfo.padding) <= tileInfo.texture.height ) {
                 while ( (uvX + tileInfo.tileWidth + tileInfo.padding) <= tileInfo.texture.width ) {
 
                     // ======================================================== 
-                    // draw grid 
+                    // draw tile element 
                     // ======================================================== 
 
                     Rect rect = new Rect( curX, 
                                           curY, 
                                           tileInfo.tileWidth + 2 * borderSize, 
                                           tileInfo.tileHeight + 2 * borderSize );
-
-                    // ======================================================== 
-                    Event e = Event.current;
-                    // ======================================================== 
-
-                    // TODO { 
-                    if ( rect.Contains(e.mousePosition) ) {
-                        exEditorHelper.DrawRect ( rect,
-                                                  new Color ( 1.0f, 1.0f, 1.0f, 0.2f ),
-                                                  new Color ( 0.0f, 0.5f, 1.0f, 1.0f ) );
-                    }
-                    else {
-                        exEditorHelper.DrawRect ( rect,
-                                                  new Color ( 1.0f, 1.0f, 1.0f, 0.0f ),
-                                                  Color.gray );
-                    }
-                    // } TODO end 
 
                     // draw the texture
                     GUI.BeginGroup( new Rect ( rect.x + 1,
@@ -380,6 +395,56 @@ partial class exTileMapEditor : exPlaneEditor {
 
                     uvX = uvX + tileInfo.tileWidth + tileInfo.padding; 
                     curX = curX + tileInfo.tileWidth + interval + 2 * borderSize; 
+
+                    // ======================================================== 
+                    // handle events
+                    // ======================================================== 
+
+                    //
+                    if ( e.type == EventType.MouseDown && e.button == 0 && e.clickCount == 1 ) {
+                        if ( rect.Contains( e.mousePosition ) ) {
+                            GUIUtility.keyboardControl = -1; // remove any keyboard control
+
+                            inRectSelectState = true;
+                            mouseDownPos = e.mousePosition;
+                            UpdateSelectRect ();
+
+                            if ( e.command == false && e.control == false ) {
+                                selectedGrids.Clear();
+                            }
+
+                            e.Use();
+                            Repaint();
+                        }
+                    }
+
+                    //
+                    bool selectInRect = false;
+                    if ( inRectSelectState ) {
+                        if ( exContains2D.RectRect( selectRect, rect ) != 0 ||
+                             exIntersection2D.RectRect( selectRect, rect ) )
+                        {
+                            AddRectSelected(x,y);
+                            selectInRect = true;
+                        }
+                    }
+
+                    // ======================================================== 
+                    // draw grid, NOTE: we should handle event first to get if the rect is slected 
+                    // ======================================================== 
+
+                    if ( HasSelected ( x, y ) || selectInRect ) {
+                        exEditorHelper.DrawRect ( rect,
+                                                  new Color ( 1.0f, 1.0f, 1.0f, 0.2f ),
+                                                  new Color ( 0.0f, 1.0f, 0.5f, 1.0f ) );
+                    }
+                    else {
+                        exEditorHelper.DrawRect ( rect,
+                                                  new Color ( 1.0f, 1.0f, 1.0f, 0.0f ),
+                                                  Color.gray );
+                    }
+
+                    ++x;
                 }
 
                 // step uv
@@ -389,10 +454,56 @@ partial class exTileMapEditor : exPlaneEditor {
                 // step pos
                 curX = 0.0f;
                 curY = curY + tileInfo.tileHeight + interval + 2 * borderSize; 
+
+                x = 0;
+                ++y;
+            }
+
+            // ======================================================== 
+            // draw select rect 
+            // ======================================================== 
+
+            if ( inRectSelectState && (selectRect.width != 0.0f || selectRect.height != 0.0f) ) {
+                exEditorHelper.DrawRect( selectRect, new Color( 0.0f, 0.5f, 1.0f, 0.2f ), new Color( 0.0f, 0.5f, 1.0f, 1.0f ) );
+            }
+
+            // ======================================================== 
+            // handle rect select
+            // ======================================================== 
+
+            if ( inRectSelectState ) {
+                if ( e.type == EventType.MouseDrag ) {
+                    UpdateSelectRect ();
+                    Repaint();
+
+                    e.Use();
+                }
+                else if ( e.type == EventType.MouseUp && e.button == 0 ) {
+                    inRectSelectState = false;
+                    ConfirmRectSelection();
+                    Repaint();
+
+                    e.Use();
+                }
             }
 
         GUI.EndGroup();
         GUILayoutUtility.GetRect ( filedRect.width, filedRect.height );
+
+        // DISABLE: we use eraser button { 
+        // // ======================================================== 
+        // // finally 
+        // // ======================================================== 
+
+        // if ( e.type == EventType.MouseDown && e.button == 0 && e.clickCount == 1 ) {
+        //     if ( filedRect.Contains( e.mousePosition ) == false ) {
+        //         selectedGrids.Clear();
+        //         Repaint();
+
+        //         e.Use();
+        //     }
+        // }
+        // } DISABLE end 
     }
 
     // ------------------------------------------------------------------ 
@@ -507,5 +618,81 @@ partial class exTileMapEditor : exPlaneEditor {
         //     break;
         // }
         // } DELME end 
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    bool HasSelected ( int _x, int _y ) {
+        foreach ( GridID gid in selectedGrids ) {
+            if ( gid.x == _x && gid.y == _y ) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void AddRectSelected ( int _x, int _y ) {
+        bool found = false;
+        foreach ( GridID gid in rectSelectedGrids ) {
+            if ( gid.x == _x && gid.y == _y ) {
+                found = true;
+                break;
+            }
+        }
+
+        //
+        if ( found == false ) {
+            rectSelectedGrids.Add( new GridID(_x,_y) );
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void UpdateSelectRect () {
+        float x = 0;
+        float y = 0;
+        float width = 0;
+        float height = 0;
+        Vector2 curMousePos = Event.current.mousePosition;
+
+        if ( mouseDownPos.x < curMousePos.x ) {
+            x = mouseDownPos.x;
+            width = curMousePos.x - mouseDownPos.x;
+        }
+        else {
+            x = curMousePos.x;
+            width = mouseDownPos.x - curMousePos.x;
+        }
+        if ( mouseDownPos.y < curMousePos.y ) {
+            y = mouseDownPos.y;
+            height = curMousePos.y - mouseDownPos.y;
+        }
+        else {
+            y = curMousePos.y;
+            height = mouseDownPos.y - curMousePos.y;
+        }
+
+        selectRect = new Rect( x, y, width, height );
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void ConfirmRectSelection () {
+        foreach ( GridID gid in rectSelectedGrids ) {
+            if ( HasSelected( gid.x, gid.y ) == false )
+                selectedGrids.Add(gid);
+        }
+        rectSelectedGrids.Clear();
     }
 }

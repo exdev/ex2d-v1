@@ -123,6 +123,7 @@ public partial class exAtlasInfo : ScriptableObject {
     public exAtlas atlas; ///< the referenced atlas asset
     public Texture2D texture; ///< the referenced atlas texture
     public Material material; ///< the default material we used
+    public bool useBuildColor = false; ///< use buildColor as background color for transparent pixels
     public Color buildColor = new Color(1.0f, 1.0f, 1.0f, 0.0f); ///< the color of transparent pixels in atlas texture
 
     // canvas settings

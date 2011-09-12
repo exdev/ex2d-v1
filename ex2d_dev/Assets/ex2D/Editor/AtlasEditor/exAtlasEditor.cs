@@ -538,12 +538,23 @@ partial class exAtlasEditor : EditorWindow {
                 // build color 
                 // ======================================================== 
 
-                Color newBuildColor = EditorGUILayout.ColorField( "Build Color", curEdit.buildColor );
-                if ( newBuildColor != curEdit.buildColor ) {
-                    curEdit.buildColor = newBuildColor;
-                    curEdit.needRebuild = true;
-                    GUI.changed = true;
-                }
+                GUILayout.BeginHorizontal();
+                    bool newUseBuildColor = GUILayout.Toggle ( curEdit.useBuildColor, "Use Build Color" ); 
+                    if ( newUseBuildColor != curEdit.useBuildColor ) {
+                        curEdit.useBuildColor = newUseBuildColor;
+                        curEdit.needRebuild = true;
+                        GUI.changed = true;
+                    }
+
+                    GUI.enabled = curEdit.useBuildColor;
+                        Color newBuildColor = EditorGUILayout.ColorField( curEdit.buildColor );
+                        if ( newBuildColor != curEdit.buildColor ) {
+                            curEdit.buildColor = newBuildColor;
+                            curEdit.needRebuild = true;
+                            GUI.changed = true;
+                        }
+                    GUI.enabled = true;
+                GUILayout.EndHorizontal();
 
                 // ======================================================== 
                 // bitmap fonts 

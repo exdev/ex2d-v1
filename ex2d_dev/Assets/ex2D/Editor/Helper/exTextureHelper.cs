@@ -76,10 +76,18 @@ public static class exTextureHelper {
     /// \param _src the src texture
     /// \param _rect the rect to fill
     /// \param _rotDir rotation direction
+    /// \param _useBgColor use the background color
+    /// \param _bgColor the background color, null if no use
     /// fill the source texture to target texture
     // ------------------------------------------------------------------ 
 
-    public static void Fill ( Texture2D _dest, Vector2 _pos, Texture2D _src, Rect _rect, RotateDirection _rotDir ) {
+    public static void Fill ( Texture2D _dest, 
+                              Vector2 _pos, 
+                              Texture2D _src, 
+                              Rect _rect, 
+                              RotateDirection _rotDir,
+                              bool _useBgColor,
+                              Color _bgColor ) {
         int xDest = (int)_pos.x;
         int yDest = (int)_pos.y;
         int xSrc = (int)_rect.x;
@@ -88,17 +96,45 @@ public static class exTextureHelper {
         int srcHeight = (int)_rect.height;
 
         if ( _rotDir == RotateDirection.None ) {
-
-            _dest.SetPixels( xDest, yDest, srcWidth, srcHeight, 
-                             _src.GetPixels( xSrc, _src.height - ySrc - srcHeight, srcWidth, srcHeight ) );
+            if ( _useBgColor ) {
+                for ( int j = 0; j < srcHeight; ++j ) {
+                    for ( int i = 0; i < srcWidth; ++i ) {
+                        Color c = _src.GetPixel( xSrc + i, _src.height - ySrc - srcHeight + j );
+                        if ( c.a == 0.0f ) {
+                            c = _bgColor;
+                            c.a = 0.0f;
+                        }
+                        _dest.SetPixel( xDest + i, yDest + j, c );
+                    }
+                }
+            }
+            else {
+                _dest.SetPixels( xDest, yDest, srcWidth, srcHeight, 
+                                 _src.GetPixels( xSrc, _src.height - ySrc - srcHeight, srcWidth, srcHeight ) );
+            }
         }
         else if ( _rotDir == RotateDirection.RotRight ) {
             int destWidth = srcHeight;
             int destHeight = srcWidth;
-            for ( int j = 0; j < destHeight; ++j ) {
-                for ( int i = 0; i < destWidth; ++i ) {
-                    _dest.SetPixel( xDest + i, yDest + j, 
-                                    _src.GetPixel( xSrc + srcWidth - j, _src.height - ySrc - srcHeight + i ) );
+
+            if ( _useBgColor ) {
+                for ( int j = 0; j < destHeight; ++j ) {
+                    for ( int i = 0; i < destWidth; ++i ) {
+                        Color c = _src.GetPixel( xSrc + srcWidth - j, _src.height - ySrc - srcHeight + i );
+                        if ( c.a == 0.0f ) {
+                            c = _bgColor;
+                            c.a = 0.0f;
+                        }
+                        _dest.SetPixel( xDest + i, yDest + j, c );
+                    }
+                }
+            }
+            else {
+                for ( int j = 0; j < destHeight; ++j ) {
+                    for ( int i = 0; i < destWidth; ++i ) {
+                        Color c = _src.GetPixel( xSrc + srcWidth - j, _src.height - ySrc - srcHeight + i );
+                        _dest.SetPixel( xDest + i, yDest + j, c ); 
+                    }
                 }
             }
         }

@@ -169,10 +169,13 @@ public static partial class exAtlasInfoUtility {
 
 
         // create temp texture
-        Color buildColor = new Color ( _atlasInfo.buildColor.r,
-                                       _atlasInfo.buildColor.g,
-                                       _atlasInfo.buildColor.b,
-                                       0.0f );
+        Color buildColor = new Color ( 0.0f, 0.0f, 0.0f, 0.0f );
+        if ( _atlasInfo.useBuildColor )
+            buildColor = new Color ( _atlasInfo.buildColor.r,
+                                     _atlasInfo.buildColor.g,
+                                     _atlasInfo.buildColor.b,
+                                     0.0f );
+
         string path = AssetDatabase.GetAssetPath(texture);
         Texture2D tex = new Texture2D(_atlasInfo.width, _atlasInfo.height, TextureFormat.ARGB32, false);
         for ( int x = 0; x < _atlasInfo.width; ++x ) {
@@ -293,7 +296,9 @@ public static partial class exAtlasInfoUtility {
                                   new Vector2 (el.coord[0], _tex.height - el.coord[1] - el.Height() ),  
                                   srcTexture,
                                   el.trimRect,
-                                  el.rotated ? exTextureHelper.RotateDirection.RotRight : exTextureHelper.RotateDirection.None ); 
+                                  el.rotated ? exTextureHelper.RotateDirection.RotRight : exTextureHelper.RotateDirection.None,
+                                  _atlasInfo.useBuildColor,
+                                  _atlasInfo.buildColor ); 
             // TODO { 
             // Color32[] colors = srcTexture.GetPixels32();
             // Color32[] colors_d = new Color32[_tex.width * _tex.height];
