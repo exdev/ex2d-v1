@@ -81,8 +81,8 @@ partial class exSpriteAnimClipEditor {
                                                    -el.trimRect.y * previewScale, 
                                                    width * previewScale, 
                                                    height * previewScale );
-                        Rect rect2 = new Rect ( (_rect.width - el.trimRect.width * previewScale) * 0.5f - offsetX,
-                                                (_rect.height - el.trimRect.height * previewScale) * 0.5f - offsetY,
+                        Rect rect2 = new Rect ( (_rect.width - el.trimRect.width * previewScale) * 0.5f - offsetX * previewScale,
+                                                (_rect.height - el.trimRect.height * previewScale) * 0.5f - offsetY * previewScale,
                                                 el.trimRect.width * previewScale, 
                                                 el.trimRect.height * previewScale );
 

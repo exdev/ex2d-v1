@@ -21,7 +21,7 @@ using System.IO;
 [CustomEditor(typeof(exPlane))]
 class exPlaneEditor : Editor {
 
-    protected static string[] anchorTexts = new string[] {
+    static string[] anchorTexts = new string[] {
         "", "", "", 
         "", "", "", 
         "", "", "", 
@@ -212,10 +212,10 @@ class exPlaneEditor : Editor {
         GUILayout.BeginHorizontal();
         GUILayout.Space(30);
             editPlane.anchor 
-                = (exSpriteBase.Anchor)GUILayout.SelectionGrid ( (int)editPlane.anchor, 
-                                                                 anchorTexts, 
-                                                                 3, 
-                                                                 GUILayout.Width(80) );  
+                = (exPlane.Anchor)GUILayout.SelectionGrid ( (int)editPlane.anchor, 
+                                                              anchorTexts, 
+                                                              3, 
+                                                              GUILayout.Width(80) );  
         GUILayout.EndHorizontal();
 
         // ======================================================== 

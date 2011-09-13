@@ -118,6 +118,7 @@ partial class exSpriteAnimClipEditor : EditorWindow {
         playingSelects = false;
 
         previewScale = 1.0f;
+        CalculatePreviewScale();
 
         if ( curEdit ) {
             curEdit.UpdateLength();
@@ -211,6 +212,8 @@ partial class exSpriteAnimClipEditor : EditorWindow {
     // ------------------------------------------------------------------ 
 
     void OnGUI () {
+        EditorGUI.indentLevel = 0;
+
         if ( curEdit == null ) {
             GUILayout.Space(10);
             GUILayout.Label ( "Please select an Sprite Animation Clip" );
@@ -286,7 +289,7 @@ partial class exSpriteAnimClipEditor : EditorWindow {
             GUILayout.Space(5);
             EditorGUILayout.SelectableLabel( curEdit.SnapToFrames(curEdit.length) + " frames | "
                                              + curEdit.length.ToString("f3") + " secs",
-                                             GUILayout.Width(150) );
+                                             GUILayout.Width(150), GUILayout.MaxHeight(18) );
 
             // ======================================================== 
             // preview speed
@@ -304,7 +307,7 @@ partial class exSpriteAnimClipEditor : EditorWindow {
 
             GUILayout.Space(5);
             EditorGUILayout.SelectableLabel( (curEdit.length / curEdit.editorSpeed).ToString("f3") + " secs", 
-                                             GUILayout.Width(200) );
+                                             GUILayout.Width(200), GUILayout.MaxHeight(18) );
 
             GUILayout.FlexibleSpace();
             // ======================================================== 
@@ -401,6 +404,22 @@ partial class exSpriteAnimClipEditor : EditorWindow {
             //     GUI.changed = true;
             // }
             // } DELME end 
+
+            // speed and length
+            GUILayout.BeginHorizontal();
+                curEdit.speed = EditorGUILayout.FloatField( "Speed", 
+                                                            curEdit.speed, 
+                                                            GUILayout.MaxWidth(200) );
+                GUILayout.Space(10);
+                float curLength = curEdit.length / curEdit.speed;
+                float newLength = EditorGUILayout.FloatField( "Length", 
+                                                              curLength, 
+                                                              GUILayout.MaxWidth(200) );
+                if ( curLength != newLength ) {
+                    curEdit.speed = curEdit.length/newLength;
+                }
+                GUILayout.Label( "secs" );
+            GUILayout.EndHorizontal();
 
             // sample rate
             curEdit.sampleRate = EditorGUILayout.FloatField( "Sample Rate", 
@@ -751,8 +770,10 @@ partial class exSpriteAnimClipEditor : EditorWindow {
             if ( elInfo != null ) {
                 exAtlasInfo atlasInfo = exEditorHelper.LoadAssetFromGUID<exAtlasInfo>(elInfo.guidAtlasInfo);
                 exAtlasInfo.Element el = atlasInfo.elements[elInfo.indexInAtlasInfo];  
-                fiWidth = el.trimRect.width;
-                fiHeight = el.trimRect.height;
+                // fiWidth = el.trimRect.width;
+                // fiHeight = el.trimRect.height;
+                fiWidth = el.texture.width;
+                fiHeight = el.texture.height;
             } else {
                 string texturePath = AssetDatabase.GUIDToAssetPath(frameInfo.textureGUID);
                 Texture2D tex2D = (Texture2D)AssetDatabase.LoadAssetAtPath( texturePath, typeof(Texture2D));

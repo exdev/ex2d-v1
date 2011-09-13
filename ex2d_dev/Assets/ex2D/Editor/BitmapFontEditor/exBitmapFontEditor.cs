@@ -136,6 +136,8 @@ partial class exBitmapFontEditor : EditorWindow {
     // ------------------------------------------------------------------ 
 
     void OnGUI () {
+        EditorGUI.indentLevel = 0;
+
         if ( curEdit == null ) {
             GUILayout.Space(10);
             GUILayout.Label ( "Please select an BitmapFont asset" );

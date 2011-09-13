@@ -21,11 +21,17 @@ using System.IO;
 [CustomEditor(typeof(exScreenPosition))]
 class exScreenPositionEditor : Editor {
 
+    static string[] anchorTexts = new string[] {
+        "", "", "", 
+        "", "", "", 
+        "", "", "", 
+    };
+
     ///////////////////////////////////////////////////////////////////////////////
     // properties
     ///////////////////////////////////////////////////////////////////////////////
 
-    private exScreenPosition curEdit;
+    exScreenPosition curEdit;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -64,6 +70,20 @@ class exScreenPositionEditor : Editor {
         // ======================================================== 
 
         curEdit.y = EditorGUILayout.FloatField ( "Screen Y", curEdit.y );
+
+        // ======================================================== 
+        // anchor
+        // ======================================================== 
+
+        EditorGUILayout.LabelField ( "Anchor", "" );
+        GUILayout.BeginHorizontal();
+        GUILayout.Space(30);
+            curEdit.anchor 
+                = (exPlane.Anchor)GUILayout.SelectionGrid ( (int)curEdit.anchor, 
+                                                            anchorTexts, 
+                                                            3, 
+                                                            GUILayout.Width(80) );  
+        GUILayout.EndHorizontal();
 
         // ======================================================== 
         // check dirty 
