@@ -312,8 +312,8 @@ class exSpriteEditor : exSpriteBaseEditor {
     // ------------------------------------------------------------------ 
 
     void OnSceneGUI () {
+
         //
-        editSprite.meshFilter = editSprite.GetComponent<MeshFilter>();
         if ( editSprite.meshFilter == null || editSprite.meshFilter.sharedMesh == null ) {
             return;
         }

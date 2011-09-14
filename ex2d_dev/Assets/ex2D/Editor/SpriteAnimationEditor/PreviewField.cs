@@ -41,8 +41,8 @@ partial class exSpriteAnimClipEditor {
         int col = (int)_rect.width / texCheckerboard.width;
         int row = (int)_rect.height / texCheckerboard.height;
 
-        for ( int i = 0; i < col; ++i ) {
-            for ( int j = 0; j < row; ++j ) {
+        for ( int j = 0; j < row; ++j ) {
+            for ( int i = 0; i < col; ++i ) {
                 Rect size = new Rect( i * texCheckerboard.width + xStart,
                                       j * texCheckerboard.height + yStart,
                                       texCheckerboard.width,

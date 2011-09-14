@@ -299,8 +299,8 @@ class exSpriteFontEditor : exSpriteBaseEditor {
     // ------------------------------------------------------------------ 
 
     void OnSceneGUI () {
+
         //
-        editSpriteFont.meshFilter = editSpriteFont.GetComponent<MeshFilter>();
         if ( editSpriteFont.meshFilter == null || editSpriteFont.meshFilter.sharedMesh == null ) {
             return;
         }

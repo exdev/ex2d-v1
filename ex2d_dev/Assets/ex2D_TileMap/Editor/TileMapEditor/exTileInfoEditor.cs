@@ -118,6 +118,8 @@ partial class exTileInfoEditor : EditorWindow {
     // ------------------------------------------------------------------ 
 
     void OnGUI () {
+        EditorGUI.indentLevel = 0;
+
         if ( curEdit == null ) {
             GUILayout.Space(10);
             GUILayout.Label ( "Please select a Tile Info" );
@@ -233,6 +235,12 @@ partial class exTileInfoEditor : EditorWindow {
 
             curEdit.padding = Mathf.Max( 0, EditorGUILayout.IntField ( "Padding", curEdit.padding ) ); 
 
+            // ======================================================== 
+            // row and col  
+            // ======================================================== 
+
+            EditorGUILayout.LabelField ( "Column x Row", curEdit.col + " x " + curEdit.row ); 
+
             // TODO { 
             // an anchor editor (used to put anchor point)
             // } TODO end 
@@ -263,6 +271,24 @@ partial class exTileInfoEditor : EditorWindow {
 
         //
         if ( GUI.changed ) {
+            int col = 0;
+            int row = 0;
+            int uvX = curEdit.padding;
+            int uvY = curEdit.padding;
+
+            // count the col
+            while ( (uvX + curEdit.tileWidth + curEdit.padding) <= curEdit.texture.width ) {
+                uvX = uvX + curEdit.tileWidth + curEdit.padding; 
+                ++col;
+            }
+            // count the row
+            while ( (uvY + curEdit.tileHeight + curEdit.padding) <= curEdit.texture.height ) {
+                uvY = uvY + curEdit.tileHeight + curEdit.padding; 
+                ++row;
+            }
+            curEdit.col = col;
+            curEdit.row = row;
+
             EditorUtility.SetDirty(curEdit);
         }
 
@@ -274,25 +300,11 @@ partial class exTileInfoEditor : EditorWindow {
     // ------------------------------------------------------------------ 
 
     void PreviewTileInfo ( float _x, float _y, exTileInfo _tileInfo ) {
-        int col = 0;
-        int row = 0;
         int uvX = _tileInfo.padding;
         int uvY = _tileInfo.padding;
 
         if ( _tileInfo.texture == null )
             return;
-
-        // count the col
-        while ( (uvX + _tileInfo.tileWidth + _tileInfo.padding) <= _tileInfo.texture.width ) {
-            uvX = uvX + _tileInfo.tileWidth + _tileInfo.padding; 
-            ++col;
-        }
-
-        // count the row
-        while ( (uvY + _tileInfo.tileHeight + _tileInfo.padding) <= _tileInfo.texture.height ) {
-            uvY = uvY + _tileInfo.tileHeight + _tileInfo.padding; 
-            ++row;
-        }
 
         // show texture by grids
         float curX = 0.0f;
@@ -305,8 +317,8 @@ partial class exTileInfoEditor : EditorWindow {
         //
         Rect filedRect = new Rect( _x, 
                                    _y,
-                                   (_tileInfo.tileWidth + interval + 2 * borderSize) * col + interval,
-                                   (_tileInfo.tileHeight + interval + 2 * borderSize) * row + interval );
+                                   (_tileInfo.tileWidth + interval + 2 * borderSize) * _tileInfo.col - interval,
+                                   (_tileInfo.tileHeight + interval + 2 * borderSize) * _tileInfo.row - interval );
         GUI.BeginGroup(filedRect);
 
             while ( (uvY + _tileInfo.tileHeight + _tileInfo.padding) <= _tileInfo.texture.height ) {
@@ -315,16 +327,19 @@ partial class exTileInfoEditor : EditorWindow {
                                           curY, 
                                           _tileInfo.tileWidth + 2 * borderSize, 
                                           _tileInfo.tileHeight + 2 * borderSize );
-                    GUI.BeginGroup( rect );
-                        GUI.DrawTexture( new Rect( -uvX + 1, 
-                                                   -uvY + 1, 
-                                                   _tileInfo.texture.width, 
-                                                   _tileInfo.texture.height ), 
-                                         _tileInfo.texture );
-                        exEditorHelper.DrawRect ( new Rect( 0, 0, rect.width, rect.height ),
-                                                  new Color ( 1.0f, 1.0f, 1.0f, 0.0f ),
-                                                  Color.gray );
+                    GUI.BeginGroup( new Rect ( rect.x + 1,
+                                               rect.y + 1,
+                                               rect.width - 2,
+                                               rect.height - 2 ) );
+                        Rect cellRect = new Rect( -uvX,
+                                                  -uvY,
+                                                  _tileInfo.texture.width, 
+                                                  _tileInfo.texture.height );
+                        GUI.DrawTexture( cellRect, _tileInfo.texture );
                     GUI.EndGroup();
+                    exEditorHelper.DrawRect ( rect,
+                                              new Color ( 1.0f, 1.0f, 1.0f, 0.0f ),
+                                              Color.gray );
 
                     uvX = uvX + _tileInfo.tileWidth + _tileInfo.padding; 
                     curX = curX + _tileInfo.tileWidth + interval + 2 * borderSize; 

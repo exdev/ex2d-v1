@@ -82,9 +82,6 @@ class exPlaneEditor : Editor {
         EditorGUILayout.Space ();
         EditorGUI.indentLevel = 1;
 
-        editPlane.layer2d = editPlane.GetComponent<exLayer2D>();
-        editPlane.meshFilter = editPlane.GetComponent<MeshFilter>();
-
         // TODO: I do not know how to do it. { 
         // // ======================================================== 
         // // Script 
@@ -143,16 +140,15 @@ class exPlaneEditor : Editor {
             if ( useLayer2D != hasLayer2D ) {
                 if ( useLayer2D ) {
                     switch ( editPlane.plane ) {
-                    case exPlane.Plane.XY: editPlane.layer2d = editPlane.gameObject.AddComponent<exLayerXY>(); break;
-                    case exPlane.Plane.XZ: editPlane.layer2d = editPlane.gameObject.AddComponent<exLayerXZ>(); break;
-                    case exPlane.Plane.ZY: editPlane.layer2d = editPlane.gameObject.AddComponent<exLayerZY>(); break;
+                    case exPlane.Plane.XY: editPlane.gameObject.AddComponent<exLayerXY>(); break;
+                    case exPlane.Plane.XZ: editPlane.gameObject.AddComponent<exLayerXZ>(); break;
+                    case exPlane.Plane.ZY: editPlane.gameObject.AddComponent<exLayerZY>(); break;
                     }
                     editPlane.layer2d.plane = editPlane;
                     editPlane.layer2d.UpdateDepth();
                 }
                 else {
                     Object.DestroyImmediate(editPlane.layer2d,true);
-                    editPlane.layer2d = null;
                 }
                 GUI.changed = true;
             }

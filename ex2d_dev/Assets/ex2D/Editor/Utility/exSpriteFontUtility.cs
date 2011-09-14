@@ -53,7 +53,8 @@ public static class exSpriteFontUtility {
 
         //
         if ( _spriteFont.fontInfo == null ) {
-            _spriteFont.GetComponent<MeshFilter>().sharedMesh = null; 
+            GameObject.DestroyImmediate( _spriteFont.meshFilter.sharedMesh, true );
+            _spriteFont.meshFilter.sharedMesh = null; 
             _spriteFont.renderer.sharedMaterial = null;
             return;
         }
@@ -66,10 +67,10 @@ public static class exSpriteFontUtility {
         _spriteFont.renderer.sharedMaterial = _spriteFont.fontInfo.pageInfos[0].material;
 
         // update mesh
-        _spriteFont.meshFilter = _spriteFont.GetComponent<MeshFilter>();
         _spriteFont.ForceUpdateMesh (newMesh);
 
         //
+        GameObject.DestroyImmediate( _spriteFont.meshFilter.sharedMesh, true ); // delete old mesh (to avoid leaking)
         _spriteFont.meshFilter.sharedMesh = newMesh;
 
         // if we have mesh collider, update it.

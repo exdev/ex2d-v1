@@ -54,7 +54,8 @@ public static class exSpriteUtility {
 
         //
         if ( _sprite.atlas == null && _texture == null ) {
-            _sprite.GetComponent<MeshFilter>().sharedMesh = null; 
+            GameObject.DestroyImmediate( _sprite.meshFilter.sharedMesh, true );
+            _sprite.meshFilter.sharedMesh = null; 
             _sprite.renderer.sharedMaterial = null;
             return;
         }
@@ -74,7 +75,8 @@ public static class exSpriteUtility {
         _sprite.ForceUpdateMesh( newMesh );
 
         // set the new mesh in MeshFilter
-        _sprite.GetComponent<MeshFilter>().sharedMesh = newMesh; 
+        GameObject.DestroyImmediate( _sprite.meshFilter.sharedMesh, true ); // delete old mesh (to avoid leaking)
+        _sprite.meshFilter.sharedMesh = newMesh; 
 
         // if we have mesh collider, update it.
         MeshCollider meshCol = _sprite.GetComponent<MeshCollider>();

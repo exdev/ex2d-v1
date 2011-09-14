@@ -52,11 +52,10 @@ public static class exTileMapUtility {
         newMesh.Clear();
 
         // build vertices, normals, uvs and colors.
-        _tileMap.meshFilter = _tileMap.GetComponent<MeshFilter>();
         _tileMap.ForceUpdateMesh( newMesh );
-        newMesh.uv = new Vector2[_tileMap.row * _tileMap.col * 4]; 
 
         //
+        GameObject.DestroyImmediate( _tileMap.meshFilter.sharedMesh, true ); // delete old mesh (to avoid leaking)
         _tileMap.meshFilter.sharedMesh = newMesh;
     }
 }

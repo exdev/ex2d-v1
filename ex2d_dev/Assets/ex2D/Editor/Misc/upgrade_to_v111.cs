@@ -38,9 +38,9 @@ public static class upgrade_to_v111 {
                 Object.DestroyImmediate(layer2d,true);
             }
             switch ( plane.plane ) {
-            case exPlane.Plane.XY: plane.layer2d = plane.gameObject.AddComponent<exLayerXY>(); break;
-            case exPlane.Plane.XZ: plane.layer2d = plane.gameObject.AddComponent<exLayerXZ>(); break;
-            case exPlane.Plane.ZY: plane.layer2d = plane.gameObject.AddComponent<exLayerZY>(); break;
+            case exPlane.Plane.XY: plane.gameObject.AddComponent<exLayerXY>(); break;
+            case exPlane.Plane.XZ: plane.gameObject.AddComponent<exLayerXZ>(); break;
+            case exPlane.Plane.ZY: plane.gameObject.AddComponent<exLayerZY>(); break;
             }
             plane.layer2d.SetLayer( layer, bias );
         }

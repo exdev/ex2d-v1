@@ -22,6 +22,16 @@ using System.Collections;
 [AddComponentMenu("ex2D TileMap/Tile Map")]
 public class exTileMap : exPlane {
 
+    // ------------------------------------------------------------------ 
+    /// The tile map type
+    // ------------------------------------------------------------------ 
+
+    public enum Type {
+        Rectangular, ///< regular
+        Hexagonal,   ///< eight corner
+        Isometric,   ///< 45 degrees
+    }
+
     ///////////////////////////////////////////////////////////////////////////////
     // properties
     ///////////////////////////////////////////////////////////////////////////////
@@ -39,7 +49,7 @@ public class exTileMap : exPlane {
                     }
                     else {
                         renderer.sharedMaterial = null;
-                        GetComponent<MeshFilter>().sharedMesh = null; 
+                        meshFilter.sharedMesh = null; 
                     }
                 }
             }
@@ -80,6 +90,28 @@ public class exTileMap : exPlane {
         }
     }
 
+    [SerializeField] protected int tileOffsetX_ = 0;
+    public int tileOffsetX { 
+        get { return tileOffsetX_; } 
+        set { 
+            if ( tileOffsetX_ != value ) {
+                tileOffsetX_ = value;
+                updateFlags |= UpdateFlags.Vertex;
+            }
+        }
+    }
+
+    [SerializeField] protected int tileOffsetY_ = 0;
+    public int tileOffsetY { 
+        get { return tileOffsetY_; } 
+        set { 
+            if ( tileOffsetY_ != value ) {
+                tileOffsetY_ = value;
+                updateFlags |= UpdateFlags.Vertex;
+            }
+        }
+    }
+
     [SerializeField] protected Color color_ = Color.white;
     public Color color { 
         get { return color_; } 
@@ -97,6 +129,67 @@ public class exTileMap : exPlane {
     ///////////////////////////////////////////////////////////////////////////////
     // defines
     ///////////////////////////////////////////////////////////////////////////////
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    override protected void Awake () {
+        base.Awake();
+
+        if ( tileInfo_ != null ||
+             ( renderer.sharedMaterial != null && renderer.sharedMaterial.mainTexture != null ) ) 
+        {
+            meshFilter.mesh = new Mesh();
+            ForceUpdateMesh( meshFilter.sharedMesh );
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    /// Clear the tilemap by sets the alpha of the color to 0.0f
+    // ------------------------------------------------------------------ 
+
+    public void Clear () {
+        int vertexCount = col_ * row_ * 4;
+        Color[] colors = new Color[vertexCount];
+        for ( int i = 0; i < vertexCount; ++i ) {
+            colors[i] = new Color(1.0f, 1.0f, 1.0f, 0.0f);
+        }
+        meshFilter.sharedMesh.colors = colors;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void SetTile ( int _row, int _col, int _index ) {
+        if ( meshFilter == null || meshFilter.sharedMesh == null) {
+            return;
+        }
+
+        Rect uv = tileInfo_.GetTileUV ( _index );
+        float xStart  = uv.x;
+        float yStart  = uv.y;
+        float xEnd    = uv.xMax;
+        float yEnd    = uv.yMax;
+        int id = _row * _col * 4; 
+
+        // set uv
+        Vector2[] uvs = meshFilter.sharedMesh.uv;
+        uvs[id + 0] = new Vector2 ( xStart,  yEnd );   
+        uvs[id + 1] = new Vector2 ( xEnd,    yEnd );  
+        uvs[id + 2] = new Vector2 ( xStart,  yStart );
+        uvs[id + 3] = new Vector2 ( xEnd,    yStart );
+        meshFilter.sharedMesh.uv = uvs;
+
+        // set color
+        Color[] colors = meshFilter.sharedMesh.colors;
+        colors[id + 0] = color_;
+        colors[id + 1] = color_;
+        colors[id + 2] = color_;
+        colors[id + 3] = color_;
+        meshFilter.sharedMesh.colors = colors;
+    }
 
     // ------------------------------------------------------------------ 
     // Desc: 
@@ -163,7 +256,7 @@ public class exTileMap : exPlane {
                         for ( int c = 0; c < 2; ++c ) {
                             int j = r * 2 + c;
                             float x = curX - halfWidth + c * tileInfo_.tileWidth;
-                            float y = -curY + halfHeight - r * tileInfo_.tileHeight;
+                            float y = -curY + halfHeight - r * tileInfo_.tileHeight + (tileInfo_.tileHeight - tileHeight_); // last thing adjust mesh start from left-bottom
 
                             // build vertices and normals
                             switch ( plane ) {
@@ -187,6 +280,19 @@ public class exTileMap : exPlane {
 
             //
             _mesh.vertices = vertices;
+        }
+
+        // ======================================================== 
+        // Update UV 
+        // ======================================================== 
+
+        if ( (updateFlags & UpdateFlags.UV) != 0 ) {
+            int vertexCount = col_ * row_ * 4;
+            Vector2[] uvs  = new Vector2[vertexCount];
+            for ( int i = 0; i < vertexCount; ++i ) {
+                uvs[i] = new Vector2(0.0f, 0.0f);
+            }
+            _mesh.uv = uvs;
         }
 
         // ======================================================== 
@@ -230,6 +336,9 @@ public class exTileMap : exPlane {
             _mesh.triangles = indices; 
         }
 
+
+        // TODO: update bounding rect ( for seeing )
+
         // NOTE: though we set updateFlags to None at exPlane::LateUpdate, 
         //       the Editor still need this or it will caused editor keep dirty
         updateFlags = UpdateFlags.None;
@@ -245,7 +354,7 @@ public class exTileMap : exPlane {
             return;
 
         _mesh.Clear();
-        updateFlags = UpdateFlags.Index | UpdateFlags.Vertex | UpdateFlags.Color;
+        updateFlags = UpdateFlags.Index | UpdateFlags.Vertex | UpdateFlags.Color | UpdateFlags.UV;
         UpdateMesh( _mesh );
     }
 

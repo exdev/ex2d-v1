@@ -21,38 +21,40 @@ using System.Collections.Generic;
 [CustomEditor(typeof(exTileMap))]
 partial class exTileMapEditor : exPlaneEditor {
 
-    struct GridID {
-        public int x;
-        public int y;
+    // DELME { 
+    // struct GridID {
+    //     public int x;
+    //     public int y;
 
-        public GridID ( int _x, int _y ) { x = _x; y = _y; }
-        public static bool operator == ( GridID _a, GridID _b ) { return _a.Equals(_b); }
-        public static bool operator != ( GridID _a, GridID _b ) { return !_a.Equals(_b); }
-        public override int GetHashCode() { return x ^ y; }
-        public override bool Equals ( object _obj ) {
-            if ( !(_obj is GridID) )
-                return false;
-            return Equals((GridID)_obj);
-        }
-        public bool Equals ( GridID _other ) {
-            if ( x != _other.x || y != _other.y ) {
-                return false;
-            }
-            return true;
-        }
-    }
+    //     public GridID ( int _x, int _y ) { x = _x; y = _y; }
+    //     public static bool operator == ( GridID _a, GridID _b ) { return _a.Equals(_b); }
+    //     public static bool operator != ( GridID _a, GridID _b ) { return !_a.Equals(_b); }
+    //     public override int GetHashCode() { return x ^ y; }
+    //     public override bool Equals ( object _obj ) {
+    //         if ( !(_obj is GridID) )
+    //             return false;
+    //         return Equals((GridID)_obj);
+    //     }
+    //     public bool Equals ( GridID _other ) {
+    //         if ( x != _other.x || y != _other.y ) {
+    //             return false;
+    //         }
+    //         return true;
+    //     }
+    // }
+    // } DELME end 
 
     private exTileMap editTileMap;
     private Plane plane;
-    private Vector2 mousePos = Vector2.zero;
     private Vector3 startOffset = Vector3.zero;
+    private Vector3 curPos = Vector3.zero;
     private Rect tileMapRect;
     private bool isMouseInside = false;
     private GameObject mouseTile = null;
 
     private bool inRectSelectState = false;
-    private List<GridID> selectedGrids = new List<GridID>();
-    private List<GridID> rectSelectedGrids = new List<GridID>();
+    private List<int> selectedGrids = new List<int>();
+    private List<int> rectSelectedGrids = new List<int>();
     private Rect selectRect = new Rect( 0, 0, 1, 1 );
     private Vector2 mouseDownPos = Vector2.zero;
 
@@ -64,6 +66,7 @@ partial class exTileMapEditor : exPlaneEditor {
         base.OnEnable();
         if ( target != editTileMap ) {
             editTileMap = target as exTileMap;
+            editTileMap.editorShowGrid = true;
         }
         InternalUpdate ();
     }
@@ -73,11 +76,9 @@ partial class exTileMapEditor : exPlaneEditor {
     // ------------------------------------------------------------------ 
 
     void OnDisable () {
-        if ( mouseTile != null ) {
-            Object.DestroyImmediate(mouseTile.GetComponent<MeshFilter>().sharedMesh,true); 
-            Object.DestroyImmediate(mouseTile,true); 
-        }
-        mouseTile = null;
+        ShowMouseTile (false);
+        HandleUtility.AddDefaultControl(-1);
+        editTileMap.editorShowGrid = false;
     }
 
     // ------------------------------------------------------------------ 
@@ -147,9 +148,7 @@ partial class exTileMapEditor : exPlaneEditor {
         // ======================================================== 
 
         base.OnInspectorGUI();
-
         bool needRebuild = false;
-        editTileMap.meshFilter = editTileMap.GetComponent<MeshFilter>();
 
         //
         EditorGUILayout.Space ();
@@ -192,6 +191,22 @@ partial class exTileMapEditor : exPlaneEditor {
             // ======================================================== 
 
             editTileMap.tileHeight = EditorGUILayout.IntField( "Tile Height", editTileMap.tileHeight ); 
+
+        GUILayout.EndHorizontal ();
+
+        GUILayout.BeginHorizontal ();
+
+            // ======================================================== 
+            // Tile Offset X 
+            // ======================================================== 
+
+            editTileMap.tileOffsetX = EditorGUILayout.IntField( "Tile Offset X", editTileMap.tileOffsetX ); 
+
+            // ======================================================== 
+            // Tile Offset Y 
+            // ======================================================== 
+
+            editTileMap.tileOffsetY = EditorGUILayout.IntField( "Tile Offset Y", editTileMap.tileOffsetY ); 
 
         GUILayout.EndHorizontal ();
 
@@ -262,11 +277,22 @@ partial class exTileMapEditor : exPlaneEditor {
         Event e = Event.current;
         // ======================================================== 
 
-        mousePos = e.mousePosition;
         int controlID = GUIUtility.GetControlID(FocusType.Passive);
         switch ( e.type ) {
         case EventType.mouseMove:
             HandleUtility.Repaint();
+
+            Ray ray = HandleUtility.GUIPointToWorldRay( e.mousePosition );
+            float dist;
+            if ( plane.Raycast(ray, out dist ) ) {
+                Vector3 pos = ray.origin +  ray.direction.normalized * dist;
+                switch ( editTileMap.plane ) {
+                case exPlane.Plane.XY: pos.z = editTileMap.transform.position.z; break;
+                case exPlane.Plane.XZ: pos.y = editTileMap.transform.position.y; break;
+                case exPlane.Plane.ZY: pos.x = editTileMap.transform.position.x; break;
+                }
+                curPos = SnapToGrid (pos);
+            }
             break;
 
         case EventType.mouseDown:
@@ -285,22 +311,56 @@ partial class exTileMapEditor : exPlaneEditor {
         // draw mouse move 
         // ======================================================== 
 
-        Ray ray = HandleUtility.GUIPointToWorldRay( mousePos );
-        float dist;
-        if ( plane.Raycast(ray, out dist ) ) {
-            Vector3 pos = ray.origin +  ray.direction.normalized * dist;
-            switch ( editTileMap.plane ) {
-            case exPlane.Plane.XY: pos.z = editTileMap.transform.position.z; break;
-            case exPlane.Plane.XZ: pos.y = editTileMap.transform.position.y; break;
-            case exPlane.Plane.ZY: pos.x = editTileMap.transform.position.x; break;
-            }
-            pos = SnapToGrid (pos);
+        if ( isMouseInside ) {
+            DrawMouseGrid ( curPos );
+        }
+        else {
+            ShowMouseTile (false);
+        }
+    }
 
-            if ( isMouseInside ) {
-                DrawMouseGrid ( pos );
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void ShowMouseTile ( bool _show ) {
+        if ( _show ) {
+            if ( mouseTile == null ) {
+                mouseTile = new GameObject(".temp_mouse_tile");
+                // mouseTile.hideFlags = HideFlags.HideAndDontSave;
+                // mouseTile.hideFlags = HideFlags.HideInHierarchy;
+                mouseTile.hideFlags = HideFlags.DontSave;
+                // DELME { 
+                // mouseTile.transform.parent = editTileMap.transform;
+                // EditorUtility.SetSelectedWireframeHidden(mouseTile.renderer, true);
+                // } DELME end 
+
+                exTileMap tm = mouseTile.AddComponent<exTileMap>();
+                tm.anchor = exPlane.Anchor.BotLeft;
+                tm.plane  = editTileMap.plane;
+
+                tm.tileInfo     = editTileMap.tileInfo;
+                tm.tileWidth    = editTileMap.tileInfo.tileWidth;
+                tm.tileHeight   = editTileMap.tileInfo.tileHeight;
+                tm.tileOffsetX  = editTileMap.tileOffsetX;
+                tm.tileOffsetY  = editTileMap.tileOffsetY;
+
+                tm.Resize(1,1);
+                tm.Build();
+                // TODO { 
+                if ( selectedGrids.Count > 0 )
+                    tm.SetTile ( 0, 0, selectedGrids[0] );
+                // } TODO end 
+                tm.meshFilter.sharedMesh.hideFlags = HideFlags.DontSave;
             }
         }
-
+        else {
+            if ( mouseTile != null ) {
+                Object.DestroyImmediate(mouseTile.GetComponent<MeshFilter>().sharedMesh,true); 
+                Object.DestroyImmediate(mouseTile,true); 
+            }
+            mouseTile = null;
+        }
     }
 
     // ------------------------------------------------------------------ 
@@ -435,8 +495,8 @@ partial class exTileMapEditor : exPlaneEditor {
 
                     if ( HasSelected ( x, y ) || selectInRect ) {
                         exEditorHelper.DrawRect ( rect,
-                                                  new Color ( 1.0f, 1.0f, 1.0f, 0.2f ),
-                                                  new Color ( 0.0f, 1.0f, 0.5f, 1.0f ) );
+                                                  new Color ( 0.0f, 0.5f, 1.0f, 0.4f ),
+                                                  new Color ( 0.0f, 0.5f, 1.0f, 1.0f ) );
                     }
                     else {
                         exEditorHelper.DrawRect ( rect,
@@ -459,13 +519,15 @@ partial class exTileMapEditor : exPlaneEditor {
                 ++y;
             }
 
-            // ======================================================== 
-            // draw select rect 
-            // ======================================================== 
+            // DISABLE { 
+            // // ======================================================== 
+            // // draw select rect 
+            // // ======================================================== 
 
-            if ( inRectSelectState && (selectRect.width != 0.0f || selectRect.height != 0.0f) ) {
-                exEditorHelper.DrawRect( selectRect, new Color( 0.0f, 0.5f, 1.0f, 0.2f ), new Color( 0.0f, 0.5f, 1.0f, 1.0f ) );
-            }
+            // if ( inRectSelectState && (selectRect.width != 0.0f || selectRect.height != 0.0f) ) {
+            //     exEditorHelper.DrawRect( selectRect, new Color( 0.0f, 0.5f, 1.0f, 0.2f ), new Color( 0.0f, 0.5f, 1.0f, 1.0f ) );
+            // }
+            // } DISABLE end 
 
             // ======================================================== 
             // handle rect select
@@ -478,22 +540,26 @@ partial class exTileMapEditor : exPlaneEditor {
 
                     e.Use();
                 }
-                else if ( e.type == EventType.MouseUp && e.button == 0 ) {
-                    inRectSelectState = false;
-                    ConfirmRectSelection();
-                    Repaint();
-
-                    e.Use();
-                }
             }
 
         GUI.EndGroup();
         GUILayoutUtility.GetRect ( filedRect.width, filedRect.height );
 
+        // ======================================================== 
+        // finally 
+        // ======================================================== 
+
+        if ( inRectSelectState ) {
+            if ( e.type == EventType.MouseUp && e.button == 0 ) {
+                inRectSelectState = false;
+                ConfirmRectSelection();
+                Repaint();
+
+                e.Use();
+            }
+        }
+
         // DISABLE: we use eraser button { 
-        // // ======================================================== 
-        // // finally 
-        // // ======================================================== 
 
         // if ( e.type == EventType.MouseDown && e.button == 0 && e.clickCount == 1 ) {
         //     if ( filedRect.Contains( e.mousePosition ) == false ) {
@@ -551,25 +617,7 @@ partial class exTileMapEditor : exPlaneEditor {
         if ( editTileMap.tileInfo == null )
             return;
 
-        if ( mouseTile == null ) {
-            mouseTile = new GameObject(".temp_mouse_tile");
-            // mouseTile.hideFlags = HideFlags.HideAndDontSave;
-            // mouseTile.hideFlags = HideFlags.HideInHierarchy;
-            mouseTile.hideFlags = HideFlags.DontSave;
-            // DELME { 
-            // mouseTile.transform.parent = editTileMap.transform;
-            // EditorUtility.SetSelectedWireframeHidden(mouseTile.renderer, true);
-            // } DELME end 
-
-            exTileMap tm = mouseTile.AddComponent<exTileMap>();
-            tm.tileInfo = editTileMap.tileInfo;
-            tm.tileWidth = editTileMap.tileInfo.tileWidth;
-            tm.tileHeight = editTileMap.tileInfo.tileHeight;
-            tm.Resize(1,1);
-            tm.Build();
-            tm.meshFilter.sharedMesh.hideFlags = HideFlags.DontSave;
-        }
-
+        ShowMouseTile(true);
         if ( mouseTile != null )
             mouseTile.transform.position = _pos;
 
@@ -625,8 +673,9 @@ partial class exTileMapEditor : exPlaneEditor {
     // ------------------------------------------------------------------ 
 
     bool HasSelected ( int _x, int _y ) {
-        foreach ( GridID gid in selectedGrids ) {
-            if ( gid.x == _x && gid.y == _y ) {
+        int in_id = _x + _y * editTileMap.tileInfo.col;
+        foreach ( int id in selectedGrids ) {
+            if ( id == in_id ) {
                 return true;
             }
         }
@@ -639,9 +688,11 @@ partial class exTileMapEditor : exPlaneEditor {
     // ------------------------------------------------------------------ 
 
     void AddRectSelected ( int _x, int _y ) {
+        int in_id = _x + _y * editTileMap.tileInfo.col;
+
         bool found = false;
-        foreach ( GridID gid in rectSelectedGrids ) {
-            if ( gid.x == _x && gid.y == _y ) {
+        foreach ( int id in rectSelectedGrids ) {
+            if ( id == in_id ) {
                 found = true;
                 break;
             }
@@ -649,7 +700,7 @@ partial class exTileMapEditor : exPlaneEditor {
 
         //
         if ( found == false ) {
-            rectSelectedGrids.Add( new GridID(_x,_y) );
+            rectSelectedGrids.Add(in_id);
         }
     }
 
@@ -689,10 +740,17 @@ partial class exTileMapEditor : exPlaneEditor {
     // ------------------------------------------------------------------ 
 
     void ConfirmRectSelection () {
-        foreach ( GridID gid in rectSelectedGrids ) {
-            if ( HasSelected( gid.x, gid.y ) == false )
-                selectedGrids.Add(gid);
+        foreach ( int id in rectSelectedGrids ) {
+            if ( selectedGrids.IndexOf(id) == -1 )
+                selectedGrids.Add(id);
         }
         rectSelectedGrids.Clear();
+
+        //
+        if ( mouseTile != null ) {
+            exTileMap tm = mouseTile.AddComponent<exTileMap>();
+            if ( selectedGrids.Count > 0 )
+                tm.SetTile ( 0, 0, selectedGrids[0] );
+        }
     }
 }
