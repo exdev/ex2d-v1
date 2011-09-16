@@ -180,6 +180,7 @@ class exSpriteAnimationEditor : Editor {
              editSpAnim.animations[0].frameInfos.Count > 0 ) 
         {
             exSpriteAnimClip.FrameInfo fi = editSpAnim.animations[0].frameInfos[0];
+            sprite.textureGUID = fi.textureGUID;
             sprite.SetSprite(fi.atlas, fi.index);
             sprite.Build();
         }
