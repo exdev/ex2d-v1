@@ -193,11 +193,27 @@ public static class exBitmapFontUtility {
 
     static string ParseValue ( string[] _words, string _key ) {
         string mykey = _key + "="; 
-        foreach ( string word in _words ) {
+        for ( int i = 0; i < _words.Length; ++i ) {
+            string word = _words[i];
             if ( word.Length > mykey.Length &&
                  word.Substring(0,mykey.Length) == mykey )
             {
-                return word.Substring(mykey.Length);
+                string txtValue = word.Substring(mykey.Length);
+                if ( txtValue[0] == '"' ) {
+                    if ( txtValue[txtValue.Length-1] == '"' ) {
+                        return txtValue; 
+                    }
+                    else {
+                        for ( int j = i+1; j < _words.Length; ++j ) {
+                            string word2 = _words[j];
+                            txtValue = txtValue + " " + word2; 
+                            if ( txtValue[txtValue.Length-1] == '"' ) {
+                                return txtValue; 
+                            }
+                        }
+                    }
+                }
+                return txtValue;
             }
         }
         return "";
