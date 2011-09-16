@@ -26,7 +26,7 @@ using System.Collections;
 // DISABLE { 
 // [ExecuteInEditMode]
 // } DISABLE end 
-public partial class exLayer2D : MonoBehaviour {
+public class exLayer2D : MonoBehaviour {
 
     // ------------------------------------------------------------------ 
     /// \memberof MAX_LAYER

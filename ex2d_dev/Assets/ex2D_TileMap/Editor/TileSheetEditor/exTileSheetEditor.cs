@@ -1,7 +1,7 @@
 // ======================================================================================
-// File         : exTileInfoEditor.cs
+// File         : exTileSheetEditor.cs
 // Author       : Wu Jie 
-// Last Change  : 08/20/2011 | 16:28:17 PM | Saturday,August
+// Last Change  : 09/16/2011 | 10:15:36 AM | Friday,September
 // Description  : 
 // ======================================================================================
 
@@ -15,16 +15,16 @@ using System.Collections;
 using System.IO;
 
 ///////////////////////////////////////////////////////////////////////////////
-// exTileInfoEditor
+// exTileSheetEditor
 ///////////////////////////////////////////////////////////////////////////////
 
-partial class exTileInfoEditor : EditorWindow {
+partial class exTileSheetEditor : EditorWindow {
 
     ///////////////////////////////////////////////////////////////////////////////
     // private data
     ///////////////////////////////////////////////////////////////////////////////
 
-    private exTileInfo curEdit;
+    private exTileSheet curEdit;
     private Vector2 scrollPos = Vector2.zero;
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -35,9 +35,9 @@ partial class exTileInfoEditor : EditorWindow {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    [MenuItem ("Window/ex2D/TileInfo Editor %&t")]
-    public static exTileInfoEditor NewWindow () {
-        exTileInfoEditor newWindow = EditorWindow.GetWindow<exTileInfoEditor>();
+    [MenuItem ("Window/ex2D/TileSheet Editor %&t")]
+    public static exTileSheetEditor NewWindow () {
+        exTileSheetEditor newWindow = EditorWindow.GetWindow<exTileSheetEditor>();
         return newWindow;
     }
 
@@ -46,7 +46,7 @@ partial class exTileInfoEditor : EditorWindow {
     // ------------------------------------------------------------------ 
 
     void OnEnable () {
-        name = "TileInfo Editor";
+        name = "TileSheet Editor";
         wantsMouseMove = true;
         autoRepaintOnSceneChange = true;
         // position = new Rect ( 50, 50, 800, 600 );
@@ -57,18 +57,6 @@ partial class exTileInfoEditor : EditorWindow {
     // ------------------------------------------------------------------ 
 
     void Init () {
-        // TODO { 
-        // selectedElements.Clear();
-
-        // inRectSelectState = false;
-        // inDraggingElementState = false;
-        // accDeltaMove = Vector2.zero;
-
-        // doImport = false;
-        // importObjects.Clear();
-        // oldSelActiveObject = null;
-        // oldSelObjects.Clear();
-        // } TODO end 
     }
 
     // ------------------------------------------------------------------ 
@@ -81,20 +69,20 @@ partial class exTileInfoEditor : EditorWindow {
 
             // check if we have atlas - editorinfo in the same directory
             Object obj = _obj; 
-            if ( obj is exTileInfo || obj is Texture2D || obj is Material ) {
+            if ( obj is exTileSheet || obj is Texture2D || obj is Material ) {
                 string assetPath = AssetDatabase.GetAssetPath(obj);
                 string dirname = Path.GetDirectoryName(assetPath);
                 string filename = Path.GetFileNameWithoutExtension(assetPath);
-                obj = (exTileInfo)AssetDatabase.LoadAssetAtPath( Path.Combine( dirname, filename + ".asset" ),
-                                                                typeof(exTileInfo) );
+                obj = (exTileSheet)AssetDatabase.LoadAssetAtPath( Path.Combine( dirname, filename + ".asset" ),
+                                                                typeof(exTileSheet) );
                 if ( obj == null ) {
                     obj = _obj;
                 }
             }
 
             // if this is another atlas, swtich to it.
-            if ( obj is exTileInfo && obj != curEdit ) {
-                curEdit = obj as exTileInfo;
+            if ( obj is exTileSheet && obj != curEdit ) {
+                curEdit = obj as exTileSheet;
                 Init();
 
                 Repaint ();
@@ -122,7 +110,7 @@ partial class exTileInfoEditor : EditorWindow {
 
         if ( curEdit == null ) {
             GUILayout.Space(10);
-            GUILayout.Label ( "Please select a Tile Info" );
+            GUILayout.Label ( "Please select a Tile Sheet" );
             return;
         }
 
@@ -137,14 +125,12 @@ partial class exTileInfoEditor : EditorWindow {
 
         // draw label
         GUILayout.Space(10);
-        GUILayout.Label ( AssetDatabase.GetAssetPath(curEdit) );
         lastRect = GUILayoutUtility.GetLastRect ();  
 
         // ======================================================== 
         // settings area 
         // ======================================================== 
 
-        GUILayout.BeginHorizontal();
         GUILayout.BeginVertical( GUILayout.MaxWidth(200) );
 
             // ======================================================== 
@@ -255,12 +241,13 @@ partial class exTileInfoEditor : EditorWindow {
         lastRect = GUILayoutUtility.GetLastRect ();  
 
         // ======================================================== 
-        // tile info texture
+        // tile sheet texture
         // ======================================================== 
 
-        GUILayout.BeginVertical();
-            PreviewTileInfo ( lastRect.xMax, lastRect.yMax, curEdit );
-        GUILayout.EndVertical();
+        GUILayout.BeginHorizontal();
+            GUILayout.Space(20);
+            lastRect = GUILayoutUtility.GetLastRect ();  
+            PreviewTileSheet ( lastRect.xMax, lastRect.yMax, curEdit );
         GUILayout.EndHorizontal();
 
         // TODO: process evenet { 
@@ -269,7 +256,12 @@ partial class exTileInfoEditor : EditorWindow {
         // // ======================================================== 
         // } TODO end 
 
-        //
+        EditorGUILayout.EndScrollView();
+
+        // ======================================================== 
+        // check dirty
+        // ======================================================== 
+
         if ( GUI.changed ) {
             int col = 0;
             int row = 0;
@@ -291,19 +283,17 @@ partial class exTileInfoEditor : EditorWindow {
 
             EditorUtility.SetDirty(curEdit);
         }
-
-        EditorGUILayout.EndScrollView();
     }
 
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    void PreviewTileInfo ( float _x, float _y, exTileInfo _tileInfo ) {
-        int uvX = _tileInfo.padding;
-        int uvY = _tileInfo.padding;
+    void PreviewTileSheet ( float _x, float _y, exTileSheet _tileSheet ) {
+        int uvX = _tileSheet.padding;
+        int uvY = _tileSheet.padding;
 
-        if ( _tileInfo.texture == null )
+        if ( _tileSheet.texture == null )
             return;
 
         // show texture by grids
@@ -311,47 +301,47 @@ partial class exTileInfoEditor : EditorWindow {
         float curY = 0.0f;
         float interval = 2.0f;
         int borderSize = 1;
-        uvX = _tileInfo.padding;
-        uvY = _tileInfo.padding;
+        uvX = _tileSheet.padding;
+        uvY = _tileSheet.padding;
 
         //
         Rect filedRect = new Rect( _x, 
                                    _y,
-                                   (_tileInfo.tileWidth + interval + 2 * borderSize) * _tileInfo.col - interval,
-                                   (_tileInfo.tileHeight + interval + 2 * borderSize) * _tileInfo.row - interval );
+                                   (_tileSheet.tileWidth + interval + 2 * borderSize) * _tileSheet.col - interval,
+                                   (_tileSheet.tileHeight + interval + 2 * borderSize) * _tileSheet.row - interval );
         GUI.BeginGroup(filedRect);
 
-            while ( (uvY + _tileInfo.tileHeight + _tileInfo.padding) <= _tileInfo.texture.height ) {
-                while ( (uvX + _tileInfo.tileWidth + _tileInfo.padding) <= _tileInfo.texture.width ) {
+            while ( (uvY + _tileSheet.tileHeight + _tileSheet.padding) <= _tileSheet.texture.height ) {
+                while ( (uvX + _tileSheet.tileWidth + _tileSheet.padding) <= _tileSheet.texture.width ) {
                     Rect rect = new Rect( curX, 
                                           curY, 
-                                          _tileInfo.tileWidth + 2 * borderSize, 
-                                          _tileInfo.tileHeight + 2 * borderSize );
+                                          _tileSheet.tileWidth + 2 * borderSize, 
+                                          _tileSheet.tileHeight + 2 * borderSize );
                     GUI.BeginGroup( new Rect ( rect.x + 1,
                                                rect.y + 1,
                                                rect.width - 2,
                                                rect.height - 2 ) );
                         Rect cellRect = new Rect( -uvX,
                                                   -uvY,
-                                                  _tileInfo.texture.width, 
-                                                  _tileInfo.texture.height );
-                        GUI.DrawTexture( cellRect, _tileInfo.texture );
+                                                  _tileSheet.texture.width, 
+                                                  _tileSheet.texture.height );
+                        GUI.DrawTexture( cellRect, _tileSheet.texture );
                     GUI.EndGroup();
                     exEditorHelper.DrawRect ( rect,
                                               new Color ( 1.0f, 1.0f, 1.0f, 0.0f ),
                                               Color.gray );
 
-                    uvX = uvX + _tileInfo.tileWidth + _tileInfo.padding; 
-                    curX = curX + _tileInfo.tileWidth + interval + 2 * borderSize; 
+                    uvX = uvX + _tileSheet.tileWidth + _tileSheet.padding; 
+                    curX = curX + _tileSheet.tileWidth + interval + 2 * borderSize; 
                 }
 
                 // step uv
-                uvX = _tileInfo.padding;
-                uvY = uvY + _tileInfo.tileHeight + _tileInfo.padding; 
+                uvX = _tileSheet.padding;
+                uvY = uvY + _tileSheet.tileHeight + _tileSheet.padding; 
 
                 // step pos
                 curX = 0.0f;
-                curY = curY + _tileInfo.tileHeight + interval + 2 * borderSize; 
+                curY = curY + _tileSheet.tileHeight + interval + 2 * borderSize; 
             }
 
         GUI.EndGroup();

@@ -1,7 +1,7 @@
 // ======================================================================================
-// File         : exTileInfo.cs
+// File         : exTileSheet.cs
 // Author       : Wu Jie 
-// Last Change  : 08/20/2011 | 15:11:00 PM | Saturday,August
+// Last Change  : 09/16/2011 | 10:14:28 AM | Friday,September
 // Description  : 
 // ======================================================================================
 
@@ -15,11 +15,11 @@ using System.Collections.Generic;
 
 ///////////////////////////////////////////////////////////////////////////////
 ///
-/// Tile Map texture information
+/// Tile Sheet Asset
 ///
 ///////////////////////////////////////////////////////////////////////////////
 
-public class exTileInfo : ScriptableObject {
+public class exTileSheet : ScriptableObject {
 
     ///////////////////////////////////////////////////////////////////////////////
     // properties
@@ -30,8 +30,8 @@ public class exTileInfo : ScriptableObject {
     public int tileWidth = 32;  ///< the width of a tile grid
     public int tileHeight = 32; ///< the height of a tile grid
     public int padding = 1;     ///< the paddding between two tile grid
-    public int row = 0;     ///< the row of the tile info
-    public int col = 0;     ///< the column of the tile info
+    public int row = 0;     ///< the row of the tile sheet
+    public int col = 0;     ///< the column of the tile sheet
 
     // TODO { 
     // ------------------------------------------------------------------ 

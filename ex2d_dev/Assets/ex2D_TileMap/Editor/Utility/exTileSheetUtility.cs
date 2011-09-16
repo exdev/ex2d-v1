@@ -1,7 +1,7 @@
 // ======================================================================================
-// File         : exTileInfoUtility.cs
+// File         : exTileSheetUtility.cs
 // Author       : Wu Jie 
-// Last Change  : 08/30/2011 | 10:52:26 AM | Tuesday,August
+// Last Change  : 09/16/2011 | 10:14:36 AM | Friday,September
 // Description  : 
 // ======================================================================================
 
@@ -18,22 +18,22 @@ using System.IO;
 // defines
 ///////////////////////////////////////////////////////////////////////////////
 
-public class exTileInfoUtility : MonoBehaviour {
+public class exTileSheetUtility : MonoBehaviour {
 
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    [MenuItem ("Assets/Create/ex2D Tile Info")]
-    public static exTileInfo Create () {
-        return Create ( exEditorHelper.GetCurrentDirectory(), "New TileInfo" );
+    [MenuItem ("Assets/Create/ex2D Tile Sheet")]
+    public static exTileSheet Create () {
+        return Create ( exEditorHelper.GetCurrentDirectory(), "New TileSheet" );
     }
 
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public static exTileInfo Create ( string _path, string _name ) {
+    public static exTileSheet Create ( string _path, string _name ) {
         //
         if ( new DirectoryInfo(_path).Exists == false ) {
             Debug.LogError ( "can't create asset, path not found" );
@@ -51,9 +51,9 @@ public class exTileInfoUtility : MonoBehaviour {
         // } TODO end 
 
         //
-        exTileInfo newTileInfo = ScriptableObject.CreateInstance<exTileInfo>();
-        AssetDatabase.CreateAsset(newTileInfo, assetPath);
-        Selection.activeObject = newTileInfo;
-        return newTileInfo;
+        exTileSheet newTileSheet = ScriptableObject.CreateInstance<exTileSheet>();
+        AssetDatabase.CreateAsset(newTileSheet, assetPath);
+        Selection.activeObject = newTileSheet;
+        return newTileSheet;
     }
 }
