@@ -20,12 +20,26 @@ using System.IO;
 
 partial class exTileMapEditor : EditorWindow {
 
+    private static Texture[] toolIcons = new Texture[] { 
+        (Texture)AssetDatabase.LoadAssetAtPath( "Assets/ex2D_TileMap/Editor/Resource/icon_stamp.png", typeof(Texture) ), 
+        (Texture)AssetDatabase.LoadAssetAtPath( "Assets/ex2D_TileMap/Editor/Resource/icon_bucket.png", typeof(Texture) ), 
+        (Texture)AssetDatabase.LoadAssetAtPath( "Assets/ex2D_TileMap/Editor/Resource/icon_area.png", typeof(Texture) ), 
+    };
+
+    private static Texture[] modeIcons = new Texture[] { 
+        (Texture)AssetDatabase.LoadAssetAtPath( "Assets/ex2D_TileMap/Editor/Resource/icon_paint.png", typeof(Texture) ), 
+        (Texture)AssetDatabase.LoadAssetAtPath( "Assets/ex2D_TileMap/Editor/Resource/icon_eraser.png", typeof(Texture) ), 
+    };
+
     ///////////////////////////////////////////////////////////////////////////////
     // private data
     ///////////////////////////////////////////////////////////////////////////////
 
     private exTileMap curEdit;
     private Vector2 mouseDownPos = Vector2.zero;
+
+    // DEBUG
+    private int debugVisibleGrids = 0;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -57,6 +71,9 @@ partial class exTileMapEditor : EditorWindow {
     // ------------------------------------------------------------------ 
 
     void Init () {
+        sheetInRectSelectState = false;
+        sheetSelectedGrids.Clear();
+        sheetCommitGrids.Clear();
     }
 
     // ------------------------------------------------------------------ 
@@ -115,38 +132,34 @@ partial class exTileMapEditor : EditorWindow {
         }
 
         // ======================================================== 
-        // toolbar 
+        // 
         // ======================================================== 
-
-        EditorGUILayout.BeginHorizontal ( EditorStyles.toolbar );
-            GUILayout.FlexibleSpace();
-        EditorGUILayout.EndHorizontal ();
-
-        // ======================================================== 
-        // scroll view
-        // ======================================================== 
-
-        float toolbarHeight = EditorStyles.toolbar.CalcHeight( new GUIContent(""), 0 );
 
         Rect lastRect = new Rect( 10, 0, 1, 1 );
-        GUILayout.Space(5);
 
         GUILayout.BeginHorizontal();
         GUILayout.BeginVertical( GUILayout.MaxWidth(300) );
+
+            GUILayout.Space(5);
 
             // ======================================================== 
             // Tile Sheet Field 
             // ======================================================== 
 
             GUILayout.BeginHorizontal();
-                curEdit.tileSheet 
-                    = (exTileSheet)EditorGUILayout.ObjectField( "Tile Sheet"
+                exTileSheet newTileSheet = 
+                    (exTileSheet)EditorGUILayout.ObjectField( "Tile Sheet"
                                                                , curEdit.tileSheet
                                                                , typeof(exTileSheet)
 #if !UNITY_3_0 && !UNITY_3_1 && !UNITY_3_3
                                                                , false
 #endif
                                                              );
+                if ( newTileSheet != curEdit.tileSheet ) {
+                    curEdit.tileSheet = newTileSheet;
+                    sheetSelectedGrids.Clear();
+                    sheetCommitGrids.Clear();
+                }
                 if ( GUILayout.Button("Edit...", GUILayout.Width(40), GUILayout.Height(15) ) ) {
                     exTileSheetEditor editor = exTileSheetEditor.NewWindow();
                     editor.Edit(curEdit.tileSheet);
@@ -157,7 +170,10 @@ partial class exTileMapEditor : EditorWindow {
             // tile size
             // ======================================================== 
 
-            EditorGUILayout.LabelField ( "Tile Size", curEdit.tileSheet.tileWidth + " x " + curEdit.tileSheet.tileHeight ); 
+            if ( curEdit.tileSheet )
+                EditorGUILayout.LabelField ( "Tile Size", curEdit.tileSheet.tileWidth + " x " + curEdit.tileSheet.tileHeight ); 
+            else
+                EditorGUILayout.LabelField ( "Tile Size", "0 x 0" ); 
 
             // ======================================================== 
             // tile sheet field 
@@ -169,19 +185,30 @@ partial class exTileMapEditor : EditorWindow {
                              curEdit.tileSheet );
 
             // ======================================================== 
-            // separate line 
+            // tile map object
             // ======================================================== 
 
             GUILayout.Space (20);
-            GUILayout.Label ( "Tile Map Option" ); 
+            GUI.enabled = false;
+            EditorGUILayout.ObjectField( "Tile Map"
+                                         , curEdit
+                                         , typeof(exTileMap)
+#if !UNITY_3_0 && !UNITY_3_1 && !UNITY_3_3
+                                         , false
+#endif
+                                       );
+            GUI.enabled = true;
 
             // ======================================================== 
             // col & row 
             // ======================================================== 
 
             GUILayout.BeginHorizontal ();
-                curEdit.col = EditorGUILayout.IntField( "Col", curEdit.col ); 
-                curEdit.row = EditorGUILayout.IntField( "Row", curEdit.row ); 
+                int newCol = Mathf.Max( EditorGUILayout.IntField( "Column", curEdit.col ), 1 ); 
+                int newRow = Mathf.Max( EditorGUILayout.IntField( "Row", curEdit.row ), 1 ); 
+                if ( newCol != curEdit.col || newRow != curEdit.row ) {
+                    curEdit.Resize ( newCol, newRow );
+                }
             GUILayout.EndHorizontal ();
 
             // ======================================================== 
@@ -189,8 +216,17 @@ partial class exTileMapEditor : EditorWindow {
             // ======================================================== 
 
             GUILayout.BeginHorizontal ();
-                curEdit.tileWidth = EditorGUILayout.IntField( "Tile Width", curEdit.tileWidth ); 
-                curEdit.tileHeight = EditorGUILayout.IntField( "Tile Height", curEdit.tileHeight ); 
+                 int newtileWidth = EditorGUILayout.IntField( "Tile Width", curEdit.tileWidth ); 
+                 if ( newtileWidth != curEdit.tileWidth ) {
+                     curEdit.tileWidth = newtileWidth;
+                     curEdit.editorNeedRebuild = true;
+                 }
+                 
+                 int newtileHeight = EditorGUILayout.IntField( "Tile Height", curEdit.tileHeight ); 
+                 if ( newtileHeight != curEdit.tileHeight ) {
+                     curEdit.tileHeight = newtileHeight;
+                     curEdit.editorNeedRebuild = true;
+                 }
             GUILayout.EndHorizontal ();
 
             // ======================================================== 
@@ -198,14 +234,102 @@ partial class exTileMapEditor : EditorWindow {
             // ======================================================== 
 
             GUILayout.BeginHorizontal ();
-                curEdit.tileOffsetX = EditorGUILayout.IntField( "Tile Offset X", curEdit.tileOffsetX ); 
-                curEdit.tileOffsetY = EditorGUILayout.IntField( "Tile Offset Y", curEdit.tileOffsetY ); 
+                 int newTileOffsetX = EditorGUILayout.IntField( "Tile Offset X", curEdit.tileOffsetX ); 
+                 if ( newTileOffsetX != curEdit.tileOffsetX ) {
+                     curEdit.tileOffsetX = newTileOffsetX;
+                     curEdit.editorNeedRebuild = true;
+                 }
+                 
+                 int newTileOffsetY = EditorGUILayout.IntField( "Tile Offset Y", curEdit.tileOffsetY ); 
+                 if ( newTileOffsetY != curEdit.tileOffsetY ) {
+                     curEdit.tileOffsetY = newTileOffsetY;
+                     curEdit.editorNeedRebuild = true;
+                 }
             GUILayout.EndHorizontal ();
+
+            // DEBUG { 
+            // ======================================================== 
+            // Debug 
+            // ======================================================== 
+
+            GUILayout.Space (20);
+            GUILayout.Label ( "Debug" );
+            GUILayout.Label ( "Visible Grids " + debugVisibleGrids );
+            // } DEBUG end 
+
 
         GUILayout.EndVertical();
 
             GUILayout.Space (10);
             lastRect = GUILayoutUtility.GetLastRect ();
+
+            // ======================================================== 
+            // toolbar 
+            // ======================================================== 
+
+            GUILayout.BeginHorizontal ( EditorStyles.toolbar );
+
+                // ======================================================== 
+                // show grid 
+                // ======================================================== 
+
+                curEdit.editorShowGrid = GUILayout.Toggle( curEdit.editorShowGrid, "Show Grid", EditorStyles.toolbarButton );
+                GUILayout.Space (10);
+
+                // ======================================================== 
+                // edit tool 
+                // ======================================================== 
+
+                curEdit.editorEditTool 
+                    = (exTileMap.EditTool)GUILayout.Toolbar ( (int)curEdit.editorEditTool, 
+                                                              toolIcons,
+                                                              EditorStyles.toolbarButton );  
+                GUILayout.Space (10);
+
+                // ======================================================== 
+                // edit mode 
+                // ======================================================== 
+
+                if ( sheetSelectedGrids.Count > 0 || sheetCommitGrids.Count > 0 ) {
+                    curEdit.editorEditMode = exTileMap.EditMode.Paint; 
+                }
+                else {
+                    curEdit.editorEditMode = exTileMap.EditMode.Erase; 
+                }
+
+                exTileMap.EditMode newEditMode
+                    = (exTileMap.EditMode)GUILayout.Toolbar ( (int)curEdit.editorEditMode, 
+                                                              modeIcons,
+                                                              EditorStyles.toolbarButton );  
+                if ( newEditMode != curEdit.editorEditMode ) {
+                    curEdit.editorEditMode = newEditMode;
+                    if ( curEdit.editorEditMode == exTileMap.EditMode.Erase ) {
+                        sheetSelectedGrids.Clear();
+                        sheetCommitGrids.Clear();
+                    }
+                }
+
+                GUILayout.FlexibleSpace();
+
+                // ======================================================== 
+                // clear
+                // ======================================================== 
+
+                if ( GUILayout.Button( "Clear", EditorStyles.toolbarButton ) ) {
+                    curEdit.Clear();
+                }
+                GUILayout.Space (10);
+
+                // ======================================================== 
+                // Help
+                // ======================================================== 
+
+                if ( GUILayout.Button( exEditorHelper.HelpTexture(), EditorStyles.toolbarButton ) ) {
+                    Help.BrowseURL("http://www.ex-dev.com/ex2d/wiki/doku.php?id=manual:tilemap_editor_guide");
+                }
+
+            GUILayout.EndHorizontal ();
+            float toolbarHeight = EditorStyles.toolbar.CalcHeight( new GUIContent(""), 0 );
 
             // ======================================================== 
             // tile map filed 
@@ -221,12 +345,34 @@ partial class exTileMapEditor : EditorWindow {
             // draw vertical split line 
             // ======================================================== 
 
-            exEditorHelper.DrawLine( new Vector2 ( lastRect.xMax, toolbarHeight-1 ),
+            exEditorHelper.DrawLine( new Vector2 ( lastRect.xMax, 0 ),
                                      new Vector2 ( lastRect.xMax, position.height ),
                                      Color.black,
                                      1.0f );
 
         GUILayout.EndHorizontal();
+
+        // ======================================================== 
+        // NOTE: cancle select event of tile sheet. Should after TileMapField, so we put it here 
+        Event e = Event.current;
+        // ======================================================== 
+
+        if ( e.type == EventType.MouseUp && e.button == 0 ) {
+            if ( sheetInRectSelectState ) {
+                sheetInRectSelectState = false;
+                ConfirmRectSelection();
+                Repaint();
+
+                e.Use();
+            }
+            else {
+                sheetCommitGrids.Clear();
+                sheetSelectedGrids.Clear();
+                Repaint();
+
+                e.Use();
+            }
+        }
 
         // ======================================================== 
         // check dirty

@@ -185,7 +185,7 @@ partial class exAtlasEditor : EditorWindow {
         // toolbar 
         // ======================================================== 
 
-        EditorGUILayout.BeginHorizontal ( EditorStyles.toolbar );
+        GUILayout.BeginHorizontal ( EditorStyles.toolbar );
 
             GUILayout.FlexibleSpace();
 
@@ -193,6 +193,7 @@ partial class exAtlasEditor : EditorWindow {
             // Select 
             // ======================================================== 
 
+            GUI.enabled = selectedElements.Count != 0;
             if ( GUILayout.Button( "Select Sprites...", EditorStyles.toolbarButton ) ) {
                 List<Object> selects = new List<Object>(curEdit.elements.Count);
                 foreach ( exAtlasInfo.Element el in selectedElements ) {
@@ -207,6 +208,7 @@ partial class exAtlasEditor : EditorWindow {
                     EditorGUIUtility.PingObject(Selection.objects[selectIdx]);
                 }
             }
+            GUI.enabled = true;
             GUILayout.Space(5);
 
             // ======================================================== 
@@ -255,7 +257,7 @@ partial class exAtlasEditor : EditorWindow {
                 Help.BrowseURL("http://www.ex-dev.com/ex2d/wiki/doku.php?id=manual:atlas_editor_guide");
             }
 
-        EditorGUILayout.EndHorizontal ();
+        GUILayout.EndHorizontal ();
 
         // ======================================================== 
         // scroll view

@@ -50,14 +50,25 @@ public class exTileSheet : ScriptableObject {
     ///////////////////////////////////////////////////////////////////////////////
 
     // ------------------------------------------------------------------ 
-    /// \param _id the id of the tile grid
+    /// \param _index the index
+    /// \param _col the out column  
+    /// \param _row the out row  
+    // ------------------------------------------------------------------ 
+
+    public void GetColRow ( int _index, out int _col, out int _row ) {
+        _row = Mathf.CeilToInt(_index / col);
+        _col = _index - _row * col;
+    }
+
+    // ------------------------------------------------------------------ 
+    /// \param _index the id of the tile grid
     /// \return the uv coordinate
     /// get the uv coordinate of the tile grid
     // ------------------------------------------------------------------ 
 
-    public Rect GetTileUV ( int _id ) {
-        int curRow = Mathf.CeilToInt(_id / col);
-        int curCol = _id - curRow * col;
+    public Rect GetTileUV ( int _index ) {
+        int curCol, curRow;
+        GetColRow ( _index, out curCol, out curRow );
         return GetTileUV ( curCol, curRow );
     }
 

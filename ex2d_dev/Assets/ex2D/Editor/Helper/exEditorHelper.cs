@@ -632,9 +632,9 @@ public static class exEditorHelper {
         {
             // Draw textfield, somehow this makes it work better when pressing enter
             // No idea why...
-            EditorGUILayout.BeginHorizontal();
-            s_EditedValue = EditorGUILayout.TextField(new GUIContent(_label, controlID.ToString()), s_EditedValue, EditorStyles.numberField);
-            EditorGUILayout.EndHorizontal();
+            GUILayout.BeginHorizontal();
+                s_EditedValue = EditorGUILayout.TextField(new GUIContent(_label, controlID.ToString()), s_EditedValue, EditorStyles.numberField);
+            GUILayout.EndHorizontal();
 
             // Parse number
             int number = 0;
@@ -654,9 +654,9 @@ public static class exEditorHelper {
             if (s_EditedField != controlID)
             {
                 // Draw textfield with current original _value
-                EditorGUILayout.BeginHorizontal();
-                EditorGUILayout.TextField(new GUIContent(_label, controlID.ToString()), _value.ToString(), EditorStyles.numberField);
-                EditorGUILayout.EndHorizontal();
+                GUILayout.BeginHorizontal();
+                    EditorGUILayout.TextField(new GUIContent(_label, controlID.ToString()), _value.ToString(), EditorStyles.numberField);
+                GUILayout.EndHorizontal();
 
                 // Save last tooltip if gets focus... also save control id
                 if (GUI.tooltip == controlID.ToString())
@@ -668,9 +668,9 @@ public static class exEditorHelper {
             else
             {
                 // Draw textfield, now with current edited _value
-                EditorGUILayout.BeginHorizontal();
-                s_EditedValue = EditorGUILayout.TextField(new GUIContent(_label, controlID.ToString()), s_EditedValue, EditorStyles.numberField);
-                EditorGUILayout.EndHorizontal();
+                GUILayout.BeginHorizontal();
+                    s_EditedValue = EditorGUILayout.TextField(new GUIContent(_label, controlID.ToString()), s_EditedValue, EditorStyles.numberField);
+                GUILayout.EndHorizontal();
             }
         }
 

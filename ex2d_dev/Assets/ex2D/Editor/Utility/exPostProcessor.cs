@@ -55,7 +55,8 @@ class ex2D_PostProcessor : AssetPostprocessor {
             string ext = Path.GetExtension(path);
             if ( ext != ".asset" &&
                  ext != ".png" &&
-                 ext != ".jpg" )
+                 ext != ".jpg" &&
+                 ext != ".tga" )
                 continue;
 
             //
@@ -86,6 +87,7 @@ class ex2D_PostProcessor : AssetPostprocessor {
             if ( obj is exAtlasInfo ) {
                 exAtlasInfo atlasInfo = obj as exAtlasInfo;
                 exAtlasDB.AddAtlasInfo(atlasInfo);
+                // Debug.Log( "add atlas " + path ); // DEBUG
             }
 
             // ======================================================== 
@@ -95,6 +97,7 @@ class ex2D_PostProcessor : AssetPostprocessor {
             if ( obj is exSpriteAnimClip ) {
                 exSpriteAnimClip spAnimClip = obj as exSpriteAnimClip;
                 exSpriteAnimationDB.AddSpriteAnimClip(spAnimClip);
+                // Debug.Log( "add sprite anim clip " + path ); // DEBUG
             }
         }
 
@@ -129,10 +132,12 @@ class ex2D_PostProcessor : AssetPostprocessor {
             if ( exAtlasDB.HasAtlasInfoGUID( guid ) ) {
                 exAtlasDB.RemoveAtlasInfo(guid);
                 atlasInfoGUIDs.Add(guid);
+                // Debug.Log( "remove atlas " + path ); // DEBUG
             }
             // check if we have the guid in the exSpriteAnimClip
             else if ( exSpriteAnimationDB.HasSpriteAnimClipGUID( guid ) ) {
                 exSpriteAnimationDB.RemoveSpriteAnimClip(guid);
+                // Debug.Log( "remove sprite anim clip " + path ); // DEBUG
             }
         }
         exSceneHelper.UpdateSceneSprites(atlasInfoGUIDs);

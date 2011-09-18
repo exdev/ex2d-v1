@@ -409,25 +409,6 @@ partial class exSpriteAnimClipEditor {
             GUILayout.Label( total.ToString("f3") + " secs" );
         GUILayout.EndHorizontal();
 
-        // ======================================================== 
-        // Select 
-        // ======================================================== 
-
-        if ( GUILayout.Button("Select In Project...", GUILayout.MaxWidth(150) ) ) {
-            List<Object> selects = new List<Object>(selectedFrameInfos.Count);
-            foreach ( exSpriteAnimClip.FrameInfo fi in selectedFrameInfos ) {
-                Texture2D texture 
-                    = exEditorHelper.LoadAssetFromGUID<Texture2D>(fi.textureGUID ); 
-                selects.Add(texture);
-            }
-
-            if ( selects.Count != 0 ) {
-                selectIdx = (selectIdx + 1) % selects.Count;  
-                Selection.objects = selects.ToArray();
-                EditorGUIUtility.PingObject(Selection.objects[selectIdx]);
-            }
-        }
-        GUI.enabled = true; 
         GUILayout.Space(10);
 
         // ======================================================== 

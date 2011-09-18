@@ -86,6 +86,15 @@ partial class exSpriteAnimClipEditor {
                                                 el.trimRect.width * previewScale, 
                                                 el.trimRect.height * previewScale );
 
+
+                        // DISABLE: because we can't make sure all texture have same size, so ScaleToFit may play large texture { 
+                        // GUI.BeginGroup( _rect );
+                        //     GUI.DrawTexture( new Rect( 0.0f, 0.0f, _rect.width, _rect.height ), 
+                        //                      el.texture, 
+                        //                      ScaleMode.ScaleToFit );
+                        // GUI.EndGroup();
+                        // } DISABLE end 
+
                         GUI.BeginGroup( _rect );
                             // draw background
                             // Color old = GUI.color;

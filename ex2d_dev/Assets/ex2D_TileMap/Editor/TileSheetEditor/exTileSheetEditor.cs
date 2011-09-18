@@ -115,6 +115,23 @@ partial class exTileSheetEditor : EditorWindow {
         }
 
         // ======================================================== 
+        // toolbar 
+        // ======================================================== 
+
+        GUILayout.BeginHorizontal ( EditorStyles.toolbar );
+            GUILayout.FlexibleSpace();
+
+            // ======================================================== 
+            // Help
+            // ======================================================== 
+
+            if ( GUILayout.Button( exEditorHelper.HelpTexture(), EditorStyles.toolbarButton ) ) {
+                Help.BrowseURL("http://www.ex-dev.com/ex2d/wiki/doku.php?id=manual:tilesheet_editor_guide");
+            }
+
+        GUILayout.EndHorizontal ();
+
+        // ======================================================== 
         // if we have curEdit
         // ======================================================== 
 
@@ -226,10 +243,6 @@ partial class exTileSheetEditor : EditorWindow {
             // ======================================================== 
 
             EditorGUILayout.LabelField ( "Column x Row", curEdit.col + " x " + curEdit.row ); 
-
-            // TODO { 
-            // an anchor editor (used to put anchor point)
-            // } TODO end 
 
         GUILayout.EndVertical();
 

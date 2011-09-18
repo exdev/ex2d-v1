@@ -208,20 +208,6 @@ partial class exTileMapEditor : EditorWindow {
         GUI.EndGroup();
         GUILayoutUtility.GetRect ( filedRect.width, filedRect.height );
 
-        // ======================================================== 
-        // finally 
-        // ======================================================== 
-
-        if ( sheetInRectSelectState ) {
-            if ( e.type == EventType.MouseUp && e.button == 0 ) {
-                sheetInRectSelectState = false;
-                ConfirmRectSelection();
-                Repaint();
-
-                e.Use();
-            }
-        }
-
         // DISABLE: we use eraser button { 
 
         // if ( e.type == EventType.MouseDown && e.button == 0 && e.clickCount == 1 ) {

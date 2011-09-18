@@ -35,16 +35,7 @@ public static class exTileMapUtility {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    [MenuItem ("Assets/Create/ex2D Tile Map")]
-    public static exTileMap Create () {
-        return Create ( exEditorHelper.GetCurrentDirectory(), "New TileMap" );
-    }
-
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
-    public static exTileMap Create ( string _path, string _name ) {
+    public static exTileMap Create ( string _path, string _name, int _row, int _col ) {
         //
         if ( new DirectoryInfo(_path).Exists == false ) {
             Debug.LogError ( "can't create asset, path not found" );
@@ -63,6 +54,11 @@ public static class exTileMapUtility {
 
         //
         exTileMap newTileMap = ScriptableObject.CreateInstance<exTileMap>();
+        newTileMap.row = _row;
+        newTileMap.col = _col;
+        newTileMap.grids = new int[newTileMap.row * newTileMap.col];
+        newTileMap.Clear();
+
         AssetDatabase.CreateAsset(newTileMap, assetPath);
         Selection.activeObject = newTileMap;
         return newTileMap;

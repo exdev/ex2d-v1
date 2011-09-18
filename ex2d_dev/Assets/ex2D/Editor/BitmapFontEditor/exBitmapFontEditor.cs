@@ -145,6 +145,34 @@ partial class exBitmapFontEditor : EditorWindow {
         }
 
         // ======================================================== 
+        // toolbar 
+        // ======================================================== 
+
+        GUILayout.BeginHorizontal ( EditorStyles.toolbar );
+            GUILayout.FlexibleSpace();
+
+            // ======================================================== 
+            // Build 
+            // ======================================================== 
+
+            GUI.enabled = curEdit.editorNeedRebuild;
+            if ( GUILayout.Button( "Build", EditorStyles.toolbarButton, GUILayout.Width(80) ) ) {
+                curEdit.Build( curFontInfo );
+            }
+            GUI.enabled = true;
+
+            // ======================================================== 
+            // Help
+            // ======================================================== 
+
+            if ( GUILayout.Button( exEditorHelper.HelpTexture(), EditorStyles.toolbarButton ) ) {
+                Help.BrowseURL("http://www.ex-dev.com/ex2d/wiki/doku.php?id=manual:font_editor_guide");
+            }
+        GUILayout.EndHorizontal ();
+
+        GUILayout.Space(5);
+
+        // ======================================================== 
         // if we have curEdit
         // ======================================================== 
 
@@ -152,9 +180,6 @@ partial class exBitmapFontEditor : EditorWindow {
                                                       GUILayout.Width(position.width),
                                                       GUILayout.Height(position.height) );
 
-        // draw label
-        GUILayout.Space(10);
-        GUILayout.Label ( AssetDatabase.GetAssetPath(curEdit) );
 
         // ======================================================== 
         // font info 
@@ -188,16 +213,6 @@ partial class exBitmapFontEditor : EditorWindow {
                                          , GUILayout.Width(50)
                                          , GUILayout.Height(50) 
                                        );
-        }
-        GUI.enabled = true;
-
-        // ======================================================== 
-        // Build 
-        // ======================================================== 
-
-        GUI.enabled = curEdit.editorNeedRebuild;
-        if ( GUILayout.Button("Build", GUILayout.MaxWidth(100) ) ) {
-            curEdit.Build( curFontInfo );
         }
         GUI.enabled = true;
 

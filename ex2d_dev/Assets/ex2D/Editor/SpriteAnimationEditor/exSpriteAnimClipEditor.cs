@@ -224,7 +224,7 @@ partial class exSpriteAnimClipEditor : EditorWindow {
         // toolbar 
         // ======================================================== 
 
-        EditorGUILayout.BeginHorizontal ( EditorStyles.toolbar );
+        GUILayout.BeginHorizontal ( EditorStyles.toolbar );
 
             // ======================================================== 
             // Play 
@@ -310,6 +310,28 @@ partial class exSpriteAnimClipEditor : EditorWindow {
                                              GUILayout.Width(200), GUILayout.MaxHeight(18) );
 
             GUILayout.FlexibleSpace();
+
+            // ======================================================== 
+            // Select 
+            // ======================================================== 
+
+            GUI.enabled = selectedFrameInfos.Count != 0;
+            if ( GUILayout.Button("Select In Project...", EditorStyles.toolbarButton ) ) {
+                List<Object> selects = new List<Object>(selectedFrameInfos.Count);
+                foreach ( exSpriteAnimClip.FrameInfo fi in selectedFrameInfos ) {
+                    Texture2D texture 
+                        = exEditorHelper.LoadAssetFromGUID<Texture2D>(fi.textureGUID ); 
+                    selects.Add(texture);
+                }
+
+                if ( selects.Count != 0 ) {
+                    selectIdx = (selectIdx + 1) % selects.Count;  
+                    Selection.objects = selects.ToArray();
+                    EditorGUIUtility.PingObject(Selection.objects[selectIdx]);
+                }
+            }
+            GUI.enabled = true; 
+
             // ======================================================== 
             // editor scale 
             // ======================================================== 
@@ -345,7 +367,7 @@ partial class exSpriteAnimClipEditor : EditorWindow {
                 Help.BrowseURL("http://www.ex-dev.com/ex2d/wiki/doku.php?id=manual:sprite_anim_editor_guide");
             }
 
-        EditorGUILayout.EndHorizontal ();
+        GUILayout.EndHorizontal ();
 
         // ======================================================== 
         // Scroll View
