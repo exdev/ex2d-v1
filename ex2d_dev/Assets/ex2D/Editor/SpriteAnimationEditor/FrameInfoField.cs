@@ -221,13 +221,15 @@ partial class exSpriteAnimClipEditor {
         List<int> indices = new List<int>();
         foreach ( exSpriteAnimClip.FrameInfo fi in selectedFrameInfos ) {
             int idx = _animClip.frameInfos.IndexOf(fi);
-            indices.Add(idx);
+            if ( idx != -1 )
+                indices.Add(idx);
         }
         indices.Sort();
 
         // check if resizable
         int lastIdx = -1;
-        bool canResize = true;
+        // NOTE: it is possible when we play the game, turn back, the selectedFrameInfos.Count > 0 but nothing inside it is correct.
+        bool canResize = indices.Count > 0;
         foreach ( int idx in indices ) {
             if ( lastIdx != -1 && idx - lastIdx != 1 ) {
                 canResize = false;

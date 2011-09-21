@@ -21,7 +21,7 @@ using System.IO;
 [CustomEditor(typeof(exSpriteBase))]
 class exSpriteBaseEditor : exPlaneEditor {
 
-    protected enum Physics {
+    protected enum CollisionType {
         None,
         Boxed,
         Mesh,
@@ -33,7 +33,7 @@ class exSpriteBaseEditor : exPlaneEditor {
 
     private exSpriteBase editSpriteBase;
     protected bool hasPixelPerfectComponent = false;
-    protected Physics physics = Physics.None;
+    protected CollisionType collisionType = CollisionType.None;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -48,16 +48,17 @@ class exSpriteBaseEditor : exPlaneEditor {
         if ( target != editSpriteBase ) {
             editSpriteBase = target as exSpriteBase;
 
-            // get physics
+            // get collision type 
             if ( editSpriteBase.GetComponent<BoxCollider>() != null ) {
-                physics = Physics.Boxed;
+                collisionType = CollisionType.Boxed;
             }
             else if ( editSpriteBase.GetComponent<MeshCollider>() != null ) {
-                physics = Physics.Mesh;
+                collisionType = CollisionType.Mesh;
             }
             else {
-                physics = Physics.None;
+                collisionType = CollisionType.None;
             }
+
         }
     }
 
@@ -78,39 +79,57 @@ class exSpriteBaseEditor : exPlaneEditor {
         EditorGUI.indentLevel = 1;
 
         GUILayout.BeginHorizontal();
-        // ======================================================== 
-        // Physics 
-        // ======================================================== 
+            // ======================================================== 
+            // Collision Type 
+            // ======================================================== 
 
-        GUI.enabled = !inAnimMode;
-        EditorGUIUtility.LookLikeControls ();
-		Physics newPhysics = (Physics)EditorGUILayout.EnumPopup( "Physics", physics, GUILayout.Width(165) );
-        EditorGUIUtility.LookLikeInspector ();
-        GUI.enabled = true;
+            GUI.enabled = !inAnimMode;
+            EditorGUIUtility.LookLikeControls ();
+            CollisionType newCollisionType = (CollisionType)EditorGUILayout.EnumPopup( "Collision Type", collisionType, GUILayout.Width(165) );
+            EditorGUIUtility.LookLikeInspector ();
+            GUI.enabled = true;
 
-        //
-        if ( newPhysics != physics ) {
-            physics = newPhysics;
+            //
+            if ( newCollisionType != collisionType ) {
+                collisionType = newCollisionType;
 
-            Collider myCollider = editSpriteBase.GetComponent<Collider>();
-            if ( myCollider != null ) {
-                Object.DestroyImmediate(myCollider,true);
+                Collider myCollider = editSpriteBase.GetComponent<Collider>();
+                if ( myCollider != null ) {
+                    Object.DestroyImmediate(myCollider,true);
+                }
+
+                switch ( collisionType ) {
+                case CollisionType.None: break;
+                case CollisionType.Boxed: editSpriteBase.gameObject.AddComponent<BoxCollider>(); break;
+                case CollisionType.Mesh: editSpriteBase.gameObject.AddComponent<MeshCollider>(); break;
+                }
+                if ( editSpriteBase.collisionHelper )
+                    editSpriteBase.collisionHelper.UpdateCollider();
             }
 
-            switch ( physics ) {
-            case Physics.None: break;
-            case Physics.Boxed: editSpriteBase.gameObject.AddComponent<BoxCollider>(); break;
-            case Physics.Mesh: editSpriteBase.gameObject.AddComponent<MeshCollider>(); break;
-            }
-        }
+            // ======================================================== 
+            // use collision helper
+            // ======================================================== 
 
-        GUILayout.Space(10);
-
-        // ======================================================== 
-        // Collider Auto Resize 
-        // ======================================================== 
-
-        editSpriteBase.autoResizeCollision = GUILayout.Toggle( editSpriteBase.autoResizeCollision, "Auto Resize", GUILayout.Width(120) );
+            GUILayout.BeginHorizontal();
+            GUILayout.Space(15);
+                GUI.enabled = !inAnimMode;
+                exCollisionHelper compCollisionHelper = editSpriteBase.collisionHelper;
+                bool hasCollisionHelperComp = compCollisionHelper != null; 
+                bool useCollisionHelper = GUILayout.Toggle ( hasCollisionHelperComp, "Use Collision Helper" ); 
+                if ( useCollisionHelper != hasCollisionHelperComp ) {
+                    if ( useCollisionHelper ) {
+                        compCollisionHelper = editSpriteBase.gameObject.AddComponent<exCollisionHelper>();
+                        compCollisionHelper.plane = editSpriteBase;
+                        compCollisionHelper.UpdateCollider();
+                    }
+                    else {
+                        Object.DestroyImmediate(compCollisionHelper,true);
+                    }
+                    GUI.changed = true;
+                }
+                GUI.enabled = true;
+            GUILayout.EndHorizontal();
         GUILayout.EndHorizontal();
 
         // ======================================================== 

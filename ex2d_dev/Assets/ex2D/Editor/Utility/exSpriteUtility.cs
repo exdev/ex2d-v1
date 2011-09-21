@@ -78,30 +78,6 @@ public static class exSpriteUtility {
         GameObject.DestroyImmediate( _sprite.meshFilter.sharedMesh, true ); // delete old mesh (to avoid leaking)
         _sprite.meshFilter.sharedMesh = newMesh; 
 
-        // if we have mesh collider, update it.
-        MeshCollider meshCol = _sprite.GetComponent<MeshCollider>();
-        if ( meshCol )
-            meshCol.sharedMesh = newMesh;
-
-        // if we have box collider, update it.
-        BoxCollider boxCol = _sprite.GetComponent<BoxCollider>();
-        if ( boxCol ) {
-            Vector3 size = newMesh.bounds.size;
-            boxCol.center = newMesh.bounds.center;
-
-            switch ( _sprite.plane ) {
-            case exSprite.Plane.XY:
-                boxCol.size = new Vector3( size.x, size.y, 0.2f );
-                break;
-            case exSprite.Plane.XZ:
-                boxCol.size = new Vector3( size.x, 0.2f, size.z );
-                break;
-            case exSprite.Plane.ZY:
-                boxCol.size = new Vector3( 0.2f, size.y, size.z );
-                break;
-            }
-        }
-
         // set a texture to it
         if ( _sprite.atlas != null ) {
             _sprite.renderer.sharedMaterial = _sprite.atlas.material;
@@ -139,6 +115,16 @@ public static class exSpriteUtility {
             _sprite.renderer.sharedMaterial = newMaterial;
         }
         EditorUtility.UnloadUnusedAssets();
+
+        // update layer2d
+        if ( _sprite.layer2d ) {
+            _sprite.layer2d.RecursivelyUpdateLayer ();
+        }
+
+        // update collider
+        if ( _sprite.collisionHelper ) {
+            _sprite.collisionHelper.UpdateCollider ();
+        }
     }
 
 }

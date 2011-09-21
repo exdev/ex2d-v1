@@ -113,7 +113,13 @@ public class exPlane : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     public Camera renderCamera {
-        get { return camera_; }
+        get { 
+            // NOTE: this is because prefab may missing link of main camera ( but will not missing second one )
+            if ( camera_ != null )
+                return camera_; 
+            camera_ = Camera.main; 
+            return camera_;
+        }
         set {
             Camera newCamera = value;
             if ( newCamera == null )
@@ -207,6 +213,19 @@ public class exPlane : MonoBehaviour {
     }
 
     // ------------------------------------------------------------------ 
+    /// The cached exCollisionHelper component
+    // ------------------------------------------------------------------ 
+
+    protected exCollisionHelper collisionHelper_ = null;
+    public exCollisionHelper collisionHelper {
+        get {
+            if ( collisionHelper_ == null )
+                collisionHelper_ = GetComponent<exCollisionHelper>();
+            return collisionHelper_;
+        }
+    }
+
+    // ------------------------------------------------------------------ 
     /// The cached MeshFilter component
     // ------------------------------------------------------------------ 
 
@@ -238,27 +257,30 @@ public class exPlane : MonoBehaviour {
     public ClipInfo clipInfo { 
         get { return clipInfo_; }
         set {
-            if ( clipInfo_ != value ) {
-                clipInfo_ = value;
-
-                if ( clipInfo_.clipped ) {
-                    if ( clipInfo_.left >= 1.0f ||
-                         clipInfo_.right >= 1.0f ||
-                         clipInfo_.top >= 1.0f ||
-                         clipInfo_.bottom >= 1.0f )
-                    {
+            if ( value.clipped ) {
+                if ( value.left >= 1.0f ||
+                     value.right >= 1.0f ||
+                     value.top >= 1.0f ||
+                     value.bottom >= 1.0f )
+                {
+                    if ( enabled == true )
                         enabled = false; // just hide it
-                    }
-                    else {
+                }
+                else {
+                    if ( clipInfo_ != value || enabled == false ) {
                         enabled = true;
                         updateFlags |= (UpdateFlags.Vertex|UpdateFlags.UV|UpdateFlags.Text);
                     }
                 }
-                else {
+            }
+            else {
+                if ( clipInfo_ != value || enabled == false ) {
                     enabled = true;
                     updateFlags |= (UpdateFlags.Vertex|UpdateFlags.UV|UpdateFlags.Text);
                 }
             }
+
+            clipInfo_ = value;
         } 
     }
 
@@ -293,7 +315,14 @@ public class exPlane : MonoBehaviour {
         if ( camera_ == null )
             camera_ = Camera.main;
         meshFilter_ = GetComponent<MeshFilter>();
+
         layer2d_ = GetComponent<exLayer2D>();
+        if ( layer2d_ )
+            layer2d_.plane = this;
+
+        collisionHelper_ = GetComponent<exCollisionHelper>();
+        if ( collisionHelper_ )
+            collisionHelper_.plane = this;
     }
 
     // ------------------------------------------------------------------ 
@@ -365,48 +394,4 @@ public class exPlane : MonoBehaviour {
         // Debug.LogWarning ("You should not directly call this function. please override it!");
     }
 
-    // ------------------------------------------------------------------ 
-    /// \param _offsetX the offset x pos of the plane (normally it is equals to offset.x + anchor_pos.x )  
-    /// \param _offsetY the offset y pos of the plane (normally it is equals to offset.y + anchor_pos.y )  
-    /// \param _width the width of the plane
-    /// \param _height the height of the plane
-    /// 
-    /// Update the boundingRect of the plane.
-    // ------------------------------------------------------------------ 
-
-    protected void UpdateBoundRect ( float _offsetX, float _offsetY, float _width, float _height ) {
-        float sign_w = Mathf.Sign(_width);
-        float sign_h = Mathf.Sign(_height);
-        boundingRect = new Rect( -_offsetX - sign_w * _width * 0.5f, 
-                                  _offsetY - sign_h * _height * 0.5f, 
-                                  sign_w * _width, 
-                                  sign_h * _height );
-    }
-
-    // ------------------------------------------------------------------ 
-    /// \param _offsetX the offset x pos of the plane (normally it is equals to offset.x + anchor_pos.x )  
-    /// \param _offsetY the offset y pos of the plane (normally it is equals to offset.y + anchor_pos.y )  
-    /// \param _width the width of the plane
-    /// \param _height the height of the plane
-    /// \return the bounds result
-    /// 
-    /// Get the Bounds of the plane, used for BoxCollider 
-    // ------------------------------------------------------------------ 
-
-    protected Bounds GetBounds ( float _offsetX, float _offsetY, float _width, float _height ) {
-        switch ( plane ) {
-        case exSprite.Plane.XY:
-            return new Bounds (  new Vector3( -_offsetX, _offsetY, 0.0f ), 
-                                 new Vector3( _width, _height, 0.2f ) );
-        case exSprite.Plane.XZ:
-            return new Bounds (  new Vector3( -_offsetX, 0.0f, _offsetY ), 
-                                 new Vector3( _width, 0.2f, _height ) );
-        case exSprite.Plane.ZY:
-            return new Bounds (  new Vector3( 0.0f, _offsetY, -_offsetX ), 
-                                 new Vector3( 0.2f, _height, _width ) );
-        default:
-            return new Bounds (  new Vector3( -_offsetX, _offsetY, 0.0f ), 
-                                 new Vector3( _width, _height, 0.2f ) );
-        }
-    } 
 }

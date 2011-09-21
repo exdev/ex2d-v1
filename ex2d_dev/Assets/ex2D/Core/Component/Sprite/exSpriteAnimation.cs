@@ -225,12 +225,12 @@ public class exSpriteAnimation : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     public void SetFrame ( string _name, int _index ) {
-        curAnimation = GetAnimation(_name);
-        if ( curAnimation != null &&
+        exSpriteAnimState animState = GetAnimation(_name);
+        if ( animState != null &&
              _index >= 0 &&
-             _index < curAnimation.clip.frameInfos.Count ) 
+             _index < animState.clip.frameInfos.Count ) 
         {
-            exSpriteAnimClip.FrameInfo fi = curAnimation.clip.frameInfos[_index]; 
+            exSpriteAnimClip.FrameInfo fi = animState.clip.frameInfos[_index]; 
             sprite.SetSprite ( fi.atlas, fi.index );
         }
     }
@@ -349,7 +349,7 @@ public class exSpriteAnimation : MonoBehaviour {
                 return curAnimation.clip.frameInfos[index];
         }
         return null;
-    } 
+    }
 
     // ------------------------------------------------------------------ 
     /// \param _animClip the sprite animation clip wants to add

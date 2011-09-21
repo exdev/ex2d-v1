@@ -338,18 +338,6 @@ class exSpriteEditor : exSpriteBaseEditor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    void AtlasTextureField ( Rect _rect, exAtlas _atlas, int _index, Texture2D _texture ) {
-
-        exEditorHelper.DrawRect ( _rect, Color.gray, Color.black );
-
-
-        GUILayoutUtility.GetRect ( _rect.width, _rect.height );
-    }
-
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
     override protected void AddAnimationHelper () {
         editSprite.gameObject.AddComponent<exSpriteAnimHelper>();
     }

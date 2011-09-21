@@ -65,7 +65,6 @@ partial class exSpriteAnimClipEditor : EditorWindow {
     private bool playingSelects = false;
 
     private float previewScale = 1.0f;
-    private float previewSize = 256.0f;
 
     private exSpriteAnimClip.EventInfoComparer eventInfoSorter 
         = new exSpriteAnimClip.EventInfoComparer(); 
@@ -550,12 +549,29 @@ partial class exSpriteAnimClipEditor : EditorWindow {
         // ======================================================== 
 
             // ======================================================== 
+            // preview Size 
+            // ======================================================== 
+
+            float newPreviewSize = EditorGUILayout.Slider( "Preview Size", 
+                                                           curEdit.editorPreviewSize, 
+                                                           32.0f, 
+                                                           512.0f,
+                                                           GUILayout.Width(300) );
+            if ( newPreviewSize != curEdit.editorPreviewSize ) {
+                curEdit.editorPreviewSize = newPreviewSize;
+                CalculatePreviewScale();
+            }
+
+            // ======================================================== 
             // PreviewField 
             // ======================================================== 
 
             GUILayout.Space(10);
             lastRect = GUILayoutUtility.GetLastRect ();  
-            PreviewField ( new Rect ( spriteAnimClipRect.x, lastRect.yMax, previewSize, previewSize ) );
+            PreviewField ( new Rect ( spriteAnimClipRect.x, 
+                                      lastRect.yMax, 
+                                      curEdit.editorPreviewSize, 
+                                      curEdit.editorPreviewSize ) );
 
         GUILayout.EndVertical();
 
@@ -814,8 +830,8 @@ partial class exSpriteAnimClipEditor : EditorWindow {
 
         // get the preview scale
         previewScale = 1.0f;
-        float viewWidth = previewSize;
-        float viewHeight = previewSize;
+        float viewWidth = curEdit.editorPreviewSize;
+        float viewHeight = curEdit.editorPreviewSize;
         if ( maxWidth > viewWidth && maxHeight > viewHeight ) {
             previewScale = Mathf.Min( viewWidth / maxWidth, viewHeight / maxHeight );
         }

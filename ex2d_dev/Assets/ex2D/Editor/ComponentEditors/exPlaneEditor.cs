@@ -55,6 +55,7 @@ class exPlaneEditor : Editor {
 
             if ( editPlane.renderer != null ) {
                 EditorUtility.SetSelectedWireframeHidden(editPlane.renderer, true);
+                // EditorUtility.SetSelectedWireframeHidden(editPlane.renderer, false); // DEBUG
             }
 
             // get trans2d

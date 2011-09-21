@@ -283,7 +283,6 @@ class exSpriteFontEditor : exSpriteBaseEditor {
         // if dirty, build it.
         if ( !EditorApplication.isPlaying && !AnimationUtility.InAnimationMode() ) {
             if ( needRebuild ) {
-                // Debug.Log("rebuilding..."); // TODO: a rebuilding label ??
                 editSpriteFont.Build();
             }
             else if ( GUI.changed ) {

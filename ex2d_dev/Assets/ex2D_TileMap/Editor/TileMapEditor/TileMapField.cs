@@ -52,8 +52,8 @@ partial class exTileMapEditor : EditorWindow {
             return;
 
         Color eraseColor = new Color( 1.0f, 0.0f, 0.0f, 0.5f );
-        float width = _tileMap.col * _tileMap.tileWidth;
-        float height = _tileMap.row * _tileMap.tileHeight;
+        float tileMapWidth = _tileMap.col * _tileMap.tileWidth;
+        float tileMapHeight = _tileMap.row * _tileMap.tileHeight;
 
         // step 1: find the center of selection
         int minX = 9999; 
@@ -80,18 +80,42 @@ partial class exTileMapEditor : EditorWindow {
         int centerY = Mathf.CeilToInt((maxY-minY)/2.0f) + minY;
 
         Event e = Event.current;
-        mapScrollPos = GUI.BeginScrollView( _rect, mapScrollPos, new Rect( -margin, -margin, width + margin * 2, height + margin * 2 )  );
+        mapScrollPos = GUI.BeginScrollView( _rect, mapScrollPos, new Rect( -margin, -margin, tileMapWidth + margin * 2, tileMapHeight + margin * 2 )  );
 
             if ( e.type == EventType.Repaint ) {
+
+                // ======================================================== 
+                // initialize
+                // ======================================================== 
+
+                debugVisibleGrids = 0;
+                Color textureColor = Color.white;
+                Vector2 sizeScrollBar = Vector2.zero;
+                Rect viewPort = new Rect ( mapScrollPos.x-margin, mapScrollPos.y-margin, _rect.width, _rect.height );
+
+                // get scroll bar width
+                sizeScrollBar = EditorGUIUtility.GetBuiltinSkin(EditorSkin.Inspector).verticalScrollbar.CalcSize( new GUIContent("") );
+                float scrollBarHeight = sizeScrollBar.x;
+
+                // get scroll bar height
+                sizeScrollBar = EditorGUIUtility.GetBuiltinSkin(EditorSkin.Inspector).horizontalScrollbar.CalcSize( new GUIContent("") );
+                float scrollBarWidth = sizeScrollBar.y;
+
+                // trim viewport to fit scroll bar 
+                float vpHeight = viewPort.height;
+                if ( viewPort.width < tileMapWidth + margin * 2 ) {
+                    vpHeight -= scrollBarHeight;
+                }
+                float vpWidth = viewPort.width;
+                if ( viewPort.height < tileMapHeight + margin * 2 ) {
+                    vpWidth -= scrollBarWidth;
+                }
+                viewPort = new Rect ( viewPort.x, viewPort.y, vpWidth, vpHeight );
 
                 // ======================================================== 
                 // draw tile 
                 // ======================================================== 
 
-                debugVisibleGrids = 0;
-                Color textureColor = Color.white;
-                Color oldColor = GUI.color;
-                Rect viewPort = new Rect ( mapScrollPos.x-margin, mapScrollPos.y-margin, _rect.width, _rect.height );
                 for ( int r = 0; r < _tileMap.row; ++r ) {
                     for ( int c = 0; c < _tileMap.col; ++c ) {
                         int curX = c * _tileMap.tileWidth;
@@ -106,9 +130,16 @@ partial class exTileMapEditor : EditorWindow {
                                                   _tileMap.tileSheet.tileWidth, 
                                                   _tileMap.tileSheet.tileHeight );
 
+                        // DELME { 
                         // check if we render this rect
-                        if ( exContains2D.RectRect ( viewPort, gridRect ) == 0 &&
-                             exIntersection2D.RectRect ( viewPort, gridRect ) == false )
+                        // if ( exContains2D.RectRect ( viewPort, gridRect ) == 0 &&
+                        //      exIntersection2D.RectRect ( viewPort, gridRect ) == false )
+                        //     continue;
+                        // } DELME end 
+
+                        // check if we render this rect
+                        bool intersected = exIntersection2D.RectRect ( viewPort, gridRect );
+                        if ( !intersected && exContains2D.RectRect ( viewPort, gridRect ) == 0 )
                             continue;
 
                         //
@@ -121,12 +152,31 @@ partial class exTileMapEditor : EditorWindow {
                         else {
                             textureColor = _tileMap.editorColor;
                         }
-                        GUI.color = textureColor; 
 
-                        //
+                        // get uv
                         Rect uv = _tileMap.tileSheet.GetTileUV (sheetID);
 
-                        // DISABLE { 
+                        // clip the rect
+                        if ( intersected ) {
+                            if ( viewPort.xMin > gridRect.xMin ) {
+                                uv.xMin += (viewPort.xMin - gridRect.xMin)/_tileMap.tileSheet.texture.width;
+                                gridRect.xMin = viewPort.xMin;
+                            }
+                            if ( viewPort.xMax < gridRect.xMax ) {
+                                uv.xMax -= (gridRect.xMax - viewPort.xMax)/_tileMap.tileSheet.texture.width;
+                                gridRect.xMax = viewPort.xMax;
+                            }
+                            if ( viewPort.yMin > gridRect.yMin ) {
+                                uv.yMax -= (viewPort.yMin - gridRect.yMin)/_tileMap.tileSheet.texture.height;
+                                gridRect.yMin = viewPort.yMin;
+                            }
+                            if ( viewPort.yMax < gridRect.yMax ) {
+                                uv.yMin += (gridRect.yMax - viewPort.yMax)/_tileMap.tileSheet.texture.height;
+                                gridRect.yMax = viewPort.yMax;
+                            }
+                        }
+
+                        // DELME { 
                         // GUI.BeginGroup( gridRect );
                         //     GUI.DrawTexture( new Rect( -uv.x * _tileMap.tileSheet.texture.width, 
                         //                                -(1.0f - uv.y) * _tileMap.tileSheet.texture.height + _tileMap.tileSheet.tileHeight, 
@@ -134,27 +184,24 @@ partial class exTileMapEditor : EditorWindow {
                         //                                _tileMap.tileSheet.texture.height), 
                         //                      _tileMap.tileSheet.texture );
                         // GUI.EndGroup();
-                        // } DISABLE end 
+                        // } DELME end 
 
-                        // DISABLE: NOTE: this is pro only { 
                         textureColor /= 2.0f;
                         Graphics.DrawTexture ( gridRect, 
                                                _tileMap.tileSheet.texture,  
                                                uv,
                                                0, 0, 0, 0,
                                                textureColor );
-                        // } DISABLE end 
                         ++debugVisibleGrids;
                     }
                 }
-                GUI.color = oldColor;
 
                 // ======================================================== 
                 // draw mouse 
                 // ======================================================== 
 
-                if ( curGridX >= 0 && curGridX < _tileMap.col * _tileMap.tileWidth &&
-                     curGridY >= 0 && curGridY < _tileMap.row * _tileMap.tileHeight )
+                if ( curGridX >= 0 && curGridX < tileMapWidth &&
+                     curGridY >= 0 && curGridY < tileMapHeight )
                 {
                     // draw selected grids 
                     if ( _tileMap.editorEditMode == exTileMap.EditMode.Paint ) {
@@ -185,8 +232,8 @@ partial class exTileMapEditor : EditorWindow {
                             }
 
                             // step 3: draw mouse texture
-                            oldColor = GUI.color;
-                            GUI.color = new Color( 1.0f, 1.0f, 1.0f, 0.6f );
+                            textureColor = new Color( 1.0f, 1.0f, 1.0f, 0.6f );
+                            textureColor /= 2.0f;
                             foreach ( int idx in sheetSelectedGrids ) {
                                 int id_x, id_y;
                                 _tileMap.tileSheet.GetColRow( idx, out id_x, out id_y );
@@ -206,15 +253,22 @@ partial class exTileMapEditor : EditorWindow {
                                                           _tileMap.tileSheet.tileWidth, 
                                                           _tileMap.tileSheet.tileHeight );
 
-                                GUI.BeginGroup( gridRect );
-                                    GUI.DrawTexture( new Rect( -uv.x * _tileMap.tileSheet.texture.width, 
-                                                               -(1.0f - uv.y) * _tileMap.tileSheet.texture.height + _tileMap.tileSheet.tileHeight, 
-                                                               _tileMap.tileSheet.texture.width, 
-                                                               _tileMap.tileSheet.texture.height), 
-                                                     _tileMap.tileSheet.texture );
-                                GUI.EndGroup();
+                                // DELME { 
+                                // GUI.BeginGroup( gridRect );
+                                //     GUI.DrawTexture( new Rect( -uv.x * _tileMap.tileSheet.texture.width, 
+                                //                                -(1.0f - uv.y) * _tileMap.tileSheet.texture.height + _tileMap.tileSheet.tileHeight, 
+                                //                                _tileMap.tileSheet.texture.width, 
+                                //                                _tileMap.tileSheet.texture.height), 
+                                //                      _tileMap.tileSheet.texture );
+                                // GUI.EndGroup();
+                                // } DELME end 
+
+                                Graphics.DrawTexture ( gridRect, 
+                                                       _tileMap.tileSheet.texture,  
+                                                       uv,
+                                                       0, 0, 0, 0,
+                                                       textureColor );
                             }
-                            GUI.color = oldColor;
                         }
                         else {
                             exEditorHelper.DrawRect( new Rect( curGridX, 
@@ -243,14 +297,14 @@ partial class exTileMapEditor : EditorWindow {
                     for ( int i = 0; i <= _tileMap.col; ++i ) {
                         float x = i * _tileMap.tileWidth;
                         exEditorHelper.DrawLine ( new Vector2( x, 0.0f ), 
-                                                  new Vector2( x, height ),
+                                                  new Vector2( x, tileMapHeight ),
                                                   new Color( 0.5f, 0.5f, 0.5f, 1.0f ),
                                                   1.0f );
                     }
                     for ( int i = 0; i <= _tileMap.row; ++i ) {
                         float y = i * _tileMap.tileHeight;
                         exEditorHelper.DrawLine ( new Vector2( 0.0f,  y ), 
-                                                  new Vector2( width, y ),
+                                                  new Vector2( tileMapWidth, y ),
                                                   new Color( 0.5f, 0.5f, 0.5f, 1.0f ),
                                                   1.0f );
                     }

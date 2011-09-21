@@ -144,6 +144,7 @@ public static partial class exAtlasInfoUtility {
 
     // ------------------------------------------------------------------ 
     /// \param _atlasInfo the atlas info
+    /// \param _noImport if true, ex2D will not import the texture to fit for atlas 
     /// build the atlas info to atlas 
     // ------------------------------------------------------------------ 
 

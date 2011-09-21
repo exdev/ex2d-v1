@@ -574,10 +574,10 @@ public class exSpriteFont : exSpriteBase {
             float clipTop    = 0.0f; 
             float clipBottom = 0.0f;
 
-            float xMinClip = -halfWidth * scale_.x;
-            float xMaxClip =  halfWidth * scale_.x;
-            float yMinClip = -halfHeight * scale_.y;
-            float yMaxClip =  halfHeight * scale_.y;
+            float xMinClip = -halfWidth;
+            float xMaxClip =  halfWidth;
+            float yMinClip = -halfHeight;
+            float yMaxClip =  halfHeight;
 
             if ( clipInfo_.clipped ) {
                 if ( scale_.x >= 0.0f ) {
@@ -599,10 +599,10 @@ public class exSpriteFont : exSpriteBase {
                 }
 
                 //
-                xMinClip = scale_.x * width  * ( -0.5f + clipLeft   );
-                xMaxClip = scale_.x * width  * (  0.5f - clipRight  );
-                yMinClip = scale_.y * height * ( -0.5f + clipTop    );
-                yMaxClip = scale_.y * height * (  0.5f - clipBottom );
+                xMinClip = width  * ( -0.5f + clipLeft   );
+                xMaxClip = width  * (  0.5f - clipRight  );
+                yMinClip = height * ( -0.5f + clipTop    );
+                yMaxClip = height * (  0.5f - clipBottom );
             }
 
             //
@@ -677,24 +677,24 @@ public class exSpriteFont : exSpriteBase {
                                 //
                                 if ( x <= xMinClip ) {
                                     if ( j == 0 )
-                                        charClipLeft = (xMinClip - x) / charInfo.width  * scale_.x; 
+                                        charClipLeft = (xMinClip - x) / (charInfo.width * scale_.x); 
                                     x = xMinClip;
                                 }
                                 else if ( x >= xMaxClip ) {
                                     if ( j == 3 )
-                                        charClipRight = (x - xMaxClip) / charInfo.width  * scale_.x; 
+                                        charClipRight = (x - xMaxClip) / (charInfo.width * scale_.x); 
                                     x = xMaxClip;
                                 }
 
                                 //
                                 if ( y <= yMinClip ) {
                                     if ( j == 3 )
-                                        charClipTop = (yMinClip - y) / charInfo.height * scale_.y; 
+                                        charClipTop = (yMinClip - y) / (charInfo.height * scale_.y); 
                                     y = yMinClip;
                                 }
                                 else if ( y >= yMaxClip ) {
                                     if ( j == 0 )
-                                        charClipBottom = (y - yMaxClip) / charInfo.height * scale_.y; 
+                                        charClipBottom = (y - yMaxClip) / (charInfo.height * scale_.y); 
                                     y = yMaxClip;
                                 }
                             }
@@ -704,8 +704,9 @@ public class exSpriteFont : exSpriteBase {
                             y += offsetY;
 
                             // calculate the shear
+                            float old_x = x;
                             x += y * shear_.x;
-                            y += x * shear_.y;
+                            y += old_x * shear_.y;
 
                             // build vertices and normals
                             switch ( plane ) {
@@ -793,11 +794,12 @@ public class exSpriteFont : exSpriteBase {
             // _mesh.normals = normals;
             _mesh.uv = uvs;
             _mesh.triangles = indices; 
-            _mesh.bounds = GetBounds ( offsetX, offsetY, halfWidth * 2.0f, halfHeight * 2.0f );
+            _mesh.bounds = GetMeshBounds ( offsetX, offsetY, halfWidth * 2.0f, halfHeight * 2.0f );
 
             // update box-collider if we have
-            UpdateCollider ( _mesh );
             UpdateBoundRect ( offsetX, offsetY, halfWidth * 2.0f, halfHeight * 2.0f );
+            if ( collisionHelper ) 
+                collisionHelper.UpdateCollider();
 
 // #if UNITY_EDITOR
 //             _mesh.RecalculateBounds();
@@ -934,11 +936,12 @@ public class exSpriteFont : exSpriteBase {
             }
 
             _mesh.vertices = vertices;
-            _mesh.bounds = GetBounds ( offsetX, offsetY, halfWidth * 2.0f, halfHeight * 2.0f );
+            _mesh.bounds = GetMeshBounds ( offsetX, offsetY, halfWidth * 2.0f, halfHeight * 2.0f );
 
             // update collider if we have
-            UpdateCollider ( _mesh );
             UpdateBoundRect ( offsetX, offsetY, halfWidth * 2.0f, halfHeight * 2.0f );
+            if ( collisionHelper ) 
+                collisionHelper.UpdateCollider();
 
 // #if UNITY_EDITOR
 //             _mesh.RecalculateBounds();

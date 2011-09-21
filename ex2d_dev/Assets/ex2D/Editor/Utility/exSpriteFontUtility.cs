@@ -73,28 +73,14 @@ public static class exSpriteFontUtility {
         GameObject.DestroyImmediate( _spriteFont.meshFilter.sharedMesh, true ); // delete old mesh (to avoid leaking)
         _spriteFont.meshFilter.sharedMesh = newMesh;
 
-        // if we have mesh collider, update it.
-        MeshCollider meshCol = _spriteFont.GetComponent<MeshCollider>();
-        if ( meshCol )
-            meshCol.sharedMesh = newMesh;
+        // update layer2d
+        if ( _spriteFont.layer2d ) {
+            _spriteFont.layer2d.RecursivelyUpdateLayer ();
+        }
 
-        // if we have box collider, update it.
-        BoxCollider boxCol = _spriteFont.GetComponent<BoxCollider>();
-        if ( boxCol ) {
-            Vector3 size = newMesh.bounds.size;
-            boxCol.center = newMesh.bounds.center;
-
-            switch ( _spriteFont.plane ) {
-            case exSprite.Plane.XY:
-                boxCol.size = new Vector3( size.x, size.y, 0.2f );
-                break;
-            case exSprite.Plane.XZ:
-                boxCol.size = new Vector3( size.x, 0.2f, size.z );
-                break;
-            case exSprite.Plane.ZY:
-                boxCol.size = new Vector3( 0.2f, size.y, size.z );
-                break;
-            }
+        // update collider
+        if ( _spriteFont.collisionHelper ) {
+            _spriteFont.collisionHelper.UpdateCollider ();
         }
     }
 }

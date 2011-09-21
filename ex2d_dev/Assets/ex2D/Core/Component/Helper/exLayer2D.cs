@@ -144,10 +144,15 @@ public class exLayer2D : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     public void UpdateDepth () {
-        if ( plane != null )
+        if ( plane != null ) {
             depth = CalculateDepth( plane.renderCamera );
-        else 
+            if ( plane.collisionHelper != null ) {
+                plane.collisionHelper.UpdateCenter();
+            }
+        }
+        else {
             depth = CalculateDepth( Camera.main );
+        }
     }
 
 

@@ -35,6 +35,30 @@ public static class exSpriteAnimationUtility {
     }
 
     // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    [MenuItem ("Assets/Create/ex2D Sprite Animation")]
+    static void Create () {
+        string assetPath = exEditorHelper.GetCurrentDirectory();
+        string assetName = "New SpriteAnimation";
+
+        bool doCreate = true;
+        string path = Path.Combine( assetPath, assetName + ".asset" );
+        FileInfo fileInfo = new FileInfo(path);
+        if ( fileInfo.Exists ) {
+            doCreate = EditorUtility.DisplayDialog( assetName + " already exists.",
+                                                    "Do you want to overwrite the old one?",
+                                                    "Yes", "No" );
+        }
+        if ( doCreate ) {
+            exSpriteAnimClip clip = exSpriteAnimationUtility.CreateSpriteAnimClip ( assetPath, assetName );
+            Selection.activeObject = clip;
+            // EditorGUIUtility.PingObject(border);
+        }
+    }
+
+    // ------------------------------------------------------------------ 
     /// \param _path the directory path to save the atlas
     /// \param _name the name of the atlas
     /// \return the sprite animation clip asset

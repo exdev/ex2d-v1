@@ -32,24 +32,25 @@ partial class exSpriteAnimClipEditor {
         // ======================================================== 
 
         int borderSize = 1;
-        int xStart = (int)_rect.x;
-        int yStart = (int)_rect.y;
         int boxWidth = (int)_rect.width + 2 * borderSize; // box border
         int boxHeight = (int)_rect.height + 2 * borderSize; // box border
         Texture2D texCheckerboard = exEditorHelper.CheckerboardTexture();
 
-        int col = (int)_rect.width / texCheckerboard.width;
-        int row = (int)_rect.height / texCheckerboard.height;
+        GUI.BeginGroup( _rect );
+            int col = Mathf.CeilToInt( _rect.width / texCheckerboard.width );
+            int row = Mathf.CeilToInt( _rect.height / texCheckerboard.height );
 
-        for ( int j = 0; j < row; ++j ) {
-            for ( int i = 0; i < col; ++i ) {
-                Rect size = new Rect( i * texCheckerboard.width + xStart,
-                                      j * texCheckerboard.height + yStart,
-                                      texCheckerboard.width,
-                                      texCheckerboard.height );
-                GUI.DrawTexture( size, texCheckerboard );
+            for ( int j = 0; j < row; ++j ) {
+                for ( int i = 0; i < col; ++i ) {
+                    Rect size = new Rect( i * texCheckerboard.width,
+                                          j * texCheckerboard.height,
+                                          texCheckerboard.width,
+                                          texCheckerboard.height );
+                    GUI.DrawTexture( size, texCheckerboard );
+                }
             }
-        }
+        GUI.EndGroup();
+
         Color oldBGColor = GUI.backgroundColor;
         GUI.backgroundColor = Color.black;
         GUI.Box ( new Rect( _rect.x - borderSize, _rect.y - borderSize, boxWidth, boxHeight), 

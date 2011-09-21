@@ -67,6 +67,13 @@ public static class exSceneHelper {
             // EditorUtility.DisplayProgressBar( "Rebuild Scene Sprites...", 
             //                                   "Build Sprite " + spBase.gameObject.name, progress );    
             // } DISABLE end 
+
+            // update layer
+            if ( spBase.layer2d ) {
+                spBase.layer2d.RecursivelyUpdateLayer ();
+            }
+
+            // if sprite
             if ( spBase is exSprite ) {
                 exSprite sp = spBase as exSprite;
                 exAtlasDB.ElementInfo elInfo = exAtlasDB.GetElementInfo(sp.textureGUID);
@@ -78,15 +85,25 @@ public static class exSceneHelper {
                 }
                 sp.Build(texture);
             }
+
+            // if sprite font
             if ( spBase is exSpriteFont ) {
                 exSpriteFont spFont = spBase as exSpriteFont;
                 spFont.Build();
             }
 
-            // update layer
-            exLayer2D layer2d = spBase.GetComponent<exLayer2D>();
-            if ( layer2d ) {
-                layer2d.RecursivelyUpdateLayer ();
+            // if sprite border
+            if ( spBase is exSpriteBorder ) {
+                exSpriteBorder spBorder = spBase as exSpriteBorder; 
+
+                exAtlasDB.ElementInfo elInfo = exAtlasDB.GetElementInfo(spBorder.guiBorder.textureGUID);
+                exSpriteBorderEditor.UpdateAtlas( spBorder, elInfo );
+
+                Texture2D texture = null;
+                if ( spBorder.useAtlas == false ) {
+                    texture = exEditorHelper.LoadAssetFromGUID<Texture2D>(spBorder.guiBorder.textureGUID );
+                }
+                spBorder.Build(texture);
             }
         }
         EditorUtility.UnloadUnusedAssets(); // NOTE: without this you will got leaks message
