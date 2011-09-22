@@ -109,6 +109,7 @@ class exSpriteEditor : exSpriteBaseEditor {
                 editTexture = newTexture;
                 editSprite.textureGUID = exEditorHelper.AssetToGUID(editTexture);
                 textureChanged = true;
+                GUI.changed = true;
             }
             GUILayout.Space(10);
             GUILayout.BeginVertical();
@@ -139,6 +140,7 @@ class exSpriteEditor : exSpriteBaseEditor {
                      editIndex != editSprite.index )
                 {
                     editSprite.SetSprite( editAtlas, editIndex );
+                    GUI.changed = true;
                 }
             }
             // if we don't use atlas and current edit target use atlas, clear it.
@@ -149,14 +151,8 @@ class exSpriteEditor : exSpriteBaseEditor {
 
             // check if we are first time assignment
             if ( useAtlas || editTexture != null ) {
-                if ( editSprite.renderer.sharedMaterial == null ) {
+                if ( editSprite.meshFilter.sharedMesh == null ) {
                     needRebuild = true;
-                }
-                else if ( editSprite.meshFilter.sharedMesh == null ) {
-                    bool isPrefab = (EditorUtility.GetPrefabType(target) == PrefabType.Prefab); 
-                    if ( isPrefab == false ) {
-                        needRebuild = true;
-                    }
                 }
             }
         }
@@ -169,6 +165,7 @@ class exSpriteEditor : exSpriteBaseEditor {
         bool newTrimTexture = EditorGUILayout.Toggle ( "Trim Texture", editSprite.trimTexture );
         if ( !useAtlas && 
              (textureChanged || newTrimTexture != editSprite.trimTexture) ) {
+            editSprite.renderer.sharedMaterial = exEditorHelper.GetDefaultMaterial(editTexture);
             editSprite.trimTexture = newTrimTexture; 
 
             // get trimUV
@@ -191,7 +188,8 @@ class exSpriteEditor : exSpriteBaseEditor {
                 }
             }
             editSprite.trimUV = trimUV;
-            needRebuild = true;
+            editSprite.updateFlags |= exPlane.UpdateFlags.UV;
+            editSprite.updateFlags |= exPlane.UpdateFlags.Vertex;
         }
         GUI.enabled = true;
 
@@ -265,7 +263,7 @@ class exSpriteEditor : exSpriteBaseEditor {
 
         GUILayout.BeginHorizontal();
         GUILayout.Space(30);
-        if ( GUILayout.Button("Reset to original...", GUILayout.Width(150) ) ) {
+        if ( GUILayout.Button("Reset", GUILayout.Width(50) ) ) {
             if ( useAtlas ) {
                 exAtlas.Element el = editAtlas.elements[editIndex];
                 editSprite.width = el.trimRect.width;
@@ -296,7 +294,8 @@ class exSpriteEditor : exSpriteBaseEditor {
 
         // if dirty, build it.
         if ( !EditorApplication.isPlaying && !AnimationUtility.InAnimationMode() ) {
-            if ( needRebuild ) {
+            if ( !isPrefab && needRebuild ) {
+                EditorUtility.ClearProgressBar();
                 editSprite.Build( editTexture );
             }
             else if ( GUI.changed ) {
@@ -312,7 +311,6 @@ class exSpriteEditor : exSpriteBaseEditor {
     // ------------------------------------------------------------------ 
 
     void OnSceneGUI () {
-
         //
         if ( editSprite.meshFilter == null || editSprite.meshFilter.sharedMesh == null ) {
             return;

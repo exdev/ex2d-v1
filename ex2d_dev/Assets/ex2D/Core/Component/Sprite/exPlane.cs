@@ -117,13 +117,12 @@ public class exPlane : MonoBehaviour {
             // NOTE: this is because prefab may missing link of main camera ( but will not missing second one )
             if ( camera_ != null )
                 return camera_; 
-            camera_ = Camera.main; 
-            return camera_;
+            return Camera.main; 
         }
         set {
             Camera newCamera = value;
-            if ( newCamera == null )
-                newCamera = Camera.main;
+            // if ( newCamera == null )
+            //     newCamera = Camera.main;
             if ( newCamera != camera_ ) {
                 camera_ = newCamera;
                 if ( layer2d )

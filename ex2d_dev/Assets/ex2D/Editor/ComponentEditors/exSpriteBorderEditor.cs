@@ -47,7 +47,9 @@ class exSpriteBorderEditor : exSpriteBaseEditor {
             }
         }
         else {
+            exGUIBorder guiBorder = _sprite.guiBorder;
             _sprite.Clear();
+            _sprite.SetBorder( guiBorder, null, -1 );
         }
     }
 
@@ -83,7 +85,7 @@ class exSpriteBorderEditor : exSpriteBaseEditor {
         bool needRebuild = false;
 
         // ======================================================== 
-        // Texture preview (input)
+        // exGUIBorder object filed
         // ======================================================== 
 
         bool borderChanged = false;
@@ -98,6 +100,7 @@ class exSpriteBorderEditor : exSpriteBaseEditor {
                                                                                  , false
 #endif
                                                                                );
+
             if ( newGUIBorder != editSpriteBorder.guiBorder ) {
                 borderChanged = true;
             }
@@ -109,10 +112,39 @@ class exSpriteBorderEditor : exSpriteBaseEditor {
         GUILayout.EndHorizontal();
         GUILayout.Space(5);
 
-        // get ElementInfo first
+        // get edit texture
         Texture2D editTexture = null;
-        if ( newGUIBorder )
+        if ( newGUIBorder ) {
             editTexture = exEditorHelper.LoadAssetFromGUID<Texture2D>(newGUIBorder.textureGUID); 
+
+            // ======================================================== 
+            // border preview
+            // ======================================================== 
+
+            Rect lastRect = GUILayoutUtility.GetLastRect ();  
+            GUILayout.BeginHorizontal();
+                GUILayout.Space(30);
+                lastRect = GUILayoutUtility.GetLastRect ();  
+                Rect previewRect = new Rect ( lastRect.xMax, 
+                                              lastRect.yMax, 
+                                              Mathf.Max(100,newGUIBorder.border.horizontal), 
+                                              Mathf.Max(100,newGUIBorder.border.vertical) );
+                exGUIBorderInspector.TexturePreviewField ( previewRect, newGUIBorder, editTexture );
+
+                GUILayout.Space(10);
+                lastRect = GUILayoutUtility.GetLastRect ();  
+                previewRect = new Rect ( lastRect.x,
+                                         lastRect.yMax, 
+                                         Mathf.Max(100,newGUIBorder.border.horizontal), 
+                                         Mathf.Max(100,newGUIBorder.border.vertical) );
+                exGUIBorderInspector.BorderPreviewField( previewRect, newGUIBorder, editTexture );
+
+                if ( GUILayout.Button("Select...", GUILayout.Width(60), GUILayout.Height(15) ) ) {
+                    EditorGUIUtility.PingObject(editTexture);
+                }
+            GUILayout.EndHorizontal();
+            GUILayout.Space(5);
+        }
 
         // ======================================================== 
         // get atlas element info from atlas database 
@@ -140,27 +172,36 @@ class exSpriteBorderEditor : exSpriteBaseEditor {
                     borderChanged = true;
                 }
             }
+            // if we don't use atlas and current edit target use atlas, clear it.
+            else {
+                if ( editSpriteBorder.useAtlas ) {
+                    borderChanged = true;
+                }
+            }
 
             // check if we are first time assignment
             if ( useAtlas || editTexture != null ) {
-                if ( editSpriteBorder.renderer.sharedMaterial == null ) {
+                if ( editSpriteBorder.meshFilter.sharedMesh == null ) {
                     needRebuild = true;
-                }
-                else if ( editSpriteBorder.meshFilter.sharedMesh == null ) {
-                    bool isPrefab = (EditorUtility.GetPrefabType(target) == PrefabType.Prefab); 
-                    if ( isPrefab == false ) {
-                        needRebuild = true;
-                    }
                 }
             }
         }
 
         // set border
         if ( borderChanged ) {
-            if ( newGUIBorder == null )
+            //
+            if ( newGUIBorder == null ) {
                 editSpriteBorder.Clear();
-            else
+            }
+            else {
                 editSpriteBorder.SetBorder( newGUIBorder, editAtlas, editIndex );
+                if ( editSpriteBorder.useAtlas == false ) {
+                    editSpriteBorder.renderer.sharedMaterial = exEditorHelper.GetDefaultMaterial(editTexture);
+                    editSpriteBorder.updateFlags |= exPlane.UpdateFlags.UV;
+                }
+            }
+
+            GUI.changed = true;
         }
 
         // ======================================================== 
@@ -216,6 +257,7 @@ class exSpriteBorderEditor : exSpriteBaseEditor {
                 newHeight = 1.0f;
             editSpriteBorder.height = newHeight;
         }
+        GUI.enabled = true;
 
         // ======================================================== 
         // Rebuild button
@@ -233,7 +275,8 @@ class exSpriteBorderEditor : exSpriteBaseEditor {
 
         // if dirty, build it.
         if ( !EditorApplication.isPlaying && !AnimationUtility.InAnimationMode() ) {
-            if ( needRebuild ) {
+            if ( !isPrefab && needRebuild ) {
+                EditorUtility.ClearProgressBar();
                 editSpriteBorder.Build( editTexture );
             }
             else if ( GUI.changed ) {

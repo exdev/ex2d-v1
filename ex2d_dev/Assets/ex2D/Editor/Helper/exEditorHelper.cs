@@ -257,6 +257,56 @@ public static class exEditorHelper {
     }
 
     ///////////////////////////////////////////////////////////////////////////////
+    // material
+    ///////////////////////////////////////////////////////////////////////////////
+
+    // ------------------------------------------------------------------ 
+    /// \param _texture the material for this texture
+    /// \return the result material
+    /// Get default material from the in texture. This function will try to
+    /// find a texture material in the same directory with the same name. If
+    /// no material found, it will find if there have one in Material/ folder
+    /// relate to texture path. If still not found, it will create a ex2D/Alpha Blended
+    /// material at Material/ and give it the same name as texture and return it.
+    // ------------------------------------------------------------------ 
+
+    public static Material GetDefaultMaterial ( Texture2D _texture ) {
+        if ( _texture == null )
+            return null;
+
+        string texturePath = AssetDatabase.GetAssetPath(_texture);
+
+        // load material from "texture_path/Materials/texture_name.mat"
+        string materialDirectory = Path.Combine( Path.GetDirectoryName(texturePath), "Materials" );
+        string materialPath = Path.Combine( materialDirectory, _texture.name + ".mat" );
+        Material newMaterial = (Material)AssetDatabase.LoadAssetAtPath(materialPath, typeof(Material));
+
+        // if not found, load material from "texture_path/texture_name.mat"
+        if ( newMaterial == null ) {
+            newMaterial = (Material)AssetDatabase.LoadAssetAtPath( Path.Combine( Path.GetDirectoryName(texturePath), 
+                                                                                 Path.GetFileNameWithoutExtension(texturePath) + ".mat" ), 
+                                                                   typeof(Material) );
+        }
+
+        // if still not found, create it!
+        if ( newMaterial == null ) {
+            // check if directory exists, if not, create one.
+            DirectoryInfo info = new DirectoryInfo(materialDirectory);
+            if ( info.Exists == false )
+                AssetDatabase.CreateFolder ( texturePath, "Materials" );
+
+            // create temp materal
+            newMaterial = new Material( Shader.Find("ex2D/Alpha Blended") );
+            newMaterial.mainTexture = _texture;
+
+            AssetDatabase.CreateAsset(newMaterial, materialPath);
+            AssetDatabase.Refresh();
+        }
+
+        return newMaterial;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////
     // special styles
     ///////////////////////////////////////////////////////////////////////////////
 

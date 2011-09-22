@@ -39,7 +39,9 @@ class exPlaneEditor : Editor {
 
     private exPlane editPlane;
     protected bool inAnimMode = false;
+    protected bool isPrefab = false;
     protected Transform2D trans2d = Transform2D.None;
+    protected GUIStyle labelStyle = new GUIStyle();
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -78,10 +80,15 @@ class exPlaneEditor : Editor {
 	override public void OnInspectorGUI () {
         exSprite editSprite = target as exSprite;
         inAnimMode = AnimationUtility.InAnimationMode();
+        isPrefab = (EditorUtility.GetPrefabType(target) == PrefabType.Prefab); 
 
         EditorGUIUtility.LookLikeInspector ();
         EditorGUILayout.Space ();
         EditorGUI.indentLevel = 1;
+
+        if ( isPrefab && editPlane.meshFilter && editPlane.meshFilter.sharedMesh ) {
+            editPlane.meshFilter.sharedMesh = null;
+        }
 
         // TODO: I do not know how to do it. { 
         // // ======================================================== 
@@ -183,13 +190,31 @@ class exPlaneEditor : Editor {
 
         GUI.enabled = !inAnimMode;
         EditorGUIUtility.LookLikeControls ();
-        editPlane.renderCamera = (Camera)EditorGUILayout.ObjectField( "Camera"
-                                                                      , editPlane.renderCamera 
-                                                                      , typeof(Camera) 
+        if ( isPrefab ) {
+            GUILayout.BeginHorizontal();
+                bool isPrefabCamera = (EditorUtility.GetPrefabType(editPlane.renderCamera) == PrefabType.Prefab);
+                editPlane.renderCamera = (Camera)EditorGUILayout.ObjectField( "Camera"
+                                                                              , isPrefabCamera ? editPlane.renderCamera : null 
+                                                                              , typeof(Camera) 
 #if !UNITY_3_0 && !UNITY_3_1 && !UNITY_3_3
-                                                                      , true 
+                                                                              , false 
 #endif
-                                                                      , GUILayout.Width(300) );
+                                                                              , GUILayout.Width(250) );
+                labelStyle.fontStyle = FontStyle.Bold;
+                labelStyle.normal.textColor = Color.yellow;
+                GUILayout.Label( "(Prefab Only)", labelStyle );
+            GUILayout.EndHorizontal();
+            GUILayout.Space(5);
+        }
+        else {
+            editPlane.renderCamera = (Camera)EditorGUILayout.ObjectField( "Camera"
+                                                                          , editPlane.renderCamera 
+                                                                          , typeof(Camera) 
+#if !UNITY_3_0 && !UNITY_3_1 && !UNITY_3_3
+                                                                          , true 
+#endif
+                                                                          , GUILayout.Width(250) );
+        }
         EditorGUIUtility.LookLikeInspector ();
 
         // ======================================================== 

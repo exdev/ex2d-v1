@@ -60,6 +60,15 @@ public static class exSpriteUtility {
             return;
         }
 
+        // set a texture to it
+        if ( _sprite.atlas != null ) {
+            _sprite.renderer.sharedMaterial = _sprite.atlas.material;
+        }
+        else if ( _texture != null ) {
+            _sprite.renderer.sharedMaterial = exEditorHelper.GetDefaultMaterial(_texture);
+        }
+        EditorUtility.UnloadUnusedAssets();
+
         //
         if ( _sprite.useAtlas == false && _sprite.customSize == false && _sprite.trimTexture == false ) {
             _sprite.width = _texture.width;
@@ -77,44 +86,6 @@ public static class exSpriteUtility {
         // set the new mesh in MeshFilter
         GameObject.DestroyImmediate( _sprite.meshFilter.sharedMesh, true ); // delete old mesh (to avoid leaking)
         _sprite.meshFilter.sharedMesh = newMesh; 
-
-        // set a texture to it
-        if ( _sprite.atlas != null ) {
-            _sprite.renderer.sharedMaterial = _sprite.atlas.material;
-        }
-        else if ( _texture != null ) {
-            string texturePath = AssetDatabase.GetAssetPath(_texture);
-
-            // load material from "texture_path/Materials/texture_name.mat"
-            string materialDirectory = Path.Combine( Path.GetDirectoryName(texturePath), "Materials" );
-            string materialPath = Path.Combine( materialDirectory, _texture.name + ".mat" );
-            Material newMaterial = (Material)AssetDatabase.LoadAssetAtPath(materialPath, typeof(Material));
-
-            // if not found, load material from "texture_path/texture_name.mat"
-            if ( newMaterial == null ) {
-                newMaterial = (Material)AssetDatabase.LoadAssetAtPath( Path.Combine( Path.GetDirectoryName(texturePath), 
-                                                                                     Path.GetFileNameWithoutExtension(texturePath) + ".mat" ), 
-                                                                       typeof(Material) );
-            }
-
-            if ( newMaterial == null ) {
-                // check if directory exists, if not, create one.
-                DirectoryInfo info = new DirectoryInfo(materialDirectory);
-                if ( info.Exists == false )
-                    AssetDatabase.CreateFolder ( texturePath, "Materials" );
-
-                // create temp materal
-                newMaterial = new Material( Shader.Find("ex2D/Alpha Blended") );
-                newMaterial.mainTexture = _texture;
-
-                AssetDatabase.CreateAsset(newMaterial, materialPath);
-                AssetDatabase.Refresh();
-            }
-
-            // assign it
-            _sprite.renderer.sharedMaterial = newMaterial;
-        }
-        EditorUtility.UnloadUnusedAssets();
 
         // update layer2d
         if ( _sprite.layer2d ) {

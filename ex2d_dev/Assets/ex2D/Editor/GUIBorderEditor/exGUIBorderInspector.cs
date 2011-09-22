@@ -90,7 +90,9 @@ class exGUIBorderInspector : Editor {
             EditorGUIUtility.LookLikeInspector ();
             if ( newTexture != editTexture ) {
                 editTexture = newTexture;
-                editTexture.filterMode = FilterMode.Point;
+                // DISABLE: some gui are good in bilinear filter (controls/window), 
+                //          some are good in point filter (controls/boxOver)
+                // editTexture.filterMode = FilterMode.Point;
                 curEdit.textureGUID = exEditorHelper.AssetToGUID(editTexture);
                 curEdit.border = new RectOffset ( 0, 0, 0, 0 );
             }
@@ -189,7 +191,7 @@ class exGUIBorderInspector : Editor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    void TexturePreviewField ( Rect _rect, exGUIBorder _guiBorder, Texture2D _texture ) {
+    public static void TexturePreviewField ( Rect _rect, exGUIBorder _guiBorder, Texture2D _texture ) {
 
         if ( _texture == null )
             return;
@@ -230,7 +232,7 @@ class exGUIBorderInspector : Editor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    void BorderPreviewField ( Rect _rect, exGUIBorder _guiBorder, Texture2D _texture ) {
+    public static void BorderPreviewField ( Rect _rect, exGUIBorder _guiBorder, Texture2D _texture ) {
 
         if ( _texture == null )
             return;
@@ -362,7 +364,7 @@ class exGUIBorderInspector : Editor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    void DrawGrid ( Rect _dest, Rect _src, Texture2D _texture ) {
+    static void DrawGrid ( Rect _dest, Rect _src, Texture2D _texture ) {
 
         GUI.BeginGroup( _dest );
             GUI.DrawTexture( new Rect( -_src.x * _src.width,

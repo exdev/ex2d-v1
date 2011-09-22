@@ -96,12 +96,14 @@ public static class exSceneHelper {
             if ( spBase is exSpriteBorder ) {
                 exSpriteBorder spBorder = spBase as exSpriteBorder; 
 
-                exAtlasDB.ElementInfo elInfo = exAtlasDB.GetElementInfo(spBorder.guiBorder.textureGUID);
-                exSpriteBorderEditor.UpdateAtlas( spBorder, elInfo );
-
                 Texture2D texture = null;
-                if ( spBorder.useAtlas == false ) {
-                    texture = exEditorHelper.LoadAssetFromGUID<Texture2D>(spBorder.guiBorder.textureGUID );
+                if ( spBorder.guiBorder ) {
+                    exAtlasDB.ElementInfo elInfo = exAtlasDB.GetElementInfo(spBorder.guiBorder.textureGUID);
+                    exSpriteBorderEditor.UpdateAtlas( spBorder, elInfo );
+
+                    if ( spBorder.useAtlas == false ) {
+                        texture = exEditorHelper.LoadAssetFromGUID<Texture2D>(spBorder.guiBorder.textureGUID );
+                    }
                 }
                 spBorder.Build(texture);
             }
@@ -202,6 +204,52 @@ public static class exSceneHelper {
                 //
                 if ( needRebuild ) {
                     spFont.Build();
+                }
+            }
+
+            // ======================================================== 
+            // exSpriteBorder
+            // ======================================================== 
+
+            if ( spBase is exSpriteBorder ) {
+                exSpriteBorder spBorder = spBase as exSpriteBorder;
+                exAtlasDB.ElementInfo elInfo = exAtlasDB.GetElementInfo(spBorder.guiBorder.textureGUID);
+                bool needRebuild = false;
+
+                // NOTE: we test spBorder.index is -1 or not instead of test atlas is null, because it is possible we delete an atlas and it will always be null
+                if ( elInfo != null ) {
+                    if ( spBorder.index == -1 ) {
+                        needRebuild = true;
+                    }
+                    else {
+                        // find if the spBorder's atalsInfo need rebuild
+                        foreach ( string guidAtlasInfo in _atlasInfoGUIDs ) {
+                            if ( elInfo.guidAtlasInfo == guidAtlasInfo ) {
+                                needRebuild = true;
+                                break;
+                            }
+                        }
+                    }
+
+                }
+                else {
+                    if ( spBorder.index != -1 ) {
+                        needRebuild = true;
+                    }
+                }
+
+                //
+                if ( needRebuild ) {
+                    exSpriteBorderEditor.UpdateAtlas( spBorder, elInfo );
+                    bool isPrefab = (EditorUtility.GetPrefabType(spBase) == PrefabType.Prefab); 
+                    if ( isPrefab == false ) {
+                        Texture2D texture = null;
+                        if ( spBorder.useAtlas == false ) {
+                            texture = exEditorHelper.LoadAssetFromGUID<Texture2D>(spBorder.guiBorder.textureGUID);
+                        }
+                        spBorder.Build(texture);
+                    }
+                    EditorUtility.SetDirty(spBorder);
                 }
             }
 

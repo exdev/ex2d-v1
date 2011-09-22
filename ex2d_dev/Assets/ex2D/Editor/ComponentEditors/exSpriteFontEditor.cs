@@ -154,18 +154,13 @@ class exSpriteFontEditor : exSpriteBaseEditor {
         GUI.enabled = true;
 
         // check if fontInfo change to null
-        if ( editSpriteFont.fontInfo == null ) 
-        {
-            if ( editSpriteFont.meshFilter.sharedMesh != null || 
-                 editSpriteFont.renderer.sharedMaterial != null )
-            {
+        if ( editSpriteFont.fontInfo == null ) {
+            editSpriteFont.Clear ();
+        }
+        else {
+            if ( editSpriteFont.meshFilter.sharedMesh == null ) {
                 needRebuild = true;
             }
-        }
-        else if ( editSpriteFont.meshFilter.sharedMesh == null || 
-                  editSpriteFont.renderer.sharedMaterial == null ) 
-        {
-            needRebuild = true;
         }
 
         // ======================================================== 
@@ -282,7 +277,8 @@ class exSpriteFontEditor : exSpriteBaseEditor {
 
         // if dirty, build it.
         if ( !EditorApplication.isPlaying && !AnimationUtility.InAnimationMode() ) {
-            if ( needRebuild ) {
+            if ( !isPrefab && needRebuild ) {
+                EditorUtility.ClearProgressBar();
                 editSpriteFont.Build();
             }
             else if ( GUI.changed ) {

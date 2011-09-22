@@ -288,8 +288,8 @@ public class exSpriteFont : exSpriteBase {
 
     void CalculateSize ( out float[] _lineWidths,
                          out float[] _kernings, 
-                         out float _halfWidth,
-                         out float _halfHeight,
+                         out float _halfWidthScaled,
+                         out float _halfHeightScaled,
                          out float _offsetX,
                          out float _offsetY )
     {
@@ -345,24 +345,24 @@ public class exSpriteFont : exSpriteBase {
             _lineWidths[curLine] = curWidth;
         }
 
-        _halfWidth = maxWidth * scale_.x * 0.5f;
-        _halfHeight = height * scale_.y * 0.5f;
+        _halfWidthScaled = maxWidth * scale_.x * 0.5f;
+        _halfHeightScaled = height * scale_.y * 0.5f;
         _offsetX = 0.0f;
         _offsetY = 0.0f;
 
         // calculate anchor offset
         switch ( anchor_ ) {
-        case Anchor.TopLeft     : _offsetX = -_halfWidth;  _offsetY = -_halfHeight;  break;
-        case Anchor.TopCenter   : _offsetX = 0.0f;         _offsetY = -_halfHeight;  break;
-        case Anchor.TopRight    : _offsetX = _halfWidth;   _offsetY = -_halfHeight;  break;
+        case Anchor.TopLeft     : _offsetX = -_halfWidthScaled;  _offsetY = -_halfHeightScaled;  break;
+        case Anchor.TopCenter   : _offsetX = 0.0f;         _offsetY = -_halfHeightScaled;  break;
+        case Anchor.TopRight    : _offsetX = _halfWidthScaled;   _offsetY = -_halfHeightScaled;  break;
 
-        case Anchor.MidLeft     : _offsetX = -_halfWidth;  _offsetY = 0.0f;          break;
+        case Anchor.MidLeft     : _offsetX = -_halfWidthScaled;  _offsetY = 0.0f;          break;
         case Anchor.MidCenter   : _offsetX = 0.0f;         _offsetY = 0.0f;          break;
-        case Anchor.MidRight    : _offsetX = _halfWidth;   _offsetY = 0.0f;          break;
+        case Anchor.MidRight    : _offsetX = _halfWidthScaled;   _offsetY = 0.0f;          break;
 
-        case Anchor.BotLeft     : _offsetX = -_halfWidth;  _offsetY = _halfHeight;   break;
-        case Anchor.BotCenter   : _offsetX = 0.0f;         _offsetY = _halfHeight;   break;
-        case Anchor.BotRight    : _offsetX = _halfWidth;   _offsetY = _halfHeight;   break;
+        case Anchor.BotLeft     : _offsetX = -_halfWidthScaled;  _offsetY = _halfHeightScaled;   break;
+        case Anchor.BotCenter   : _offsetX = 0.0f;         _offsetY = _halfHeightScaled;   break;
+        case Anchor.BotRight    : _offsetX = _halfWidthScaled;   _offsetY = _halfHeightScaled;   break;
 
         default                 : _offsetX = 0.0f;         _offsetY = 0.0f;          break;
         }
@@ -554,30 +554,30 @@ public class exSpriteFont : exSpriteBase {
 
             float[] lineWidths;
             float[] kernings;
-            float halfWidth;
-            float halfHeight;
+            float halfWidthScaled;
+            float halfHeightScaled;
             float offsetX;
             float offsetY;
             CalculateSize ( out lineWidths,
                             out kernings, 
-                            out halfWidth,
-                            out halfHeight,
+                            out halfWidthScaled,
+                            out halfHeightScaled,
                             out offsetX,
                             out offsetY );
 
             // get clip info first
-            float width = 2.0f * halfWidth;
-            float height = 2.0f * halfHeight;
+            float widthScaled = 2.0f * halfWidthScaled;
+            float heightScaled = 2.0f * halfHeightScaled;
 
             float clipLeft   = 0.0f; 
             float clipRight  = 0.0f; 
             float clipTop    = 0.0f; 
             float clipBottom = 0.0f;
 
-            float xMinClip = -halfWidth;
-            float xMaxClip =  halfWidth;
-            float yMinClip = -halfHeight;
-            float yMaxClip =  halfHeight;
+            float xMinClip = -halfWidthScaled;
+            float xMaxClip =  halfWidthScaled;
+            float yMinClip = -halfHeightScaled;
+            float yMaxClip =  halfHeightScaled;
 
             if ( clipInfo_.clipped ) {
                 if ( scale_.x >= 0.0f ) {
@@ -599,10 +599,10 @@ public class exSpriteFont : exSpriteBase {
                 }
 
                 //
-                xMinClip = width  * ( -0.5f + clipLeft   );
-                xMaxClip = width  * (  0.5f - clipRight  );
-                yMinClip = height * ( -0.5f + clipTop    );
-                yMaxClip = height * (  0.5f - clipBottom );
+                xMinClip = widthScaled  * ( -0.5f + clipLeft   );
+                xMaxClip = widthScaled  * (  0.5f - clipRight  );
+                yMinClip = heightScaled * ( -0.5f + clipTop    );
+                yMaxClip = heightScaled * (  0.5f - clipBottom );
             }
 
             //
@@ -619,10 +619,10 @@ public class exSpriteFont : exSpriteBase {
                     curX = 0.0f;
                     break;
                 case TextAlign.Center:
-                    curX = halfWidth - lineWidths[curLine] * 0.5f * scale_.x;
+                    curX = halfWidthScaled - lineWidths[curLine] * 0.5f * scale_.x;
                     break;
                 case TextAlign.Right:
-                    curX = halfWidth * 2.0f - lineWidths[curLine] * scale_.x;
+                    curX = halfWidthScaled * 2.0f - lineWidths[curLine] * scale_.x;
                     break;
                 }
             }
@@ -639,10 +639,10 @@ public class exSpriteFont : exSpriteBase {
                             curX = 0.0f;
                             break;
                         case TextAlign.Center:
-                            curX = halfWidth - lineWidths[curLine] * 0.5f * scale_.x;
+                            curX = halfWidthScaled - lineWidths[curLine] * 0.5f * scale_.x;
                             break;
                         case TextAlign.Right:
-                            curX = halfWidth * 2.0f - lineWidths[curLine] * scale_.x;
+                            curX = halfWidthScaled * 2.0f - lineWidths[curLine] * scale_.x;
                             break;
                         }
                         curY = curY + fontInfo_.lineHeight * scale_.y + lineSpacing_;
@@ -669,8 +669,8 @@ public class exSpriteFont : exSpriteBase {
                             int j = r * 2 + c;
 
                             // calculate the base pos
-                            float x = curX - halfWidth + c * charInfo.width * scale_.x + charInfo.xoffset * scale_.x;
-                            float y = -curY + halfHeight - r * charInfo.height * scale_.y - charInfo.yoffset * scale_.y;
+                            float x = curX - halfWidthScaled + c * charInfo.width * scale_.x + charInfo.xoffset * scale_.x;
+                            float y = -curY + halfHeightScaled - r * charInfo.height * scale_.y - charInfo.yoffset * scale_.y;
 
                             // do clip
                             if ( clipInfo_.clipped ) {
@@ -794,10 +794,10 @@ public class exSpriteFont : exSpriteBase {
             // _mesh.normals = normals;
             _mesh.uv = uvs;
             _mesh.triangles = indices; 
-            _mesh.bounds = GetMeshBounds ( offsetX, offsetY, halfWidth * 2.0f, halfHeight * 2.0f );
+            _mesh.bounds = GetMeshBounds ( offsetX, offsetY, halfWidthScaled * 2.0f, halfHeightScaled * 2.0f );
 
             // update box-collider if we have
-            UpdateBoundRect ( offsetX, offsetY, halfWidth * 2.0f, halfHeight * 2.0f );
+            UpdateBoundRect ( offsetX, offsetY, halfWidthScaled * 2.0f, halfHeightScaled * 2.0f );
             if ( collisionHelper ) 
                 collisionHelper.UpdateCollider();
 
@@ -814,14 +814,14 @@ public class exSpriteFont : exSpriteBase {
 
             float[] lineWidths;
             float[] kernings;
-            float halfWidth;
-            float halfHeight;
+            float halfWidthScaled;
+            float halfHeightScaled;
             float offsetX;
             float offsetY;
             CalculateSize ( out lineWidths,
                             out kernings, 
-                            out halfWidth,
-                            out halfHeight,
+                            out halfWidthScaled,
+                            out halfHeightScaled,
                             out offsetX,
                             out offsetY );
 
@@ -837,10 +837,10 @@ public class exSpriteFont : exSpriteBase {
                     curX = 0.0f;
                     break;
                 case TextAlign.Center:
-                    curX = halfWidth - lineWidths[curLine] * 0.5f * scale_.x;
+                    curX = halfWidthScaled - lineWidths[curLine] * 0.5f * scale_.x;
                     break;
                 case TextAlign.Right:
-                    curX = halfWidth * 2.0f - lineWidths[curLine] * scale_.x;
+                    curX = halfWidthScaled * 2.0f - lineWidths[curLine] * scale_.x;
                     break;
                 }
             }
@@ -857,10 +857,10 @@ public class exSpriteFont : exSpriteBase {
                             curX = 0.0f;
                             break;
                         case TextAlign.Center:
-                            curX = halfWidth - lineWidths[curLine] * 0.5f * scale_.x;
+                            curX = halfWidthScaled - lineWidths[curLine] * 0.5f * scale_.x;
                             break;
                         case TextAlign.Right:
-                            curX = halfWidth * 2.0f - lineWidths[curLine] * scale_.x;
+                            curX = halfWidthScaled * 2.0f - lineWidths[curLine] * scale_.x;
                             break;
                         }
                         curY = curY + fontInfo_.lineHeight * scale_.y + lineSpacing_;
@@ -879,8 +879,8 @@ public class exSpriteFont : exSpriteBase {
                             int j = r * 2 + c;
 
                             // calculate the base pos
-                            float x = curX - halfWidth + c * charInfo.width * scale_.x + charInfo.xoffset * scale_.x;
-                            float y = -curY + halfHeight - r * charInfo.height * scale_.y - charInfo.yoffset * scale_.y;
+                            float x = curX - halfWidthScaled + c * charInfo.width * scale_.x + charInfo.xoffset * scale_.x;
+                            float y = -curY + halfHeightScaled - r * charInfo.height * scale_.y - charInfo.yoffset * scale_.y;
 
                             // calculate the pos affect by anchor
                             x -= offsetX;
@@ -936,10 +936,10 @@ public class exSpriteFont : exSpriteBase {
             }
 
             _mesh.vertices = vertices;
-            _mesh.bounds = GetMeshBounds ( offsetX, offsetY, halfWidth * 2.0f, halfHeight * 2.0f );
+            _mesh.bounds = GetMeshBounds ( offsetX, offsetY, halfWidthScaled * 2.0f, halfHeightScaled * 2.0f );
 
             // update collider if we have
-            UpdateBoundRect ( offsetX, offsetY, halfWidth * 2.0f, halfHeight * 2.0f );
+            UpdateBoundRect ( offsetX, offsetY, halfWidthScaled * 2.0f, halfHeightScaled * 2.0f );
             if ( collisionHelper ) 
                 collisionHelper.UpdateCollider();
 
@@ -1049,7 +1049,6 @@ public class exSpriteFont : exSpriteBase {
     // ------------------------------------------------------------------ 
 
     public void Clear () {
-        text_ = ""; 
         fontInfo_ = null;
 
         if ( renderer != null )

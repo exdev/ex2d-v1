@@ -228,35 +228,80 @@ public class exSpriteBorder : exSpriteBase {
             float y2 = y1 - centerHeight * scale_.y; 
             float y3 = y2 - guiBorder_.border.bottom * scale_.y; 
 
-            // TODO { 
-            // // do clip
-            // if ( clipInfo_.clipped ) {
-            //     if ( _x <= _xMinClip ) {
-            //         _x = _xMinClip;
-            //     }
-            //     else if ( _x >= _xMaxClip ) {
-            //         _x = _xMaxClip;
-            //     }
+            // do clip
+            if ( clipInfo_.clipped ) {
+                // xMinClip
+                if ( x2 <= xMinClip ) {
+                    clipLeft = (xMinClip - x3) / (guiBorder_.border.right * scale_.x); 
+                    x0 = xMinClip;
+                    x1 = xMinClip;
+                    x2 = xMinClip;
+                }
+                else if ( x1 <= xMinClip ) {
+                    clipLeft = 0.0f; // FIXME
+                    x0 = xMinClip;
+                    x1 = xMinClip;
+                }
+                else if ( x0 <= xMinClip ) {
+                    clipLeft = (xMinClip - x0) / (float)(guiBorder_.border.left * scale_.x); 
+                    x0 = xMinClip;
+                }
 
-            //     if ( _y <= _yMinClip ) {
-            //         _y = _yMinClip;
-            //     }
-            //     else if ( _y >= _yMaxClip ) {
-            //         _y = _yMaxClip;
-            //     }
-            // }
-            // } TODO end 
+                // xMaxClip
+                if ( x1 >= xMaxClip ) {
+                    clipRight = (x0 - xMaxClip) / (guiBorder_.border.left * scale_.x); 
+                    x1 = xMaxClip;
+                    x2 = xMaxClip;
+                    x3 = xMaxClip;
+                }
+                else if ( x2 >= xMaxClip ) {
+                    clipRight = 0.0f; // FIXME
+                    x2 = xMaxClip;
+                    x3 = xMaxClip;
+                }
+                else if ( x3 >= xMaxClip ) {
+                    clipRight = (x3 - xMaxClip) / (guiBorder_.border.right * scale_.x); 
+                    x3 = xMaxClip;
+                }
+
+                // yMinClip
+                if ( y1 <= yMinClip ) {
+                    clipTop = (yMinClip - y0) / (guiBorder_.border.bottom * scale_.y); 
+                    y1 = yMinClip;
+                    y2 = yMinClip;
+                    y3 = yMinClip;
+                }
+                else if ( y2 <= yMinClip ) {
+                    clipTop = 0.0f; // FIXME
+                    y2 = yMinClip;
+                    y3 = yMinClip;
+                }
+                else if ( y3 <= yMinClip ) {
+                    clipTop = (yMinClip - y3) / (guiBorder_.border.top * scale_.y); 
+                    y3 = yMinClip;
+                }
+
+                // yMaxClip
+                if ( y2 >= yMaxClip ) {
+                    clipBottom = (y3 - yMaxClip) / (guiBorder_.border.top * scale_.y); 
+                    y0 = yMaxClip;
+                    y1 = yMaxClip;
+                    y2 = yMaxClip;
+                }
+                else if ( y1 >= yMaxClip ) {
+                    clipBottom = 0.0f; // FIXME
+                    y0 = yMaxClip;
+                    y1 = yMaxClip;
+                }
+                else if ( y0 >= yMaxClip ) {
+                    clipBottom = (y0 - yMaxClip) / (guiBorder_.border.bottom * scale_.y); 
+                    y0 = yMaxClip;
+                }
+            }
 
             // calculate the pos affect by anchor
             x0 -= offsetX; x1 -= offsetX; x2 -= offsetX; x3 -= offsetX;
             y0 += offsetY; y1 += offsetY; y2 += offsetY; y3 += offsetY;
-
-            // TODO { 
-            // // calculate the shear
-            // float old_x = x;
-            // _x += _y * shear_.x;
-            // _y += old_x * shear_.y;
-            // } TODO end 
 
             // build vertices
             switch ( plane ) {
@@ -354,35 +399,58 @@ public class exSpriteBorder : exSpriteBase {
                 float topRatio      = (float)guiBorder_.border.top    / (float)atlas_.texture.height; 
                 float bottomRatio   = (float)guiBorder_.border.bottom / (float)atlas_.texture.height; 
 
-                // TODO { 
-                // // do uv clip
-                // if ( clipInfo_.clipped ) {
-                //     xStart  += el.coords.width  * clipLeft;
-                //     yStart  += el.coords.height * clipTop;
-                //     xEnd    -= el.coords.width  * clipRight;
-                //     yEnd    -= el.coords.height * clipBottom;
-                // }
-                // } TODO end 
+                float umin = xStart;
+                float umax = xEnd;
+                float vmin = yStart;
+                float vmax = yEnd;
 
-                uvs[0]  = new Vector2 ( xStart,              yEnd );
-                uvs[1]  = new Vector2 ( xStart + leftRatio,  yEnd );
-                uvs[2]  = new Vector2 ( xEnd   - rightRatio, yEnd );
-                uvs[3]  = new Vector2 ( xEnd,                yEnd );
+                float u0 = xStart; 
+                float u1 = xStart + leftRatio; 
+                float u2 = xEnd - rightRatio; 
+                float u3 = xEnd;
 
-                uvs[4]  = new Vector2 ( xStart,              yEnd - topRatio );
-                uvs[5]  = new Vector2 ( xStart + leftRatio,  yEnd - topRatio );
-                uvs[6]  = new Vector2 ( xEnd   - rightRatio, yEnd - topRatio );
-                uvs[7]  = new Vector2 ( xEnd,                yEnd - topRatio );
+                float v0 = yEnd; 
+                float v1 = yEnd - topRatio; 
+                float v2 = yStart + bottomRatio; 
+                float v3 = yStart;
 
-                uvs[8]  = new Vector2 ( xStart,              yStart + bottomRatio );
-                uvs[9]  = new Vector2 ( xStart + leftRatio,  yStart + bottomRatio );
-                uvs[10] = new Vector2 ( xEnd   - rightRatio, yStart + bottomRatio );
-                uvs[11] = new Vector2 ( xEnd,                yStart + bottomRatio );
+                // do uv clip
+                if ( clipInfo_.clipped ) {
+                    umin = clipLeft   >= 0.0f ? xStart + clipLeft * leftRatio     : xEnd   + clipLeft * rightRatio;
+                    umax = clipRight  >= 0.0f ? xEnd   - clipRight * rightRatio   : xStart - clipRight * leftRatio;
+                    vmin = clipTop    >= 0.0f ? yStart + clipTop * topRatio       : yEnd   + clipTop * bottomRatio;
+                    vmax = clipBottom >= 0.0f ? yEnd   - clipBottom * bottomRatio : yStart - clipBottom * topRatio;
 
-                uvs[12] = new Vector2 ( xStart,              yStart );
-                uvs[13] = new Vector2 ( xStart + leftRatio,  yStart );
-                uvs[14] = new Vector2 ( xEnd   - rightRatio, yStart );
-                uvs[15] = new Vector2 ( xEnd,                yStart );
+                    u0 = Mathf.Clamp ( u0, umin, umax ); 
+                    u1 = Mathf.Clamp ( u1, umin, umax ); 
+                    u2 = Mathf.Clamp ( u2, umin, umax ); 
+                    u3 = Mathf.Clamp ( u3, umin, umax ); 
+
+                    v0 = Mathf.Clamp ( v0, vmin, vmax ); 
+                    v1 = Mathf.Clamp ( v1, vmin, vmax ); 
+                    v2 = Mathf.Clamp ( v2, vmin, vmax ); 
+                    v3 = Mathf.Clamp ( v3, vmin, vmax ); 
+                }
+
+                uvs[0]  = new Vector2 ( u0, v0 );
+                uvs[1]  = new Vector2 ( u1, v0 );
+                uvs[2]  = new Vector2 ( u2, v0 );
+                uvs[3]  = new Vector2 ( u3, v0 );
+
+                uvs[4]  = new Vector2 ( u0, v1 );
+                uvs[5]  = new Vector2 ( u1, v1 );
+                uvs[6]  = new Vector2 ( u2, v1 );
+                uvs[7]  = new Vector2 ( u3, v1 );
+
+                uvs[8]  = new Vector2 ( u0, v2 );
+                uvs[9]  = new Vector2 ( u1, v2 );
+                uvs[10] = new Vector2 ( u2, v2 );
+                uvs[11] = new Vector2 ( u3, v2 );
+
+                uvs[12] = new Vector2 ( u0, v3 );
+                uvs[13] = new Vector2 ( u1, v3 );
+                uvs[14] = new Vector2 ( u2, v3 );
+                uvs[15] = new Vector2 ( u3, v3 );
             }
             else {
                 float xStart  = 0.0f;
@@ -396,35 +464,58 @@ public class exSpriteBorder : exSpriteBase {
                 float topRatio      = (float)guiBorder_.border.top    / (float)texture.height; 
                 float bottomRatio   = (float)guiBorder_.border.bottom / (float)texture.height; 
 
-                // TODO { 
-                // // do uv clip
-                // if ( clipInfo_.clipped ) {
-                //     xStart  += trimUV.width  * clipLeft;
-                //     yStart  += trimUV.height * clipTop;
-                //     xEnd    -= trimUV.width  * clipRight;
-                //     yEnd    -= trimUV.height * clipBottom;
-                // }
-                // } TODO end 
+                float umin = xStart;
+                float umax = xEnd;
+                float vmin = yStart;
+                float vmax = yEnd;
 
-                uvs[0]  = new Vector2 ( xStart,              yEnd );
-                uvs[1]  = new Vector2 ( xStart + leftRatio,  yEnd );
-                uvs[2]  = new Vector2 ( xEnd   - rightRatio, yEnd );
-                uvs[3]  = new Vector2 ( xEnd,                yEnd );
+                float u0 = xStart; 
+                float u1 = xStart + leftRatio; 
+                float u2 = xEnd - rightRatio; 
+                float u3 = xEnd;
 
-                uvs[4]  = new Vector2 ( xStart,              yEnd - topRatio );
-                uvs[5]  = new Vector2 ( xStart + leftRatio,  yEnd - topRatio );
-                uvs[6]  = new Vector2 ( xEnd   - rightRatio, yEnd - topRatio );
-                uvs[7]  = new Vector2 ( xEnd,                yEnd - topRatio );
+                float v0 = yEnd; 
+                float v1 = yEnd - topRatio; 
+                float v2 = yStart + bottomRatio; 
+                float v3 = yStart;
 
-                uvs[8]  = new Vector2 ( xStart,              yStart + bottomRatio );
-                uvs[9]  = new Vector2 ( xStart + leftRatio,  yStart + bottomRatio );
-                uvs[10] = new Vector2 ( xEnd   - rightRatio, yStart + bottomRatio );
-                uvs[11] = new Vector2 ( xEnd,                yStart + bottomRatio );
+                // do uv clip
+                if ( clipInfo_.clipped ) {
+                    umin = clipLeft   >= 0.0f ? xStart + clipLeft * leftRatio     : xEnd   + clipLeft * rightRatio;
+                    umax = clipRight  >= 0.0f ? xEnd   - clipRight * rightRatio   : xStart - clipRight * leftRatio;
+                    vmin = clipTop    >= 0.0f ? yStart + clipTop * topRatio       : yEnd   + clipTop * bottomRatio;
+                    vmax = clipBottom >= 0.0f ? yEnd   - clipBottom * bottomRatio : yStart - clipBottom * topRatio;
 
-                uvs[12] = new Vector2 ( xStart,              yStart );
-                uvs[13] = new Vector2 ( xStart + leftRatio,  yStart );
-                uvs[14] = new Vector2 ( xEnd   - rightRatio, yStart );
-                uvs[15] = new Vector2 ( xEnd,                yStart );
+                    u0 = Mathf.Clamp ( u0, umin, umax ); 
+                    u1 = Mathf.Clamp ( u1, umin, umax ); 
+                    u2 = Mathf.Clamp ( u2, umin, umax ); 
+                    u3 = Mathf.Clamp ( u3, umin, umax ); 
+
+                    v0 = Mathf.Clamp ( v0, vmin, vmax ); 
+                    v1 = Mathf.Clamp ( v1, vmin, vmax ); 
+                    v2 = Mathf.Clamp ( v2, vmin, vmax ); 
+                    v3 = Mathf.Clamp ( v3, vmin, vmax ); 
+                }
+
+                uvs[0]  = new Vector2 ( u0, v0 );
+                uvs[1]  = new Vector2 ( u1, v0 );
+                uvs[2]  = new Vector2 ( u2, v0 );
+                uvs[3]  = new Vector2 ( u3, v0 );
+
+                uvs[4]  = new Vector2 ( u0, v1 );
+                uvs[5]  = new Vector2 ( u1, v1 );
+                uvs[6]  = new Vector2 ( u2, v1 );
+                uvs[7]  = new Vector2 ( u3, v1 );
+
+                uvs[8]  = new Vector2 ( u0, v2 );
+                uvs[9]  = new Vector2 ( u1, v2 );
+                uvs[10] = new Vector2 ( u2, v2 );
+                uvs[11] = new Vector2 ( u3, v2 );
+
+                uvs[12] = new Vector2 ( u0, v3 );
+                uvs[13] = new Vector2 ( u1, v3 );
+                uvs[14] = new Vector2 ( u2, v3 );
+                uvs[15] = new Vector2 ( u3, v3 );
             }
             _mesh.uv = uvs;
         }
@@ -587,8 +678,6 @@ public class exSpriteBorder : exSpriteBase {
             index_ = _index;
             updateFlags |= UpdateFlags.UV;
         }
-
     }
-
 }
 

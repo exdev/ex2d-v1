@@ -221,6 +221,7 @@ partial class exTileMapRendererEditor : exPlaneEditor {
         if ( !EditorApplication.isPlaying && !AnimationUtility.InAnimationMode() ) {
             if ( needRebuild ) {
                 // Debug.Log("rebuild mesh...");
+                EditorUtility.ClearProgressBar();
                 editTileMap.Build();
             }
             else if ( GUI.changed ) {

@@ -169,37 +169,8 @@ partial class exTileSheetEditor : EditorWindow {
 
                 // if we have texture but no material, try to find it
                 if ( curEdit.texture != null ) {
-                    string texturePath = AssetDatabase.GetAssetPath(curEdit.texture);
-
-                    // load material from "texture_path/Materials/texture_name.mat"
-                    string materialDirectory = Path.Combine( Path.GetDirectoryName(texturePath), "Materials" );
-                    string materialPath = Path.Combine( materialDirectory, curEdit.texture.name + ".mat" );
-                    Material newMaterial = (Material)AssetDatabase.LoadAssetAtPath(materialPath, typeof(Material));
-
-                    // if not found, load material from "texture_path/texture_name.mat"
-                    if ( newMaterial == null ) {
-                        newMaterial = (Material)AssetDatabase.LoadAssetAtPath( Path.Combine( Path.GetDirectoryName(texturePath), 
-                                                                                             Path.GetFileNameWithoutExtension(texturePath) + ".mat" ), 
-                                                                               typeof(Material) );
-                    }
-
-                    // if still not found, create it!
-                    if ( newMaterial == null ) {
-                        // check if directory exists, if not, create one.
-                        DirectoryInfo info = new DirectoryInfo(materialDirectory);
-                        if ( info.Exists == false )
-                            AssetDatabase.CreateFolder ( texturePath, "Materials" );
-
-                        // create temp materal
-                        newMaterial = new Material( Shader.Find("ex2D/Alpha Blended") );
-                        newMaterial.mainTexture = curEdit.texture;
-
-                        AssetDatabase.CreateAsset(newMaterial, materialPath);
-                        AssetDatabase.Refresh();
-                    }
-
                     // assign it
-                    curEdit.material = newMaterial;
+                    curEdit.material = exEditorHelper.GetDefaultMaterial(curEdit.texture);
                 }
                 // if we don't have texture, set material to null
                 else {

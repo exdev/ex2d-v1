@@ -24,7 +24,7 @@ public class ScrollView : MonoBehaviour {
     // properties
     ///////////////////////////////////////////////////////////////////////////////
 
-    public exSprite scrollButton;
+    public exPlane scrollButton;
     public exPlane scrollPage;
 
     exPlane plane;
