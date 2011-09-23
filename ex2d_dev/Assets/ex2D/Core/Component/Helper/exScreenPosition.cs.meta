@@ -4,3 +4,6 @@ labels:
 - 2d
 - gui
 - screen
+MonoImporter:
+  importerVersion: 1
+  executionOrder: 500

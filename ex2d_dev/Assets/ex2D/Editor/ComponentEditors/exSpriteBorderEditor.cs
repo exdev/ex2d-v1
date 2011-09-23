@@ -287,42 +287,238 @@ class exSpriteBorderEditor : exSpriteBaseEditor {
         }
 	}
 
-    // TODO { 
-    // // ------------------------------------------------------------------ 
-    // // Desc: 
-    // // ------------------------------------------------------------------ 
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
 
-    // void OnSceneGUI () {
+    void OnSceneGUI () {
 
-    //     //
-    //     if ( editSpriteBorder.meshFilter == null || editSpriteBorder.meshFilter.sharedMesh == null ) {
-    //         return;
-    //     }
+        //
+        if ( editSpriteBorder.meshFilter == null || editSpriteBorder.meshFilter.sharedMesh == null ) {
+            return;
+        }
 
-    //     //
-    //     Vector3[] vertices = editSpriteBorder.meshFilter.sharedMesh.vertices;
-    //     if ( vertices.Length > 0 ) {
-    //         Transform trans = editSpriteBorder.transform;
+        //
+        Vector3[] vertices = editSpriteBorder.meshFilter.sharedMesh.vertices;
+        Vector3[] corners = new Vector3[5];
+        Vector3[] controls = new Vector3[8];
 
-    //         Vector3[] w_vertices = new Vector3[5];
-    //         w_vertices[0] = trans.localToWorldMatrix * new Vector4 ( vertices[0].x, vertices[0].y, vertices[0].z, 1.0f );
-    //         w_vertices[1] = trans.localToWorldMatrix * new Vector4 ( vertices[1].x, vertices[1].y, vertices[1].z, 1.0f ); 
-    //         w_vertices[2] = trans.localToWorldMatrix * new Vector4 ( vertices[3].x, vertices[3].y, vertices[3].z, 1.0f ); 
-    //         w_vertices[3] = trans.localToWorldMatrix * new Vector4 ( vertices[2].x, vertices[2].y, vertices[2].z, 1.0f ); 
-    //         w_vertices[4] = w_vertices[0];
+        // 0 -- 1
+        // |    |
+        // 3 -- 2
 
-    //         Handles.DrawPolyLine( w_vertices );
-    //     }
-    // }
-    // } TODO end 
+        Transform trans = editSpriteBorder.transform;
+        corners[0] = trans.localToWorldMatrix * new Vector4 ( vertices[0].x, vertices[0].y, vertices[0].z, 1.0f );
+        corners[1] = trans.localToWorldMatrix * new Vector4 ( vertices[3].x, vertices[3].y, vertices[3].z, 1.0f );
+        corners[2] = trans.localToWorldMatrix * new Vector4 ( vertices[15].x, vertices[15].y, vertices[15].z, 1.0f );
+        corners[3] = trans.localToWorldMatrix * new Vector4 ( vertices[12].x, vertices[12].y, vertices[12].z, 1.0f );
+        corners[4] = corners[0];
+        Handles.DrawPolyLine( corners );
 
-    // TODO { 
-    // // ------------------------------------------------------------------ 
-    // // Desc: 
-    // // ------------------------------------------------------------------ 
+        // 0 -- 1 -- 2
+        // |         |
+        // 7         3
+        // |         |
+        // 6 -- 5 -- 4
 
-    // override protected void AddAnimationHelper () {
-    //     editSpriteBorder.gameObject.AddComponent<exSpriteBorderAnimHelper>();
-    // }
-    // } TODO end 
+        controls[0] = corners[0];
+        controls[1] = (corners[0] + corners[1])/2.0f;
+        controls[2] = corners[1];
+        controls[3] = (corners[1] + corners[2])/2.0f;
+        controls[4] = corners[2];
+        controls[5] = (corners[2] + corners[3])/2.0f;
+        controls[6] = corners[3];
+        controls[7] = (corners[3] + corners[0])/2.0f;
+
+        //
+        for ( int i = 0; i < controls.Length; ++i ) {
+            Vector3 pos = controls[i];
+            Handles.color = new Color( 1.0f, 1.0f, 0.0f, 0.5f );
+            Vector3 newPos = Handles.FreeMoveHandle( pos,
+                                                     editSpriteBorder.transform.rotation,
+                                                     HandleUtility.GetHandleSize(pos) / 10.0f,
+                                                     Vector3.zero,
+                                                     Handles.DotCap
+                                                   );
+            HandleRezie ( i, pos, newPos );
+        }
+        // Handles.Label( editSpriteBorder.transform.position + Vector3.up * 2,
+        //                "Size = " + editSpriteBorder.width + " x " + editSpriteBorder.height );
+
+
+        if (GUI.changed)
+            EditorUtility.SetDirty (editSpriteBorder);
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    override protected void AddAnimationHelper () {
+        editSpriteBorder.gameObject.AddComponent<exSpriteBorderAnimHelper>();
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void HandleRezie ( int _handleID, Vector3 _oldPos, Vector3 _newPos ) {
+        if ( _oldPos == _newPos ) {
+            return;
+        }
+
+        //
+        float dx, dy;
+        GetDelatSize ( _newPos - _oldPos, out dx, out dy );
+
+        float oldWidth = editSpriteBorder.width;
+        float oldHeight = editSpriteBorder.height;
+        float xRatio = 1.0f;
+        float yRatio = 1.0f;
+
+        // 0 -- 1 -- 2
+        // |         |
+        // 7         3
+        // |         |
+        // 6 -- 5 -- 4
+
+        if ( _handleID == 0 ) {
+            switch ( editSpriteBorder.anchor ) {
+            case exPlane.Anchor.TopLeft:     xRatio = -1.0f; yRatio = 1.0f; break;
+            case exPlane.Anchor.TopCenter:   xRatio = -0.5f; yRatio = 1.0f; break;
+            case exPlane.Anchor.TopRight:    xRatio = -0.0f; yRatio = 1.0f; break;
+            case exPlane.Anchor.MidLeft:     xRatio = -1.0f; yRatio = 0.5f; break;
+            case exPlane.Anchor.MidCenter:   xRatio = -0.5f; yRatio = 0.5f; break;
+            case exPlane.Anchor.MidRight:    xRatio = -0.0f; yRatio = 0.5f; break;
+            case exPlane.Anchor.BotLeft:     xRatio = -1.0f; yRatio = 0.0f; break;
+            case exPlane.Anchor.BotCenter:   xRatio = -0.5f; yRatio = 0.0f; break;
+            case exPlane.Anchor.BotRight:    xRatio = -0.0f; yRatio = 0.0f; break;
+            }
+            editSpriteBorder.width -= dx; editSpriteBorder.height += dy;
+        }
+        else if ( _handleID == 1 ) {
+            switch ( editSpriteBorder.anchor ) {
+            case exPlane.Anchor.TopLeft:     xRatio = 0.0f; yRatio = 1.0f; break;
+            case exPlane.Anchor.TopCenter:   xRatio = 0.0f; yRatio = 1.0f; break;
+            case exPlane.Anchor.TopRight:    xRatio = 0.0f; yRatio = 1.0f; break;
+            case exPlane.Anchor.MidLeft:     xRatio = 0.0f; yRatio = 0.5f; break;
+            case exPlane.Anchor.MidCenter:   xRatio = 0.0f; yRatio = 0.5f; break;
+            case exPlane.Anchor.MidRight:    xRatio = 0.0f; yRatio = 0.5f; break;
+            case exPlane.Anchor.BotLeft:     xRatio = 0.0f; yRatio = 0.0f; break;
+            case exPlane.Anchor.BotCenter:   xRatio = 0.0f; yRatio = 0.0f; break;
+            case exPlane.Anchor.BotRight:    xRatio = 0.0f; yRatio = 0.0f; break;
+            }
+            editSpriteBorder.height += dy;
+        }
+        else if ( _handleID == 2 ) {
+            switch ( editSpriteBorder.anchor ) {
+            case exPlane.Anchor.TopLeft:     xRatio = 0.0f; yRatio = 1.0f; break;
+            case exPlane.Anchor.TopCenter:   xRatio = 0.5f; yRatio = 1.0f; break;
+            case exPlane.Anchor.TopRight:    xRatio = 1.0f; yRatio = 1.0f; break;
+            case exPlane.Anchor.MidLeft:     xRatio = 0.0f; yRatio = 0.5f; break;
+            case exPlane.Anchor.MidCenter:   xRatio = 0.5f; yRatio = 0.5f; break;
+            case exPlane.Anchor.MidRight:    xRatio = 1.0f; yRatio = 0.5f; break;
+            case exPlane.Anchor.BotLeft:     xRatio = 0.0f; yRatio = 0.0f; break;
+            case exPlane.Anchor.BotCenter:   xRatio = 0.5f; yRatio = 0.0f; break;
+            case exPlane.Anchor.BotRight:    xRatio = 1.0f; yRatio = 0.0f; break;
+            }
+            editSpriteBorder.width += dx; editSpriteBorder.height += dy;
+        }
+        else if ( _handleID == 3 ) {
+            switch ( editSpriteBorder.anchor ) {
+            case exPlane.Anchor.TopLeft:     xRatio = 0.0f; yRatio = 0.0f; break;
+            case exPlane.Anchor.TopCenter:   xRatio = 0.5f; yRatio = 0.0f; break;
+            case exPlane.Anchor.TopRight:    xRatio = 1.0f; yRatio = 0.0f; break;
+            case exPlane.Anchor.MidLeft:     xRatio = 0.0f; yRatio = 0.0f; break;
+            case exPlane.Anchor.MidCenter:   xRatio = 0.5f; yRatio = 0.0f; break;
+            case exPlane.Anchor.MidRight:    xRatio = 1.0f; yRatio = 0.0f; break;
+            case exPlane.Anchor.BotLeft:     xRatio = 0.0f; yRatio = 0.0f; break;
+            case exPlane.Anchor.BotCenter:   xRatio = 0.5f; yRatio = 0.0f; break;
+            case exPlane.Anchor.BotRight:    xRatio = 1.0f; yRatio = 0.0f; break;
+            }
+            editSpriteBorder.width += dx;
+        }
+        else if ( _handleID == 4 ) {
+            switch ( editSpriteBorder.anchor ) {
+            case exPlane.Anchor.TopLeft:     xRatio = 0.0f; yRatio = -0.0f; break;
+            case exPlane.Anchor.TopCenter:   xRatio = 0.5f; yRatio = -0.0f; break;
+            case exPlane.Anchor.TopRight:    xRatio = 1.0f; yRatio = -0.0f; break;
+            case exPlane.Anchor.MidLeft:     xRatio = 0.0f; yRatio = -0.5f; break;
+            case exPlane.Anchor.MidCenter:   xRatio = 0.5f; yRatio = -0.5f; break;
+            case exPlane.Anchor.MidRight:    xRatio = 1.0f; yRatio = -0.5f; break;
+            case exPlane.Anchor.BotLeft:     xRatio = 0.0f; yRatio = -1.0f; break;
+            case exPlane.Anchor.BotCenter:   xRatio = 0.5f; yRatio = -1.0f; break;
+            case exPlane.Anchor.BotRight:    xRatio = 1.0f; yRatio = -1.0f; break;
+            }
+            editSpriteBorder.width += dx; editSpriteBorder.height -= dy;
+        }
+        else if ( _handleID == 5 ) {
+            switch ( editSpriteBorder.anchor ) {
+            case exPlane.Anchor.TopLeft:     xRatio = 0.0f; yRatio = -0.0f; break;
+            case exPlane.Anchor.TopCenter:   xRatio = 0.0f; yRatio = -0.0f; break;
+            case exPlane.Anchor.TopRight:    xRatio = 0.0f; yRatio = -0.0f; break;
+            case exPlane.Anchor.MidLeft:     xRatio = 0.0f; yRatio = -0.5f; break;
+            case exPlane.Anchor.MidCenter:   xRatio = 0.0f; yRatio = -0.5f; break;
+            case exPlane.Anchor.MidRight:    xRatio = 0.0f; yRatio = -0.5f; break;
+            case exPlane.Anchor.BotLeft:     xRatio = 0.0f; yRatio = -1.0f; break;
+            case exPlane.Anchor.BotCenter:   xRatio = 0.0f; yRatio = -1.0f; break;
+            case exPlane.Anchor.BotRight:    xRatio = 0.0f; yRatio = -1.0f; break;
+            }
+            editSpriteBorder.height -= dy;
+        }
+        else if ( _handleID == 6 ) {
+            switch ( editSpriteBorder.anchor ) {
+            case exPlane.Anchor.TopLeft:     xRatio = -1.0f; yRatio = -0.0f; break;
+            case exPlane.Anchor.TopCenter:   xRatio = -0.5f; yRatio = -0.0f; break;
+            case exPlane.Anchor.TopRight:    xRatio = -0.0f; yRatio = -0.0f; break;
+            case exPlane.Anchor.MidLeft:     xRatio = -1.0f; yRatio = -0.5f; break;
+            case exPlane.Anchor.MidCenter:   xRatio = -0.5f; yRatio = -0.5f; break;
+            case exPlane.Anchor.MidRight:    xRatio = -0.0f; yRatio = -0.5f; break;
+            case exPlane.Anchor.BotLeft:     xRatio = -1.0f; yRatio = -1.0f; break;
+            case exPlane.Anchor.BotCenter:   xRatio = -0.5f; yRatio = -1.0f; break;
+            case exPlane.Anchor.BotRight:    xRatio = -0.0f; yRatio = -1.0f; break;
+            }
+            editSpriteBorder.width -= dx; editSpriteBorder.height -= dy;
+        }
+        else if ( _handleID == 7 ) {
+            switch ( editSpriteBorder.anchor ) {
+            case exPlane.Anchor.TopLeft:     xRatio = -1.0f; yRatio = 0.0f; break;
+            case exPlane.Anchor.TopCenter:   xRatio = -0.5f; yRatio = 0.0f; break;
+            case exPlane.Anchor.TopRight:    xRatio = -0.0f; yRatio = 0.0f; break;
+            case exPlane.Anchor.MidLeft:     xRatio = -1.0f; yRatio = 0.0f; break;
+            case exPlane.Anchor.MidCenter:   xRatio = -0.5f; yRatio = 0.0f; break;
+            case exPlane.Anchor.MidRight:    xRatio = -0.0f; yRatio = 0.0f; break;
+            case exPlane.Anchor.BotLeft:     xRatio = -1.0f; yRatio = 0.0f; break;
+            case exPlane.Anchor.BotCenter:   xRatio = -0.5f; yRatio = 0.0f; break;
+            case exPlane.Anchor.BotRight:    xRatio = -0.0f; yRatio = 0.0f; break;
+            }
+            editSpriteBorder.width -= dx;
+        }
+
+        float offsetX = (editSpriteBorder.width - oldWidth) * xRatio;
+        float offsetY = (editSpriteBorder.height - oldHeight) * yRatio;
+        editSpriteBorder.Translate ( offsetX, offsetY );
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void GetDelatSize ( Vector3 _deltaVec, out float _dx, out float _dy ) {
+        _dx = 0.0f; _dy = 0.0f;
+
+        switch ( editSpriteBorder.plane ) {
+        case exPlane.Plane.XY:
+            _dx = _deltaVec.x; _dy = _deltaVec.y;
+            break;
+
+        case exPlane.Plane.XZ:
+            _dx = _deltaVec.x; _dy = _deltaVec.z;
+            break;
+
+        case exPlane.Plane.ZY:
+            _dx = _deltaVec.z; _dy = _deltaVec.y;
+            break;
+        }
+    }
 }

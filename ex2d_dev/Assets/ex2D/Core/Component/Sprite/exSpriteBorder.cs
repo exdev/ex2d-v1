@@ -42,10 +42,12 @@ public class exSpriteBorder : exSpriteBase {
     public float width {
         get { return width_; }
         set {
-            if ( width_ != value ) {
-                width_ = value;
-                if ( guiBorder_ )
-                    width_ = Mathf.Max( guiBorder_.border.horizontal, width_ );
+            float newWidth = value; 
+            if ( guiBorder_ )
+                newWidth = Mathf.Max( guiBorder_.border.horizontal, newWidth );
+
+            if ( width_ != newWidth ) {
+                width_ = newWidth;
                 updateFlags |= UpdateFlags.Vertex;
             }
         }
@@ -61,10 +63,12 @@ public class exSpriteBorder : exSpriteBase {
     public float height {
         get { return height_; }
         set {
-            if ( height_ != value ) {
-                height_ = value;
-                if ( guiBorder_ )
-                    height_ = Mathf.Max( guiBorder_.border.vertical, height_ );
+            float newHeight = value;
+            if ( guiBorder_ )
+                newHeight = Mathf.Max( guiBorder_.border.vertical, newHeight );
+
+            if ( height_ != newHeight ) {
+                height_ = newHeight;
                 updateFlags |= UpdateFlags.Vertex;
             }
         }

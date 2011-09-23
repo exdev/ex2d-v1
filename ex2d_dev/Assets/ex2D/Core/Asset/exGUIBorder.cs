@@ -24,5 +24,7 @@ public class exGUIBorder : ScriptableObject {
     public string textureGUID = ""; ///< the guid of the source texture 
     public RectOffset border = new RectOffset(0, 0, 0, 0); ///< the border for GUI grid
 
+    // editor data
+    public bool editorNeedRebuild = false; ///< check if the gui border need rebuild
 }
 

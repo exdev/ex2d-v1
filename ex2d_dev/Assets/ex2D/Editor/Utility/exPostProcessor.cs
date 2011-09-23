@@ -165,6 +165,7 @@ class ex2D_SaveAssetsProcessor : SaveAssetsProcessor {
     static void OnWillSaveAssets ( string[] _paths ) {
         List<exAtlasInfo> rebuildAtlasInfos = new List<exAtlasInfo>();
         List<exSpriteAnimClip> rebuildSpriteAnimClips = new List<exSpriteAnimClip>();
+        List<exGUIBorder> rebuildGuiBorders = new List<exGUIBorder>();
 
         //
         foreach ( string path in _paths ) {
@@ -218,6 +219,20 @@ class ex2D_SaveAssetsProcessor : SaveAssetsProcessor {
             //         bitmapFont.Build( fontInfo );
             // }
             // } TODO end 
+
+            // ======================================================== 
+            // build exGUIBorder 
+            // ======================================================== 
+
+            if ( obj is exGUIBorder ) {
+                exGUIBorder guiBorder = obj as exGUIBorder;
+                if ( guiBorder.editorNeedRebuild &&  
+                     rebuildGuiBorders.IndexOf(guiBorder) == -1 ) {
+                    guiBorder.editorNeedRebuild = false;
+                    EditorUtility.SetDirty(guiBorder);
+                    rebuildGuiBorders.Add(guiBorder);
+                }
+            }
         }
 
         // NOTE: we need to make sure exAtlasInfo build before exSpriteAnimClip,
@@ -238,18 +253,24 @@ class ex2D_SaveAssetsProcessor : SaveAssetsProcessor {
         // ======================================================== 
 
         foreach ( exSpriteAnimClip spAnimClip in rebuildSpriteAnimClips ) {
-            spAnimClip.Build();
+            // NOTE: it could be built in BuildSpAnimClipsFromRebuildList above
+            if ( spAnimClip.editorNeedRebuild )
+                spAnimClip.Build();
         }
 
         // ======================================================== 
         // post build 
         // ======================================================== 
 
+        // update scene sprites with rebuild atlasInfo list
         List<string> rebuildAtlasInfoGUIDs = new List<string>();
         foreach ( exAtlasInfo atlasInfo in rebuildAtlasInfos ) {
             rebuildAtlasInfoGUIDs.Add( exEditorHelper.AssetToGUID(atlasInfo) );
         }
         exSceneHelper.UpdateSceneSprites (rebuildAtlasInfoGUIDs);
+
+        // update scene sprites with rebuild guiBorder list
+        exSceneHelper.UpdateSceneSprites (rebuildGuiBorders);
 
         // NOTE: without this you will got leaks message
         EditorUtility.UnloadUnusedAssets();

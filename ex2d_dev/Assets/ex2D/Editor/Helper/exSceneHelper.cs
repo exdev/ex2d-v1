@@ -121,7 +121,7 @@ public static class exSceneHelper {
         if ( _atlasInfoGUIDs.Count == 0 )
             return;
 
-        EditorUtility.DisplayProgressBar( "Update Scene Sprites...", "Scanning...", 0.0f );    
+        EditorUtility.DisplayProgressBar( "Update Scene Sprites With Changed Atlas...", "Scanning...", 0.0f );    
         // exSpriteBase[] sprites = GameObject.FindObjectsOfType(typeof(exSpriteBase)) as exSpriteBase[];
         exSpriteBase[] sprites = Resources.FindObjectsOfTypeAll(typeof(exSpriteBase)) as exSpriteBase[];
         for ( int i = 0; i < sprites.Length; ++i ) {
@@ -258,6 +258,56 @@ public static class exSceneHelper {
             // EditorUtility.DisplayProgressBar( "Update Scene Sprites...", 
             //                                   "Update Sprite " + spBase.gameObject.name, progress );    
             // } DISABLE end 
+        }
+        EditorUtility.ClearProgressBar();    
+    }
+
+    // ------------------------------------------------------------------ 
+    /// \param _ the list of atlas info guid
+    /// update scene sprites by atlas info list
+    // ------------------------------------------------------------------ 
+
+    public static void UpdateSceneSprites ( List<exGUIBorder> _guiBorderList ) {
+        if ( _guiBorderList.Count == 0 )
+            return;
+
+        EditorUtility.DisplayProgressBar( "Update Scene Sprites With Changed GUIBorders...", "Scanning...", 0.0f );    
+        // exSpriteBase[] sprites = GameObject.FindObjectsOfType(typeof(exSpriteBase)) as exSpriteBase[];
+        exSpriteBase[] sprites = Resources.FindObjectsOfTypeAll(typeof(exSpriteBase)) as exSpriteBase[];
+        for ( int i = 0; i < sprites.Length; ++i ) {
+            exSpriteBase spBase = sprites[i]; 
+
+            // ======================================================== 
+            // exSpriteBorder
+            // ======================================================== 
+
+            if ( spBase is exSpriteBorder ) {
+                exSpriteBorder spBorder = spBase as exSpriteBorder;
+                bool needRebuild = false;
+
+                // find if the spBorder's atalsInfo need rebuild
+                foreach ( exGUIBorder guiBorder in _guiBorderList ) {
+                    if ( spBorder.guiBorder == guiBorder ) {
+                        needRebuild = true;
+                        break;
+                    }
+                }
+
+                //
+                if ( needRebuild ) {
+                    exAtlasDB.ElementInfo elInfo = exAtlasDB.GetElementInfo(spBorder.guiBorder.textureGUID);
+                    exSpriteBorderEditor.UpdateAtlas( spBorder, elInfo );
+                    bool isPrefab = (EditorUtility.GetPrefabType(spBase) == PrefabType.Prefab); 
+                    if ( isPrefab == false ) {
+                        Texture2D texture = null;
+                        if ( spBorder.useAtlas == false ) {
+                            texture = exEditorHelper.LoadAssetFromGUID<Texture2D>(spBorder.guiBorder.textureGUID);
+                        }
+                        spBorder.Build(texture);
+                    }
+                    EditorUtility.SetDirty(spBorder);
+                }
+            }
         }
         EditorUtility.ClearProgressBar();    
     }

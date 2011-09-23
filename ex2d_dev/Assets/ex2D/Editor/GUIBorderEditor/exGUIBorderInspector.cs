@@ -94,7 +94,8 @@ class exGUIBorderInspector : Editor {
                 //          some are good in point filter (controls/boxOver)
                 // editTexture.filterMode = FilterMode.Point;
                 curEdit.textureGUID = exEditorHelper.AssetToGUID(editTexture);
-                curEdit.border = new RectOffset ( 0, 0, 0, 0 );
+                // curEdit.border = new RectOffset ( 0, 0, 0, 0 ); // NOTE: we have protect below
+                curEdit.editorNeedRebuild = true;
             }
         GUILayout.EndHorizontal();
 
@@ -117,25 +118,47 @@ class exGUIBorderInspector : Editor {
         GUI.enabled = editTexture != null;
         EditorGUIUtility.LookLikeControls ();
         GUILayout.BeginHorizontal();
-            curEdit.border.left = EditorGUILayout.IntField ( "Left", curEdit.border.left, GUILayout.Width(150) ); // left
-            if ( editTexture )
-                curEdit.border.left = Mathf.Clamp( curEdit.border.left, 0, editTexture.width - curEdit.border.right );
+            int newLeft = EditorGUILayout.IntField ( "Left", curEdit.border.left, GUILayout.Width(150) ); // left
+            if ( editTexture ) {
+                newLeft = Mathf.Clamp( newLeft, 0, editTexture.width - curEdit.border.right );
+                if ( newLeft != curEdit.border.left ) {
+                    curEdit.border.left = newLeft;
+                    curEdit.editorNeedRebuild = true;
+                }
+                
+            }
 
-            curEdit.border.right = EditorGUILayout.IntField ( "Right", curEdit.border.right, GUILayout.Width(150) ); // right
-            if ( editTexture )
-                curEdit.border.right = Mathf.Clamp( curEdit.border.right, 0, editTexture.width - curEdit.border.left );
+            int newRight = EditorGUILayout.IntField ( "Right", curEdit.border.right, GUILayout.Width(150) ); // right
+            if ( editTexture ) {
+                newRight = Mathf.Clamp( newRight, 0, editTexture.width - curEdit.border.left );
+                if ( newRight != curEdit.border.right ) {
+                    curEdit.border.right = newRight;
+                    curEdit.editorNeedRebuild = true;
+                }
+            }
 
             GUILayout.Label ( " = " + curEdit.border.horizontal );
         GUILayout.EndHorizontal();
 
         GUILayout.BeginHorizontal();
-            curEdit.border.top = EditorGUILayout.IntField ( "Top", curEdit.border.top, GUILayout.Width(150) ); // top
-            if ( editTexture )
-                curEdit.border.top = Mathf.Clamp( curEdit.border.top, 0, editTexture.height - curEdit.border.bottom );
+            int newTop = EditorGUILayout.IntField ( "Top", curEdit.border.top, GUILayout.Width(150) ); // top
+            if ( editTexture ) {
+                 newTop = Mathf.Clamp( newTop, 0, editTexture.height - curEdit.border.bottom );
+                 if ( newTop != curEdit.border.top ) {
+                    curEdit.border.top = newTop;
+                    curEdit.editorNeedRebuild = true;
+                 }
+                 
+            }
 
-            curEdit.border.bottom = EditorGUILayout.IntField ( "Bottom", curEdit.border.bottom, GUILayout.Width(150) ); // bottom
-            if ( editTexture )
-                curEdit.border.bottom = Mathf.Clamp( curEdit.border.bottom, 0, editTexture.height - curEdit.border.top );
+            int newBottom = EditorGUILayout.IntField ( "Bottom", curEdit.border.bottom, GUILayout.Width(150) ); // bottom
+            if ( editTexture ) {
+                newBottom = Mathf.Clamp( newBottom, 0, editTexture.height - curEdit.border.top );
+                if ( newBottom != curEdit.border.bottom ) {
+                    curEdit.border.bottom = newBottom;
+                    curEdit.editorNeedRebuild = true;
+                }
+            }
 
             GUILayout.Label ( " = " + curEdit.border.vertical );
         GUILayout.EndHorizontal();
@@ -146,6 +169,20 @@ class exGUIBorderInspector : Editor {
                                      (editTexture.width - curEdit.border.horizontal) + " x " + (editTexture.height - curEdit.border.vertical)
                                      : "0 x 0", 
                                      GUILayout.Width(200) );
+
+        // ======================================================== 
+        // save button
+        // ======================================================== 
+
+        GUI.enabled = curEdit.editorNeedRebuild;
+        GUILayout.BeginHorizontal();
+        GUILayout.FlexibleSpace();
+            if ( GUILayout.Button("Save", GUILayout.Width(50), GUILayout.Height(20) ) ) {
+                AssetDatabase.SaveAssets();
+            }
+        GUILayout.Space(5);
+        GUILayout.EndHorizontal();
+        GUI.enabled = true;
 
         // ======================================================== 
         // Preview Width and Height 
@@ -179,7 +216,7 @@ class exGUIBorderInspector : Editor {
                              editTexture );
 
         // ======================================================== 
-        // Rebuild button
+        // dirty
         // ======================================================== 
 
         if ( GUI.changed ) {
@@ -244,8 +281,8 @@ class exGUIBorderInspector : Editor {
         int previewCenterWidth = (int)_rect.width - _guiBorder.border.horizontal;
         int previewCenterHeight = (int)_rect.height - _guiBorder.border.vertical;
 
-        float widthRatio = (float)previewCenterWidth/(texCenterWidth != 0 ? (float)texCenterWidth : 1.0f);
-        float heightRatio = (float)previewCenterHeight/(texCenterHeight != 0 ? (float)texCenterHeight : 1.0f);
+        float widthRatio = (float)previewCenterWidth/(texCenterWidth != 0 ? (float)texCenterWidth : 0.001f);
+        float heightRatio = (float)previewCenterHeight/(texCenterHeight != 0 ? (float)texCenterHeight : 0.001f);
 
         // ======================================================== 
         // top 

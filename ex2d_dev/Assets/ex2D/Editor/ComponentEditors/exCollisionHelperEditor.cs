@@ -82,6 +82,8 @@ class exCollisionHelperEditor : Editor {
 
             Collider myCollider = curEdit.GetComponent<Collider>();
             if ( myCollider != null ) {
+                if ( myCollider is MeshCollider )
+                    Object.DestroyImmediate((myCollider as MeshCollider).sharedMesh,true);
                 Object.DestroyImmediate(myCollider,true);
             }
 
