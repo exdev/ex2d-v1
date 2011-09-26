@@ -377,18 +377,17 @@ class exSpriteBorderEditor : exSpriteBaseEditor {
         controls[6] = corners[3];
         controls[7] = (corners[3] + corners[0])/2.0f;
 
+        // TEMP: not sure this is good { 
         Event e = Event.current;
+        if ( e.type == EventType.MouseDown && e.button == 0 && e.clickCount == 1 ) {
+            Undo.RegisterSceneUndo("ex2D.Scene");
+        }
+        // } TEMP end 
 
         //
         for ( int i = 0; i < controls.Length; ++i ) {
             Vector3 pos = controls[i];
             Handles.color = new Color( 1.0f, 1.0f, 0.0f, 0.5f );
-
-            if ( e.type == EventType.MouseDown && e.button == 0 && e.clickCount == 1 ) {
-                Undo.RegisterUndo(editSpriteBorder.meshFilter.sharedMesh, "editSpriteBorder.meshFilter.sharedMesh");
-                Undo.RegisterUndo(editSpriteBorder.transform, "editSpriteBorder.transform");
-                Undo.RegisterUndo(editSpriteBorder, "editSpriteBorder");
-            }
 
             Vector3 newPos = Handles.FreeMoveHandle( pos,
                                                      editSpriteBorder.transform.rotation,

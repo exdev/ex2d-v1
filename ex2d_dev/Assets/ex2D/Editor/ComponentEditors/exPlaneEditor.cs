@@ -79,16 +79,19 @@ class exPlaneEditor : Editor {
 
 	override public void OnInspectorGUI () {
 
-        // TEMP: not sure this is good { 
-        Event e = Event.current;
-        if ( e.type == EventType.MouseDown && e.button == 0 && e.clickCount == 1 ) {
-            Undo.RegisterUndo(target, "ex2D Modified Object");
-        }
-        // } TEMP end 
-
         exSprite editSprite = target as exSprite;
         inAnimMode = AnimationUtility.InAnimationMode();
         isPrefab = (EditorUtility.GetPrefabType(target) == PrefabType.Prefab); 
+
+        // TEMP: not sure this is good { 
+        Event e = Event.current;
+        if ( e.type == EventType.MouseDown && e.button == 0 && e.clickCount == 1 ) {
+            if ( isPrefab )
+                Undo.RegisterUndo(editPlane, "editPlane");
+            else
+                Undo.RegisterSceneUndo("ex2D.Scene");
+        }
+        // } TEMP end 
 
         EditorGUIUtility.LookLikeInspector ();
         EditorGUILayout.Space ();
