@@ -126,7 +126,7 @@ partial class exTileSheetEditor : EditorWindow {
             // ======================================================== 
 
             if ( GUILayout.Button( exEditorHelper.HelpTexture(), EditorStyles.toolbarButton ) ) {
-                Help.BrowseURL("http://www.ex-dev.com/ex2d/wiki/doku.php?id=manual:tilesheet_editor_guide");
+                Help.BrowseURL("http://www.ex-dev.com/ex2d/wiki/doku.php?id=manual:tilesheet_editor");
             }
 
         GUILayout.EndHorizontal ();

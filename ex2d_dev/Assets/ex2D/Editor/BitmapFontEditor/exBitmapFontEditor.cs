@@ -30,9 +30,6 @@ partial class exBitmapFontEditor : EditorWindow {
     private exBitmapFont curEdit;
     private Object curFontInfo;
 
-    private string newPath = "Assets/";
-    private string newName = "New BitmapFont";
-
     private Vector2 scrollPos = Vector2.zero;
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -166,7 +163,7 @@ partial class exBitmapFontEditor : EditorWindow {
             // ======================================================== 
 
             if ( GUILayout.Button( exEditorHelper.HelpTexture(), EditorStyles.toolbarButton ) ) {
-                Help.BrowseURL("http://www.ex-dev.com/ex2d/wiki/doku.php?id=manual:font_editor_guide");
+                Help.BrowseURL("http://www.ex-dev.com/ex2d/wiki/doku.php?id=manual:font_editor");
             }
         GUILayout.EndHorizontal ();
 
@@ -217,31 +214,5 @@ partial class exBitmapFontEditor : EditorWindow {
         GUI.enabled = true;
 
         EditorGUILayout.EndScrollView();
-    }
-
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
-    void CreateNewBitmapFont ( Object _fontInfo ) {
-        // create atlas info
-        EditorUtility.DisplayProgressBar( "Creating BitmapFont...",
-                                          "Creating BitmapFont Asset...",
-                                          0.1f );    
-
-        // check if there have 
-        if ( curEdit == null ) {
-            curEdit = exBitmapFontUtility.Create( newPath, newName );
-        }
-
-        // check if we have the texture and textasset with the same name of bitmapfont 
-        EditorUtility.DisplayProgressBar( "Creating BitmapFont...",
-                                          "Check building ...",
-                                          0.2f );    
-
-        // if we have enough information, try to build the exBitmapFont asset
-        curEdit.Build ( _fontInfo );
-
-        EditorUtility.ClearProgressBar();    
     }
 }

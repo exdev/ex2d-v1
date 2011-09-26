@@ -70,6 +70,7 @@ $(RUNTIME_TARGET):
 # /////////////////////////////////////////////////////////////////////////////
 
 # get sources 
+EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/
 EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/About/
 EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/AtlasEditor/
 EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/BitmapFontEditor/

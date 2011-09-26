@@ -113,25 +113,34 @@ class exSpriteBaseEditor : exPlaneEditor {
             // use collision helper
             // ======================================================== 
 
-            GUILayout.BeginHorizontal();
-            GUILayout.Space(15);
-                GUI.enabled = !inAnimMode;
-                exCollisionHelper compCollisionHelper = editSpriteBase.collisionHelper;
-                bool hasCollisionHelperComp = compCollisionHelper != null; 
-                bool useCollisionHelper = GUILayout.Toggle ( hasCollisionHelperComp, "Use Collision Helper" ); 
-                if ( useCollisionHelper != hasCollisionHelperComp ) {
-                    if ( useCollisionHelper ) {
-                        compCollisionHelper = editSpriteBase.gameObject.AddComponent<exCollisionHelper>();
-                        compCollisionHelper.plane = editSpriteBase;
-                        compCollisionHelper.UpdateCollider();
-                    }
-                    else {
-                        Object.DestroyImmediate(compCollisionHelper,true);
-                    }
-                    GUI.changed = true;
+            GUILayout.Space(5);
+            GUI.enabled = !inAnimMode;
+            exCollisionHelper compCollisionHelper = editSpriteBase.collisionHelper;
+            bool hasCollisionHelperComp = compCollisionHelper != null; 
+            bool useCollisionHelper = GUILayout.Toggle ( hasCollisionHelperComp, "Use Collision Helper" ); 
+            if ( useCollisionHelper != hasCollisionHelperComp ) {
+                if ( useCollisionHelper ) {
+                    compCollisionHelper = editSpriteBase.gameObject.AddComponent<exCollisionHelper>();
+                    compCollisionHelper.plane = editSpriteBase;
+                    compCollisionHelper.UpdateCollider();
                 }
-                GUI.enabled = true;
-            GUILayout.EndHorizontal();
+                else {
+                    Object.DestroyImmediate(compCollisionHelper,true);
+                }
+                GUI.changed = true;
+            }
+            GUI.enabled = true;
+
+            // ======================================================== 
+            // sync button
+            // ======================================================== 
+
+            GUILayout.FlexibleSpace();
+            GUI.enabled = (isPrefab == false) && (useCollisionHelper == false);
+            if ( GUILayout.Button( "Sync" ) ) {
+                editSpriteBase.UpdateColliderSize(0.2f);
+            }
+            GUI.enabled = true;
         GUILayout.EndHorizontal();
 
         // ======================================================== 

@@ -286,6 +286,7 @@ public static partial class exAtlasInfoUtility {
             if ( exTextureHelper.IsValidForAtlas (srcTexture) == false ) {
                 if ( _noImport ) {
                     Debug.LogError( "The texture import settings of [" + AssetDatabase.GetAssetPath(srcTexture) + "] is invalid for atlas build" );
+                    continue;
                 }
                 else {
                     exTextureHelper.ImportTextureForAtlas(srcTexture);

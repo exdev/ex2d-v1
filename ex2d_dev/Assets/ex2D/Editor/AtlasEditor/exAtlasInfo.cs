@@ -47,12 +47,12 @@ public partial class exAtlasInfo : ScriptableObject {
     }
 
     // ------------------------------------------------------------------ 
-    /// sorting the elements in Accending or Descending order
+    /// sorting the elements in Ascending or Descending order
     // ------------------------------------------------------------------ 
 
     public enum SortOrder {
         UseBest,   ///< use the best order depends on the exAtlasInfo.algorithm
-        Accending, ///< use accending order 
+        Ascending, ///< use ascending order 
         Descending ///< use descending order
     }
 

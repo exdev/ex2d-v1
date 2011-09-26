@@ -66,9 +66,12 @@ class ex2D_PostProcessor : AssetPostprocessor {
 
             // ======================================================== 
             // Texture2D 
+            // NOTE: if we are OnWillSaveAssets, it is possible we reimport 
+            //       textures if they are not valid for atlas. and when import it will
+            //       trigger things here which will lead to infinite cycle.
             // ======================================================== 
 
-            if ( obj is Texture2D ) {
+            if ( ex.onSavingAssets == false && obj is Texture2D ) {
                 Texture2D tex2d = obj as Texture2D;
                 exAtlasDB.ElementInfo ei = exAtlasDB.GetElementInfo(tex2d);
                 if ( ei != null ) {
@@ -163,6 +166,7 @@ class ex2D_SaveAssetsProcessor : SaveAssetsProcessor {
     // ------------------------------------------------------------------ 
 
     static void OnWillSaveAssets ( string[] _paths ) {
+        ex.onSavingAssets = true;
         List<exAtlasInfo> rebuildAtlasInfos = new List<exAtlasInfo>();
         List<exSpriteAnimClip> rebuildSpriteAnimClips = new List<exSpriteAnimClip>();
         List<exGUIBorder> rebuildGuiBorders = new List<exGUIBorder>();
@@ -274,5 +278,6 @@ class ex2D_SaveAssetsProcessor : SaveAssetsProcessor {
 
         // NOTE: without this you will got leaks message
         EditorUtility.UnloadUnusedAssets();
+        ex.onSavingAssets = false;
     }
 }

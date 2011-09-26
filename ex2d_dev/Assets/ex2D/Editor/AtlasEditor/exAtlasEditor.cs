@@ -194,7 +194,7 @@ partial class exAtlasEditor : EditorWindow {
             // ======================================================== 
 
             GUI.enabled = selectedElements.Count != 0;
-            if ( GUILayout.Button( "Select Sprites...", EditorStyles.toolbarButton ) ) {
+            if ( GUILayout.Button( "Select In Project...", EditorStyles.toolbarButton ) ) {
                 List<Object> selects = new List<Object>(curEdit.elements.Count);
                 foreach ( exAtlasInfo.Element el in selectedElements ) {
                     if ( selects.IndexOf(el.texture) == -1 ) {
@@ -254,7 +254,7 @@ partial class exAtlasEditor : EditorWindow {
             // ======================================================== 
 
             if ( GUILayout.Button( exEditorHelper.HelpTexture(), EditorStyles.toolbarButton ) ) {
-                Help.BrowseURL("http://www.ex-dev.com/ex2d/wiki/doku.php?id=manual:atlas_editor_guide");
+                Help.BrowseURL("http://www.ex-dev.com/ex2d/wiki/doku.php?id=manual:atlas_editor");
             }
 
         GUILayout.EndHorizontal ();
@@ -275,6 +275,21 @@ partial class exAtlasEditor : EditorWindow {
         // // draw label
         // GUILayout.Label ( AssetDatabase.GetAssetPath(curEdit) );
         // } DISABLE end 
+
+        // ======================================================== 
+        // atlas info
+        // ======================================================== 
+
+        Object newAtlasInfo = EditorGUILayout.ObjectField( "Atlas Info"
+                                                           , curEdit
+                                                           , typeof(exAtlasInfo)
+#if !UNITY_3_0 && !UNITY_3_1 && !UNITY_3_3
+                                                           , false 
+#endif
+                                                           , GUILayout.Width(300)
+                                                         );
+        if ( newAtlasInfo != curEdit ) 
+            Selection.activeObject = newAtlasInfo;
 
         // ======================================================== 
         // settings area 
@@ -523,20 +538,6 @@ partial class exAtlasEditor : EditorWindow {
                 }
                 GUI.enabled = true;
                 // GUILayout.Space(5);
-
-                // ======================================================== 
-                // atlas info
-                // ======================================================== 
-
-                Object newAtlasInfo = EditorGUILayout.ObjectField( "exAtlasInfo"
-                                                                   , curEdit
-                                                                   , typeof(exAtlasInfo)
-#if !UNITY_3_0 && !UNITY_3_1 && !UNITY_3_3
-                                                                   , false 
-#endif
-                                                                 );
-                if ( newAtlasInfo != curEdit ) 
-                    Selection.activeObject = newAtlasInfo;
 
                 // ======================================================== 
                 // build color 

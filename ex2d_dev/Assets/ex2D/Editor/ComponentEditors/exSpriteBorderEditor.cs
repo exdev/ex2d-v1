@@ -106,7 +106,8 @@ class exSpriteBorderEditor : exSpriteBaseEditor {
             }
 
             if ( GUILayout.Button("Edit...", GUILayout.Width(40), GUILayout.Height(15) ) ) {
-                Selection.activeObject = newGUIBorder;
+                exGUIBorderEditor editor = exGUIBorderEditor.NewWindow();
+                editor.Edit(editSpriteBorder.guiBorder);
             }
         GUI.enabled = true;
         GUILayout.EndHorizontal();
@@ -129,7 +130,7 @@ class exSpriteBorderEditor : exSpriteBaseEditor {
                                               lastRect.yMax, 
                                               Mathf.Max(100,newGUIBorder.border.horizontal), 
                                               Mathf.Max(100,newGUIBorder.border.vertical) );
-                exGUIBorderInspector.TexturePreviewField ( previewRect, newGUIBorder, editTexture );
+                exGUIBorderEditor.TexturePreviewField ( previewRect, newGUIBorder, editTexture );
 
                 GUILayout.Space(10);
                 lastRect = GUILayoutUtility.GetLastRect ();  
@@ -137,7 +138,7 @@ class exSpriteBorderEditor : exSpriteBaseEditor {
                                          lastRect.yMax, 
                                          Mathf.Max(100,newGUIBorder.border.horizontal), 
                                          Mathf.Max(100,newGUIBorder.border.vertical) );
-                exGUIBorderInspector.BorderPreviewField( previewRect, newGUIBorder, editTexture );
+                exGUIBorderEditor.BorderPreviewField( previewRect, newGUIBorder, editTexture );
 
                 if ( GUILayout.Button("Select...", GUILayout.Width(60), GUILayout.Height(15) ) ) {
                     EditorGUIUtility.PingObject(editTexture);
@@ -299,9 +300,55 @@ class exSpriteBorderEditor : exSpriteBaseEditor {
         }
 
         //
-        Vector3[] vertices = editSpriteBorder.meshFilter.sharedMesh.vertices;
+        Vector3[] vertices = new Vector3[4]; 
         Vector3[] corners = new Vector3[5];
         Vector3[] controls = new Vector3[8];
+
+        float halfWidthScaled = editSpriteBorder.width * editSpriteBorder.scale.x * 0.5f;
+        float halfHeightScaled = editSpriteBorder.height * editSpriteBorder.scale.y * 0.5f;
+        float offsetX = 0.0f;
+        float offsetY = 0.0f;
+
+        //
+        switch ( editSpriteBorder.anchor ) {
+        case exPlane.Anchor.TopLeft     : offsetX = -halfWidthScaled;   offsetY = -halfHeightScaled;  break;
+        case exPlane.Anchor.TopCenter   : offsetX = 0.0f;               offsetY = -halfHeightScaled;  break;
+        case exPlane.Anchor.TopRight    : offsetX = halfWidthScaled;    offsetY = -halfHeightScaled;  break;
+
+        case exPlane.Anchor.MidLeft     : offsetX = -halfWidthScaled;   offsetY = 0.0f;               break;
+        case exPlane.Anchor.MidCenter   : offsetX = 0.0f;               offsetY = 0.0f;               break;
+        case exPlane.Anchor.MidRight    : offsetX = halfWidthScaled;    offsetY = 0.0f;               break;
+
+        case exPlane.Anchor.BotLeft     : offsetX = -halfWidthScaled;   offsetY = halfHeightScaled;   break;
+        case exPlane.Anchor.BotCenter   : offsetX = 0.0f;               offsetY = halfHeightScaled;   break;
+        case exPlane.Anchor.BotRight    : offsetX = halfWidthScaled;    offsetY = halfHeightScaled;   break;
+
+        default                         : offsetX = 0.0f;               offsetY = 0.0f;               break;
+        }
+
+        //
+        switch ( editSpriteBorder.plane ) {
+        case exPlane.Plane.XY:
+            vertices[0] = new Vector3 (-halfWidthScaled+offsetX,  halfHeightScaled+offsetY, 0.0f );
+            vertices[1] = new Vector3 ( halfWidthScaled+offsetX,  halfHeightScaled+offsetY, 0.0f );
+            vertices[2] = new Vector3 ( halfWidthScaled+offsetX, -halfHeightScaled+offsetY, 0.0f );
+            vertices[3] = new Vector3 (-halfWidthScaled+offsetX, -halfHeightScaled+offsetY, 0.0f );
+            break;
+
+        case exPlane.Plane.XZ:
+            vertices[0] = new Vector3 (-halfWidthScaled+offsetX, 0.0f,  halfHeightScaled+offsetY );
+            vertices[1] = new Vector3 ( halfWidthScaled+offsetX, 0.0f,  halfHeightScaled+offsetY );
+            vertices[2] = new Vector3 ( halfWidthScaled+offsetX, 0.0f, -halfHeightScaled+offsetY );
+            vertices[3] = new Vector3 (-halfWidthScaled+offsetX, 0.0f, -halfHeightScaled+offsetY );
+            break;
+
+        case exPlane.Plane.ZY:
+            vertices[0] = new Vector3 (0.0f,  halfHeightScaled+offsetY, -halfWidthScaled+offsetX );
+            vertices[1] = new Vector3 (0.0f,  halfHeightScaled+offsetY,  halfWidthScaled+offsetX );
+            vertices[2] = new Vector3 (0.0f, -halfHeightScaled+offsetY,  halfWidthScaled+offsetX );
+            vertices[3] = new Vector3 (0.0f, -halfHeightScaled+offsetY, -halfWidthScaled+offsetX );
+            break;
+        }
 
         // 0 -- 1
         // |    |
@@ -309,9 +356,9 @@ class exSpriteBorderEditor : exSpriteBaseEditor {
 
         Transform trans = editSpriteBorder.transform;
         corners[0] = trans.localToWorldMatrix * new Vector4 ( vertices[0].x, vertices[0].y, vertices[0].z, 1.0f );
-        corners[1] = trans.localToWorldMatrix * new Vector4 ( vertices[3].x, vertices[3].y, vertices[3].z, 1.0f );
-        corners[2] = trans.localToWorldMatrix * new Vector4 ( vertices[15].x, vertices[15].y, vertices[15].z, 1.0f );
-        corners[3] = trans.localToWorldMatrix * new Vector4 ( vertices[12].x, vertices[12].y, vertices[12].z, 1.0f );
+        corners[1] = trans.localToWorldMatrix * new Vector4 ( vertices[1].x, vertices[1].y, vertices[1].z, 1.0f );
+        corners[2] = trans.localToWorldMatrix * new Vector4 ( vertices[2].x, vertices[2].y, vertices[2].z, 1.0f );
+        corners[3] = trans.localToWorldMatrix * new Vector4 ( vertices[3].x, vertices[3].y, vertices[3].z, 1.0f );
         corners[4] = corners[0];
         Handles.DrawPolyLine( corners );
 
@@ -330,10 +377,19 @@ class exSpriteBorderEditor : exSpriteBaseEditor {
         controls[6] = corners[3];
         controls[7] = (corners[3] + corners[0])/2.0f;
 
+        Event e = Event.current;
+
         //
         for ( int i = 0; i < controls.Length; ++i ) {
             Vector3 pos = controls[i];
             Handles.color = new Color( 1.0f, 1.0f, 0.0f, 0.5f );
+
+            if ( e.type == EventType.MouseDown && e.button == 0 && e.clickCount == 1 ) {
+                Undo.RegisterUndo(editSpriteBorder.meshFilter.sharedMesh, "editSpriteBorder.meshFilter.sharedMesh");
+                Undo.RegisterUndo(editSpriteBorder.transform, "editSpriteBorder.transform");
+                Undo.RegisterUndo(editSpriteBorder, "editSpriteBorder");
+            }
+
             Vector3 newPos = Handles.FreeMoveHandle( pos,
                                                      editSpriteBorder.transform.rotation,
                                                      HandleUtility.GetHandleSize(pos) / 10.0f,
@@ -344,7 +400,6 @@ class exSpriteBorderEditor : exSpriteBaseEditor {
         }
         // Handles.Label( editSpriteBorder.transform.position + Vector3.up * 2,
         //                "Size = " + editSpriteBorder.width + " x " + editSpriteBorder.height );
-
 
         if (GUI.changed)
             EditorUtility.SetDirty (editSpriteBorder);
@@ -495,8 +550,8 @@ class exSpriteBorderEditor : exSpriteBaseEditor {
             editSpriteBorder.width -= dx;
         }
 
-        float offsetX = (editSpriteBorder.width - oldWidth) * xRatio;
-        float offsetY = (editSpriteBorder.height - oldHeight) * yRatio;
+        float offsetX = (editSpriteBorder.width - oldWidth) * xRatio * editSpriteBorder.scale.x;
+        float offsetY = (editSpriteBorder.height - oldHeight) * yRatio * editSpriteBorder.scale.y;
         editSpriteBorder.Translate ( offsetX, offsetY );
     }
 
@@ -509,15 +564,15 @@ class exSpriteBorderEditor : exSpriteBaseEditor {
 
         switch ( editSpriteBorder.plane ) {
         case exPlane.Plane.XY:
-            _dx = _deltaVec.x; _dy = _deltaVec.y;
+            _dx = _deltaVec.x / editSpriteBorder.scale.x; _dy = _deltaVec.y / editSpriteBorder.scale.y;
             break;
 
         case exPlane.Plane.XZ:
-            _dx = _deltaVec.x; _dy = _deltaVec.z;
+            _dx = _deltaVec.x / editSpriteBorder.scale.x; _dy = _deltaVec.z / editSpriteBorder.scale.y;
             break;
 
         case exPlane.Plane.ZY:
-            _dx = _deltaVec.z; _dy = _deltaVec.y;
+            _dx = _deltaVec.z / editSpriteBorder.scale.x; _dy = _deltaVec.y / editSpriteBorder.scale.y;
             break;
         }
     }
