@@ -35,7 +35,8 @@ class exSpriteEditor : exSpriteBaseEditor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public static void UpdateAtlas ( exSprite _sprite, exAtlasDB.ElementInfo _elInfo ) {
+    public static void UpdateAtlas ( exSprite _sprite, 
+                                     exAtlasDB.ElementInfo _elInfo ) {
         // get atlas and index from textureGUID
         if ( _elInfo != null ) {
             if ( _elInfo.guidAtlas != exEditorHelper.AssetToGUID(_sprite.atlas) ||
@@ -151,7 +152,7 @@ class exSpriteEditor : exSpriteBaseEditor {
 
             // check if we are first time assignment
             if ( useAtlas || editTexture != null ) {
-                if ( editSprite.meshFilter.sharedMesh == null ) {
+                if ( isPrefab == false && editSprite.meshFilter.sharedMesh == null ) {
                     needRebuild = true;
                 }
             }
@@ -294,7 +295,7 @@ class exSpriteEditor : exSpriteBaseEditor {
 
         // if dirty, build it.
         if ( !EditorApplication.isPlaying && !AnimationUtility.InAnimationMode() ) {
-            if ( !isPrefab && needRebuild ) {
+            if ( needRebuild ) {
                 EditorUtility.ClearProgressBar();
                 editSprite.Build( editTexture );
             }

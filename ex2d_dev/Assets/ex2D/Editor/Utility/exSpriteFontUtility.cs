@@ -48,6 +48,8 @@ public static class exSpriteFontUtility {
     // ------------------------------------------------------------------ 
 
     public static void Build ( this exSpriteFont _spriteFont ) {
+        bool isPrefab = (EditorUtility.GetPrefabType(_spriteFont) == PrefabType.Prefab); 
+
         // when build, alway set dirty
         EditorUtility.SetDirty (_spriteFont);
 
@@ -59,19 +61,22 @@ public static class exSpriteFontUtility {
             return;
         }
 
-        //
-        Mesh newMesh = new Mesh();
-        newMesh.Clear();
+        // prefab do not need rebuild mesh
+        if ( isPrefab == false ) {
+            //
+            Mesh newMesh = new Mesh();
+            newMesh.Clear();
 
-        // update material 
-        _spriteFont.renderer.sharedMaterial = _spriteFont.fontInfo.pageInfos[0].material;
+            // update material 
+            _spriteFont.renderer.sharedMaterial = _spriteFont.fontInfo.pageInfos[0].material;
 
-        // update mesh
-        _spriteFont.ForceUpdateMesh (newMesh);
+            // update mesh
+            _spriteFont.ForceUpdateMesh (newMesh);
 
-        //
-        GameObject.DestroyImmediate( _spriteFont.meshFilter.sharedMesh, true ); // delete old mesh (to avoid leaking)
-        _spriteFont.meshFilter.sharedMesh = newMesh;
+            //
+            GameObject.DestroyImmediate( _spriteFont.meshFilter.sharedMesh, true ); // delete old mesh (to avoid leaking)
+            _spriteFont.meshFilter.sharedMesh = newMesh;
+        }
 
         // update layer2d
         if ( _spriteFont.layer2d ) {

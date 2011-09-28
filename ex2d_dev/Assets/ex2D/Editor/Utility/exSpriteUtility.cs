@@ -50,6 +50,7 @@ public static class exSpriteUtility {
     // ------------------------------------------------------------------ 
 
     public static void Build ( this exSprite _sprite, Texture2D _texture = null ) {
+        bool isPrefab = (EditorUtility.GetPrefabType(_sprite) == PrefabType.Prefab); 
         EditorUtility.SetDirty (_sprite);
 
         //
@@ -75,17 +76,20 @@ public static class exSpriteUtility {
             _sprite.height = _texture.height;
         }
 
-        // NOTE: it is possible user duplicate an GameObject, 
-        //       if we directly change the mesh, the original one will changed either.
-        Mesh newMesh = new Mesh();
-        newMesh.Clear();
+        // prefab do not need rebuild mesh
+        if ( isPrefab == false ) {
+            // NOTE: it is possible user duplicate an GameObject, 
+            //       if we directly change the mesh, the original one will changed either.
+            Mesh newMesh = new Mesh();
+            newMesh.Clear();
 
-        // build vertices, normals, uvs and colors.
-        _sprite.ForceUpdateMesh( newMesh );
+            // build vertices, normals, uvs and colors.
+            _sprite.ForceUpdateMesh( newMesh );
 
-        // set the new mesh in MeshFilter
-        GameObject.DestroyImmediate( _sprite.meshFilter.sharedMesh, true ); // delete old mesh (to avoid leaking)
-        _sprite.meshFilter.sharedMesh = newMesh; 
+            // set the new mesh in MeshFilter
+            GameObject.DestroyImmediate( _sprite.meshFilter.sharedMesh, true ); // delete old mesh (to avoid leaking)
+            _sprite.meshFilter.sharedMesh = newMesh; 
+        }
 
         // update layer2d
         if ( _sprite.layer2d ) {

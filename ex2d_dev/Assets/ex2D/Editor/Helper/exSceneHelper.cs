@@ -164,7 +164,7 @@ public static class exSceneHelper {
                     bool isPrefab = (EditorUtility.GetPrefabType(spBase) == PrefabType.Prefab); 
                     if ( isPrefab == false ) {
                         Texture2D texture = null;
-                        if ( sp.useAtlas == false ) {
+                        if ( sp.index == -1 ) {
                             texture = exEditorHelper.LoadAssetFromGUID<Texture2D>(sp.textureGUID );
                         }
                         sp.Build(texture);
@@ -244,7 +244,7 @@ public static class exSceneHelper {
                     bool isPrefab = (EditorUtility.GetPrefabType(spBase) == PrefabType.Prefab); 
                     if ( isPrefab == false ) {
                         Texture2D texture = null;
-                        if ( spBorder.useAtlas == false ) {
+                        if ( spBorder.index == -1 ) {
                             texture = exEditorHelper.LoadAssetFromGUID<Texture2D>(spBorder.guiBorder.textureGUID);
                         }
                         spBorder.Build(texture);
@@ -267,7 +267,7 @@ public static class exSceneHelper {
     /// update scene sprites by atlas info list
     // ------------------------------------------------------------------ 
 
-    public static void UpdateSceneSprites ( List<exGUIBorder> _guiBorderList ) {
+    public static void UpdateSceneSpriteBorders ( List<exGUIBorder> _guiBorderList ) {
         if ( _guiBorderList.Count == 0 )
             return;
 

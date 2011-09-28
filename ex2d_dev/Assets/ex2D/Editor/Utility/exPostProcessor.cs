@@ -274,7 +274,7 @@ class ex2D_SaveAssetsProcessor : SaveAssetsProcessor {
         exSceneHelper.UpdateSceneSprites (rebuildAtlasInfoGUIDs);
 
         // update scene sprites with rebuild guiBorder list
-        exSceneHelper.UpdateSceneSprites (rebuildGuiBorders);
+        exSceneHelper.UpdateSceneSpriteBorders (rebuildGuiBorders);
 
         // NOTE: without this you will got leaks message
         EditorUtility.UnloadUnusedAssets();

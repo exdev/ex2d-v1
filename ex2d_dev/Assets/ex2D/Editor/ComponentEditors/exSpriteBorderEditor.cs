@@ -35,21 +35,22 @@ class exSpriteBorderEditor : exSpriteBaseEditor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public static void UpdateAtlas ( exSpriteBorder _sprite, exAtlasDB.ElementInfo _elInfo ) {
+    public static void UpdateAtlas ( exSpriteBorder _spriteBorder, 
+                                     exAtlasDB.ElementInfo _elInfo ) {
         // get atlas and index from textureGUID
         if ( _elInfo != null ) {
-            if ( _elInfo.guidAtlas != exEditorHelper.AssetToGUID(_sprite.atlas) ||
-                 _elInfo.indexInAtlas != _sprite.index )
+            if ( _elInfo.guidAtlas != exEditorHelper.AssetToGUID(_spriteBorder.atlas) ||
+                 _elInfo.indexInAtlas != _spriteBorder.index )
             {
-                _sprite.SetBorder( _sprite.guiBorder,
+                _spriteBorder.SetBorder( _spriteBorder.guiBorder,
                                    exEditorHelper.LoadAssetFromGUID<exAtlas>(_elInfo.guidAtlas), 
                                    _elInfo.indexInAtlas );
             }
         }
         else {
-            exGUIBorder guiBorder = _sprite.guiBorder;
-            _sprite.Clear();
-            _sprite.SetBorder( guiBorder, null, -1 );
+            exGUIBorder guiBorder = _spriteBorder.guiBorder;
+            _spriteBorder.Clear();
+            _spriteBorder.SetBorder( guiBorder, null, -1 );
         }
     }
 
@@ -182,7 +183,7 @@ class exSpriteBorderEditor : exSpriteBaseEditor {
 
             // check if we are first time assignment
             if ( useAtlas || editTexture != null ) {
-                if ( editSpriteBorder.meshFilter.sharedMesh == null ) {
+                if ( isPrefab == false && editSpriteBorder.meshFilter.sharedMesh == null ) {
                     needRebuild = true;
                 }
             }
@@ -276,7 +277,7 @@ class exSpriteBorderEditor : exSpriteBaseEditor {
 
         // if dirty, build it.
         if ( !EditorApplication.isPlaying && !AnimationUtility.InAnimationMode() ) {
-            if ( !isPrefab && needRebuild ) {
+            if ( needRebuild ) {
                 EditorUtility.ClearProgressBar();
                 editSpriteBorder.Build( editTexture );
             }

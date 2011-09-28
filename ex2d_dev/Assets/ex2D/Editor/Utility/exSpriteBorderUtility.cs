@@ -50,6 +50,7 @@ public static class exSpriteBorderUtility {
     // ------------------------------------------------------------------ 
 
     public static void Build ( this exSpriteBorder _spriteBorder, Texture2D _texture = null ) {
+        bool isPrefab = (EditorUtility.GetPrefabType(_spriteBorder) == PrefabType.Prefab); 
         EditorUtility.SetDirty (_spriteBorder);
 
         //
@@ -69,17 +70,20 @@ public static class exSpriteBorderUtility {
         }
         EditorUtility.UnloadUnusedAssets();
 
-        // NOTE: it is possible user duplicate an GameObject, 
-        //       if we directly change the mesh, the original one will changed either.
-        Mesh newMesh = new Mesh();
-        newMesh.Clear();
+        // prefab do not need rebuild mesh
+        if ( isPrefab == false ) {
+            // NOTE: it is possible user duplicate an GameObject, 
+            //       if we directly change the mesh, the original one will changed either.
+            Mesh newMesh = new Mesh();
+            newMesh.Clear();
 
-        // build vertices, normals, uvs and colors.
-        _spriteBorder.ForceUpdateMesh( newMesh );
+            // build vertices, normals, uvs and colors.
+            _spriteBorder.ForceUpdateMesh( newMesh );
 
-        // set the new mesh in MeshFilter
-        GameObject.DestroyImmediate( _spriteBorder.meshFilter.sharedMesh, true ); // delete old mesh (to avoid leaking)
-        _spriteBorder.meshFilter.sharedMesh = newMesh; 
+            // set the new mesh in MeshFilter
+            GameObject.DestroyImmediate( _spriteBorder.meshFilter.sharedMesh, true ); // delete old mesh (to avoid leaking)
+            _spriteBorder.meshFilter.sharedMesh = newMesh; 
+        }
 
         // update layer2d
         if ( _spriteBorder.layer2d ) {

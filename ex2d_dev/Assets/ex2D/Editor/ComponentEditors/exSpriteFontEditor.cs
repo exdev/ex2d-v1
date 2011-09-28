@@ -158,7 +158,7 @@ class exSpriteFontEditor : exSpriteBaseEditor {
             editSpriteFont.Clear ();
         }
         else {
-            if ( editSpriteFont.meshFilter.sharedMesh == null ) {
+            if ( isPrefab == false && editSpriteFont.meshFilter.sharedMesh == null ) {
                 needRebuild = true;
             }
         }
@@ -277,7 +277,7 @@ class exSpriteFontEditor : exSpriteBaseEditor {
 
         // if dirty, build it.
         if ( !EditorApplication.isPlaying && !AnimationUtility.InAnimationMode() ) {
-            if ( !isPrefab && needRebuild ) {
+            if ( needRebuild ) {
                 EditorUtility.ClearProgressBar();
                 editSpriteFont.Build();
             }
