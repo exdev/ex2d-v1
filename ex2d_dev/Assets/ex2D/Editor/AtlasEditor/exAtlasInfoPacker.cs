@@ -155,6 +155,8 @@ partial class exAtlasInfo {
         foreach ( exAtlasInfo.Element el in elements ) {
             AddSpriteAnimClipForRebuilding(el);
         }
+
+        needLayout = false;
     }
 }
 

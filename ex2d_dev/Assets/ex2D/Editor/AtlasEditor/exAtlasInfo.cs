@@ -154,6 +154,7 @@ public partial class exAtlasInfo : ScriptableObject {
     public List<string> rebuildAnimClipGUIDs = new List<string>(); ///< the sprite animation clip guid list for rebuilding
     public bool needUpdateAnimClips = false; ///< if need update anim clips
     public bool needRebuild = false; ///< if need rebuild the atlas
+    public bool needLayout = false; ///< if need layout the atlas
 
     ///////////////////////////////////////////////////////////////////////////////
     // static
@@ -234,6 +235,43 @@ public partial class exAtlasInfo : ScriptableObject {
     ///////////////////////////////////////////////////////////////////////////////
     // functions
     ///////////////////////////////////////////////////////////////////////////////
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void UpdateElement ( Texture2D _tex, bool _trim, bool _noImport = true ) {
+        //
+        if ( exTextureHelper.IsValidForAtlas (_tex) == false ) {
+            if ( _noImport ) {
+                Debug.LogError("Invalid texture settings for atlas, texture name " + _tex.name );
+                return;
+            }
+            exTextureHelper.ImportTextureForAtlas(_tex);
+        }
+
+        //
+        exAtlasInfo.Element el = null;
+        for ( int i = 0; i < elements.Count; ++i ) {
+            el = elements[i];
+            if ( el.texture == _tex )
+                break;
+        }
+
+        //
+        if ( el == null ) {
+            Debug.LogError("can't find element by texture " + _tex.name );
+            return;
+        }
+
+        //
+        if ( _trim ) {
+            el.trimRect = exTextureHelper.GetTrimTextureRect(_tex);
+        }
+        else {
+            el.trimRect = new Rect( 0, 0, _tex.width, _tex.height );
+        }
+    }
 
     // ------------------------------------------------------------------ 
     /// \param _tex the raw texture you want to add

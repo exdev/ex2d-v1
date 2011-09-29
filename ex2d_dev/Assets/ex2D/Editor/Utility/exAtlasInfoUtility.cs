@@ -24,6 +24,22 @@ using System.IO;
 public static partial class exAtlasInfoUtility {
 
     // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    [MenuItem ("Assets/Select Atlas")]
+    static void SelectAtlasByActiveTexture () {
+        if ( Selection.activeObject is Texture2D ) {
+            exAtlasDB.ElementInfo elInfo = exAtlasDB.GetElementInfo ( Selection.activeObject as Texture2D );
+            if ( elInfo != null ) {
+                Selection.activeObject 
+                    = exEditorHelper.LoadAssetFromGUID<exAtlasInfo>(elInfo.guidAtlasInfo); 
+                EditorGUIUtility.PingObject(Selection.activeObject);
+            }
+        }
+    }
+
+    // ------------------------------------------------------------------ 
     /// \param _path the directory path to save the atlas
     /// \param _name the name of the atlas
     /// \return the atlas
@@ -168,6 +184,11 @@ public static partial class exAtlasInfoUtility {
             return;
         }
 
+        //
+        if ( _atlasInfo.needLayout ) {
+            _atlasInfo.LayoutElements();
+            _atlasInfo.needLayout = false;
+        }
 
         // create temp texture
         Color buildColor = new Color ( 0.0f, 0.0f, 0.0f, 0.0f );

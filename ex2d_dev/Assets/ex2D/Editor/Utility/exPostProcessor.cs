@@ -38,6 +38,7 @@ class ex2D_PostProcessor : AssetPostprocessor {
                                          string[] _movedFromAssetPaths ) 
     {
         List<exAtlasInfo> updateAtlasInfos = new List<exAtlasInfo>();
+        List<string> atlasInfoGUIDs = new List<string>();
 
         // ======================================================== 
         // import assets 
@@ -76,7 +77,9 @@ class ex2D_PostProcessor : AssetPostprocessor {
                 exAtlasDB.ElementInfo ei = exAtlasDB.GetElementInfo(tex2d);
                 if ( ei != null ) {
                     exAtlasInfo atlasInfo = exEditorHelper.LoadAssetFromGUID<exAtlasInfo>(ei.guidAtlasInfo);
+                    atlasInfo.UpdateElement( tex2d, true, true );
                     if ( atlasInfo && updateAtlasInfos.IndexOf(atlasInfo) == -1 ) {
+                        atlasInfo.needLayout = true;
                         updateAtlasInfos.Add(atlasInfo);
                     }
                 }
@@ -106,16 +109,17 @@ class ex2D_PostProcessor : AssetPostprocessor {
 
         // build exAtlasInfo first
         foreach ( exAtlasInfo atlasInfo in updateAtlasInfos ) {
-            //  NOTE: Build atlas without import texture, without this, we will crash when changing import settings of a texture and rebuild it.
+            // NOTE: Build atlas without import texture, without this, we will crash when changing import settings of a texture and rebuild it.
             exAtlasInfoUtility.Build(atlasInfo,true);
             // NOTE: no need to update scene sprite and sprite animation clip, because we didn't change index
+
+            atlasInfoGUIDs.Add( exEditorHelper.AssetToGUID(atlasInfo) );
         }
 
         // ======================================================== 
         // deleted assets
         // ======================================================== 
 
-        List<string> atlasInfoGUIDs = new List<string>();
         foreach ( string path in _deletedAssets ) {
             // check if we are .ex2D_AtlasDB or .ex2D_SpriteAnimationDB
             if ( string.Equals(path, exAtlasDB.dbPath, System.StringComparison.CurrentCultureIgnoreCase) || 
