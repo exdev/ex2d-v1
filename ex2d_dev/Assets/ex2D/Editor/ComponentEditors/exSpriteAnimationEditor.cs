@@ -119,6 +119,7 @@ class exSpriteAnimationEditor : Editor {
                 GUI.changed = true;
             }
 
+            int idxRemoved = -1;
             for ( int i = 0; i < editSpAnim.animations.Count; ++i ) {
                 GUILayout.BeginHorizontal();
                 editSpAnim.animations[i] = 
@@ -129,6 +130,9 @@ class exSpriteAnimationEditor : Editor {
                                                                  , false 
 #endif
                                                                );
+                if ( GUILayout.Button("-", GUILayout.Width(15), GUILayout.Height(15) ) ) {
+                    idxRemoved = i;
+                }
                 if ( GUILayout.Button("Edit...", GUILayout.Width(40), GUILayout.Height(15) ) ) {
                     exSpriteAnimClipEditor editor = exSpriteAnimClipEditor.NewWindow();
                     editor.Edit(editSpAnim.animations[i]);
@@ -140,6 +144,16 @@ class exSpriteAnimationEditor : Editor {
                 // } TODO end 
                 GUILayout.EndHorizontal();
             }
+
+            // if we have item to remove
+            if ( idxRemoved != -1 ) {
+                exSpriteAnimClip animClip = editSpAnim.animations[idxRemoved];
+                editSpAnim.animations.RemoveAt(idxRemoved);
+                if ( animClip == editSpAnim.defaultAnimation ) {
+                    editSpAnim.defaultAnimation = null;
+                }
+            }
+
             EditorGUI.indentLevel = 1;
             EditorGUILayout.Space ();
         }

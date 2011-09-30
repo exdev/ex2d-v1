@@ -191,6 +191,15 @@ public class exSpriteAnimation : MonoBehaviour {
     // Unity Animation Editor, it can send message to function that only have one parameter.
 
     // ------------------------------------------------------------------ 
+    /// Play the default animation by _name 
+    // ------------------------------------------------------------------ 
+
+    public void Play () {
+        if ( defaultAnimation )
+            Play( defaultAnimation.name, 0 );
+    }
+
+    // ------------------------------------------------------------------ 
     /// \param _name the name of the animation to play
     /// Play the animation by _name 
     // ------------------------------------------------------------------ 
@@ -332,6 +341,13 @@ public class exSpriteAnimation : MonoBehaviour {
         // } DISABLE end 
         return nameToState[_name];
     }
+
+    // ------------------------------------------------------------------ 
+    /// \return the current animation state
+    /// Get the current playing animation state
+    // ------------------------------------------------------------------ 
+
+    public exSpriteAnimState GetCurrentAnimation () { return curAnimation; }
 
     // ------------------------------------------------------------------ 
     /// \return the frame info
