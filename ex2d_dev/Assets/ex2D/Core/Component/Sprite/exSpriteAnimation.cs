@@ -172,6 +172,12 @@ public class exSpriteAnimation : MonoBehaviour {
                                              delta,
                                              curAnimation.wrapMode );
 
+            // NOTE: it is possible in the events, user destroy this component. In this case, 
+            //       the curAnimation will be null.
+            if ( curAnimation == null ) {
+                return;
+            }
+
             // set sprite to current time
             exSpriteAnimClip.FrameInfo fi = GetCurFrameInfo();
             if ( fi != null )

@@ -263,8 +263,8 @@ public static class exSceneHelper {
     }
 
     // ------------------------------------------------------------------ 
-    /// \param _ the list of atlas info guid
-    /// update scene sprites by atlas info list
+    /// \param _guiBorderList the list of gui-borders 
+    /// update scene sprite borders by gui-border list
     // ------------------------------------------------------------------ 
 
     public static void UpdateSceneSpriteBorders ( List<exGUIBorder> _guiBorderList ) {
