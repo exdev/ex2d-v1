@@ -192,17 +192,33 @@ public partial class exAtlasInfo : ScriptableObject {
     // ------------------------------------------------------------------ 
 
     public static int CompareByWidth ( Element _a, Element _b ) {
-        return (int)_a.trimRect.width - (int)_b.trimRect.width;
+        int ret = (int)_a.trimRect.width - (int)_b.trimRect.width;
+        if ( ret == 0 ) {
+            return _a.texture.GetInstanceID() - _b.texture.GetInstanceID();
+        }
+        return ret;
     }
     public static int CompareByHeight ( Element _a, Element _b ) {
-        return (int)_a.trimRect.height - (int)_b.trimRect.height;
+        int ret = (int)_a.trimRect.height - (int)_b.trimRect.height;
+        if ( ret == 0 ) {
+            return _a.texture.GetInstanceID() - _b.texture.GetInstanceID();
+        }
+        return ret;
     }
     public static int CompareByArea ( Element _a, Element _b ) {
-        return (int)_a.trimRect.width * (int)_a.trimRect.height - 
+        int ret = (int)_a.trimRect.width * (int)_a.trimRect.height - 
             (int)_b.trimRect.width * (int)_b.trimRect.height;
+        if ( ret == 0 ) {
+            return _a.texture.GetInstanceID() - _b.texture.GetInstanceID();
+        }
+        return ret;
     }
     public static int CompareByName ( Element _a, Element _b ) {
-        return string.Compare( _a.texture.name, _b.texture.name );
+        int ret = string.Compare( _a.texture.name, _b.texture.name );
+        if ( ret == 0 ) {
+            return _a.texture.GetInstanceID() - _b.texture.GetInstanceID();
+        }
+        return ret;
     }
 
     public static int CompareByWidthRotate ( Element _a, Element _b ) {
@@ -216,7 +232,11 @@ public partial class exAtlasInfo : ScriptableObject {
             b_size = (int)_b.trimRect.height;
             _b.rotated = true;
         }
-        return a_size - b_size;
+        int ret = a_size - b_size;
+        if ( ret == 0 ) {
+            return _a.texture.GetInstanceID() - _b.texture.GetInstanceID();
+        }
+        return ret;
     }
     public static int CompareByHeightRotate ( Element _a, Element _b ) {
         int a_size = (int)_a.trimRect.height;
@@ -229,7 +249,11 @@ public partial class exAtlasInfo : ScriptableObject {
             b_size = (int)_b.trimRect.width;
             _b.rotated = true;
         }
-        return a_size - b_size;
+        int ret = a_size - b_size;
+        if ( ret == 0 ) {
+            return _a.texture.GetInstanceID() - _b.texture.GetInstanceID();
+        }
+        return ret;
     }
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -396,17 +420,23 @@ public partial class exAtlasInfo : ScriptableObject {
     public void RemoveElementAt ( int _idx ) {
         Element el = elements[_idx];
 
-        // remove element in atlas DB
-        exAtlasDB.RemoveElementInfo(exEditorHelper.AssetToGUID(el.texture));
-
         // get sprite animation clip by textureGUID, add them to rebuildAnimClipGUIDs
         AddSpriteAnimClipForRebuilding(el);
+        needRebuild = true;
+
+        // register undo
+        Undo.RegisterUndo ( new Object[] {
+                            exAtlasDB.DB(),
+                            this
+                            }, "RemoveElementAt" );
+
+        // remove element in atlas DB
+        exAtlasDB.RemoveElementInfo(exEditorHelper.AssetToGUID(el.texture));
 
         //
         elements.RemoveAt(_idx);
 
         //
-        needRebuild = true;
         EditorUtility.SetDirty(this);
     }
 

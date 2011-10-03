@@ -32,11 +32,6 @@ partial class exTileMapEditor : EditorWindow {
     private int curGridY = -1;
     private int margin = 30;
 
-    // private bool mapInRectSelectState = false;
-    // private Rect mapSelectRect = new Rect( 0, 0, 1, 1 );
-    // private List<int> mapSelectedGrids = new List<int>();
-    // private List<int> mapCommitGrids = new List<int>();
-
     ///////////////////////////////////////////////////////////////////////////////
     // functions
     ///////////////////////////////////////////////////////////////////////////////
@@ -331,6 +326,11 @@ partial class exTileMapEditor : EditorWindow {
 
                         e.Use();
                     }
+                }
+
+                // register undo
+                if ( e.type == EventType.MouseDown && e.button == 0 && e.clickCount == 1 ) {
+                    Undo.RegisterUndo(_tileMap, "_tileMap");
                 }
 
                 //

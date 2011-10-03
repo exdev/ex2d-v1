@@ -147,7 +147,7 @@ class ex2D_PostProcessor : AssetPostprocessor {
                 // Debug.Log( "remove sprite anim clip " + path ); // DEBUG
             }
         }
-        exSceneHelper.UpdateSceneSprites(atlasInfoGUIDs);
+        exSceneHelper.UpdateSprites(atlasInfoGUIDs);
 
         // DISABLE { 
         // for ( int i = 0; i < _movedAssets.Length; ++i )
@@ -275,10 +275,10 @@ class ex2D_SaveAssetsProcessor : SaveAssetsProcessor {
         foreach ( exAtlasInfo atlasInfo in rebuildAtlasInfos ) {
             rebuildAtlasInfoGUIDs.Add( exEditorHelper.AssetToGUID(atlasInfo) );
         }
-        exSceneHelper.UpdateSceneSprites (rebuildAtlasInfoGUIDs);
+        exSceneHelper.UpdateSprites (rebuildAtlasInfoGUIDs);
 
         // update scene sprites with rebuild guiBorder list
-        exSceneHelper.UpdateSceneSpriteBorders (rebuildGuiBorders);
+        exSceneHelper.UpdateSpriteBorders (rebuildGuiBorders);
 
         // NOTE: without this you will got leaks message
         EditorUtility.UnloadUnusedAssets();

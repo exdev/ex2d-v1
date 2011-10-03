@@ -242,7 +242,7 @@ partial class exAtlasEditor : EditorWindow {
                 // update scene sprites
                 List<string> rebuildAtlasInfos = new List<string>();
                 rebuildAtlasInfos.Add(exEditorHelper.AssetToGUID(curEdit));
-                exSceneHelper.UpdateSceneSprites (rebuildAtlasInfos);
+                exSceneHelper.UpdateSprites (rebuildAtlasInfos);
 
                 // NOTE: without this you will got leaks message
                 EditorUtility.UnloadUnusedAssets();
@@ -387,6 +387,8 @@ partial class exAtlasEditor : EditorWindow {
 
                 if ( GUILayout.Button ( "Apply" ) ) {
                     EditorUtility.DisplayProgressBar( "Layout Elements...", "Layout Elements...", 0.5f  );    
+                    // register undo
+                    Undo.RegisterUndo ( curEdit, "Apply.LayoutElements" );
                     curEdit.LayoutElements ();
                     EditorUtility.ClearProgressBar();
                 }
@@ -818,6 +820,11 @@ partial class exAtlasEditor : EditorWindow {
     void MoveSelections ( Vector2 _delta ) {
         int x_offset = 0;
         int y_offset = 0;
+        curEdit.needUpdateAnimClips = true;
+        curEdit.needRebuild = true;
+
+        // register undo
+        Undo.RegisterUndo ( curEdit, "MoveSelections" );
 
         //
         accDeltaMove += _delta;
@@ -846,8 +853,6 @@ partial class exAtlasEditor : EditorWindow {
         }
 
         //
-        curEdit.needUpdateAnimClips = true;
-        curEdit.needRebuild = true;
         EditorUtility.SetDirty(curEdit);
     }
 

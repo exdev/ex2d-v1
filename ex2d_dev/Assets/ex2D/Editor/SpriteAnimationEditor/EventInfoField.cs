@@ -71,7 +71,7 @@ partial class exSpriteAnimClipEditor {
         }
 
         // ======================================================== 
-        e = Event.current;
+        //
         // ======================================================== 
 
         if ( e.isMouse ) {
@@ -98,9 +98,10 @@ partial class exSpriteAnimClipEditor {
                      && e.clickCount == 2
                      && e.command == false ) 
                 {
+                    // Undo.RegisterUndo(curEdit, "AddEventInfo"); // DISABLE
                     exSpriteAnimClip.EventInfo eventInfo = new exSpriteAnimClip.EventInfo();
                     eventInfo.time = curEdit.SnapToSeconds( ((e.mousePosition.x - _rect.x) * _animClip.length) / totalWidth ); 
-                    _animClip.AddEvent (eventInfo);
+                    _animClip.AddEvent(eventInfo);
                     EditorUtility.SetDirty(_animClip);
                     e.Use();
                 }

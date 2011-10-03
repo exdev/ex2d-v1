@@ -114,10 +114,10 @@ public static class exSceneHelper {
 
     // ------------------------------------------------------------------ 
     /// \param _atlasInfoGUIDs the list of atlas info guid
-    /// update scene sprites by atlas info list
+    /// update sprites in current scene and in prefab by atlas info list
     // ------------------------------------------------------------------ 
 
-    public static void UpdateSceneSprites ( List<string> _atlasInfoGUIDs ) {
+    public static void UpdateSprites ( List<string> _atlasInfoGUIDs ) {
         if ( _atlasInfoGUIDs.Count == 0 )
             return;
 
@@ -264,10 +264,10 @@ public static class exSceneHelper {
 
     // ------------------------------------------------------------------ 
     /// \param _guiBorderList the list of gui-borders 
-    /// update scene sprite borders by gui-border list
+    /// update sprite borders in current scene and in prefab by gui-border list
     // ------------------------------------------------------------------ 
 
-    public static void UpdateSceneSpriteBorders ( List<exGUIBorder> _guiBorderList ) {
+    public static void UpdateSpriteBorders ( List<exGUIBorder> _guiBorderList ) {
         if ( _guiBorderList.Count == 0 )
             return;
 

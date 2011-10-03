@@ -1127,6 +1127,8 @@ partial class exSpriteAnimClipEditor : EditorWindow {
 
     void MoveSelectedFrameInfo () {
         if ( insertAt != -1 ) {
+            // Undo.RegisterUndo(curEdit, "MoveSelectedFrameInfo"); // DISABLE
+
             // add indices
             List<int> indices = new List<int>();
             foreach ( exSpriteAnimClip.FrameInfo fi in selectedFrameInfos ) {
@@ -1153,7 +1155,6 @@ partial class exSpriteAnimClipEditor : EditorWindow {
                 ++insertAt;
             }
             insertAt = -1;
-            selectedFrameInfos.Clear();
             curEdit.UpdateLength();
 
             curEdit.editorNeedRebuild = true;

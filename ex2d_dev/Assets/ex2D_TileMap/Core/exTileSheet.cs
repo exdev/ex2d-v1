@@ -84,7 +84,7 @@ public class exTileSheet : ScriptableObject {
             return new Rect ( 0.0f, 0.0f, 1.0f, 1.0f );
 
         int xStart = (tileWidth + padding) * _col + padding;
-        int yStart = (tileHeight + padding) * (row - _row - 1) + padding;
+        int yStart = (texture.height - (tileHeight + padding) * (_row + 1));
         int xEnd = xStart + tileWidth; 
         int yEnd = yStart + tileHeight; 
 
