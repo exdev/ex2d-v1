@@ -47,6 +47,7 @@ rebuild: |clean all
 RUNTIME_SOURCE_DIRS += Assets/ex2D/Core/Asset/
 RUNTIME_SOURCE_DIRS += Assets/ex2D/Core/Component/
 RUNTIME_SOURCE_DIRS += Assets/ex2D/Core/Component/AnimationHelper/
+RUNTIME_SOURCE_DIRS += Assets/ex2D/Core/Component/Camera/
 RUNTIME_SOURCE_DIRS += Assets/ex2D/Core/Component/Helper/
 RUNTIME_SOURCE_DIRS += Assets/ex2D/Core/Component/Sprite/
 RUNTIME_SOURCE_DIRS += Assets/ex2D/Core/Extension/

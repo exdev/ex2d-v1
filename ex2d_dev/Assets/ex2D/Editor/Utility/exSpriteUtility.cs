@@ -102,5 +102,43 @@ public static class exSpriteUtility {
         }
     }
 
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    static public void RecursivelyNormalizeScale ( this Transform _trans ) {
+        //
+        foreach ( Transform child in _trans ) {
+            child.RecursivelyNormalizeScale();
+        }
+
+        // if we don't have exSpriteBase component, return
+        exSpriteBase sprite = _trans.GetComponent<exSpriteBase>();
+        if ( sprite == null ) {
+            return;
+        }
+
+        //
+        switch ( sprite.plane ) {
+        case exSprite.Plane.XY:
+            sprite.scale = new Vector2( sprite.scale.x * _trans.lossyScale.x, sprite.scale.y * _trans.lossyScale.y );
+            break;
+        case exSprite.Plane.XZ:
+            sprite.scale = new Vector2( sprite.scale.x * _trans.lossyScale.x, sprite.scale.y * _trans.lossyScale.z );
+            break;
+        case exSprite.Plane.ZY:
+            sprite.scale = new Vector2( sprite.scale.x * _trans.lossyScale.z, sprite.scale.y * _trans.lossyScale.y );
+            break;
+        }
+
+        //
+        if ( _trans.parent != null ) {
+            _trans.localPosition 
+                =  new Vector3 ( _trans.localPosition.x * _trans.parent.lossyScale.x,
+                                 _trans.localPosition.y * _trans.parent.lossyScale.y,
+                                 _trans.localPosition.z * _trans.parent.lossyScale.z ) ;
+        }
+        _trans.localScale = Vector3.one;
+    }
 }
 

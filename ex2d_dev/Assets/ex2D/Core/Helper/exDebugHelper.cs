@@ -23,6 +23,10 @@ using System.Collections.Generic;
 
 public class exDebugHelper : MonoBehaviour {
 
+    ///////////////////////////////////////////////////////////////////////////////
+    // static
+    ///////////////////////////////////////////////////////////////////////////////
+
     // static instance
     private static exDebugHelper instance = null;
 
@@ -31,19 +35,73 @@ public class exDebugHelper : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     public static void ScreenPrint ( string _text ) {
-        instance.debugText.text += "\n" + _text; 
+        instance.txtPrint.text = instance.txtPrint.text + _text + "\n"; 
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public static void ScreenLog ( string _text ) {
+        instance.logs.Add(_text);
+        if ( instance.logs.Count > instance.logCount ) {
+            instance.logs.RemoveAt(0);
+        }
+        instance.updateLogText = true;
     }
 
     ///////////////////////////////////////////////////////////////////////////////
-    // properties
+    // serialized
     ///////////////////////////////////////////////////////////////////////////////
 
-    public GUIText debugText;
-    public GUIText fpsText;
+    public exSpriteFont txtPrint;
+    public exSpriteFont txtFPS;
+    public exSpriteFont txtLog;
 
-    public bool showFps = true;
-    public bool showDebugText = true;
+    [SerializeField] protected bool showFps_ = true;
+    public bool showFps {
+        get { return showFps_; }
+        set {
+            if ( showFps_ != value ) {
+                showFps_ = value;
+                if ( txtFPS != null )
+                    txtFPS.enabled = showFps_;
+            }
+        }
+    }
 
+    [SerializeField] protected bool showScreenPrint_ = true;
+    public bool showScreenPrint {
+        get { return showScreenPrint_; }
+        set {
+            if ( showScreenPrint_ != value ) {
+                showScreenPrint_ = value;
+                if ( txtPrint != null )
+                    txtPrint.enabled = showScreenPrint_;
+            }
+        }
+    }
+
+    [SerializeField] protected bool showScreenLog_ = true;
+    public bool showScreenLog {
+        get { return showScreenLog_; }
+        set {
+            if ( showScreenLog_ != value ) {
+                showScreenLog_ = value;
+                if ( txtLog != null ) 
+                    txtLog.enabled = showScreenLog_;
+            }
+        }
+    }
+
+    public int logCount = 10;
+
+    ///////////////////////////////////////////////////////////////////////////////
+    // non-serialized
+    ///////////////////////////////////////////////////////////////////////////////
+
+    [System.NonSerialized] public List<string> logs = new List<string>();
+    [System.NonSerialized] public bool updateLogText = false; 
     private int frames = 0;
     private float fps = 0.0f;
     private float lastInterval = 0.0f;
@@ -60,13 +118,9 @@ public class exDebugHelper : MonoBehaviour {
         if ( instance == null )
             instance = this;
 
-        debugText.text = "";
-        if ( showFps == false && fpsText != null ) {
-            fpsText.enabled = false;
-        }
-        if ( showDebugText == false && debugText != null ) {
-            debugText.enabled = false;
-        }
+        txtPrint.text = "";
+        txtFPS.text = "";
+        txtLog.text = "";
     }
 
     // ------------------------------------------------------------------ 
@@ -85,6 +139,9 @@ public class exDebugHelper : MonoBehaviour {
         // count fps
         ++frames;
 
+        // update log
+        UpdateLog ();
+
         // NOTE: the OnGUI call multiple times in one frame, so we just clear text here.
         StartCoroutine ( CleanDebugText() );
     }
@@ -98,7 +155,7 @@ public class exDebugHelper : MonoBehaviour {
         fps = frames / (timeNow - lastInterval);
         frames = 0;
         lastInterval = timeNow;
-        fpsText.text = "fps: " + fps.ToString("f2");
+        txtFPS.text = "fps: " + fps.ToString("f2");
     }
 
     // ------------------------------------------------------------------ 
@@ -107,6 +164,21 @@ public class exDebugHelper : MonoBehaviour {
 
     IEnumerator CleanDebugText () {
         yield return new WaitForEndOfFrame();
-        debugText.text = "";
+        txtPrint.text = "";
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void UpdateLog () {
+        if ( updateLogText ) {
+            string text = "";
+            foreach ( string l in logs ) {
+                text = text + l + "\n";
+            }
+            txtLog.text = text;
+            updateLogText = false;
+        }
     }
 }

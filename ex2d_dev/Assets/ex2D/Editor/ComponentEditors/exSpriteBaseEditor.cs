@@ -156,9 +156,8 @@ class exSpriteBaseEditor : exPlaneEditor {
             if ( usePixelPerfect != hasPixelPerfectComponent ) {
                 if ( usePixelPerfect )
                     editSpriteBase.gameObject.AddComponent<exPixelPerfect>();
-                else {
+                else
                     Object.DestroyImmediate(compPixelPerfect,true);
-                }
                 GUI.changed = true;
             }
             GUI.enabled = true;

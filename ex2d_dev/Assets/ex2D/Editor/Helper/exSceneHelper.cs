@@ -24,6 +24,28 @@ using System.IO;
 public static class exSceneHelper {
 
     // ------------------------------------------------------------------ 
+    /// change transform.scale to Scale
+    // ------------------------------------------------------------------ 
+
+    [MenuItem ("Edit/ex2D/Normalize Scene Sprite Scales")]
+    public static void NormalizeSceneSpriteScale () {
+        EditorUtility.DisplayProgressBar( "Normalize Scene Sprite Scales...", 
+                                          "Normalize Scene Sprite Scales...", 
+                                          0.5f );    
+
+        Transform[] transforms = GameObject.FindObjectsOfType(typeof(Transform)) as Transform[];
+        for ( int i = 0; i < transforms.Length; ++i ) {
+            // NOTE: only doing normalize from the root
+            Transform trans = transforms[i]; 
+            if ( trans.root != trans )
+                continue;
+
+            trans.RecursivelyNormalizeScale ();
+        }
+        EditorUtility.ClearProgressBar();
+    }
+
+    // ------------------------------------------------------------------ 
     /// update GameObject with exLayer2D component in the current scene
     // ------------------------------------------------------------------ 
 
