@@ -37,7 +37,7 @@ public class exSoftClip : exPlane {
         get { return width_; }
         set {
             if ( width_ != value ) {
-                width_ = value;
+                width_ = Mathf.Max(value, 0.0f);
                 updateFlags |= UpdateFlags.Vertex;
             }
         }
@@ -52,7 +52,7 @@ public class exSoftClip : exPlane {
         get { return height_; }
         set {
             if ( height_ != value ) {
-                height_ = value;
+                height_ = Mathf.Max(value, 0.0f);
                 updateFlags |= UpdateFlags.Vertex;
             }
         }

@@ -99,7 +99,8 @@ class exSpriteAnimationEditor : Editor {
         showAnimations = EditorGUILayout.Foldout(showAnimations, "Animations");
         if ( showAnimations ) {
             EditorGUI.indentLevel = 2;
-            int count = EditorGUILayout.IntField ( "Size", editSpAnim.animations.Count );
+            // int count = EditorGUILayout.IntField ( "Size", editSpAnim.animations.Count );
+            int count = exEditorHelper.IntField ( "Size", editSpAnim.animations.Count );
             lastRect = GUILayoutUtility.GetLastRect ();  
             dropRect.height =  lastRect.yMax - dropRect.y;
             count = Mathf.Max ( count, 0 );
