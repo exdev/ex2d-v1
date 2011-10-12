@@ -31,7 +31,13 @@ partial class exSpriteAnimClipEditor {
         Rect curRect = new Rect( -100, _rect.y, 7, maxHeight );
         exSpriteAnimClip.EventInfo lastClicked = null;
 
+        // NOTE: when editor.playing, the selectedFrameInfos will become invalid, don't know why :(
+        bool selectedAreInvalid = true;
         foreach ( exSpriteAnimClip.EventInfo eventInfo in _animClip.eventInfos ) {
+
+            if ( selectedEventInfos.IndexOf(eventInfo) != -1 )
+                selectedAreInvalid = false;
+
             float at = _rect.x + (eventInfo.time / _animClip.length) * totalWidth;
             lastRect = curRect;
             curRect = new Rect( at - 4, _rect.y, 7, maxHeight );
@@ -45,6 +51,8 @@ partial class exSpriteAnimClipEditor {
             if ( clicked_ei != null )
                 lastClicked = clicked_ei;
         }
+        if ( selectedAreInvalid )
+            selectedEventInfos.Clear();
 
         // ======================================================== 
         Event e = Event.current;

@@ -105,6 +105,7 @@ public class exSpriteAnimation : MonoBehaviour {
     private bool paused = false;
     private exAtlas defaultAtlas;
     private int defaultIndex;
+    private int lastEventInfoIndex = -1;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -167,10 +168,11 @@ public class exSpriteAnimation : MonoBehaviour {
 
             // advance the time
             curAnimation.time += delta;
-            curAnimation.clip.TriggerEvents( gameObject, 
-                                             curTime,
-                                             delta,
-                                             curAnimation.wrapMode );
+            lastEventInfoIndex = curAnimation.clip.TriggerEvents( gameObject, 
+                                                                  lastEventInfoIndex,
+                                                                  curTime,
+                                                                  delta,
+                                                                  curAnimation.wrapMode );
 
             // NOTE: it is possible in the events, user destroy this component. In this case, 
             //       the curAnimation will be null.
