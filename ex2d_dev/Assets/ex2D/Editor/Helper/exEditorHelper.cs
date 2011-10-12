@@ -278,7 +278,10 @@ public static class exEditorHelper {
 
         // load material from "texture_path/Materials/texture_name.mat"
         string materialDirectory = Path.Combine( Path.GetDirectoryName(texturePath), "Materials" );
-        string materialPath = Path.Combine( materialDirectory, _texture.name + ".mat" );
+        string materialPath = Path.Combine( materialDirectory, _texture.name 
+                                            + "-" 
+                                            + Path.GetExtension (texturePath).Substring(1) 
+                                            + ".mat" );
         Material newMaterial = (Material)AssetDatabase.LoadAssetAtPath(materialPath, typeof(Material));
 
         // if not found, load material from "texture_path/texture_name.mat"
