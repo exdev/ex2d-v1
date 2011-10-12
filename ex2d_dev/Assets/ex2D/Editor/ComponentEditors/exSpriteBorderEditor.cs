@@ -301,9 +301,9 @@ class exSpriteBorderEditor : exSpriteBaseEditor {
         }
 
         //
-        Vector3[] vertices = new Vector3[4]; 
-        Vector3[] corners = new Vector3[5];
-        Vector3[] controls = new Vector3[8];
+        Vector3[] vertices  = new Vector3[4]; 
+        Vector3[] corners   = new Vector3[5];
+        Vector3[] controls  = new Vector3[8];
 
         float halfWidthScaled = editSpriteBorder.width * editSpriteBorder.scale.x * 0.5f;
         float halfHeightScaled = editSpriteBorder.height * editSpriteBorder.scale.y * 0.5f;
@@ -330,24 +330,24 @@ class exSpriteBorderEditor : exSpriteBaseEditor {
         //
         switch ( editSpriteBorder.plane ) {
         case exPlane.Plane.XY:
-            vertices[0] = new Vector3 (-halfWidthScaled+offsetX,  halfHeightScaled+offsetY, 0.0f );
-            vertices[1] = new Vector3 ( halfWidthScaled+offsetX,  halfHeightScaled+offsetY, 0.0f );
-            vertices[2] = new Vector3 ( halfWidthScaled+offsetX, -halfHeightScaled+offsetY, 0.0f );
-            vertices[3] = new Vector3 (-halfWidthScaled+offsetX, -halfHeightScaled+offsetY, 0.0f );
+            vertices[0] = new Vector3 (-halfWidthScaled-offsetX,  halfHeightScaled+offsetY, 0.0f );
+            vertices[1] = new Vector3 ( halfWidthScaled-offsetX,  halfHeightScaled+offsetY, 0.0f );
+            vertices[2] = new Vector3 ( halfWidthScaled-offsetX, -halfHeightScaled+offsetY, 0.0f );
+            vertices[3] = new Vector3 (-halfWidthScaled-offsetX, -halfHeightScaled+offsetY, 0.0f );
             break;
 
         case exPlane.Plane.XZ:
-            vertices[0] = new Vector3 (-halfWidthScaled+offsetX, 0.0f,  halfHeightScaled+offsetY );
-            vertices[1] = new Vector3 ( halfWidthScaled+offsetX, 0.0f,  halfHeightScaled+offsetY );
-            vertices[2] = new Vector3 ( halfWidthScaled+offsetX, 0.0f, -halfHeightScaled+offsetY );
-            vertices[3] = new Vector3 (-halfWidthScaled+offsetX, 0.0f, -halfHeightScaled+offsetY );
+            vertices[0] = new Vector3 (-halfWidthScaled-offsetX, 0.0f,  halfHeightScaled+offsetY );
+            vertices[1] = new Vector3 ( halfWidthScaled-offsetX, 0.0f,  halfHeightScaled+offsetY );
+            vertices[2] = new Vector3 ( halfWidthScaled-offsetX, 0.0f, -halfHeightScaled+offsetY );
+            vertices[3] = new Vector3 (-halfWidthScaled-offsetX, 0.0f, -halfHeightScaled+offsetY );
             break;
 
         case exPlane.Plane.ZY:
-            vertices[0] = new Vector3 (0.0f,  halfHeightScaled+offsetY, -halfWidthScaled+offsetX );
-            vertices[1] = new Vector3 (0.0f,  halfHeightScaled+offsetY,  halfWidthScaled+offsetX );
-            vertices[2] = new Vector3 (0.0f, -halfHeightScaled+offsetY,  halfWidthScaled+offsetX );
-            vertices[3] = new Vector3 (0.0f, -halfHeightScaled+offsetY, -halfWidthScaled+offsetX );
+            vertices[0] = new Vector3 (0.0f,  halfHeightScaled+offsetY, -halfWidthScaled-offsetX );
+            vertices[1] = new Vector3 (0.0f,  halfHeightScaled+offsetY,  halfWidthScaled-offsetX );
+            vertices[2] = new Vector3 (0.0f, -halfHeightScaled+offsetY,  halfWidthScaled-offsetX );
+            vertices[3] = new Vector3 (0.0f, -halfHeightScaled+offsetY, -halfWidthScaled-offsetX );
             break;
         }
 

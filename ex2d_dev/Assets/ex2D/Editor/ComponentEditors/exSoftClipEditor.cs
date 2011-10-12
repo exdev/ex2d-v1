@@ -167,24 +167,24 @@ class exSoftClipEditor : exPlaneEditor {
         //
         switch ( curEdit.plane ) {
         case exPlane.Plane.XY:
-            vertices[0] = new Vector3 (-halfWidthScaled+offsetX,  halfHeightScaled+offsetY, 0.0f );
-            vertices[1] = new Vector3 ( halfWidthScaled+offsetX,  halfHeightScaled+offsetY, 0.0f );
-            vertices[2] = new Vector3 ( halfWidthScaled+offsetX, -halfHeightScaled+offsetY, 0.0f );
-            vertices[3] = new Vector3 (-halfWidthScaled+offsetX, -halfHeightScaled+offsetY, 0.0f );
+            vertices[0] = new Vector3 (-halfWidthScaled-offsetX,  halfHeightScaled+offsetY, 0.0f );
+            vertices[1] = new Vector3 ( halfWidthScaled-offsetX,  halfHeightScaled+offsetY, 0.0f );
+            vertices[2] = new Vector3 ( halfWidthScaled-offsetX, -halfHeightScaled+offsetY, 0.0f );
+            vertices[3] = new Vector3 (-halfWidthScaled-offsetX, -halfHeightScaled+offsetY, 0.0f );
             break;
 
         case exPlane.Plane.XZ:
-            vertices[0] = new Vector3 (-halfWidthScaled+offsetX, 0.0f,  halfHeightScaled+offsetY );
-            vertices[1] = new Vector3 ( halfWidthScaled+offsetX, 0.0f,  halfHeightScaled+offsetY );
-            vertices[2] = new Vector3 ( halfWidthScaled+offsetX, 0.0f, -halfHeightScaled+offsetY );
-            vertices[3] = new Vector3 (-halfWidthScaled+offsetX, 0.0f, -halfHeightScaled+offsetY );
+            vertices[0] = new Vector3 (-halfWidthScaled-offsetX, 0.0f,  halfHeightScaled+offsetY );
+            vertices[1] = new Vector3 ( halfWidthScaled-offsetX, 0.0f,  halfHeightScaled+offsetY );
+            vertices[2] = new Vector3 ( halfWidthScaled-offsetX, 0.0f, -halfHeightScaled+offsetY );
+            vertices[3] = new Vector3 (-halfWidthScaled-offsetX, 0.0f, -halfHeightScaled+offsetY );
             break;
 
         case exPlane.Plane.ZY:
-            vertices[0] = new Vector3 (0.0f,  halfHeightScaled+offsetY, -halfWidthScaled+offsetX );
-            vertices[1] = new Vector3 (0.0f,  halfHeightScaled+offsetY,  halfWidthScaled+offsetX );
-            vertices[2] = new Vector3 (0.0f, -halfHeightScaled+offsetY,  halfWidthScaled+offsetX );
-            vertices[3] = new Vector3 (0.0f, -halfHeightScaled+offsetY, -halfWidthScaled+offsetX );
+            vertices[0] = new Vector3 (0.0f,  halfHeightScaled+offsetY, -halfWidthScaled-offsetX );
+            vertices[1] = new Vector3 (0.0f,  halfHeightScaled+offsetY,  halfWidthScaled-offsetX );
+            vertices[2] = new Vector3 (0.0f, -halfHeightScaled+offsetY,  halfWidthScaled-offsetX );
+            vertices[3] = new Vector3 (0.0f, -halfHeightScaled+offsetY, -halfWidthScaled-offsetX );
             break;
         }
 
