@@ -168,17 +168,20 @@ public class exSpriteAnimation : MonoBehaviour {
 
             // advance the time
             curAnimation.time += delta;
-            lastEventInfoIndex = curAnimation.clip.TriggerEvents( gameObject, 
-                                                                  lastEventInfoIndex,
-                                                                  curTime,
-                                                                  delta,
-                                                                  curAnimation.wrapMode );
+            exSpriteAnimState lastAnimation = curAnimation;
+            int newIdx = curAnimation.clip.TriggerEvents( this, 
+                                                          lastAnimation,
+                                                          lastEventInfoIndex,
+                                                          curTime,
+                                                          delta,
+                                                          curAnimation.wrapMode );
 
             // NOTE: it is possible in the events, user destroy this component. In this case, 
             //       the curAnimation will be null.
-            if ( curAnimation == null ) {
+            if ( curAnimation == null || curAnimation != lastAnimation ) {
                 return;
             }
+            lastEventInfoIndex = newIdx;
 
             // set sprite to current time
             exSpriteAnimClip.FrameInfo fi = GetCurFrameInfo();
@@ -231,6 +234,10 @@ public class exSpriteAnimation : MonoBehaviour {
                 curAnimation.time = curAnimation.frameTimes[_index];
             playing = true;
             paused = false;
+            if ( curAnimation.speed >= 0.0f )
+                lastEventInfoIndex = -1;
+            else
+                lastEventInfoIndex = curAnimation.clip.eventInfos.Count;
         }
     }
 
@@ -356,6 +363,15 @@ public class exSpriteAnimation : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     public exSpriteAnimState GetCurrentAnimation () { return curAnimation; }
+
+    // DISABLE { 
+    // // ------------------------------------------------------------------ 
+    // // \return the last event info index
+    // // Get the last event info index
+    // // ------------------------------------------------------------------ 
+
+    // public int GetLastEventInfoIndex () { return lastEventInfoIndex; }
+    // } DISABLE end 
 
     // ------------------------------------------------------------------ 
     /// \return the frame info
