@@ -76,7 +76,7 @@ public partial class exAtlasInfo : ScriptableObject {
 
         public exAtlasInfo atlasInfo; ///< the referernced atlas info 
         public Texture2D texture;     ///< the raw texture
-        public int[] coord = new int[] { 0, 0 }; ///< the coordination of the element in atlas. start from top-left (0,0) to bottom-right (1,1)
+        public int[] coord = new int[] { 0, 0 }; ///< the coordination of the element in atlas. start from top-left (0,0) to bottom-right (width,height)
         public Rect trimRect; ///< the trimed rect of the raw texture
 
         // ======================================================== 

@@ -78,10 +78,12 @@ partial class exSpriteAnimClipEditor {
                         float offsetX = (width - el.trimRect.width) * 0.5f - el.trimRect.x;
                         float offsetY = (height - el.trimRect.height) * 0.5f - el.trimRect.y;
 
-                        Rect frameRect = new Rect( -el.trimRect.x * previewScale, 
-                                                   -el.trimRect.y * previewScale, 
-                                                   width * previewScale, 
-                                                   height * previewScale );
+                        // DELME { 
+                        // Rect frameRect = new Rect( -el.trimRect.x * previewScale, 
+                        //                            -el.trimRect.y * previewScale, 
+                        //                            width * previewScale, 
+                        //                            height * previewScale );
+                        // } DELME end 
                         Rect rect2 = new Rect ( (_rect.width - el.trimRect.width * previewScale) * 0.5f - offsetX * previewScale,
                                                 (_rect.height - el.trimRect.height * previewScale) * 0.5f - offsetY * previewScale,
                                                 el.trimRect.width * previewScale, 
@@ -97,27 +99,40 @@ partial class exSpriteAnimClipEditor {
                         // } DISABLE end 
 
                         GUI.BeginGroup( _rect );
+                            // DELME { 
                             // draw background
                             // Color old = GUI.color;
                             // GUI.color = new Color( 1.0f, 0.0f, 0.85f, 0.2f );
                             //     GUI.DrawTexture( rect2, exEditorHelper.WhiteTexture() );
                             // GUI.color = old;
 
-                            // draw texture
-                            GUI.BeginGroup( rect2 );
-                                GUI.BeginGroup( new Rect( (rect2.width - el.trimRect.width * previewScale) * 0.5f,
-                                                          (rect2.height - el.trimRect.height * previewScale) * 0.5f,
-                                                          el.trimRect.width * previewScale, 
-                                                          el.trimRect.height * previewScale ) );
-                                    GUI.DrawTexture( frameRect, el.texture );
-                                GUI.EndGroup();
-                            GUI.EndGroup();
+                            // // draw texture
+                            // GUI.BeginGroup( rect2 );
+                            //     GUI.BeginGroup( new Rect( (rect2.width - el.trimRect.width * previewScale) * 0.5f,
+                            //                               (rect2.height - el.trimRect.height * previewScale) * 0.5f,
+                            //                               el.trimRect.width * previewScale, 
+                            //                               el.trimRect.height * previewScale ) );
+                            //         GUI.DrawTexture( frameRect, el.texture );
+                            //     GUI.EndGroup();
+                            // GUI.EndGroup();
+                            // } DELME end 
 
+                            Graphics.DrawTexture ( rect2, 
+                                                   el.texture,  
+                                                   new Rect( el.trimRect.x/el.texture.width, 
+                                                             (el.texture.height - el.trimRect.y - el.trimRect.height)/el.texture.height,
+                                                             el.trimRect.width/el.texture.width,
+                                                             el.trimRect.height/el.texture.height ) ,
+                                                   0, 0, 0, 0,
+                                                   Color.white/2.0f );
+
+                            // DELME { 
                             // draw border
                             // Color oldBGColor = GUI.backgroundColor;
                             // GUI.backgroundColor = Color.black;
                             //     GUI.Box ( rect2, GUIContent.none, exEditorHelper.RectBorderStyle() );
                             // GUI.backgroundColor = oldBGColor;
+                            // } DELME end 
                         GUI.EndGroup();
                     }
                 }
