@@ -672,8 +672,9 @@ public class exSpriteBorder : exSpriteBase {
 
         //
         if ( guiBorder_ != _border ) {
-            if ( guiBorder_ == null || guiBorder_.border != _border.border )
+            if ( guiBorder_ == null || guiBorder_.border != _border.border ) {
                 updateFlags |= UpdateFlags.Vertex;
+            }
             guiBorder_ = _border;
         }
 

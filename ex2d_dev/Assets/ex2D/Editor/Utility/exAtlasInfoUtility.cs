@@ -90,15 +90,14 @@ public static partial class exAtlasInfoUtility {
                                        newAtlasInfo.height, 
                                        TextureFormat.ARGB32, 
                                        false );
-        Color buildColor = new Color ( newAtlasInfo.buildColor.r,
+        Color32 buildColor = new Color ( newAtlasInfo.buildColor.r,
                                        newAtlasInfo.buildColor.g,
                                        newAtlasInfo.buildColor.b,
                                        0.0f );
-        for ( int i = 0; i < newAtlasInfo.width; ++i ) {
-            for ( int j = 0; j < newAtlasInfo.height; ++j ) {
-                tex.SetPixel(i, j, buildColor );
-            }
-        }
+        Color32[] colors = new Color32[newAtlasInfo.width*newAtlasInfo.height];
+        for ( int i = 0; i < newAtlasInfo.width * newAtlasInfo.height; ++i )
+            colors[i] = buildColor;
+        tex.SetPixels32( colors );
         tex.Apply(false);
 
         // save texture to png
@@ -109,8 +108,8 @@ public static partial class exAtlasInfoUtility {
         byte[] pngData = tex.EncodeToPNG();
         if (pngData != null)
             File.WriteAllBytes(atlasTexturePath, pngData);
-        AssetDatabase.ImportAsset( atlasTexturePath );
         Object.DestroyImmediate(tex);
+        AssetDatabase.ImportAsset( atlasTexturePath );
 
         // import texture
         EditorUtility.DisplayProgressBar( "Creating Atlas...",
@@ -119,7 +118,7 @@ public static partial class exAtlasInfoUtility {
         TextureImporter importSettings = TextureImporter.GetAtPath(atlasTexturePath) as TextureImporter;
         importSettings.maxTextureSize = Mathf.Max( newAtlasInfo.width, newAtlasInfo.height );
         importSettings.textureFormat = TextureImporterFormat.AutomaticTruecolor;
-        importSettings.isReadable = true;
+        importSettings.isReadable = false;
         importSettings.mipmapEnabled = false;
         importSettings.textureType = TextureImporterType.Advanced;
         importSettings.npotScale = TextureImporterNPOTScale.None;
@@ -191,7 +190,7 @@ public static partial class exAtlasInfoUtility {
         }
 
         // create temp texture
-        Color buildColor = new Color ( 0.0f, 0.0f, 0.0f, 0.0f );
+        Color32 buildColor = new Color ( 0.0f, 0.0f, 0.0f, 0.0f );
         if ( _atlasInfo.useBuildColor )
             buildColor = new Color ( _atlasInfo.buildColor.r,
                                      _atlasInfo.buildColor.g,
@@ -200,11 +199,10 @@ public static partial class exAtlasInfoUtility {
 
         string path = AssetDatabase.GetAssetPath(texture);
         Texture2D tex = new Texture2D(_atlasInfo.width, _atlasInfo.height, TextureFormat.ARGB32, false);
-        for ( int x = 0; x < _atlasInfo.width; ++x ) {
-            for ( int y = 0; y < _atlasInfo.height; ++y ) {
-                tex.SetPixel(x, y, buildColor );
-            }
-        }
+        Color32[] colors = new Color32[_atlasInfo.width*_atlasInfo.height];
+        for ( int i = 0; i < _atlasInfo.width * _atlasInfo.height; ++i )
+            colors[i] = buildColor;
+        tex.SetPixels32( colors );
 
         EditorUtility.DisplayProgressBar( "Building Atlas " + _atlasInfo.name, "Building Atlas...", 0.1f );    
 
@@ -220,6 +218,11 @@ public static partial class exAtlasInfoUtility {
         if (pngData != null)
             File.WriteAllBytes(path, pngData);
         Object.DestroyImmediate(tex);
+        AssetDatabase.ImportAsset( path );
+
+        // now we finish atlas texture filling, we should turn off Read/Write settings, that will save memory a lot!
+        TextureImporter importSettings = TextureImporter.GetAtPath(path) as TextureImporter;
+        importSettings.isReadable = false;
         AssetDatabase.ImportAsset( path );
 
         //

@@ -194,14 +194,20 @@ public partial class exAtlasInfo : ScriptableObject {
     public static int CompareByWidth ( Element _a, Element _b ) {
         int ret = (int)_a.trimRect.width - (int)_b.trimRect.width;
         if ( ret == 0 ) {
-            return _a.texture.GetInstanceID() - _b.texture.GetInstanceID();
+            ret = _a.texture.GetInstanceID() - _b.texture.GetInstanceID();
+        }
+        if ( _a.isFontElement && _b.isFontElement && ret == 0 ) {
+            ret = _a.charInfo.id - _b.charInfo.id;
         }
         return ret;
     }
     public static int CompareByHeight ( Element _a, Element _b ) {
         int ret = (int)_a.trimRect.height - (int)_b.trimRect.height;
         if ( ret == 0 ) {
-            return _a.texture.GetInstanceID() - _b.texture.GetInstanceID();
+            ret = _a.texture.GetInstanceID() - _b.texture.GetInstanceID();
+        }
+        if ( _a.isFontElement && _b.isFontElement && ret == 0 ) {
+            ret = _a.charInfo.id - _b.charInfo.id;
         }
         return ret;
     }
@@ -209,14 +215,20 @@ public partial class exAtlasInfo : ScriptableObject {
         int ret = (int)_a.trimRect.width * (int)_a.trimRect.height - 
             (int)_b.trimRect.width * (int)_b.trimRect.height;
         if ( ret == 0 ) {
-            return _a.texture.GetInstanceID() - _b.texture.GetInstanceID();
+            ret = _a.texture.GetInstanceID() - _b.texture.GetInstanceID();
+        }
+        if ( _a.isFontElement && _b.isFontElement && ret == 0 ) {
+            ret = _a.charInfo.id - _b.charInfo.id;
         }
         return ret;
     }
     public static int CompareByName ( Element _a, Element _b ) {
         int ret = string.Compare( _a.texture.name, _b.texture.name );
         if ( ret == 0 ) {
-            return _a.texture.GetInstanceID() - _b.texture.GetInstanceID();
+            ret = _a.texture.GetInstanceID() - _b.texture.GetInstanceID();
+        }
+        if ( _a.isFontElement && _b.isFontElement && ret == 0 ) {
+            ret = _a.charInfo.id - _b.charInfo.id;
         }
         return ret;
     }
@@ -234,7 +246,10 @@ public partial class exAtlasInfo : ScriptableObject {
         }
         int ret = a_size - b_size;
         if ( ret == 0 ) {
-            return _a.texture.GetInstanceID() - _b.texture.GetInstanceID();
+            ret = _a.texture.GetInstanceID() - _b.texture.GetInstanceID();
+        }
+        if ( _a.isFontElement && _b.isFontElement && ret == 0 ) {
+            ret = _a.charInfo.id - _b.charInfo.id;
         }
         return ret;
     }
@@ -251,7 +266,10 @@ public partial class exAtlasInfo : ScriptableObject {
         }
         int ret = a_size - b_size;
         if ( ret == 0 ) {
-            return _a.texture.GetInstanceID() - _b.texture.GetInstanceID();
+            ret = _a.texture.GetInstanceID() - _b.texture.GetInstanceID();
+        }
+        if ( _a.isFontElement && _b.isFontElement && ret == 0 ) {
+            ret = _a.charInfo.id - _b.charInfo.id;
         }
         return ret;
     }

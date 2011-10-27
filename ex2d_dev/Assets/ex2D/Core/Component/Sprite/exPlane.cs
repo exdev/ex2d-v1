@@ -121,10 +121,15 @@ public class exPlane : MonoBehaviour {
         }
         set {
             Camera newCamera = value;
-            // if ( newCamera == null )
-            //     newCamera = Camera.main;
             if ( newCamera != camera_ ) {
                 camera_ = newCamera;
+
+                // update sprite manager
+                spriteMng_ = camera_.GetComponent<exSpriteMng>();
+                if ( spriteMng_ == null )
+                    spriteMng_ = camera_.gameObject.AddComponent<exSpriteMng>();
+
+                // update layer2d 
                 if ( layer2d )
                     layer2d_.UpdateDepth();
             }
@@ -244,7 +249,18 @@ public class exPlane : MonoBehaviour {
     /// user should only change this in class derived from exPlane.
     // ------------------------------------------------------------------ 
 
-	[System.NonSerialized] public UpdateFlags updateFlags = UpdateFlags.None;
+    protected UpdateFlags updateFlags_ = UpdateFlags.None;
+	public UpdateFlags updateFlags {
+        set {
+            updateFlags_ = value;
+            if ( updateFlags_ != UpdateFlags.None ) {
+                if ( spriteMng != null ) {
+                    spriteMng_.AddToCommitList(this);
+                }
+            }
+        }
+        get { return updateFlags_; }
+    }
 
     // ------------------------------------------------------------------ 
     /// The bounding rect of the plane
@@ -283,6 +299,27 @@ public class exPlane : MonoBehaviour {
         } 
     }
 
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    protected exSpriteMng spriteMng_ = null;
+    protected exSpriteMng spriteMng {
+        get {
+            if ( camera_ == null )
+                return null;
+
+            if ( spriteMng_ == null ) {
+                spriteMng_ = camera_.GetComponent<exSpriteMng>();
+                if ( spriteMng_ == null )
+                    spriteMng_ = camera_.gameObject.AddComponent<exSpriteMng>();
+            }
+            return spriteMng_;
+        }
+    }
+
+    [System.NonSerialized] public bool inCommitList = false;
+
     ///////////////////////////////////////////////////////////////////////////////
     // functions
     ///////////////////////////////////////////////////////////////////////////////
@@ -311,14 +348,26 @@ public class exPlane : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     virtual protected void Awake () {
+        //
         if ( camera_ == null )
             camera_ = Camera.main;
+
+        //
+        if ( camera_ != null ) {
+            spriteMng_ = camera_.GetComponent<exSpriteMng>();
+            if ( spriteMng_ == null )
+                spriteMng_ = camera_.gameObject.AddComponent<exSpriteMng>();
+        }
+
+        //
         meshFilter_ = GetComponent<MeshFilter>();
 
+        //
         layer2d_ = GetComponent<exLayer2D>();
         if ( layer2d_ )
             layer2d_.plane = this;
 
+        //
         collisionHelper_ = GetComponent<exCollisionHelper>();
         if ( collisionHelper_ )
             collisionHelper_.plane = this;
@@ -373,16 +422,18 @@ public class exPlane : MonoBehaviour {
         }
     }
 
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
+    // DISABLE { 
+    // // ------------------------------------------------------------------ 
+    // // Desc: 
+    // // ------------------------------------------------------------------ 
 
-    void LateUpdate () {
-        if ( updateFlags != UpdateFlags.None ) {
-            Commit();
-            updateFlags = UpdateFlags.None;
-        }
-    }
+    // void LateUpdate () {
+    //     if ( updateFlags != UpdateFlags.None ) {
+    //         Commit();
+    //         updateFlags = UpdateFlags.None;
+    //     }
+    // }
+    // } DISABLE end 
 
     // ------------------------------------------------------------------ 
     /// A virtual for user to override.

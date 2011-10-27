@@ -40,7 +40,7 @@ public class RaycastSorter : IComparer {
 [System.Serializable]
 public class exUIEvent {
     public enum Type {
-    } 
+    }
 }
 
 // ------------------------------------------------------------------ 

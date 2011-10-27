@@ -207,8 +207,9 @@ public class exSpriteFont : exSpriteBase {
         set {
             if ( outlineWidth_ != value ) {
                 outlineWidth_ = value;
-                if ( useOutline_ )
+                if ( useOutline_ ) {
                     updateFlags |= UpdateFlags.Vertex;
+                }
             }
         }
     }
@@ -223,8 +224,9 @@ public class exSpriteFont : exSpriteBase {
         set {
             if ( outlineColor_ != value ) {
                 outlineColor_ = value;
-                if ( useOutline_ )
+                if ( useOutline_ ) {
                     updateFlags |= UpdateFlags.Color;
+                }
             }
         }
     }
@@ -256,8 +258,9 @@ public class exSpriteFont : exSpriteBase {
         set {
             if ( shadowBias_ != value ) {
                 shadowBias_ = value;
-                if ( useShadow_ )
+                if ( useShadow_ ) {
                     updateFlags |= UpdateFlags.Vertex;
+                }
             }
         }
     }
@@ -272,8 +275,9 @@ public class exSpriteFont : exSpriteBase {
         set {
             if ( shadowColor_ != value ) {
                 shadowColor_ = value;
-                if ( useShadow_ )
+                if ( useShadow_ ) {
                     updateFlags |= UpdateFlags.Color;
+                }
             }
         }
     }

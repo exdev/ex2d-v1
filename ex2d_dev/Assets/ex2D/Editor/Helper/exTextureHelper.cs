@@ -71,6 +71,21 @@ public static class exTextureHelper {
     }
 
     // ------------------------------------------------------------------ 
+    /// \param _tex
+    /// \param _isReadable
+    /// change the Read/Write settings to false
+    // ------------------------------------------------------------------ 
+
+    public static void SetReadable ( Texture2D _tex, bool _isReadable ) {
+        string path = AssetDatabase.GetAssetPath(_tex);
+        TextureImporter importer = TextureImporter.GetAtPath(path) as TextureImporter;
+        if ( importer.isReadable != _isReadable ) {
+            importer.isReadable = _isReadable;
+            AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate|ImportAssetOptions.ForceSynchronousImport);
+        }
+    }
+
+    // ------------------------------------------------------------------ 
     /// \param _dest the target texture
     /// \param _pos the fill start position in target texture
     /// \param _src the src texture

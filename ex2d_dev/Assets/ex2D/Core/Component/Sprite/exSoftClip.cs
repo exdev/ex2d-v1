@@ -116,8 +116,6 @@ public class exSoftClip : exPlane {
         base.Awake();
 
         updateFlags |= UpdateFlags.Vertex;
-        Commit ();
-        updateFlags = UpdateFlags.None;
     }
 
     // ------------------------------------------------------------------ 

@@ -22,10 +22,20 @@ UNITY_VER = UNITY_3_4
 MKDIR = mkdir -p
 RM = rm -f
 
-# Target
-TARGET_DIR = ../ex2d_submit/Assets/ex2D
-RUNTIME_TARGET = $(TARGET_DIR)/Core/ex2D.Runtime.dll
-EDITOR_TARGET = $(TARGET_DIR)/Editor/ex2D.Editor.dll
+# ex2D Target
+EX2D_TARGET_DIR = ../ex2d_submit/Assets/ex2D
+EX2D_RUNTIME_TARGET = $(EX2D_TARGET_DIR)/Core/ex2D.Runtime.dll
+EX2D_EDITOR_TARGET = $(EX2D_TARGET_DIR)/Editor/ex2D.Editor.dll
+
+# ex2D TileMap Target
+EX2D_TILEMAP_TARGET_DIR = ../ex2d_tilemap_submit/Assets/ex2D_TileMap
+EX2D_TILEMAP_RUNTIME_TARGET = $(EX2D_TILEMAP_TARGET_DIR)/Core/ex2D.TileMap.Runtime.dll
+EX2D_TILEMAP_EDITOR_TARGET = $(EX2D_TILEMAP_TARGET_DIR)/Editor/ex2D.TileMap.Editor.dll
+
+# ex2D GUI Target
+EX2D_GUI_TARGET_DIR = ../ex2d_gui_submit/Assets/ex2D_GUI
+EX2D_GUI_RUNTIME_TARGET = $(EX2D_GUI_TARGET_DIR)/Core/ex2D.GUI.Runtime.dll
+EX2D_GUI_EDITOR_TARGET = $(EX2D_GUI_TARGET_DIR)/Editor/ex2D.GUI.Editor.dll
 
 # /////////////////////////////////////////////////////////////////////////////
 # do build
@@ -33,71 +43,170 @@ EDITOR_TARGET = $(TARGET_DIR)/Editor/ex2D.Editor.dll
 
 .PHONY: clean rebuild
 
-all: $(RUNTIME_TARGET) $(EDITOR_TARGET)
-clean: 
-	$(RM) $(RUNTIME_TARGET)
-	$(RM) $(EDITOR_TARGET)
-rebuild: |clean all
+ex2d: $(EX2D_RUNTIME_TARGET) $(EX2D_EDITOR_TARGET)
+clean_ex2d: 
+	$(RM) $(EX2D_RUNTIME_TARGET)
+	$(RM) $(EX2D_EDITOR_TARGET)
+rebuild_ex2d: |clean_ex2d ex2d 
 
-# /////////////////////////////////////////////////////////////////////////////
-#  runtime target
-# /////////////////////////////////////////////////////////////////////////////
+tilemap: $(EX2D_TILEMAP_RUNTIME_TARGET) $(EX2D_TILEMAP_EDITOR_TARGET)
+clean_tilemap: 
+	$(RM) $(EX2D_TILEMAP_RUNTIME_TARGET) 
+	$(RM) $(EX2D_TILEMAP_EDITOR_TARGET)
+rebuild_tilemap: |clean_tilemap tilemap 
 
-# get sources 
-RUNTIME_SOURCE_DIRS += Assets/ex2D/Core/Asset/
-RUNTIME_SOURCE_DIRS += Assets/ex2D/Core/Component/
-RUNTIME_SOURCE_DIRS += Assets/ex2D/Core/Component/AnimationHelper/
-RUNTIME_SOURCE_DIRS += Assets/ex2D/Core/Component/Camera/
-RUNTIME_SOURCE_DIRS += Assets/ex2D/Core/Component/Helper/
-RUNTIME_SOURCE_DIRS += Assets/ex2D/Core/Component/Sprite/
-RUNTIME_SOURCE_DIRS += Assets/ex2D/Core/Extension/
-RUNTIME_SOURCE_DIRS += Assets/ex2D/Core/Helper/
-RUNTIME_SOURCE = $(wildcard $(addsuffix *.cs,$(RUNTIME_SOURCE_DIRS)))
+gui: $(EX2D_GUI_RUNTIME_TARGET) $(EX2D_GUI_EDITOR_TARGET) 
+clean_gui: 
+	$(RM) $(EX2D_GUI_RUNTIME_TARGET) 
+	$(RM) $(EX2D_GUI_EDITOR_TARGET) 
+rebuild_gui: |clean_gui gui 
+
+clean_all: |clean_ex2d clean_tilemap clean_gui  
+all: |ex2d tilemap gui
+rebuild_all: |clean_all all
 
 # defines
 RUNTIME_DEFINE = -d:UNITY_3_4
-
-# deubg argument
-# RUNTIME_ARGUMENT = $(RUNTIME_DEFINE) -d:DEBUG -r:$(UNITY_ENGINE_DLL)
-# release argument
-RUNTIME_ARGUMENT = $(RUNTIME_DEFINE) -r:$(UNITY_ENGINE_DLL)
-
-# do the build
-$(RUNTIME_TARGET):
-	$(COMPILER) -target:library -out:$(RUNTIME_TARGET) $(RUNTIME_ARGUMENT) $(RUNTIME_SOURCE)
+EDITOR_DEFINE = -d:UNITY_EDITOR -d:UNITY_3_4
 
 # /////////////////////////////////////////////////////////////////////////////
-#  editor target
+# ex2D runtime target
 # /////////////////////////////////////////////////////////////////////////////
 
 # get sources 
-EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/
-EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/About/
-EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/AtlasEditor/
-EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/BitmapFontEditor/
-EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/ComponentEditors/
-EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/DB/
-EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/GroupImportEditor/
-EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/Helper/
-EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/GUIBorderEditor/
-EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/SpriteAnimationEditor/
-EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/Utility/
-EDITOR_SOURCE = $(wildcard $(addsuffix *.cs,$(EDITOR_SOURCE_DIRS)))
-
-# resources
-#  RESOURCES += -resource:Assets/ex2D/Editor/Resource/pixel.png
-#  RESOURCES += -resource:Assets/ex2D/Editor/Resource/checkerboard_64x64.png
-#  RESOURCES += -resource:Assets/ex2D/Editor/Resource/border.png
-#  RESOURCES += -resource:Assets/ex2D/Editor/Resource/rect_select.png
-
-# defines
-EDITOR_DEFINE = -d:UNITY_EDITOR -d:UNITY_3_4
+EX2D_RUNTIME_SOURCE_DIRS += Assets/ex2D/Core/Asset/
+EX2D_RUNTIME_SOURCE_DIRS += Assets/ex2D/Core/Component/
+EX2D_RUNTIME_SOURCE_DIRS += Assets/ex2D/Core/Component/AnimationHelper/
+EX2D_RUNTIME_SOURCE_DIRS += Assets/ex2D/Core/Component/Camera/
+EX2D_RUNTIME_SOURCE_DIRS += Assets/ex2D/Core/Component/Helper/
+EX2D_RUNTIME_SOURCE_DIRS += Assets/ex2D/Core/Component/Manager//
+EX2D_RUNTIME_SOURCE_DIRS += Assets/ex2D/Core/Component/Sprite/
+EX2D_RUNTIME_SOURCE_DIRS += Assets/ex2D/Core/Extension/
+EX2D_RUNTIME_SOURCE_DIRS += Assets/ex2D/Core/Helper/
+EX2D_RUNTIME_SOURCE = $(wildcard $(addsuffix *.cs,$(EX2D_RUNTIME_SOURCE_DIRS)))
 
 # deubg argument
-# EDITOR_ARGUMENT = $(EDITOR_DEFINE) -d:DEBUG -r:$(RUNTIME_TARGET),$(UNITY_ENGINE_DLL),$(UNITY_EDITOR_DLL)
+# EX2D_RUNTIME_ARGUMENT = $(RUNTIME_DEFINE) -d:DEBUG -r:$(UNITY_ENGINE_DLL)
 # release argument
-EDITOR_ARGUMENT = $(EDITOR_DEFINE) $(RESOURCES) -r:$(RUNTIME_TARGET),$(UNITY_ENGINE_DLL),$(UNITY_EDITOR_DLL)
+EX2D_RUNTIME_ARGUMENT = $(RUNTIME_DEFINE) -r:$(UNITY_ENGINE_DLL)
 
 # do the build
-$(EDITOR_TARGET): 
-	$(COMPILER) -target:library -out:$(EDITOR_TARGET) $(EDITOR_ARGUMENT) $(EDITOR_SOURCE)
+$(EX2D_RUNTIME_TARGET):
+	@echo "========================================================" 
+	@echo Building ex2D.Runtime.dll...
+	@echo "========================================================" 
+	$(COMPILER) -target:library -out:$(EX2D_RUNTIME_TARGET) $(EX2D_RUNTIME_ARGUMENT) $(EX2D_RUNTIME_SOURCE)
+	@echo done!
+	@echo 
+
+# /////////////////////////////////////////////////////////////////////////////
+# ex2D editor target
+# /////////////////////////////////////////////////////////////////////////////
+
+# get sources 
+EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/
+EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/About/
+EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/AtlasEditor/
+EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/BitmapFontEditor/
+EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/ComponentEditors/
+EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/DB/
+EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/GroupImportEditor/
+EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/Helper/
+EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/GUIBorderEditor/
+EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/SpriteAnimationEditor/
+EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/Utility/
+EX2D_EDITOR_SOURCE = $(wildcard $(addsuffix *.cs,$(EX2D_EDITOR_SOURCE_DIRS)))
+
+# resources
+# EX2D_RESOURCES += -resource:Assets/ex2D/Editor/Resource/pixel.png
+# EX2D_RESOURCES += -resource:Assets/ex2D/Editor/Resource/checkerboard_64x64.png
+# EX2D_RESOURCES += -resource:Assets/ex2D/Editor/Resource/border.png
+# EX2D_RESOURCES += -resource:Assets/ex2D/Editor/Resource/rect_select.png
+
+# deubg argument
+# EX2D_EDITOR_ARGUMENT = $(EDITOR_DEFINE) -d:DEBUG -r:$(EX2D_RUNTIME_TARGET),$(UNITY_ENGINE_DLL),$(UNITY_EDITOR_DLL)
+# release argument
+EX2D_EDITOR_ARGUMENT = $(EDITOR_DEFINE) $(EX2D_RESOURCES) -r:$(EX2D_RUNTIME_TARGET),$(UNITY_ENGINE_DLL),$(UNITY_EDITOR_DLL)
+
+# do the build
+$(EX2D_EDITOR_TARGET): 
+	@echo "========================================================" 
+	@echo building ex2D.Editor.dll...
+	@echo "========================================================" 
+	$(COMPILER) -target:library -out:$(EX2D_EDITOR_TARGET) $(EX2D_EDITOR_ARGUMENT) $(EX2D_EDITOR_SOURCE)
+	@echo done!
+	@echo
+
+# /////////////////////////////////////////////////////////////////////////////
+# ex2D TileMap runtime target
+# /////////////////////////////////////////////////////////////////////////////
+
+# TODO:
+$(EX2D_TILEMAP_RUNTIME_TARGET):
+	@echo "========================================================" 
+	@echo building ex2D.TileMap.Runtime.dll...
+	@echo "========================================================" 
+	@echo done!
+	@echo
+
+# /////////////////////////////////////////////////////////////////////////////
+# ex2D TileMap editor target
+# /////////////////////////////////////////////////////////////////////////////
+
+# TODO:
+$(EX2D_TILEMAP_EDITOR_TARGET):
+	@echo "========================================================" 
+	@echo building ex2D.TileMap.Editor.dll...
+	@echo "========================================================" 
+	@echo done!
+	@echo
+
+# /////////////////////////////////////////////////////////////////////////////
+# ex2D GUI runtime target
+# /////////////////////////////////////////////////////////////////////////////
+
+# get sources 
+EX2D_GUI_RUNTIME_SOURCE_DIRS += Assets/ex2D_GUI/Core/Asset/
+EX2D_GUI_RUNTIME_SOURCE_DIRS += Assets/ex2D_GUI/Core/Component/
+EX2D_GUI_RUNTIME_SOURCE_DIRS += Assets/ex2D_GUI/Core/Effect/
+EX2D_GUI_RUNTIME_SOURCE_DIRS += Assets/ex2D_GUI/Core/Effect/EffectFrom/
+EX2D_GUI_RUNTIME_SOURCE_DIRS += Assets/ex2D_GUI/Core/Effect/EffectTo/
+EX2D_GUI_RUNTIME_SOURCE_DIRS += Assets/ex2D_GUI/Core/Helper/
+EX2D_GUI_RUNTIME_SOURCE = $(wildcard $(addsuffix *.cs,$(EX2D_GUI_RUNTIME_SOURCE_DIRS)))
+
+# deubg argument
+# EX2D_GUI_RUNTIME_ARGUMENT = $(RUNTIME_DEFINE) -d:DEBUG -r:$(UNITY_ENGINE_DLL),$(EX2D_RUNTIME_TARGET)
+# release argument
+EX2D_GUI_RUNTIME_ARGUMENT = $(RUNTIME_DEFINE) -r:$(UNITY_ENGINE_DLL),$(EX2D_RUNTIME_TARGET)
+
+# do the build
+$(EX2D_GUI_RUNTIME_TARGET):
+	@echo "========================================================" 
+	@echo building ex2D.GUI.Runtime.dll...
+	@echo "========================================================" 
+	$(COMPILER) -target:library -out:$(EX2D_GUI_RUNTIME_TARGET) $(EX2D_GUI_RUNTIME_ARGUMENT) $(EX2D_GUI_RUNTIME_SOURCE)
+	@echo done!
+	@echo
+
+# /////////////////////////////////////////////////////////////////////////////
+# ex2D GUI editor target
+# /////////////////////////////////////////////////////////////////////////////
+
+# get sources 
+EX2D_GUI_EDITOR_SOURCE_DIRS += Assets/ex2D_GUI/Editor/
+EX2D_GUI_EDITOR_SOURCE_DIRS += Assets/ex2D_GUI/Editor/TimebasedCurve/
+EX2D_GUI_EDITOR_SOURCE = $(wildcard $(addsuffix *.cs,$(EX2D_GUI_EDITOR_SOURCE_DIRS)))
+
+# deubg argument
+# EX2D_GUI_EDITOR_ARGUMENT = $(EDITOR_DEFINE) -d:DEBUG -r:$(EX2D_RUNTIME_TARGET),$(EX2D_EDITOR_TARGET),$(EX2D_GUI_RUNTIME_TARGET),$(UNITY_ENGINE_DLL),$(UNITY_EDITOR_DLL)
+# release argument
+EX2D_GUI_EDITOR_ARGUMENT = $(EDITOR_DEFINE) -r:$(EX2D_RUNTIME_TARGET),$(EX2D_EDITOR_TARGET),$(EX2D_GUI_RUNTIME_TARGET),$(UNITY_ENGINE_DLL),$(UNITY_EDITOR_DLL)
+
+# do the build
+$(EX2D_GUI_EDITOR_TARGET): 
+	@echo "========================================================" 
+	@echo building ex2D.GUI.Editor.dll...
+	@echo "========================================================" 
+	$(COMPILER) -target:library -out:$(EX2D_GUI_EDITOR_TARGET) $(EX2D_GUI_EDITOR_ARGUMENT) $(EX2D_GUI_EDITOR_SOURCE)
+	@echo done!
+	@echo
