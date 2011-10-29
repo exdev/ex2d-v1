@@ -30,11 +30,14 @@ public class exSpriteMng : MonoBehaviour {
 
     void OnPreRender () {
         foreach ( exPlane sp in sprites ) {
-            if ( sp.updateFlags != exPlane.UpdateFlags.None ) {
-                sp.Commit();
-                sp.updateFlags = exPlane.UpdateFlags.None;
+            // NOTE: it is possible the sprite has been destroyed first
+            if ( sp != null ) { 
+                if ( sp.updateFlags != exPlane.UpdateFlags.None ) {
+                    sp.Commit();
+                    sp.updateFlags = exPlane.UpdateFlags.None;
+                }
+                sp.inCommitList = false;
             }
-            sp.inCommitList = false;
         }
         sprites.Clear();
     }

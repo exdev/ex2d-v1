@@ -144,15 +144,13 @@ public class exSpriteAnimation : MonoBehaviour {
         // } DEBUG end 
 
         Init ();
-    }
 
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
-    void Start () {
+        // NOTE: start will only trigger when the Component first run after enabled
         if ( playAutomatically && defaultAnimation != null ) {
             Play (defaultAnimation.name);
+        }
+        else {
+            enabled = false;
         }
     }
 
@@ -168,7 +166,12 @@ public class exSpriteAnimation : MonoBehaviour {
 
             // advance the time
             curAnimation.time += delta;
+
+            // save the last state
+            float lastAnimTime = curAnimation.time;
             exSpriteAnimState lastAnimation = curAnimation;
+
+            //
             int newIdx = curAnimation.clip.TriggerEvents( this, 
                                                           lastAnimation,
                                                           lastEventInfoIndex,
@@ -178,7 +181,9 @@ public class exSpriteAnimation : MonoBehaviour {
 
             // NOTE: it is possible in the events, user destroy this component. In this case, 
             //       the curAnimation will be null.
-            if ( curAnimation == null || curAnimation != lastAnimation ) {
+            if ( curAnimation == null || 
+                 curAnimation != lastAnimation || 
+                 lastAnimTime != curAnimation.time /*NOTE: it is possible in the event we reply the same animation*/ ) {
                 return;
             }
             lastEventInfoIndex = newIdx;
@@ -205,7 +210,7 @@ public class exSpriteAnimation : MonoBehaviour {
     /// Play the default animation by _name 
     // ------------------------------------------------------------------ 
 
-    public void Play () {
+    public void PlayDefault () {
         if ( defaultAnimation )
             Play( defaultAnimation.name, 0 );
     }
@@ -238,6 +243,11 @@ public class exSpriteAnimation : MonoBehaviour {
                 lastEventInfoIndex = -1;
             else
                 lastEventInfoIndex = curAnimation.clip.eventInfos.Count;
+
+            exSpriteAnimClip.FrameInfo fi = curAnimation.clip.frameInfos[_index]; 
+            if ( fi != null )
+                sprite.SetSprite ( fi.atlas, fi.index );
+            enabled = true;
         }
     }
 
@@ -294,6 +304,7 @@ public class exSpriteAnimation : MonoBehaviour {
                 break;
             }
         }
+        enabled = false;
     }
 
     // ------------------------------------------------------------------ 
@@ -302,6 +313,7 @@ public class exSpriteAnimation : MonoBehaviour {
 
     public void Pause () {
         paused = true;
+        enabled = false;
     }
 
     // ------------------------------------------------------------------ 
@@ -310,6 +322,7 @@ public class exSpriteAnimation : MonoBehaviour {
 
     public void Resume () {
         paused = false;
+        enabled = true;
     }
 
     // ------------------------------------------------------------------ 

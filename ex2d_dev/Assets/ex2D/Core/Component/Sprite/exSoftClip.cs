@@ -114,8 +114,8 @@ public class exSoftClip : exPlane {
 
     override protected void Awake () {
         base.Awake();
-
         updateFlags |= UpdateFlags.Vertex;
+        Commit();
     }
 
     // ------------------------------------------------------------------ 
@@ -194,13 +194,24 @@ public class exSoftClip : exPlane {
                 clippedRect = boundingRect;
             }
         }
+
+        //
+        updateFlags = UpdateFlags.None;
     }
 
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    void Update () {
+    void LateUpdate () {
+        UpdateClipInfo ();
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void UpdateClipInfo () {
         //
         Rect a = clippedRect;
         switch ( plane ) {

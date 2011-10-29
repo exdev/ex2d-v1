@@ -141,11 +141,21 @@ $(EX2D_EDITOR_TARGET):
 # ex2D TileMap runtime target
 # /////////////////////////////////////////////////////////////////////////////
 
-# TODO:
+# get sources 
+EX2D_TILEMAP_RUNTIME_SOURCE_DIRS += Assets/ex2D_TileMap/Core/
+EX2D_TILEMAP_RUNTIME_SOURCE = $(wildcard $(addsuffix *.cs,$(EX2D_TILEMAP_RUNTIME_SOURCE_DIRS)))
+
+# deubg argument
+# EX2D_TILEMAP_RUNTIME_ARGUMENT = $(RUNTIME_DEFINE) -d:DEBUG -r:$(UNITY_ENGINE_DLL),$(EX2D_RUNTIME_TARGET)
+# release argument
+EX2D_TILEMAP_RUNTIME_ARGUMENT = $(RUNTIME_DEFINE) -r:$(UNITY_ENGINE_DLL),$(EX2D_RUNTIME_TARGET)
+
+# do the build
 $(EX2D_TILEMAP_RUNTIME_TARGET):
 	@echo "========================================================" 
 	@echo building ex2D.TileMap.Runtime.dll...
 	@echo "========================================================" 
+	$(COMPILER) -target:library -out:$(EX2D_TILEMAP_RUNTIME_TARGET) $(EX2D_TILEMAP_RUNTIME_ARGUMENT) $(EX2D_TILEMAP_RUNTIME_SOURCE)
 	@echo done!
 	@echo
 
@@ -153,11 +163,24 @@ $(EX2D_TILEMAP_RUNTIME_TARGET):
 # ex2D TileMap editor target
 # /////////////////////////////////////////////////////////////////////////////
 
-# TODO:
-$(EX2D_TILEMAP_EDITOR_TARGET):
+# get sources 
+EX2D_TILEMAP_EDITOR_SOURCE_DIRS += Assets/ex2D_TileMap/Editor/ComponentEditors/
+EX2D_TILEMAP_EDITOR_SOURCE_DIRS += Assets/ex2D_TileMap/Editor/TileMapEditor/
+EX2D_TILEMAP_EDITOR_SOURCE_DIRS += Assets/ex2D_TileMap/Editor/TileSheetEditor/
+EX2D_TILEMAP_EDITOR_SOURCE_DIRS += Assets/ex2D_TileMap/Editor/Utility/
+EX2D_TILEMAP_EDITOR_SOURCE = $(wildcard $(addsuffix *.cs,$(EX2D_TILEMAP_EDITOR_SOURCE_DIRS)))
+
+# deubg argument
+# EX2D_TILEMAP_EDITOR_ARGUMENT = $(EDITOR_DEFINE) -d:DEBUG -r:$(EX2D_RUNTIME_TARGET),$(EX2D_EDITOR_TARGET),$(EX2D_TILEMAP_RUNTIME_TARGET),$(UNITY_ENGINE_DLL),$(UNITY_EDITOR_DLL)
+# release argument
+EX2D_TILEMAP_EDITOR_ARGUMENT = $(EDITOR_DEFINE) -r:$(EX2D_RUNTIME_TARGET),$(EX2D_EDITOR_TARGET),$(EX2D_TILEMAP_RUNTIME_TARGET),$(UNITY_ENGINE_DLL),$(UNITY_EDITOR_DLL)
+
+# do the build
+$(EX2D_TILEMAP_EDITOR_TARGET): 
 	@echo "========================================================" 
 	@echo building ex2D.TileMap.Editor.dll...
 	@echo "========================================================" 
+	$(COMPILER) -target:library -out:$(EX2D_TILEMAP_EDITOR_TARGET) $(EX2D_TILEMAP_EDITOR_ARGUMENT) $(EX2D_TILEMAP_EDITOR_SOURCE)
 	@echo done!
 	@echo
 

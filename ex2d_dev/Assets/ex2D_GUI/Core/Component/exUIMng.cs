@@ -37,9 +37,43 @@ public class RaycastSorter : IComparer {
 // Desc: 
 // ------------------------------------------------------------------ 
 
-[System.Serializable]
 public class exUIEvent {
+
+    ///////////////////////////////////////////////////////////////////////////////
+    // static
+    ///////////////////////////////////////////////////////////////////////////////
+
+    public static exUIEvent current = new exUIEvent();
+
+    ///////////////////////////////////////////////////////////////////////////////
+    // structures
+    ///////////////////////////////////////////////////////////////////////////////
+
     public enum Type {
+        Unknown = -1,
+        MouseDown = 0,
+        MouseUp,
+        MouseMove,
+        MouseDrag,
+        Used,
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////
+    // properties
+    ///////////////////////////////////////////////////////////////////////////////
+
+    public Type type = Type.Unknown;
+    public Vector2 position = Vector2.zero;
+    public Vector2 delta = Vector2.zero;
+
+    ///////////////////////////////////////////////////////////////////////////////
+    // functions
+    ///////////////////////////////////////////////////////////////////////////////
+
+    public void Reset () {
+        type = Type.Unknown;
+        position = Vector2.zero;
+        delta = Vector2.zero;
     }
 }
 
@@ -49,26 +83,72 @@ public class exUIEvent {
 
 public class exUIMng : MonoBehaviour {
 
+    protected static exUIMng instance_ = null; 
+    public static exUIMng instance {
+        get {
+            if ( instance_ == null ) {
+                instance_ = FindObjectOfType ( typeof(exUIMng) ) as exUIMng;
+                if ( instance_ != null )
+                    instance_.Init();
+            }
+            return instance_;
+        }
+    }
+
     ///////////////////////////////////////////////////////////////////////////////
     // properties
     ///////////////////////////////////////////////////////////////////////////////
 
     public Camera uiCamera;
-    // public exUIElement[] elements;
+    [System.NonSerialized] public List<exUIElement> elements = new List<exUIElement>();
 
     //
-    private List<exUIElement> elements = new List<exUIElement>();
     private RaycastSorter raycastSorter = new RaycastSorter();
+    private RaycastHit[] sortedHits;
 
     // internal ui status
+    private bool initialized = false;
     private Vector2 curMousePos = Vector2.zero;
-    // private exUIElement curDragElement = null;
-    private exUIElement curElement = null;
-    private RaycastHit[] sortedHits;
+    private exUIElement hotElement = null;
+    private exUIElement activeElement = null;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
     ///////////////////////////////////////////////////////////////////////////////
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void Init () {
+        if ( initialized )
+            return;
+
+        //
+        if ( uiCamera == null ) {
+            Debug.LogWarning ( "Please specifiy an Ui Camera in Inspector, use MainCamera as default." );
+            uiCamera = Camera.main;
+        }
+
+        // recursively add ui-tree
+        foreach ( Transform child in transform ) {
+            exUIElement child_el = child.GetComponent<exUIElement>();
+            if ( child_el ) {
+                elements.Add(child_el);
+                exUIElement.FindAndAddChild (child_el);
+            }
+        }
+
+        initialized = true;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void Awake () {
+        Init ();
+    }
 
     // ------------------------------------------------------------------ 
     // Desc: 
@@ -84,30 +164,6 @@ public class exUIMng : MonoBehaviour {
         }
         _r = new RaycastHit();
         return false;
-    }
-
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
-    void Awake () {
-        //
-        if ( uiCamera == null ) {
-            Debug.LogWarning ( "Please specifiy an Ui Camera in Inspector, use MainCamera as default." );
-            uiCamera = Camera.main;
-        }
-
-        // recursively add ui-tree
-        foreach ( Transform child in transform ) {
-            exUIElement child_el = child.GetComponent<exUIElement>();
-            if ( child_el ) {
-                elements.Add(child_el);
-                exUIElement.FindAndAddChild (child_el);
-            }
-        }
-        // foreach ( exUIElement el in elements ) {
-        //     exUIElement.FindAndAddChild(el);
-        // }
     }
 	
     // ------------------------------------------------------------------ 
@@ -146,66 +202,62 @@ public class exUIMng : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     void ProcessMouse () {
-        // TODO { 
-        // check mouse drag, mouse move and barabara
-        // } TODO end 
+        exUIEvent currentEvent = exUIEvent.current;
+        currentEvent.Reset();
 
+        Vector2 lastMousePos = curMousePos;
         curMousePos = Input.mousePosition;
-        exUIElement lastElement = curElement;
-        bool eventHandled = false;
+        Vector2 deltaPos = curMousePos - lastMousePos;
 
-        // DELME { 
-        // Vector2 lastMousePos = curMousePos;
-        // Vector2 deltaPos = curMousePos - lastMousePos;
-        // } DELME end 
+        // Get Hot Element
+        hotElement = PickTopElement(curMousePos);
+        hotElement.OnEvent();
 
-        // handle mouse dragging
-        if ( curElement ) {
-            eventHandled = curElement.UpdateMouseDrag();
+        if ( currentEvent.type != exUIEvent.Type.Used ) {
         }
 
-        // if the mouse dragging event not processed
-        // remain to normal event process
-        if ( !eventHandled ) {
-            curElement = PickTopElement(curMousePos);
+        // // if the mouse dragging event not processed
+        // // remain to normal event process
+        // if ( !eventHandled ) {
+        //     curElement = PickTopElement(curMousePos);
 
-            // process hover in/out
-            if ( lastElement != curElement ) {
-                if ( lastElement )
-                    lastElement.MouseExit();
-                if ( curElement )
-                    curElement.MouseEnter();
-            }
+        //     // process hover in/out
+        //     if ( lastElement != curElement ) {
+        //         if ( lastElement )
+        //             lastElement.MouseExit();
+        //         if ( curElement )
+        //             curElement.MouseEnter();
+        //     }
 
-            // process mouse down/up
-            exUIElement process_el = curElement;
-            if ( process_el == null ) {
-                foreach ( exUIElement el in elements ) {
-                    if ( el.enabled ) {
-                        process_el = el;
-                        break;
-                    }
-                }
-            }
-            if ( process_el ) {
-                if ( Input.GetMouseButtonDown(0) || 
-                     Input.GetMouseButtonDown(1) ||
-                     Input.GetMouseButtonDown(2) )
-                {
-                    process_el.MouseButtonDown();
-                }
-                if ( Input.GetMouseButtonUp(0) || 
-                     Input.GetMouseButtonUp(1) ||
-                     Input.GetMouseButtonUp(2) )
-                {
-                    process_el.MouseButtonUp();
-                }
-            }
-        }
+        //     // process mouse down/up
+        //     exUIElement process_el = curElement;
+        //     if ( process_el == null ) {
+        //         foreach ( exUIElement el in elements ) {
+        //             if ( el.enabled ) {
+        //                 process_el = el;
+        //                 break;
+        //             }
+        //         }
+        //     }
+        //     if ( process_el ) {
+        //         if ( Input.GetMouseButtonDown(0) || 
+        //              Input.GetMouseButtonDown(1) ||
+        //              Input.GetMouseButtonDown(2) )
+        //         {
+        //             process_el.MouseButtonDown();
+        //         }
+        //         if ( Input.GetMouseButtonUp(0) || 
+        //              Input.GetMouseButtonUp(1) ||
+        //              Input.GetMouseButtonUp(2) )
+        //         {
+        //             process_el.MouseButtonUp();
+        //         }
+        //     }
+        // }
 
-        // DEBUG { 
-        // Debug.Log ( "curElement = " + curElement );
-        // } DEBUG end 
+        // // DEBUG { 
+        // // Debug.Log ( "curElement = " + curElement );
+        // // } DEBUG end 
     }
 
     // ------------------------------------------------------------------ 

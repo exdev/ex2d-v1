@@ -613,9 +613,6 @@ public class exSprite : exSpriteBase {
         if ( spanim == null ) {
             spanim = GetComponent<exSpriteAnimation>(); 
         }
-        if ( spanim ) {
-            spanim.enabled = true;
-        }
     }
 
     // ------------------------------------------------------------------ 
@@ -630,7 +627,6 @@ public class exSprite : exSpriteBase {
             spanim = GetComponent<exSpriteAnimation>(); 
         }
         if ( spanim ) {
-            spanim.enabled = false;
             spanim.Stop();
         }
     }

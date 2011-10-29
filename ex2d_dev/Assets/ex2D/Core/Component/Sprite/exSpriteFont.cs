@@ -319,7 +319,7 @@ public class exSpriteFont : exSpriteBase {
                     }
                     _lineWidths[curLine] = curWidth;
                     curWidth = 0.0f;
-                    height = height + fontInfo_.lineHeight * scale_.y + lineSpacing_;
+                    height = height + fontInfo_.lineHeight + lineSpacing_;
                     ++curLine;
                 }
                 continue;
