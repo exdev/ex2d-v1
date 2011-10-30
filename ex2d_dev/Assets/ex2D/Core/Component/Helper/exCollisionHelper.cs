@@ -189,9 +189,7 @@ public class exCollisionHelper : MonoBehaviour {
         if ( plane == null )
             plane = GetComponent<exPlane>();
 
-        if ( plane.meshFilter == null||
-             plane.meshFilter.sharedMesh == null || 
-             collider == null || 
+        if ( collider == null || 
              autoResizeCollision == false )
             return;
 

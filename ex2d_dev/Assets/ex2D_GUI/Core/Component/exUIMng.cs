@@ -40,41 +40,37 @@ public class RaycastSorter : IComparer {
 public class exUIEvent {
 
     ///////////////////////////////////////////////////////////////////////////////
-    // static
-    ///////////////////////////////////////////////////////////////////////////////
-
-    public static exUIEvent current = new exUIEvent();
-
-    ///////////////////////////////////////////////////////////////////////////////
     // structures
     ///////////////////////////////////////////////////////////////////////////////
 
     public enum Type {
         Unknown = -1,
-        MouseDown = 0,
-        MouseUp,
-        MouseMove,
-        MouseDrag,
-        Used,
+        PointerPress = 0,
+        PointerRelease,
+        PointerMove,
+        HoverIn,
+        HoverOut,
+        KeyPress,
+        KeyRelease,
+    }
+
+	[System.FlagsAttribute]
+    public enum MouseButtonFlags {
+        None    = 0,
+        Left    = 1,
+        Middle  = 2,
+        Right   = 4
     }
 
     ///////////////////////////////////////////////////////////////////////////////
     // properties
     ///////////////////////////////////////////////////////////////////////////////
 
+    public exUIElement target = null;
     public Type type = Type.Unknown;
     public Vector2 position = Vector2.zero;
     public Vector2 delta = Vector2.zero;
-
-    ///////////////////////////////////////////////////////////////////////////////
-    // functions
-    ///////////////////////////////////////////////////////////////////////////////
-
-    public void Reset () {
-        type = Type.Unknown;
-        position = Vector2.zero;
-        delta = Vector2.zero;
-    }
+    public MouseButtonFlags buttons = 0; // the pressed buttons
 }
 
 // ------------------------------------------------------------------ 
@@ -88,6 +84,8 @@ public class exUIMng : MonoBehaviour {
         get {
             if ( instance_ == null ) {
                 instance_ = FindObjectOfType ( typeof(exUIMng) ) as exUIMng;
+                // if ( instance_ == null && Application.isEditor )
+                //     Debug.LogError ("Can't find exUIMng in the scene, please create one first.");
                 if ( instance_ != null )
                     instance_.Init();
             }
@@ -99,7 +97,6 @@ public class exUIMng : MonoBehaviour {
     // properties
     ///////////////////////////////////////////////////////////////////////////////
 
-    public Camera uiCamera;
     [System.NonSerialized] public List<exUIElement> elements = new List<exUIElement>();
 
     //
@@ -108,9 +105,14 @@ public class exUIMng : MonoBehaviour {
 
     // internal ui status
     private bool initialized = false;
-    private Vector2 curMousePos = Vector2.zero;
+    private int touchID = -1;
+    private Vector2 curPointerPos = Vector2.zero;
+    private exUIEvent.MouseButtonFlags curPointerPressed = 0;
     private exUIElement hotElement = null;
-    private exUIElement activeElement = null;
+    // private exUIElement activeElement = null; // TODO?
+
+    //
+    private List<exUIEvent> eventList = new List<exUIEvent>();
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -125,9 +127,9 @@ public class exUIMng : MonoBehaviour {
             return;
 
         //
-        if ( uiCamera == null ) {
-            Debug.LogWarning ( "Please specifiy an Ui Camera in Inspector, use MainCamera as default." );
-            uiCamera = Camera.main;
+        if ( camera == null ) {
+            Debug.LogError ( "The exUIMng should attach to a camera" );
+            return;
         }
 
         // recursively add ui-tree
@@ -154,6 +156,31 @@ public class exUIMng : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
+    void Start () {
+#if UNITY_IPHONE
+        if ( Application.isEditor == false ) {
+            touchID = -1;
+        } else {
+#endif
+            curPointerPos = Input.mousePosition;
+#if UNITY_IPHONE
+        }
+#endif
+    }
+	
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+	void Update () {
+        QueueEvents ();
+        DispatchEvents ();
+	}
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
     public RaycastHit[] GetLastHits () { return sortedHits; }
     public bool GetLastHit ( out RaycastHit _r, GameObject _go ) { 
         foreach ( RaycastHit r in sortedHits ) {
@@ -165,20 +192,37 @@ public class exUIMng : MonoBehaviour {
         _r = new RaycastHit();
         return false;
     }
-	
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
-	void Update () {
-        ProcessInput();
-	}
 
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    void ProcessInput () {
+    void QueueEvents () {
+        ProcessPointer ();
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void DispatchEvents () {
+        foreach ( exUIEvent e in eventList ) {
+            bool used = e.target.OnEvent(e);
+            while ( used == false ) {
+                exUIElement uiParent = e.target.parent;
+                if ( uiParent == null )
+                    break;
+                used = uiParent.OnEvent(e);
+            }
+        }
+        eventList.Clear();
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void ProcessPointer () {
 #if UNITY_IPHONE
         if ( Application.isEditor == false ) {
             ProcessTouch();
@@ -195,6 +239,17 @@ public class exUIMng : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     void ProcessTouch () {
+        // TODO { 
+        foreach ( Touch touch in Input.touches ) {
+            if ( touch.phase == TouchPhase.Began ) {
+                touchID = touch.fingerId;
+                break;
+            }
+        }
+        if ( touchID != -1 ) {
+            return;
+        }
+        // } TODO end 
     }
 
     // ------------------------------------------------------------------ 
@@ -202,62 +257,113 @@ public class exUIMng : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     void ProcessMouse () {
-        exUIEvent currentEvent = exUIEvent.current;
-        currentEvent.Reset();
+        //
+        Vector2 lastPointerPos = curPointerPos;
 
-        Vector2 lastMousePos = curMousePos;
-        curMousePos = Input.mousePosition;
-        Vector2 deltaPos = curMousePos - lastMousePos;
+        // get current position
+        curPointerPos = Input.mousePosition;
+        Vector2 deltaPos = curPointerPos - lastPointerPos;
 
-        // Get Hot Element
-        hotElement = PickTopElement(curMousePos);
-        hotElement.OnEvent();
+        // get current mouse button
+        exUIEvent.MouseButtonFlags lastPointerPressed = curPointerPressed;
+        exUIEvent.MouseButtonFlags buttonDown = exUIEvent.MouseButtonFlags.None;
+        exUIEvent.MouseButtonFlags buttonUp = exUIEvent.MouseButtonFlags.None;
 
-        if ( currentEvent.type != exUIEvent.Type.Used ) {
+        // handle pressed
+        curPointerPressed = 0;
+        if ( Input.anyKey ) {
+            if ( Input.GetMouseButton(0) )
+                curPointerPressed |= exUIEvent.MouseButtonFlags.Left;
+            if ( Input.GetMouseButton(1) )
+                curPointerPressed |= exUIEvent.MouseButtonFlags.Right;
+            if ( Input.GetMouseButton(2) )
+                curPointerPressed |= exUIEvent.MouseButtonFlags.Middle;
         }
 
-        // // if the mouse dragging event not processed
-        // // remain to normal event process
-        // if ( !eventHandled ) {
-        //     curElement = PickTopElement(curMousePos);
+        // handle press
+        if ( Input.anyKeyDown ) {
+            if ( Input.GetMouseButtonDown(0) )
+                buttonDown = exUIEvent.MouseButtonFlags.Left;
+            else if ( Input.GetMouseButton(1) )
+                buttonDown = exUIEvent.MouseButtonFlags.Right;
+            else if ( Input.GetMouseButton(2) )
+                buttonDown = exUIEvent.MouseButtonFlags.Middle;
+        }
 
-        //     // process hover in/out
-        //     if ( lastElement != curElement ) {
-        //         if ( lastElement )
-        //             lastElement.MouseExit();
-        //         if ( curElement )
-        //             curElement.MouseEnter();
-        //     }
+        // handle release
+        if ( lastPointerPressed != curPointerPressed ) {
+            if ( Input.GetMouseButtonUp(0) )
+                buttonUp = exUIEvent.MouseButtonFlags.Left;
+            else if ( Input.GetMouseButtonUp(1) )
+                buttonUp = exUIEvent.MouseButtonFlags.Right;
+            else if ( Input.GetMouseButtonUp(2) )
+                buttonUp = exUIEvent.MouseButtonFlags.Middle;
+        }
+        
+        // get hot element
+        exUIElement lastHotElement = hotElement;
+        hotElement = PickTopElement(curPointerPos);
 
-        //     // process mouse down/up
-        //     exUIElement process_el = curElement;
-        //     if ( process_el == null ) {
-        //         foreach ( exUIElement el in elements ) {
-        //             if ( el.enabled ) {
-        //                 process_el = el;
-        //                 break;
-        //             }
-        //         }
-        //     }
-        //     if ( process_el ) {
-        //         if ( Input.GetMouseButtonDown(0) || 
-        //              Input.GetMouseButtonDown(1) ||
-        //              Input.GetMouseButtonDown(2) )
-        //         {
-        //             process_el.MouseButtonDown();
-        //         }
-        //         if ( Input.GetMouseButtonUp(0) || 
-        //              Input.GetMouseButtonUp(1) ||
-        //              Input.GetMouseButtonUp(2) )
-        //         {
-        //             process_el.MouseButtonUp();
-        //         }
-        //     }
-        // }
+        // process hover event
+        if ( lastHotElement != hotElement ) {
+            // add hover-in event
+            if ( hotElement != null ) {
+                exUIEvent e = new exUIEvent(); 
+                e.type =  exUIEvent.Type.HoverIn;
+                e.position = curPointerPos;
+                e.delta = deltaPos;
+                e.target = hotElement;
+                e.buttons = curPointerPressed;
+                eventList.Add(e);
+            }
 
-        // // DEBUG { 
-        // // Debug.Log ( "curElement = " + curElement );
-        // // } DEBUG end 
+            // add hover-out event
+            if ( lastHotElement != null ) {
+                exUIEvent e = new exUIEvent(); 
+                e.type =  exUIEvent.Type.HoverOut;
+                e.position = curPointerPos;
+                e.delta = deltaPos;
+                e.target = lastHotElement;
+                e.buttons = curPointerPressed;
+                eventList.Add(e);
+            }
+        }
+
+        //
+        if ( hotElement != null ) {
+            // add pointer-move event
+            if ( deltaPos != Vector2.zero ) {
+                exUIEvent e = new exUIEvent(); 
+                e.type =  exUIEvent.Type.PointerMove;
+                e.position = curPointerPos;
+                e.delta = deltaPos;
+                e.target = hotElement;
+                e.buttons = curPointerPressed;
+                eventList.Add(e);
+            }
+
+            // add pointer-press event
+            if ( buttonDown != exUIEvent.MouseButtonFlags.None ) {
+                exUIEvent e = new exUIEvent(); 
+                e.type =  exUIEvent.Type.PointerPress;
+                e.position = curPointerPos;
+                e.delta = deltaPos;
+                e.target = hotElement;
+                e.buttons = buttonDown;
+                eventList.Add(e);
+            }
+
+            // add pointer-press event
+            if ( buttonUp != exUIEvent.MouseButtonFlags.None ) {
+                exUIEvent e = new exUIEvent(); 
+                e.type =  exUIEvent.Type.PointerRelease;
+                e.position = curPointerPos;
+                e.delta = deltaPos;
+                e.target = hotElement;
+                e.buttons = buttonUp;
+                eventList.Add(e);
+            }
+        }
     }
 
     // ------------------------------------------------------------------ 
@@ -265,7 +371,8 @@ public class exUIMng : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     exUIElement PickTopElement ( Vector2 _pos ) {
-        Ray ray = uiCamera.ScreenPointToRay ( _pos );
+        Ray ray = camera.ScreenPointToRay ( _pos );
+        ray.origin = new Vector3 ( ray.origin.x, ray.origin.y, camera.transform.position.z );
         sortedHits = Physics.RaycastAll(ray);
         System.Array.Sort(sortedHits, raycastSorter);
         if ( sortedHits.Length > 0 ) {

@@ -392,7 +392,7 @@ class exSpriteBorderEditor : exSpriteBaseEditor {
 
             Vector3 newPos = Handles.FreeMoveHandle( pos,
                                                      editSpriteBorder.transform.rotation,
-                                                     HandleUtility.GetHandleSize(pos) / 10.0f,
+                                                     HandleUtility.GetHandleSize(pos) / 20.0f,
                                                      Vector3.zero,
                                                      Handles.DotCap
                                                    );
@@ -401,8 +401,10 @@ class exSpriteBorderEditor : exSpriteBaseEditor {
         // Handles.Label( editSpriteBorder.transform.position + Vector3.up * 2,
         //                "Size = " + editSpriteBorder.width + " x " + editSpriteBorder.height );
 
-        if (GUI.changed)
+        if (GUI.changed) {
+            editSpriteBorder.Commit();
             EditorUtility.SetDirty (editSpriteBorder);
+        }
     }
 
     // ------------------------------------------------------------------ 

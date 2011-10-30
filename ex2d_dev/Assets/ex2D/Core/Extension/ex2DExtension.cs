@@ -218,26 +218,29 @@ public static class ex2DExtension {
     // ------------------------------------------------------------------ 
 
     public static void UpdateColliderSize ( this exPlane _plane, float _length ) {
-        Mesh mesh = _plane.meshFilter.sharedMesh;
         Collider collider = _plane.collider;
 
         // update box collider
         if ( collider is BoxCollider ) {
             BoxCollider boxCollider = collider as BoxCollider;
-            boxCollider.center = mesh.bounds.center;
-            boxCollider.size = mesh.bounds.size;
+            Rect boundingRect = _plane.boundingRect;
+            float center_x = _plane.boundingRect.x + _plane.boundingRect.width * 0.5f; 
+            float center_y = _plane.boundingRect.y + _plane.boundingRect.height * 0.5f; 
 
             switch ( _plane.plane ) {
             case exSprite.Plane.XY:
-                boxCollider.size = new Vector3( mesh.bounds.size.x, mesh.bounds.size.y, _length );
+                boxCollider.center = new Vector3 ( center_x, center_y, boxCollider.center.z );
+                boxCollider.size = new Vector3( boundingRect.width, boundingRect.height, _length );
                 break;
 
             case exSprite.Plane.XZ:
-                boxCollider.size = new Vector3( mesh.bounds.size.x, _length, mesh.bounds.size.z );
+                boxCollider.center = new Vector3 ( center_x, boxCollider.center.y, center_y );
+                boxCollider.size = new Vector3( boundingRect.width, _length, boundingRect.height );
                 break;
 
             case exSprite.Plane.ZY:
-                boxCollider.size = new Vector3( _length, mesh.bounds.size.y, mesh.bounds.size.z );
+                boxCollider.center = new Vector3 ( boxCollider.center.x, center_y, center_x );
+                boxCollider.size = new Vector3( _length, boundingRect.height, boundingRect.width );
                 break;
             }
 
@@ -246,10 +249,14 @@ public static class ex2DExtension {
 
         // update mesh collider
         if ( collider is MeshCollider ) {
-            MeshCollider meshCollider = collider as MeshCollider;
-            // NOTE: only in this way, mesh collider changes
-            meshCollider.sharedMesh = null;
-            meshCollider.sharedMesh = mesh;
+            MeshFilter meshFilter = _plane.meshFilter;
+            if ( meshFilter ) {
+                Mesh mesh = meshFilter.sharedMesh;
+                MeshCollider meshCollider = collider as MeshCollider;
+                // NOTE: only in this way, mesh collider changes
+                meshCollider.sharedMesh = null;
+                meshCollider.sharedMesh = mesh;
+            }
             return;
         }
     }

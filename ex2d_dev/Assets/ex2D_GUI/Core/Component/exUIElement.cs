@@ -23,8 +23,6 @@ using System.Collections.Generic;
 
 public class exUIElement : MonoBehaviour {
 
-    public bool multiTouch = false; // support multi-touch or not.
-
     ///////////////////////////////////////////////////////////////////////////////
     // properties
     ///////////////////////////////////////////////////////////////////////////////
@@ -61,7 +59,8 @@ public class exUIElement : MonoBehaviour {
     void OnDestroy () {
         if ( parent == null ) {
             exUIMng uiMng = exUIMng.instance;
-            uiMng.elements.Remove(this);
+            if ( uiMng )
+                uiMng.elements.Remove(this);
         }
         else {
             parent.RemoveChild(this);
@@ -72,8 +71,8 @@ public class exUIElement : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public virtual void OnEvent () {
-        // TODO:
+    public virtual bool OnEvent ( exUIEvent _e ) {
+        return false;
     }
 
     // ------------------------------------------------------------------ 
