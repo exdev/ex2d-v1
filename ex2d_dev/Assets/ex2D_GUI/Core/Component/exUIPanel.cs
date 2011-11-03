@@ -21,7 +21,7 @@ using System.Collections.Generic;
 // defines
 ///////////////////////////////////////////////////////////////////////////////
 
-[RequireComponent (typeof(exSpriteBorder))]
+[AddComponentMenu("ex2D GUI/Panel")]
 public class exUIPanel : exUIElement {
 
     // delegates
@@ -32,12 +32,9 @@ public class exUIPanel : exUIElement {
 	public event EventHandler OnHoverOut;
 	public event EventHandler OnButtonPress;
 	public event EventHandler OnButtonRelease;
+	public event EventHandler OnPointerMove;
 
-    ///////////////////////////////////////////////////////////////////////////////
-    // serialize properites 
-    ///////////////////////////////////////////////////////////////////////////////
-
-    protected exSpriteBase backgroundSP = null;
+    public exSpriteBorder background = null;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -47,44 +44,13 @@ public class exUIPanel : exUIElement {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    void Awake () {
-        backgroundSP = GetComponent<exSpriteBase> ();
-    }
+    override public void Sync () {
+        base.Sync ();
 
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
-    void Reset () {
-        backgroundSP = GetComponent<exSpriteBase> ();
-
-        // add box collider
-        BoxCollider boxCollider = GetComponent<BoxCollider>();
-        if ( boxCollider == null ) {
-            boxCollider = backgroundSP.gameObject.AddComponent<BoxCollider>();
-            switch ( backgroundSP.plane ) {
-            case exSprite.Plane.XY:
-                boxCollider.center = new Vector3( boxCollider.center.x, boxCollider.center.y, 0.2f );
-                break;
-
-            case exSprite.Plane.XZ:
-                boxCollider.center = new Vector3( boxCollider.center.x, 0.2f, boxCollider.center.z );
-                break;
-
-            case exSprite.Plane.ZY:
-                boxCollider.center = new Vector3( 0.2f, boxCollider.center.y, boxCollider.center.z );
-                break;
-            }
-        }
-
-        // add collision helper
-        if ( backgroundSP.collisionHelper == null ) {
-            exCollisionHelper collisionHelper = backgroundSP.gameObject.AddComponent<exCollisionHelper>();
-            collisionHelper.plane = backgroundSP;
-            collisionHelper.autoLength = false;
-            collisionHelper.length = 0.2f;
-            collisionHelper.UpdateCollider();
-        }
+        background.anchor = anchor;
+        background.width = width;
+        background.height = height;
+        background.transform.localPosition = Vector3.zero;
     }
 
     // ------------------------------------------------------------------ 
@@ -104,17 +70,18 @@ public class exUIPanel : exUIElement {
             return true;
 
         case exUIEvent.Type.PointerPress: 
-            if ( _e.buttons == exUIEvent.MouseButtonFlags.Left ) {
-                if ( OnButtonPress != null )
-                    OnButtonPress ();
-            }
+            if ( OnButtonPress != null )
+                OnButtonPress ();
             return true;
 
         case exUIEvent.Type.PointerRelease: 
-            if ( _e.buttons == exUIEvent.MouseButtonFlags.Left ) {
-                if ( OnButtonRelease != null )
-                    OnButtonRelease ();
-            }
+            if ( OnButtonRelease != null )
+                OnButtonRelease ();
+            return true;
+
+        case exUIEvent.Type.PointerMove: 
+            if ( OnPointerMove != null )
+                OnPointerMove ();
             return true;
         }
 

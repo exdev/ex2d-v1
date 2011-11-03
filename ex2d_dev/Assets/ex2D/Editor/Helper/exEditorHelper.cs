@@ -734,13 +734,120 @@ public static class exEditorHelper {
     // Menu Item
     ///////////////////////////////////////////////////////////////////////////////
 
+    // DISABLE { 
+    // // ------------------------------------------------------------------ 
+    // // Desc: 
+    // // ------------------------------------------------------------------ 
+
+    // [MenuItem ("Edit/ex2D/Unload Unused Assets")]
+    // static void ex2D_UnloadUnusedAssets () {
+    //     EditorUtility.UnloadUnusedAssets();
+    // }
+    // } DISABLE end 
+
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    [MenuItem ("Edit/ex2D/Unload Unused Assets")]
-    static void ex2D_UnloadUnusedAssets () {
+    [MenuItem ("Edit/ex2D/Rebuild Prefabs")]
+    static void ex2D_RebuildPrefabs () {
+        EditorUtility.DisplayProgressBar( "Rebuilding Prefabs...", "Rebuilding...", 0.5f );    
+            List<exSpriteBase> sprites = new List<exSpriteBase>();
+            GetSpritesFromPrefabs ( "Assets", ref sprites );
+            RebuildSprites(sprites.ToArray());
+            sprites.Clear();
         EditorUtility.UnloadUnusedAssets();
+        EditorUtility.ClearProgressBar();    
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    static void GetSpritesFromPrefabs ( string _path, ref List<exSpriteBase> _sprites ) {
+        // Process the list of files found in the directory.
+        string [] files = Directory.GetFiles(_path, "*.prefab");
+        foreach ( string fileName in files ) {
+            Object prefab = (Object)AssetDatabase.LoadAssetAtPath( fileName, typeof(Object) );
+            if ( prefab ) {
+                Object [] objs = EditorUtility.CollectDeepHierarchy ( new Object [] {prefab} );
+                foreach ( Object o in objs ) {
+                    GameObject go = o as GameObject;
+                    if ( go != null ) {
+                        exSpriteBase sp = go.GetComponent<exSpriteBase>();
+                        if ( sp != null )
+                            _sprites.Add(sp);
+                    }
+                }
+            }
+        }
+
+        // Recurse into subdirectories of this directory.
+        string [] dirs = Directory.GetDirectories(_path);
+        foreach( string dirName in dirs ) {
+            GetSpritesFromPrefabs ( dirName, ref _sprites );
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    /// \param _sprites the list of sprites to rebuild
+    /// rebuild the listed sprites
+    // ------------------------------------------------------------------ 
+
+    public static void RebuildSprites ( exSpriteBase[] _sprites ) {
+        EditorUtility.DisplayProgressBar( "Rebuild Scene Sprites...", 
+                                          "Rebuild Scene Sprites...", 
+                                          0.5f );    
+
+        for ( int i = 0; i < _sprites.Length; ++i ) {
+            exSpriteBase spBase = _sprites[i]; 
+            // DISABLE: it is too slow { 
+            // float progress = (float)i/(float)_sprites.Length;
+            // EditorUtility.DisplayProgressBar( "Rebuild Scene Sprites...", 
+            //                                   "Build Sprite " + spBase.gameObject.name, progress );    
+            // } DISABLE end 
+
+            // update layer
+            if ( spBase.layer2d ) {
+                spBase.layer2d.RecursivelyUpdateLayer ();
+            }
+
+            // if sprite
+            if ( spBase is exSprite ) {
+                exSprite sp = spBase as exSprite;
+                exAtlasDB.ElementInfo elInfo = exAtlasDB.GetElementInfo(sp.textureGUID);
+                exSpriteEditor.UpdateAtlas( sp, elInfo );
+
+                Texture2D texture = null;
+                if ( sp.useAtlas == false ) {
+                    texture = exEditorHelper.LoadAssetFromGUID<Texture2D>(sp.textureGUID );
+                }
+                sp.Build(texture);
+            }
+
+            // if sprite font
+            if ( spBase is exSpriteFont ) {
+                exSpriteFont spFont = spBase as exSpriteFont;
+                spFont.Build();
+            }
+
+            // if sprite border
+            if ( spBase is exSpriteBorder ) {
+                exSpriteBorder spBorder = spBase as exSpriteBorder; 
+
+                Texture2D texture = null;
+                if ( spBorder.guiBorder ) {
+                    exAtlasDB.ElementInfo elInfo = exAtlasDB.GetElementInfo(spBorder.guiBorder.textureGUID);
+                    exSpriteBorderEditor.UpdateAtlas( spBorder, elInfo );
+
+                    if ( spBorder.useAtlas == false ) {
+                        texture = exEditorHelper.LoadAssetFromGUID<Texture2D>(spBorder.guiBorder.textureGUID );
+                    }
+                }
+                spBorder.Build(texture);
+            }
+        }
+        EditorUtility.ClearProgressBar();    
     }
 
     // TEMP { 

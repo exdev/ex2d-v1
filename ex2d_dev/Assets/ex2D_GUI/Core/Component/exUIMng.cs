@@ -55,11 +55,12 @@ public class exUIEvent {
     }
 
 	[System.FlagsAttribute]
-    public enum MouseButtonFlags {
+    public enum PointerButtonFlags {
         None    = 0,
         Left    = 1,
         Middle  = 2,
-        Right   = 4
+        Right   = 4,
+        Touch   = 8,
     }
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -70,7 +71,7 @@ public class exUIEvent {
     public Type type = Type.Unknown;
     public Vector2 position = Vector2.zero;
     public Vector2 delta = Vector2.zero;
-    public MouseButtonFlags buttons = 0; // the pressed buttons
+    public PointerButtonFlags buttons = 0; // the pressed buttons
 }
 
 // ------------------------------------------------------------------ 
@@ -97,7 +98,6 @@ public class exUIMng : MonoBehaviour {
     // properties
     ///////////////////////////////////////////////////////////////////////////////
 
-    [System.NonSerialized] public List<exUIElement> elements = new List<exUIElement>();
 
     //
     private RaycastSorter raycastSorter = new RaycastSorter();
@@ -107,9 +107,9 @@ public class exUIMng : MonoBehaviour {
     private bool initialized = false;
     private int touchID = -1;
     private Vector2 curPointerPos = Vector2.zero;
-    private exUIEvent.MouseButtonFlags curPointerPressed = 0;
+    private exUIEvent.PointerButtonFlags curPointerPressed = 0;
     private exUIElement hotElement = null;
-    // private exUIElement activeElement = null; // TODO?
+    [System.NonSerialized] public exUIElement activeElement = null;
 
     //
     private List<exUIEvent> eventList = new List<exUIEvent>();
@@ -133,11 +133,11 @@ public class exUIMng : MonoBehaviour {
         }
 
         // recursively add ui-tree
-        foreach ( Transform child in transform ) {
-            exUIElement child_el = child.GetComponent<exUIElement>();
-            if ( child_el ) {
-                elements.Add(child_el);
-                exUIElement.FindAndAddChild (child_el);
+        exUIElement[] elements = FindObjectsOfType(typeof(exUIElement)) as exUIElement[];
+        foreach ( exUIElement el in elements ) {
+            exUIElement parent_el = el.FindParent();
+            if ( parent_el == null ) {
+                exUIElement.FindAndAddChild (el);
             }
         }
 
@@ -208,8 +208,9 @@ public class exUIMng : MonoBehaviour {
     void DispatchEvents () {
         foreach ( exUIEvent e in eventList ) {
             bool used = e.target.OnEvent(e);
+            exUIElement uiParent = e.target;
             while ( used == false ) {
-                exUIElement uiParent = e.target.parent;
+                uiParent = uiParent.parent;
                 if ( uiParent == null )
                     break;
                 used = uiParent.OnEvent(e);
@@ -239,17 +240,113 @@ public class exUIMng : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     void ProcessTouch () {
-        // TODO { 
-        foreach ( Touch touch in Input.touches ) {
-            if ( touch.phase == TouchPhase.Began ) {
-                touchID = touch.fingerId;
-                break;
+        //
+        exUIElement lastHotElement = hotElement;
+        Vector2 deltaPos = Vector2.zero;
+        bool touchPress = false;
+        bool touchRelease = false;
+
+        //
+        if ( touchID != -1 ) {
+            bool found = false;
+            foreach ( Touch touch in Input.touches ) {
+                if ( touchID == touch.fingerId ) {
+                    found = true;
+                    if ( touch.phase == TouchPhase.Ended ||
+                         touch.phase == TouchPhase.Canceled ) 
+                    {
+                        touchRelease = true;
+                        touchID = -1;
+                        break;
+                    }
+                    else if ( touch.phase == TouchPhase.Moved ) {
+                        deltaPos = touch.deltaPosition;
+                    }
+                    curPointerPos = touch.position;
+                    hotElement = PickTopElement(touch.position);
+                }
+            }
+
+            // if not found
+            if ( found == false ) {
+                touchRelease = true;
+                touchID = -1;
             }
         }
-        if ( touchID != -1 ) {
-            return;
+        else {
+            foreach ( Touch touch in Input.touches ) {
+                if ( touch.phase == TouchPhase.Began ) {
+                    hotElement = PickTopElement(touch.position);
+                    if ( hotElement != null ) {
+                        curPointerPos = touch.position;
+                        touchID = touch.fingerId;
+                        touchPress = true;
+                        break;
+                    }
+                }
+            }
         }
-        // } TODO end 
+
+        // process hover event
+        if ( lastHotElement != hotElement ) {
+            // add hover-in event
+            if ( hotElement != null ) {
+                exUIEvent e = new exUIEvent(); 
+                e.type =  exUIEvent.Type.HoverIn;
+                e.position = curPointerPos;
+                e.delta = deltaPos;
+                e.target = hotElement;
+                e.buttons = exUIEvent.PointerButtonFlags.Touch;
+                eventList.Add(e);
+            }
+
+            // add hover-out event
+            if ( lastHotElement != null ) {
+                exUIEvent e = new exUIEvent(); 
+                e.type =  exUIEvent.Type.HoverOut;
+                e.position = curPointerPos;
+                e.delta = deltaPos;
+                e.target = lastHotElement;
+                e.buttons = exUIEvent.PointerButtonFlags.Touch;
+                eventList.Add(e);
+            }
+        }
+
+        //
+        if ( activeElement != null || hotElement != null ) {
+            // add pointer-move event
+            if ( deltaPos != Vector2.zero ) {
+                exUIEvent e = new exUIEvent(); 
+                e.type =  exUIEvent.Type.PointerMove;
+                e.position = curPointerPos;
+                e.delta = deltaPos;
+                e.target = (activeElement != null) ? activeElement : hotElement;
+                e.buttons = exUIEvent.PointerButtonFlags.Touch;
+                eventList.Add(e);
+            }
+
+            // add pointer-press event
+            if ( touchPress ) {
+                exUIEvent e = new exUIEvent(); 
+                e.type =  exUIEvent.Type.PointerPress;
+                e.position = curPointerPos;
+                e.delta = deltaPos;
+                e.target = hotElement;
+                e.buttons = exUIEvent.PointerButtonFlags.Touch;
+                eventList.Add(e);
+            }
+
+            // add pointer-press event
+            if ( touchRelease ) {
+                exUIEvent e = new exUIEvent(); 
+                e.type =  exUIEvent.Type.PointerRelease;
+                e.position = curPointerPos;
+                e.delta = deltaPos;
+                e.target = (activeElement != null) ? activeElement : hotElement;
+                e.buttons = exUIEvent.PointerButtonFlags.Touch;
+                eventList.Add(e);
+            }
+        }
     }
 
     // ------------------------------------------------------------------ 
@@ -265,39 +362,39 @@ public class exUIMng : MonoBehaviour {
         Vector2 deltaPos = curPointerPos - lastPointerPos;
 
         // get current mouse button
-        exUIEvent.MouseButtonFlags lastPointerPressed = curPointerPressed;
-        exUIEvent.MouseButtonFlags buttonDown = exUIEvent.MouseButtonFlags.None;
-        exUIEvent.MouseButtonFlags buttonUp = exUIEvent.MouseButtonFlags.None;
+        exUIEvent.PointerButtonFlags lastPointerPressed = curPointerPressed;
+        exUIEvent.PointerButtonFlags buttonDown = exUIEvent.PointerButtonFlags.None;
+        exUIEvent.PointerButtonFlags buttonUp = exUIEvent.PointerButtonFlags.None;
 
         // handle pressed
         curPointerPressed = 0;
         if ( Input.anyKey ) {
             if ( Input.GetMouseButton(0) )
-                curPointerPressed |= exUIEvent.MouseButtonFlags.Left;
+                curPointerPressed |= exUIEvent.PointerButtonFlags.Left;
             if ( Input.GetMouseButton(1) )
-                curPointerPressed |= exUIEvent.MouseButtonFlags.Right;
+                curPointerPressed |= exUIEvent.PointerButtonFlags.Right;
             if ( Input.GetMouseButton(2) )
-                curPointerPressed |= exUIEvent.MouseButtonFlags.Middle;
+                curPointerPressed |= exUIEvent.PointerButtonFlags.Middle;
         }
 
         // handle press
         if ( Input.anyKeyDown ) {
             if ( Input.GetMouseButtonDown(0) )
-                buttonDown = exUIEvent.MouseButtonFlags.Left;
+                buttonDown = exUIEvent.PointerButtonFlags.Left;
             else if ( Input.GetMouseButton(1) )
-                buttonDown = exUIEvent.MouseButtonFlags.Right;
+                buttonDown = exUIEvent.PointerButtonFlags.Right;
             else if ( Input.GetMouseButton(2) )
-                buttonDown = exUIEvent.MouseButtonFlags.Middle;
+                buttonDown = exUIEvent.PointerButtonFlags.Middle;
         }
 
         // handle release
         if ( lastPointerPressed != curPointerPressed ) {
             if ( Input.GetMouseButtonUp(0) )
-                buttonUp = exUIEvent.MouseButtonFlags.Left;
+                buttonUp = exUIEvent.PointerButtonFlags.Left;
             else if ( Input.GetMouseButtonUp(1) )
-                buttonUp = exUIEvent.MouseButtonFlags.Right;
+                buttonUp = exUIEvent.PointerButtonFlags.Right;
             else if ( Input.GetMouseButtonUp(2) )
-                buttonUp = exUIEvent.MouseButtonFlags.Middle;
+                buttonUp = exUIEvent.PointerButtonFlags.Middle;
         }
         
         // get hot element
@@ -330,20 +427,20 @@ public class exUIMng : MonoBehaviour {
         }
 
         //
-        if ( hotElement != null ) {
+        if ( activeElement != null || hotElement != null ) {
             // add pointer-move event
             if ( deltaPos != Vector2.zero ) {
                 exUIEvent e = new exUIEvent(); 
                 e.type =  exUIEvent.Type.PointerMove;
                 e.position = curPointerPos;
                 e.delta = deltaPos;
-                e.target = hotElement;
+                e.target = (activeElement != null) ? activeElement : hotElement;
                 e.buttons = curPointerPressed;
                 eventList.Add(e);
             }
 
             // add pointer-press event
-            if ( buttonDown != exUIEvent.MouseButtonFlags.None ) {
+            if ( buttonDown != exUIEvent.PointerButtonFlags.None ) {
                 exUIEvent e = new exUIEvent(); 
                 e.type =  exUIEvent.Type.PointerPress;
                 e.position = curPointerPos;
@@ -354,12 +451,12 @@ public class exUIMng : MonoBehaviour {
             }
 
             // add pointer-press event
-            if ( buttonUp != exUIEvent.MouseButtonFlags.None ) {
+            if ( buttonUp != exUIEvent.PointerButtonFlags.None ) {
                 exUIEvent e = new exUIEvent(); 
                 e.type =  exUIEvent.Type.PointerRelease;
                 e.position = curPointerPos;
                 e.delta = deltaPos;
-                e.target = hotElement;
+                e.target = (activeElement != null) ? activeElement : hotElement;
                 e.buttons = buttonUp;
                 eventList.Add(e);
             }

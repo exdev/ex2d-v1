@@ -21,24 +21,109 @@ using System.Collections.Generic;
 // defines
 ///////////////////////////////////////////////////////////////////////////////
 
-public class exUIElement : MonoBehaviour {
+public class exUIElement : exPlane {
 
     ///////////////////////////////////////////////////////////////////////////////
     // properties
     ///////////////////////////////////////////////////////////////////////////////
 
-    [System.NonSerialized] public exUIElement parent;
-    [System.NonSerialized] public List<exUIElement> children;
+    [System.NonSerialized] public exUIElement parent = null;
+    [System.NonSerialized] public List<exUIElement> children = new List<exUIElement>();
+
+    // ------------------------------------------------------------------ 
+    [SerializeField] protected float width_ = 100.0f;
+    /// the width of the soft-clip
+    // ------------------------------------------------------------------ 
+
+    public float width {
+        get { return width_; }
+        set {
+            if ( width_ != value ) {
+                width_ = Mathf.Max(value, 0.0f);
+                updateFlags |= UpdateFlags.Vertex;
+            }
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    [SerializeField] protected float height_ = 100.0f;
+    /// the height of the soft-clip
+    // ------------------------------------------------------------------ 
+
+    public float height {
+        get { return height_; }
+        set {
+            if ( height_ != value ) {
+                height_ = Mathf.Max(value, 0.0f);
+                updateFlags |= UpdateFlags.Vertex;
+            }
+        }
+    }
 
     ///////////////////////////////////////////////////////////////////////////////
     // static functions
     ///////////////////////////////////////////////////////////////////////////////
 
     // ------------------------------------------------------------------ 
+    /// Awake functoin inherit from exPlane.
+    // ------------------------------------------------------------------ 
+
+    override protected void Awake () {
+        base.Awake();
+        updateFlags |= UpdateFlags.Vertex;
+        Commit();
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    override public void Commit () {
+
+        if ( (updateFlags & UpdateFlags.Vertex) != 0 ) {
+            //
+            float halfWidth = width_ * 0.5f;
+            float halfHeight = height_ * 0.5f;
+            float offsetX = 0.0f;
+            float offsetY = 0.0f;
+
+            //
+            switch ( anchor ) {
+            case Anchor.TopLeft     : offsetX = -halfWidth;   offsetY = -halfHeight;  break;
+            case Anchor.TopCenter   : offsetX = 0.0f;         offsetY = -halfHeight;  break;
+            case Anchor.TopRight    : offsetX = halfWidth;    offsetY = -halfHeight;  break;
+
+            case Anchor.MidLeft     : offsetX = -halfWidth;   offsetY = 0.0f;         break;
+            case Anchor.MidCenter   : offsetX = 0.0f;         offsetY = 0.0f;         break;
+            case Anchor.MidRight    : offsetX = halfWidth;    offsetY = 0.0f;         break;
+
+            case Anchor.BotLeft     : offsetX = -halfWidth;   offsetY = halfHeight;   break;
+            case Anchor.BotCenter   : offsetX = 0.0f;         offsetY = halfHeight;   break;
+            case Anchor.BotRight    : offsetX = halfWidth;    offsetY = halfHeight;   break;
+
+            default                 : offsetX = 0.0f;         offsetY = 0.0f;         break;
+            }
+
+            //
+            boundingRect = new Rect( -offsetX - halfWidth, 
+                                      offsetY - halfHeight,
+                                      width_, 
+                                      height_ );
+
+            if ( collisionHelper ) 
+                collisionHelper.UpdateCollider();
+        }
+
+        //
+        updateFlags = UpdateFlags.None;
+    }
+
+    // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
 
     public static void FindAndAddChild ( exUIElement _el ) {
+        _el.children.Clear();
         foreach ( Transform child in _el.transform ) {
             exUIElement child_el = child.GetComponent<exUIElement>();
             if ( child_el ) {
@@ -56,13 +141,72 @@ public class exUIElement : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    void OnDestroy () {
-        if ( parent == null ) {
-            exUIMng uiMng = exUIMng.instance;
-            if ( uiMng )
-                uiMng.elements.Remove(this);
+    void Reset () {
+        // add box collider
+        BoxCollider boxCollider = GetComponent<BoxCollider>();
+        if ( boxCollider == null ) {
+            boxCollider = gameObject.AddComponent<BoxCollider>();
+            switch ( plane ) {
+            case exSprite.Plane.XY:
+                boxCollider.center = new Vector3( boxCollider.center.x, boxCollider.center.y, 0.2f );
+                break;
+
+            case exSprite.Plane.XZ:
+                boxCollider.center = new Vector3( boxCollider.center.x, 0.2f, boxCollider.center.z );
+                break;
+
+            case exSprite.Plane.ZY:
+                boxCollider.center = new Vector3( 0.2f, boxCollider.center.y, boxCollider.center.z );
+                break;
+            }
         }
-        else {
+
+        // add collision helper
+        exCollisionHelper collisionHelper = GetComponent<exCollisionHelper>();
+        if ( collisionHelper == null ) {
+            collisionHelper = gameObject.AddComponent<exCollisionHelper>();
+            collisionHelper.plane = this;
+            collisionHelper.autoLength = false;
+            collisionHelper.length = 0.2f;
+            collisionHelper.UpdateCollider();
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    override protected void OnEnable () {
+        base.OnEnable();
+        foreach ( exUIElement el in children ) {
+            el.enabled = true;
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    override protected void OnDisable () {
+        base.OnDisable();
+        foreach ( exUIElement el in children ) {
+            el.enabled = false;
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    virtual public void Sync () {
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void OnDestroy () {
+        if ( parent != null ) {
             parent.RemoveChild(this);
         }
     }
@@ -80,7 +224,6 @@ public class exUIElement : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     public void AddChild ( exUIElement _element ) {
-        _element.transform.parent = transform;
         _element.parent = this;
         children.Add(_element);
     }
@@ -91,7 +234,6 @@ public class exUIElement : MonoBehaviour {
 
     public void RemoveChild ( exUIElement _element ) {
         _element.parent = null;
-        _element.transform.parent = null;
         children.Remove(_element);
     }
 
@@ -99,7 +241,7 @@ public class exUIElement : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    exUIElement FindParent () {
+    public exUIElement FindParent () {
         Transform tranParent = transform.parent;
         while ( tranParent != null ) {
             exUIElement el = tranParent.GetComponent<exUIElement>();

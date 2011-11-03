@@ -21,7 +21,7 @@ using System.Collections.Generic;
 // defines
 ///////////////////////////////////////////////////////////////////////////////
 
-[RequireComponent (typeof(exSpriteBorder))]
+[AddComponentMenu("ex2D GUI/Button")]
 public class exUIButton : exUIElement {
 
     // delegates
@@ -33,11 +33,30 @@ public class exUIButton : exUIElement {
 	public event EventHandler OnButtonPress;
 	public event EventHandler OnButtonRelease;
 
+
+    // ------------------------------------------------------------------ 
+    [SerializeField] protected string text_ = "";
+    /// the text of the button
+    // ------------------------------------------------------------------ 
+
+    public string text {
+        get { return text_; }
+        set {
+            if ( text_ != value ) {
+                text_ = value;
+                font.text = text_;
+            }
+        }
+    }
+
     ///////////////////////////////////////////////////////////////////////////////
-    // serialize properites 
+    // properties
     ///////////////////////////////////////////////////////////////////////////////
 
-    protected exSpriteBase buttonSP = null;
+    bool isPressing = false;
+
+    public exSpriteBorder border = null;
+    public exSpriteFont font = null;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -47,43 +66,31 @@ public class exUIButton : exUIElement {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    void Awake () {
-        buttonSP = GetComponent<exSpriteBase> ();
-    }
+    override public void Sync () {
+        base.Sync ();
 
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
+        border.anchor = anchor;
+        border.width = width;
+        border.height = height;
+        border.transform.localPosition = Vector3.zero;
 
-    void Reset () {
-        buttonSP = GetComponent<exSpriteBase> ();
-
-        // add box collider
         BoxCollider boxCollider = GetComponent<BoxCollider>();
-        if ( boxCollider == null ) {
-            boxCollider = buttonSP.gameObject.AddComponent<BoxCollider>();
-            switch ( buttonSP.plane ) {
-            case exSprite.Plane.XY:
-                boxCollider.center = new Vector3( boxCollider.center.x, boxCollider.center.y, 0.2f );
-                break;
 
-            case exSprite.Plane.XZ:
-                boxCollider.center = new Vector3( boxCollider.center.x, 0.2f, boxCollider.center.z );
-                break;
+        switch ( plane ) {
+        case exSprite.Plane.XY:
+            font.transform.localPosition 
+                = new Vector3( boxCollider.center.x, boxCollider.center.y, font.transform.localPosition.z );
+            break;
 
-            case exSprite.Plane.ZY:
-                boxCollider.center = new Vector3( 0.2f, boxCollider.center.y, boxCollider.center.z );
-                break;
-            }
-        }
+        case exSprite.Plane.XZ:
+            font.transform.localPosition 
+                = new Vector3( boxCollider.center.x, font.transform.localPosition.y, boxCollider.center.z );
+            break;
 
-        // add collision helper
-        if ( buttonSP.collisionHelper == null ) {
-            exCollisionHelper collisionHelper = buttonSP.gameObject.AddComponent<exCollisionHelper>();
-            collisionHelper.plane = buttonSP;
-            collisionHelper.autoLength = false;
-            collisionHelper.length = 0.2f;
-            collisionHelper.UpdateCollider();
+        case exSprite.Plane.ZY:
+            font.transform.localPosition 
+                = new Vector3( font.transform.localPosition.x, boxCollider.center.y, boxCollider.center.z );
+            break;
         }
     }
 
@@ -99,21 +106,33 @@ public class exUIButton : exUIElement {
             return true;
 
         case exUIEvent.Type.HoverOut: 
-            if ( OnHoverOut != null )
-                OnHoverOut ();
+            if ( exUIMng.instance.activeElement == this ) {
+                isPressing = false;
+                exUIMng.instance.activeElement = null;
+                if ( OnHoverOut != null )
+                    OnHoverOut ();
+            }
             return true;
 
         case exUIEvent.Type.PointerPress: 
-            if ( _e.buttons == exUIEvent.MouseButtonFlags.Left ) {
+            if ( _e.buttons == exUIEvent.PointerButtonFlags.Left ||
+                 _e.buttons == exUIEvent.PointerButtonFlags.Touch ) {
+                isPressing = true;
+                exUIMng.instance.activeElement = this;
                 if ( OnButtonPress != null )
                     OnButtonPress ();
             }
             return true;
 
         case exUIEvent.Type.PointerRelease: 
-            if ( _e.buttons == exUIEvent.MouseButtonFlags.Left ) {
-                if ( OnButtonRelease != null )
-                    OnButtonRelease ();
+            if ( _e.buttons == exUIEvent.PointerButtonFlags.Left ||
+                 _e.buttons == exUIEvent.PointerButtonFlags.Touch ) {
+                exUIMng.instance.activeElement = null;
+                if ( isPressing ) {
+                    if ( OnButtonRelease != null )
+                        OnButtonRelease ();
+                    isPressing = false;
+                }
             }
             return true;
         }

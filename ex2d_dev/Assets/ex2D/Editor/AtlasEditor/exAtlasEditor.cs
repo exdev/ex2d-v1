@@ -323,6 +323,7 @@ partial class exAtlasEditor : EditorWindow {
                     if ( curEdit.texture ) {
                         // NOTE: if we don't write data to disk, all changes will go back.
                         string path = AssetDatabase.GetAssetPath(curEdit.texture);
+                        exTextureHelper.SetReadable ( curEdit.texture, true );
                         curEdit.texture.Resize( width, height );
                         curEdit.ClearAtlasTexture();
 
@@ -342,6 +343,7 @@ partial class exAtlasEditor : EditorWindow {
 
                         TextureImporter importSettings = TextureImporter.GetAtPath(path) as TextureImporter;
                         importSettings.maxTextureSize = Mathf.Max( width, height );
+                        importSettings.isReadable = false;
                         AssetDatabase.ImportAsset( path );
                     }
 

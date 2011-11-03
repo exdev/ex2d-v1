@@ -193,6 +193,9 @@ public class exSoftClip : exPlane {
             else {
                 clippedRect = boundingRect;
             }
+
+            if ( collisionHelper ) 
+                collisionHelper.UpdateCollider();
         }
 
         //

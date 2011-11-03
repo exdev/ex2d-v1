@@ -218,6 +218,7 @@ $(EX2D_GUI_RUNTIME_TARGET):
 # get sources 
 EX2D_GUI_EDITOR_SOURCE_DIRS += Assets/ex2D_GUI/Editor/
 EX2D_GUI_EDITOR_SOURCE_DIRS += Assets/ex2D_GUI/Editor/TimebasedCurve/
+EX2D_GUI_EDITOR_SOURCE_DIRS += Assets/ex2D_GUI/Editor/Utility/
 EX2D_GUI_EDITOR_SOURCE = $(wildcard $(addsuffix *.cs,$(EX2D_GUI_EDITOR_SOURCE_DIRS)))
 
 # deubg argument

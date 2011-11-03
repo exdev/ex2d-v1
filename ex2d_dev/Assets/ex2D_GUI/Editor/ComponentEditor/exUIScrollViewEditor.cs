@@ -1,0 +1,122 @@
+// ======================================================================================
+// File         : exUIScrollViewEditor.cs
+// Author       : Wu Jie 
+// Last Change  : 11/03/2011 | 17:55:15 PM | Thursday,November
+// Description  : 
+// ======================================================================================
+
+///////////////////////////////////////////////////////////////////////////////
+// usings
+///////////////////////////////////////////////////////////////////////////////
+
+using UnityEngine;
+using UnityEditor;
+using System.Collections;
+
+///////////////////////////////////////////////////////////////////////////////
+// public
+///////////////////////////////////////////////////////////////////////////////
+
+[CustomEditor(typeof(exUIScrollView))]
+public class exUIScrollViewEditor : exUIElementEditor {
+
+    ///////////////////////////////////////////////////////////////////////////////
+    // properties
+    ///////////////////////////////////////////////////////////////////////////////
+
+    private exUIScrollView editScrollView;
+
+    ///////////////////////////////////////////////////////////////////////////////
+    // functions
+    ///////////////////////////////////////////////////////////////////////////////
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    override protected void OnEnable () {
+        base.OnEnable();
+        if ( target != editScrollView ) {
+            editScrollView = target as exUIScrollView;
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+	override public void OnInspectorGUI () {
+
+        // ======================================================== 
+        // Base GUI 
+        // ======================================================== 
+
+        base.OnInspectorGUI();
+        GUILayout.Space(20);
+
+        // ======================================================== 
+        // width
+        // ======================================================== 
+
+        GUI.enabled = !inAnimMode;
+        editScrollView.contentWidth = EditorGUILayout.FloatField( "Content Width", editScrollView.contentWidth );
+        GUI.enabled = true;
+
+        // ======================================================== 
+        // height
+        // ======================================================== 
+
+        GUI.enabled = !inAnimMode;
+        editScrollView.contentHeight = EditorGUILayout.FloatField( "Content Height", editScrollView.contentHeight );
+        GUI.enabled = true;
+
+        // ======================================================== 
+        // bounce
+        // ======================================================== 
+
+        GUILayout.BeginHorizontal();
+        GUILayout.Space(15);
+            GUI.enabled = !inAnimMode;
+            editScrollView.bounce = GUILayout.Toggle( editScrollView.bounce, "Bounce" );
+            GUI.enabled = true;
+        GUILayout.EndHorizontal();
+
+        // ======================================================== 
+        // scroll direction
+        // ======================================================== 
+
+        GUI.enabled = !inAnimMode;
+        EditorGUIUtility.LookLikeControls ();
+        editScrollView.scrollDirection = (exUIScrollView.ScrollDirection)EditorGUILayout.EnumPopup( "Scroll Direction", editScrollView.scrollDirection, GUILayout.Width(165) );
+        EditorGUIUtility.LookLikeInspector ();
+        GUI.enabled = true;
+
+        // ======================================================== 
+        // check dirty 
+        // ======================================================== 
+
+        if ( EditorApplication.isPlaying == false )
+            editScrollView.Sync();
+
+        if ( GUI.changed )
+            EditorUtility.SetDirty (editScrollView);
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    override protected void OnSceneGUI () {
+        base.OnSceneGUI();
+
+        // ======================================================== 
+        // check dirty 
+        // ======================================================== 
+
+        if ( EditorApplication.isPlaying == false )
+            editScrollView.Sync();
+
+        if ( GUI.changed )
+            EditorUtility.SetDirty (editScrollView);
+    }
+}
