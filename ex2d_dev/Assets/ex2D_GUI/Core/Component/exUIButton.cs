@@ -69,28 +69,31 @@ public class exUIButton : exUIElement {
     override public void Sync () {
         base.Sync ();
 
-        border.anchor = anchor;
-        border.width = width;
-        border.height = height;
-        border.transform.localPosition = Vector3.zero;
+        if ( border ) {
+            border.anchor = anchor;
+            border.width = width;
+            border.height = height;
+            border.transform.localPosition = Vector3.zero;
+        }
 
-        BoxCollider boxCollider = GetComponent<BoxCollider>();
+        if ( font ) {
+            BoxCollider boxCollider = GetComponent<BoxCollider>();
+            switch ( plane ) {
+            case exSprite.Plane.XY:
+                font.transform.localPosition 
+                    = new Vector3( boxCollider.center.x, boxCollider.center.y, font.transform.localPosition.z );
+                break;
 
-        switch ( plane ) {
-        case exSprite.Plane.XY:
-            font.transform.localPosition 
-                = new Vector3( boxCollider.center.x, boxCollider.center.y, font.transform.localPosition.z );
-            break;
+            case exSprite.Plane.XZ:
+                font.transform.localPosition 
+                    = new Vector3( boxCollider.center.x, font.transform.localPosition.y, boxCollider.center.z );
+                break;
 
-        case exSprite.Plane.XZ:
-            font.transform.localPosition 
-                = new Vector3( boxCollider.center.x, font.transform.localPosition.y, boxCollider.center.z );
-            break;
-
-        case exSprite.Plane.ZY:
-            font.transform.localPosition 
-                = new Vector3( font.transform.localPosition.x, boxCollider.center.y, boxCollider.center.z );
-            break;
+            case exSprite.Plane.ZY:
+                font.transform.localPosition 
+                    = new Vector3( font.transform.localPosition.x, boxCollider.center.y, boxCollider.center.z );
+                break;
+            }
         }
     }
 

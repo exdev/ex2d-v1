@@ -74,7 +74,7 @@ partial class exSpriteAnimClipEditor : EditorWindow {
     /// Open the sprite animation editor window
     // ------------------------------------------------------------------ 
 
-    [MenuItem ("Window/ex2D/Sprite Animation Editor %&s")]
+    [MenuItem ("Window/ex2D/Sprite Animation Editor")]
     public static exSpriteAnimClipEditor NewWindow () {
         exSpriteAnimClipEditor newWindow = EditorWindow.GetWindow<exSpriteAnimClipEditor>();
         return newWindow;

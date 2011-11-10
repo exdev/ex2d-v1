@@ -82,6 +82,14 @@ public class exUIScrollViewEditor : exUIElementEditor {
         GUILayout.EndHorizontal();
 
         // ======================================================== 
+        // bounce duration 
+        // ======================================================== 
+
+        GUI.enabled = !inAnimMode && editScrollView.bounce;
+        editScrollView.bounceDuration = EditorGUILayout.FloatField( "Bounce Duration", editScrollView.bounceDuration );
+        GUI.enabled = true;
+
+        // ======================================================== 
         // scroll direction
         // ======================================================== 
 
@@ -89,6 +97,22 @@ public class exUIScrollViewEditor : exUIElementEditor {
         EditorGUIUtility.LookLikeControls ();
         editScrollView.scrollDirection = (exUIScrollView.ScrollDirection)EditorGUILayout.EnumPopup( "Scroll Direction", editScrollView.scrollDirection, GUILayout.Width(165) );
         EditorGUIUtility.LookLikeInspector ();
+        GUI.enabled = true;
+
+        // ======================================================== 
+        // damping 
+        // ======================================================== 
+
+        GUI.enabled = !inAnimMode;
+        editScrollView.damping = EditorGUILayout.FloatField( "Damping", editScrollView.damping );
+        GUI.enabled = true;
+
+        // ======================================================== 
+        // elasticity 
+        // ======================================================== 
+
+        GUI.enabled = !inAnimMode;
+        editScrollView.elasticity = EditorGUILayout.FloatField( "Elasticity", editScrollView.elasticity );
         GUI.enabled = true;
 
         // ======================================================== 

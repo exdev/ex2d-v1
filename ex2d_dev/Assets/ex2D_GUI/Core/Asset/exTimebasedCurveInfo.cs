@@ -29,11 +29,33 @@ public class exTimebasedCurveInfo : ScriptableObject {
     ///////////////////////////////////////////////////////////////////////////////
 
     public WrapMode wrapMode = WrapMode.Once;
-    public float time = 1.0f;
+    public float length = 1.0f;
     public bool useRealTime = false;
     public bool useEaseCurve = true;
     public exEase.Type easeCurveType = exEase.Type.Linear;
     public AnimationCurve animationCurve = AnimationCurve.Linear( 0.0f, 0.0f, 1.0f, 1.0f );
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public float WrapSeconds ( float _seconds, WrapMode _wrapMode ) {
+        float t = Mathf.Abs(_seconds);
+        if ( _wrapMode == WrapMode.Loop ) {
+            t %= length;
+        }
+        else if ( _wrapMode == WrapMode.PingPong ) {
+            int cnt = (int)(t/length);
+            t %= length;
+            if ( cnt % 2 == 1 ) {
+                t = length - t;
+            }
+        }
+        else {
+            t = Mathf.Clamp( t, 0.0f, length );
+        }
+        return t;
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -45,10 +67,12 @@ public class exTimebasedCurve {
 
     public exTimebasedCurveInfo data;
 
+    private bool inverse = false;
     private exEase.easeCallback callback;
-    private float startTime = 0.0f; 
-    private bool reverse = false;
+    private float time = 0.0f; 
+    private float lastTime = 0.0f; 
     private bool timeup = false;
+    private bool started = false;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -58,11 +82,25 @@ public class exTimebasedCurve {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public void Start () {
+    public void Start ( bool _rewind = false ) {
         callback = data.useEaseCurve ? exEase.TypeToFunction(data.easeCurveType) : data.animationCurve.Evaluate;
-        startTime = data.useRealTime ? Time.realtimeSinceStartup : Time.time;
-        reverse = false;
+        lastTime = data.useRealTime ? Time.realtimeSinceStartup : Time.time;
+        if ( _rewind || started == false ) {
+            if ( inverse )
+                time = data.length;
+            else
+                time = 0.0f;
+        }
         timeup = false;
+        started = true;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void Inverse ( bool _enable ) {
+        inverse = _enable;
     }
 
     // ------------------------------------------------------------------ 
@@ -78,30 +116,54 @@ public class exTimebasedCurve {
     // ------------------------------------------------------------------ 
 
     public float Step () {
-        float timespan = (data.useRealTime ? Time.realtimeSinceStartup : Time.time) - startTime;
+        if ( timeup ) {
+            if ( inverse )
+                return 0.0f;
+            else
+                return 1.0f;
+        }
+
+        if ( started == false ) {
+            Debug.LogWarning( "the curve didn't started, please call curve.Start() first" );
+            if ( inverse )
+                return 1.0f;
+            else
+                return 0.0f;
+        }
+
+        float curTime = data.useRealTime ? Time.realtimeSinceStartup : Time.time;
+        float deltaTime = curTime - lastTime;
+        lastTime = curTime;
 
         //
-        if ( timespan >= data.time ) {
-            if ( data.wrapMode == exTimebasedCurveInfo.WrapMode.Once ) {
+        if ( inverse )
+            deltaTime = -deltaTime;
+        time += deltaTime;
+
+        //
+        float wrappedTime = data.WrapSeconds(time, data.wrapMode);
+
+        // check if stop
+        if ( data.wrapMode == exTimebasedCurveInfo.WrapMode.Once ) {
+            if ( (!inverse && time >= data.length) ||
+                 (inverse && time <= 0.0f) )
+            {
                 timeup = true;
-                return 1.0f;
-            }
-            else if ( data.wrapMode == exTimebasedCurveInfo.WrapMode.Loop ) {
-                startTime += data.time;
-                timespan = timespan % data.time;
-            }
-            else if ( data.wrapMode == exTimebasedCurveInfo.WrapMode.PingPong ) {
-                startTime += data.time;
-                timespan = timespan % data.time;
-                reverse = !reverse;
+                started = false;
+                if ( inverse ) {
+                    time = 0.0f;
+                    return 0.0f;
+                }
+                else {
+                    time = data.length;
+                    return 1.0f;
+                }
             }
         }
 
-        //
-        if ( reverse )
-            timespan = data.time - timespan;
 
-        float ratio = Mathf.Clamp ( timespan/data.time, 0.0f, 1.0f );
+        //
+        float ratio = Mathf.Clamp ( wrappedTime/data.length, 0.0f, 1.0f );
         return callback(ratio);
     }
 }

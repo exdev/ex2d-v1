@@ -194,11 +194,14 @@ public class exSpriteAnimation : MonoBehaviour {
                 sprite.SetSprite ( fi.atlas, fi.index );
 
             // check if stop
-            if ( ( curAnimation.wrapMode == WrapMode.Once ||
-                   curAnimation.wrapMode == WrapMode.Default ) && 
-                 curAnimation.time >= curAnimation.length )
+            if ( curAnimation.wrapMode == WrapMode.Once ||
+                 curAnimation.wrapMode == WrapMode.Default )
             {
-                Stop();
+                if ( (curAnimation.speed > 0.0f && curAnimation.time >= curAnimation.length) ||
+                     (curAnimation.speed < 0.0f && curAnimation.time <= 0.0f) )
+                {
+                    Stop();
+                }
             }
         }
     }

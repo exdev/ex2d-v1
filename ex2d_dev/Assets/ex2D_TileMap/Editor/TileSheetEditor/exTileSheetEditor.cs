@@ -35,7 +35,7 @@ partial class exTileSheetEditor : EditorWindow {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    [MenuItem ("Window/ex2D/TileSheet Editor %&t")]
+    [MenuItem ("Window/ex2D/TileSheet Editor")]
     public static exTileSheetEditor NewWindow () {
         exTileSheetEditor newWindow = EditorWindow.GetWindow<exTileSheetEditor>();
         return newWindow;

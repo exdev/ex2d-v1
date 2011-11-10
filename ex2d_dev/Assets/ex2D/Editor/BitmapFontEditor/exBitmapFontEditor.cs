@@ -41,7 +41,7 @@ partial class exBitmapFontEditor : EditorWindow {
     /// Open the atlas editor window
     // ------------------------------------------------------------------ 
 
-    [MenuItem ("Window/ex2D/BitmapFont Editor %&f")]
+    [MenuItem ("Window/ex2D/BitmapFont Editor")]
     public static exBitmapFontEditor NewWindow () {
         exBitmapFontEditor newWindow = EditorWindow.GetWindow<exBitmapFontEditor>();
         return newWindow;

@@ -7,7 +7,7 @@ TextureImporter:
   grayscaleToAlpha: 0
   npotScale: 0
   generateCubemap: 0
-  isReadable: 1
+  isReadable: 0
   textureType: 5
   mipmaps:
     generation: 0

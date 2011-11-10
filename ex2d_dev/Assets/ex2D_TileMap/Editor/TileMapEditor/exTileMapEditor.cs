@@ -49,7 +49,7 @@ partial class exTileMapEditor : EditorWindow {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    [MenuItem ("Window/ex2D/TileMap Editor %&t")]
+    [MenuItem ("Window/ex2D/TileMap Editor")]
     public static exTileMapEditor NewWindow () {
         exTileMapEditor newWindow = EditorWindow.GetWindow<exTileMapEditor>();
         return newWindow;

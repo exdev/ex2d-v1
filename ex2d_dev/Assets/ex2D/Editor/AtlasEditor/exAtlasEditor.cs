@@ -66,7 +66,7 @@ partial class exAtlasEditor : EditorWindow {
     /// Open the atlas editor window
     // ------------------------------------------------------------------ 
 
-    [MenuItem ("Window/ex2D/Atlas Editor %&a")]
+    [MenuItem ("Window/ex2D/Atlas Editor")]
     public static exAtlasEditor NewWindow () {
         exAtlasEditor newWindow = EditorWindow.GetWindow<exAtlasEditor>();
         return newWindow;

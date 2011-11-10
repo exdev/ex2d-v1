@@ -255,6 +255,7 @@ public class exUIMng : MonoBehaviour {
                     if ( touch.phase == TouchPhase.Ended ||
                          touch.phase == TouchPhase.Canceled ) 
                     {
+                        deltaPos = touch.deltaPosition;
                         touchRelease = true;
                         touchID = -1;
                         break;
@@ -312,40 +313,37 @@ public class exUIMng : MonoBehaviour {
             }
         }
 
-        //
-        if ( activeElement != null || hotElement != null ) {
-            // add pointer-move event
-            if ( deltaPos != Vector2.zero ) {
-                exUIEvent e = new exUIEvent(); 
-                e.type =  exUIEvent.Type.PointerMove;
-                e.position = curPointerPos;
-                e.delta = deltaPos;
-                e.target = (activeElement != null) ? activeElement : hotElement;
-                e.buttons = exUIEvent.PointerButtonFlags.Touch;
-                eventList.Add(e);
-            }
+        // add pointer-move event
+        if ( activeElement != null && deltaPos != Vector2.zero ) {
+            exUIEvent e = new exUIEvent(); 
+            e.type =  exUIEvent.Type.PointerMove;
+            e.position = curPointerPos;
+            e.delta = deltaPos;
+            e.target = activeElement;
+            e.buttons = exUIEvent.PointerButtonFlags.Touch;
+            eventList.Add(e);
+        }
 
-            // add pointer-press event
-            if ( touchPress ) {
-                exUIEvent e = new exUIEvent(); 
-                e.type =  exUIEvent.Type.PointerPress;
-                e.position = curPointerPos;
-                e.delta = deltaPos;
-                e.target = hotElement;
-                e.buttons = exUIEvent.PointerButtonFlags.Touch;
-                eventList.Add(e);
-            }
+        // add pointer-press event
+        if ( hotElement != null && touchPress ) {
+            exUIEvent e = new exUIEvent(); 
+            e.type =  exUIEvent.Type.PointerPress;
+            e.position = curPointerPos;
+            e.delta = deltaPos;
+            e.target = hotElement;
+            e.buttons = exUIEvent.PointerButtonFlags.Touch;
+            eventList.Add(e);
+        }
 
-            // add pointer-press event
-            if ( touchRelease ) {
-                exUIEvent e = new exUIEvent(); 
-                e.type =  exUIEvent.Type.PointerRelease;
-                e.position = curPointerPos;
-                e.delta = deltaPos;
-                e.target = (activeElement != null) ? activeElement : hotElement;
-                e.buttons = exUIEvent.PointerButtonFlags.Touch;
-                eventList.Add(e);
-            }
+        // add pointer-press event
+        if ( activeElement != null && touchRelease ) {
+            exUIEvent e = new exUIEvent(); 
+            e.type =  exUIEvent.Type.PointerRelease;
+            e.position = curPointerPos;
+            e.delta = deltaPos;
+            e.target = activeElement;
+            e.buttons = exUIEvent.PointerButtonFlags.Touch;
+            eventList.Add(e);
         }
     }
 
@@ -426,40 +424,37 @@ public class exUIMng : MonoBehaviour {
             }
         }
 
-        //
-        if ( activeElement != null || hotElement != null ) {
-            // add pointer-move event
-            if ( deltaPos != Vector2.zero ) {
-                exUIEvent e = new exUIEvent(); 
-                e.type =  exUIEvent.Type.PointerMove;
-                e.position = curPointerPos;
-                e.delta = deltaPos;
-                e.target = (activeElement != null) ? activeElement : hotElement;
-                e.buttons = curPointerPressed;
-                eventList.Add(e);
-            }
+        // add pointer-move event
+        if ( activeElement != null && deltaPos != Vector2.zero ) {
+            exUIEvent e = new exUIEvent(); 
+            e.type =  exUIEvent.Type.PointerMove;
+            e.position = curPointerPos;
+            e.delta = deltaPos;
+            e.target = activeElement;
+            e.buttons = curPointerPressed;
+            eventList.Add(e);
+        }
 
-            // add pointer-press event
-            if ( buttonDown != exUIEvent.PointerButtonFlags.None ) {
-                exUIEvent e = new exUIEvent(); 
-                e.type =  exUIEvent.Type.PointerPress;
-                e.position = curPointerPos;
-                e.delta = deltaPos;
-                e.target = hotElement;
-                e.buttons = buttonDown;
-                eventList.Add(e);
-            }
+        // add pointer-press event
+        if ( hotElement != null && buttonDown != exUIEvent.PointerButtonFlags.None ) {
+            exUIEvent e = new exUIEvent(); 
+            e.type =  exUIEvent.Type.PointerPress;
+            e.position = curPointerPos;
+            e.delta = deltaPos;
+            e.target = hotElement;
+            e.buttons = buttonDown;
+            eventList.Add(e);
+        }
 
-            // add pointer-press event
-            if ( buttonUp != exUIEvent.PointerButtonFlags.None ) {
-                exUIEvent e = new exUIEvent(); 
-                e.type =  exUIEvent.Type.PointerRelease;
-                e.position = curPointerPos;
-                e.delta = deltaPos;
-                e.target = (activeElement != null) ? activeElement : hotElement;
-                e.buttons = buttonUp;
-                eventList.Add(e);
-            }
+        // add pointer-press event
+        if ( activeElement != null && buttonUp != exUIEvent.PointerButtonFlags.None ) {
+            exUIEvent e = new exUIEvent(); 
+            e.type =  exUIEvent.Type.PointerRelease;
+            e.position = curPointerPos;
+            e.delta = deltaPos;
+            e.target = activeElement;
+            e.buttons = buttonUp;
+            eventList.Add(e);
         }
     }
 

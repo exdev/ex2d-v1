@@ -143,6 +143,11 @@ public class exSpriteBorder : exSpriteBase {
 
     public void UpdateMesh ( Mesh _mesh ) {
 
+        if ( guiBorder_ == null ) {
+            updateFlags = UpdateFlags.None;
+            return;
+        }
+
         exAtlas.Element el = null;
         if ( useAtlas )
             el = atlas_.elements[index_];

@@ -61,6 +61,35 @@ public class exUIButtonEditor : exUIElementEditor {
         editButton.text = EditorGUILayout.TextField( "Text", editButton.text );
 
         // ======================================================== 
+        // Updates 
+        // ======================================================== 
+
+        // update button
+        GUILayout.BeginHorizontal();
+        GUILayout.Space(15);
+            if ( GUILayout.Button("Update", GUILayout.Width(50), GUILayout.Height(20) ) ) {
+                editButton.border = editButton.transform.Find("Border").GetComponent<exSpriteBorder>();
+                editButton.font = editButton.transform.Find("Border/Text").GetComponent<exSpriteFont>();
+                GUI.changed = true;
+            }
+        GUILayout.EndHorizontal();
+
+        EditorGUI.indentLevel = 2;
+        GUI.enabled = false;
+        EditorGUILayout.ObjectField( "Border"
+                                     , editButton.border
+                                     , typeof(exSpriteBorder)
+                                     , false 
+                                   );
+        EditorGUILayout.ObjectField( "Font"
+                                     , editButton.font
+                                     , typeof(exSpriteFont)
+                                     , false 
+                                   );
+        GUI.enabled = true;
+        EditorGUI.indentLevel = 1;
+
+        // ======================================================== 
         // check dirty 
         // ======================================================== 
 

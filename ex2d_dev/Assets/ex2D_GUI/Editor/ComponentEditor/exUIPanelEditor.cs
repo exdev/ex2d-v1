@@ -24,7 +24,7 @@ public class exUIPanelEditor : exUIElementEditor {
     // properties
     ///////////////////////////////////////////////////////////////////////////////
 
-    private exUIPanel editPlane;
+    private exUIPanel editPanel;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -36,8 +36,8 @@ public class exUIPanelEditor : exUIElementEditor {
 
     override protected void OnEnable () {
         base.OnEnable();
-        if ( target != editPlane ) {
-            editPlane = target as exUIPanel;
+        if ( target != editPanel ) {
+            editPanel = target as exUIPanel;
         }
     }
 
@@ -55,14 +55,37 @@ public class exUIPanelEditor : exUIElementEditor {
         GUILayout.Space(20);
 
         // ======================================================== 
+        // Updates 
+        // ======================================================== 
+
+        // update button
+        GUILayout.BeginHorizontal();
+        GUILayout.Space(15);
+            if ( GUILayout.Button("Update", GUILayout.Width(50), GUILayout.Height(20) ) ) {
+                editPanel.background = editPanel.transform.Find("Background").GetComponent<exSpriteBorder>();
+                GUI.changed = true;
+            }
+        GUILayout.EndHorizontal();
+
+        EditorGUI.indentLevel = 2;
+        GUI.enabled = false;
+        EditorGUILayout.ObjectField( "Background"
+                                     , editPanel.background
+                                     , typeof(exSpriteBorder)
+                                     , false 
+                                   );
+        GUI.enabled = true;
+        EditorGUI.indentLevel = 1;
+
+        // ======================================================== 
         // check dirty 
         // ======================================================== 
 
         if ( EditorApplication.isPlaying == false )
-            editPlane.Sync();
+            editPanel.Sync();
 
         if ( GUI.changed )
-            EditorUtility.SetDirty (editPlane);
+            EditorUtility.SetDirty (editPanel);
     }
 
     // ------------------------------------------------------------------ 
@@ -77,9 +100,9 @@ public class exUIPanelEditor : exUIElementEditor {
         // ======================================================== 
 
         if ( EditorApplication.isPlaying == false )
-            editPlane.Sync();
+            editPanel.Sync();
 
         if ( GUI.changed )
-            EditorUtility.SetDirty (editPlane);
+            EditorUtility.SetDirty (editPanel);
     }
 }

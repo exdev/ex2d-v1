@@ -47,10 +47,12 @@ public class exUIPanel : exUIElement {
     override public void Sync () {
         base.Sync ();
 
-        background.anchor = anchor;
-        background.width = width;
-        background.height = height;
-        background.transform.localPosition = Vector3.zero;
+        if ( background ) {
+            background.anchor = anchor;
+            background.width = width;
+            background.height = height;
+            background.transform.localPosition = Vector3.zero;
+        }
     }
 
     // ------------------------------------------------------------------ 
@@ -70,11 +72,13 @@ public class exUIPanel : exUIElement {
             return true;
 
         case exUIEvent.Type.PointerPress: 
+            exUIMng.instance.activeElement = this;
             if ( OnButtonPress != null )
                 OnButtonPress ();
             return true;
 
         case exUIEvent.Type.PointerRelease: 
+            exUIMng.instance.activeElement = null;
             if ( OnButtonRelease != null )
                 OnButtonRelease ();
             return true;

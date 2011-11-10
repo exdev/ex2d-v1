@@ -43,7 +43,7 @@ partial class exGUIBorderEditor : EditorWindow {
     /// Open the atlas editor window
     // ------------------------------------------------------------------ 
 
-    [MenuItem ("Window/ex2D/GUIBorder Editor %&g")]
+    [MenuItem ("Window/ex2D/GUIBorder Editor")]
     public static exGUIBorderEditor NewWindow () {
         exGUIBorderEditor newWindow = EditorWindow.GetWindow<exGUIBorderEditor>();
         return newWindow;

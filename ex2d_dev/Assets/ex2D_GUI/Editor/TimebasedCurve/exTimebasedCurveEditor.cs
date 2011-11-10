@@ -44,10 +44,10 @@ public class exTimebasedCurveEditor : Editor {
             (exTimebasedCurveInfo.WrapMode)EditorGUILayout.EnumPopup( "Wrap Mode", curEditTarget.wrapMode );
 
         // ======================================================== 
-        // time 
+        // length 
         // ======================================================== 
 
-        curEditTarget.time = EditorGUILayout.FloatField( "Time", curEditTarget.time );
+        curEditTarget.length = EditorGUILayout.FloatField( "Length", curEditTarget.length );
 
         // ======================================================== 
         // use real time 
