@@ -47,12 +47,13 @@ public class exLayerEditor : EditorWindow {
     protected float totalInfoFieldHeight = 0.0f;
 
     protected bool inDragState = false;
+    protected bool doDrag = false;
     protected Vector2 scrollPos = Vector2.zero;
     protected bool sortSelection = false;
 
     protected List<exLayer> layers = new List<exLayer>();
     protected List<exLayer> selectedLayers = new List<exLayer>();
-    protected exLayer insertLayer = null;
+    protected exLayer layerCursorIn = null;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -197,10 +198,14 @@ public class exLayerEditor : EditorWindow {
 
         if ( e.type == EventType.MouseDown && e.button == 0 && e.clickCount == 1 ) {
             selectedLayers.Clear();
+
+            e.Use();
             Repaint();
         }
         else if ( e.type == EventType.MouseUp ) {
             inDragState = false;
+
+            e.Use();
             Repaint();
         }
         // do add GameObject to layerMng 
@@ -274,51 +279,153 @@ public class exLayerEditor : EditorWindow {
     void LayerTreeField ( float _x, float _y, exLayer _layer ) {
         //
         layers.Clear();
-        LayerField ( new Rect ( _x, _y, position.width - 2.0f * _x, layerFieldHeight ),
-                     0,
-                     _layer );
+        Rect layerFieldRect = new Rect ( _x, _y, position.width - 2.0f * _x, layerFieldHeight );
+        float totalLayerHeight = LayerField ( layerFieldRect, 0, _layer ); 
+
+        // DISABLE { 
+        // if ( sortSelection ) {
+        //     SortSelection();
+        //     sortSelection = false;
+        // }
+        // } DISABLE end 
 
         //
-        if ( sortSelection ) {
-            SortSelection();
-            sortSelection = false;
-        }
+        GUILayoutUtility.GetRect ( position.width, totalLayerHeight );
 
         //
-        if ( inDragState && insertLayer != null ) {
-            bool insertLayerSelected = selectedLayers.IndexOf(insertLayer) != -1;
+        if ( inDragState && layerCursorIn != null ) {
+            bool insertLayerSelected = selectedLayers.IndexOf(layerCursorIn) != -1;
             int index = 0;
-            GetLayerIndex ( ref index, curLayer, insertLayer ); 
+            index = layers.IndexOf(layerCursorIn);
             Rect rect = new Rect( _x,
                                   _y + index * (layerFieldHeight) - index,
                                   position.width - 2.0f * _x,
                                   layerFieldHeight );
+            int hlIndex = -1;
 
+            //
             if ( Event.current.mousePosition.y <= rect.y + rect.height * 0.5f ) {
-                index = layers.IndexOf(insertLayer);
-                exLayer prevLayer = (index-1 < 0 ) ? null : layers[index-1];
+                index = layers.IndexOf(layerCursorIn);
+                exLayer prevLayer = (index-1 < 0) ? null : layers[index-1];
 
                 // up
                 if ( prevLayer != null && 
-                     ( selectedLayers.IndexOf(prevLayer) == -1 || insertLayerSelected == false ) )
+                     ( selectedLayers.IndexOf(prevLayer) == -1 || 
+                       insertLayerSelected == false ) )
                 {
+                    hlIndex = index-1;
                     exEditorHelper.DrawRect( new Rect( rect.x, rect.y+1 - rect.height * 0.1f, rect.width, rect.height * 0.2f ), 
                                              new Color( 1.0f, 1.0f, 0.0f, 1.0f ), 
                                              new Color( 1.0f, 1.0f, 0.0f, 1.0f ) );
                 }
             }
             else if ( Event.current.mousePosition.y > rect.y + rect.height * 0.5f ) {
-                index = layers.IndexOf(insertLayer);
-                exLayer nextLayer = (index+1 > layers.Count-1 ) ? null : layers[index+1];
+                index = layers.IndexOf(layerCursorIn);
+                exLayer nextLayer = (index > layers.Count-1) ? null : layers[index];
+                int nextIndexInSelection = selectedLayers.IndexOf(nextLayer);
 
                 // down
                 if ( nextLayer != null && 
-                     ( selectedLayers.IndexOf(nextLayer) == -1 || insertLayerSelected == false ) )
+                     ( nextIndexInSelection == -1 || 
+                       nextIndexInSelection == selectedLayers.Count-1 ||
+                       insertLayerSelected == false ) )
                 {
+                    hlIndex = index;
                     exEditorHelper.DrawRect( new Rect( rect.x, rect.y + rect.height * 0.9f, rect.width, rect.height * 0.2f ), 
                                              new Color( 1.0f, 1.0f, 0.0f, 1.0f ), 
                                              new Color( 1.0f, 1.0f, 0.0f, 1.0f ) );
                 }
+            }
+
+            //
+            exLayer hlLayer = null;
+            exLayer insertLayer = null;
+            exLayer insertLayerNext = null;
+
+            // highlight the layer for insert 
+            if ( hlIndex != -1 ) {
+                insertLayer = layers[hlIndex];
+                insertLayerNext = (hlIndex == layers.Count-1) ? null : layers[hlIndex+1];
+
+                hlLayer = layers[hlIndex];
+                float indentX = _x + hlLayer.indentLevel * 15.0f + 10.0f;
+                if ( hlLayer.children.Count == 0 ) {
+                    indentX += 15.0f;
+                }
+                while ( selectedLayers.IndexOf(hlLayer) != -1 || Event.current.mousePosition.x <= indentX ) {
+                    exLayer hlParent = hlLayer.parent;
+
+                    if ( hlParent == null )
+                        break;
+
+                    if ( insertLayerNext != null &&
+                         (insertLayerNext.indentLevel - hlParent.indentLevel) >= 2 )
+                    {
+                        break;
+                    }
+
+                    //
+                    hlLayer = hlParent;
+                    indentX = _x + hlLayer.indentLevel * 15.0f + 10.0f;
+                    if ( hlLayer.children.Count == 0 ) {
+                        indentX += 15.0f;
+                    }
+                }
+                hlIndex = layers.IndexOf(hlLayer);
+            }
+
+            // again
+            if ( hlIndex != -1 ) {
+                exEditorHelper.DrawRect( new Rect( _x,
+                                                   _y + hlIndex * (layerFieldHeight) - hlIndex,
+                                                   position.width - 2.0f * _x,
+                                                   layerFieldHeight ), 
+                                         new Color( 0.0f, 1.0f, 0.0f, 0.2f ), 
+                                         new Color( 0.0f, 0.0f, 0.0f, 0.0f ) );
+            }
+
+            //
+            if ( (Event.current.type == EventType.MouseUp && Event.current.button == 0) ||
+                 (Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.Escape) ) {
+
+                inDragState = false;
+
+                if ( hlIndex != -1 && Event.current.type == EventType.MouseUp ) {
+                    //
+                    if ( sortSelection ) {
+                        SortSelection();
+                        sortSelection = false;
+                    }
+                    List<exLayer> insertList = new List<exLayer>();
+                    foreach ( exLayer layer in selectedLayers ) {
+                        if ( selectedLayers.IndexOf(layer.parent) == -1 ) {
+                            insertList.Add(layer);
+                        }
+                    }
+
+                    // get exact insert layer
+                    while ( (insertLayer.indentLevel - hlLayer.indentLevel) > 1 ) {
+                        insertLayer = insertLayer.parent;
+                    }
+                    if ( hlLayer.children.Count == 0 ) {
+                        foreach ( exLayer layer in insertList ) {
+                            layer.parent = hlLayer;
+                            EditorUtility.SetDirty(layer);
+                        }
+                    }
+                    else {
+                        for ( int i = insertList.Count-1; i >=0; --i ) {
+                            int insertIdx = hlLayer.children.IndexOf(insertLayer) + 1; 
+                            hlLayer.InsertAt ( insertIdx, insertList[i] );
+                            EditorUtility.SetDirty(insertList[i]);
+                        }
+                    }
+                }
+
+                //
+                EditorUtility.SetDirty(curLayer);
+                Event.current.Use();
+                Repaint();
             }
         }
     }
@@ -349,6 +456,7 @@ public class exLayerEditor : EditorWindow {
         else {
             curX += 10;
         }
+        _layer.indentLevel = _indentLevel;
 
         GUI.Label ( new Rect ( curX, curY + 1, _rect.width - curX, _rect.height ), _layer.name );
         layers.Add(_layer);
@@ -370,10 +478,11 @@ public class exLayerEditor : EditorWindow {
                             AddSelected(_layer);
                         }
                     }
-                    insertLayer = null;
+                    layerCursorIn = null;
                     e.Use();
                     Repaint();
                 }
+                doDrag = true;
             }
             else if ( inDragState == false && 
                       e.type == EventType.MouseUp && 
@@ -386,7 +495,7 @@ public class exLayerEditor : EditorWindow {
                     selectedLayers.Clear();
                     AddSelected(_layer);
 
-                    insertLayer = null;
+                    layerCursorIn = null;
                     e.Use();
                     Repaint();
                 }
@@ -394,12 +503,13 @@ public class exLayerEditor : EditorWindow {
             else if ( e.type == EventType.MouseDrag ) {
                 if ( inDragState ) {
                     if ( _layer != curLayer ) {
-                        insertLayer = _layer;
+                        layerCursorIn = _layer;
                         Repaint();
                     }
                 }
-                else {
+                else if ( selected && doDrag ) {
                     inDragState = true;
+                    doDrag = false;
                 }
                 e.Use();
                 Repaint();
@@ -484,7 +594,7 @@ public class exLayerEditor : EditorWindow {
         List<LayerForSort> layerForSorts = new List<LayerForSort>(); 
         foreach ( exLayer l in selectedLayers ) {
             int index = 0;
-            GetLayerIndex( ref index, curLayer, l );
+            GetExactLayerIndex( ref index, curLayer, l );
             LayerForSort lfs = new LayerForSort();
             lfs.index = index;
             lfs.layer = l;
@@ -501,7 +611,7 @@ public class exLayerEditor : EditorWindow {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    bool GetLayerIndex ( ref int _index, exLayer _curLayer, exLayer _l ) {
+    bool GetExactLayerIndex ( ref int _index, exLayer _curLayer, exLayer _l ) {
         if ( _curLayer == _l )
             return true;
 
@@ -511,7 +621,7 @@ public class exLayerEditor : EditorWindow {
             if ( childLayer == _l ) {
                 return true;
             }
-            bool found = GetLayerIndex ( ref _index, childLayer, _l );
+            bool found = GetExactLayerIndex ( ref _index, childLayer, _l );
             if ( found )
                 return true;
         }

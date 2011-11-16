@@ -19,7 +19,7 @@ using System.IO;
 ///////////////////////////////////////////////////////////////////////////////
 
 [CustomEditor(typeof(exSpriteBase))]
-class exSpriteBaseEditor : exPlaneEditor {
+public class exSpriteBaseEditor : exPlaneEditor {
 
     protected enum CollisionType {
         None,

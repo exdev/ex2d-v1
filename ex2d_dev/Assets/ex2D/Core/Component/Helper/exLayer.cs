@@ -47,6 +47,21 @@ public class exLayer : MonoBehaviour {
             if ( value ) {
                 value.children_.Add(this);
             }
+
+            // TEMP { 
+            exLayer parentLayer = parent_;
+            exLayer lastLayer = this;
+            while ( parentLayer != null ) {
+                lastLayer = parentLayer;
+                parentLayer = lastLayer.parent;
+            }
+            exLayerMng layerMng = lastLayer as exLayerMng;
+            if ( layerMng ) {
+                layerMng.UpdateLayer();
+            }
+            // } TEMP end 
+
+            //
             parent_ = value;
         }
         get {
@@ -63,6 +78,9 @@ public class exLayer : MonoBehaviour {
 
     // editor only data
     public bool foldout = true;
+    public int indentLevel = -1;
+    // TODO: public bool dynamic = false; // if static, the layer will not update when running the game
+    // TODO: public float range = 100.0f;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -95,5 +113,30 @@ public class exLayer : MonoBehaviour {
 
     void OnDestroy () {
         parent = null;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void InsertAt ( int _index, exLayer _layer ) {
+        if ( _layer.parent == this ) {
+            int index = children_.IndexOf (_layer);
+            if ( index > _index ) {
+                _layer.parent = null;
+                children_.Insert ( _index, _layer );
+                _layer.parent_ = this;
+            }
+            else {
+                children_.Insert ( _index, _layer );
+                _layer.parent = null;
+                _layer.parent_ = this;
+            }
+        }
+        else {
+            _layer.parent = null;
+            children_.Insert ( _index, _layer );
+            _layer.parent_ = this;
+        }
     }
 }
