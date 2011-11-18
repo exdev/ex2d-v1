@@ -419,53 +419,70 @@ public class exSprite : exSpriteBase {
             float yMaxClip = scale_.y * height_ * (  0.5f - clipBottom );
 
             // build vertices & normals
-            switch ( plane ) {
-            case Plane.XY:
-                for ( int r = 0; r < 2; ++r ) {
-                    for ( int c = 0; c < 2; ++c ) {
-                        int i = r * 2 + c;
-                        float x, y;
-                        CalculateVertex( out x, out y,
-                                         width_ * scale_.x, height_ * scale_.y,
-                                         c, r, 
-                                         xMinClip, xMaxClip, yMinClip, yMaxClip, 
-                                         offsetX, offsetY );
-                        vertices[i] = new Vector3( x, y, 0.0f );
-                        normals[i] = new Vector3( 0.0f, 0.0f, -1.0f ); // TEMP
-                    }
+            for ( int r = 0; r < 2; ++r ) {
+                for ( int c = 0; c < 2; ++c ) {
+                    int i = r * 2 + c;
+                    float x, y;
+                    CalculateVertex( out x, out y,
+                                     width_ * scale_.x, height_ * scale_.y,
+                                     c, r, 
+                                     xMinClip, xMaxClip, yMinClip, yMaxClip, 
+                                     offsetX, offsetY );
+                    vertices[i] = new Vector3( x, y, 0.0f );
+                    normals[i] = new Vector3( 0.0f, 0.0f, -1.0f ); // TEMP
                 }
-                break;
-            case Plane.XZ:
-                for ( int r = 0; r < 2; ++r ) {
-                    for ( int c = 0; c < 2; ++c ) {
-                        int i = r * 2 + c;
-                        float x, y;
-                        CalculateVertex( out x, out y,
-                                         width_ * scale_.x, height_ * scale_.y,
-                                         c, r, 
-                                         xMinClip, xMaxClip, yMinClip, yMaxClip, 
-                                         offsetX, offsetY );
-                        vertices[i] = new Vector3( x, 0.0f, y );
-                        normals[i] = new Vector3( 0.0f, 0.0f, -1.0f ); // TEMP
-                    }
-                }
-                break;
-            case Plane.ZY:
-                for ( int r = 0; r < 2; ++r ) {
-                    for ( int c = 0; c < 2; ++c ) {
-                        int i = r * 2 + c;
-                        float x, y;
-                        CalculateVertex( out x, out y,
-                                         width_ * scale_.x, height_ * scale_.y,
-                                         c, r, 
-                                         xMinClip, xMaxClip, yMinClip, yMaxClip, 
-                                         offsetX, offsetY );
-                        vertices[i] = new Vector3( 0.0f, y, x );
-                        normals[i] = new Vector3( 0.0f, 0.0f, -1.0f ); // TEMP
-                    }
-                }
-                break;
             }
+
+            // DELME { 
+            // switch ( plane ) {
+            // case Plane.XY:
+            //     for ( int r = 0; r < 2; ++r ) {
+            //         for ( int c = 0; c < 2; ++c ) {
+            //             int i = r * 2 + c;
+            //             float x, y;
+            //             CalculateVertex( out x, out y,
+            //                              width_ * scale_.x, height_ * scale_.y,
+            //                              c, r, 
+            //                              xMinClip, xMaxClip, yMinClip, yMaxClip, 
+            //                              offsetX, offsetY );
+            //             vertices[i] = new Vector3( x, y, 0.0f );
+            //             normals[i] = new Vector3( 0.0f, 0.0f, -1.0f ); // TEMP
+            //         }
+            //     }
+            //     break;
+            // case Plane.XZ:
+            //     for ( int r = 0; r < 2; ++r ) {
+            //         for ( int c = 0; c < 2; ++c ) {
+            //             int i = r * 2 + c;
+            //             float x, y;
+            //             CalculateVertex( out x, out y,
+            //                              width_ * scale_.x, height_ * scale_.y,
+            //                              c, r, 
+            //                              xMinClip, xMaxClip, yMinClip, yMaxClip, 
+            //                              offsetX, offsetY );
+            //             vertices[i] = new Vector3( x, 0.0f, y );
+            //             normals[i] = new Vector3( 0.0f, 0.0f, -1.0f ); // TEMP
+            //         }
+            //     }
+            //     break;
+            // case Plane.ZY:
+            //     for ( int r = 0; r < 2; ++r ) {
+            //         for ( int c = 0; c < 2; ++c ) {
+            //             int i = r * 2 + c;
+            //             float x, y;
+            //             CalculateVertex( out x, out y,
+            //                              width_ * scale_.x, height_ * scale_.y,
+            //                              c, r, 
+            //                              xMinClip, xMaxClip, yMinClip, yMaxClip, 
+            //                              offsetX, offsetY );
+            //             vertices[i] = new Vector3( 0.0f, y, x );
+            //             normals[i] = new Vector3( 0.0f, 0.0f, -1.0f ); // TEMP
+            //         }
+            //     }
+            //     break;
+            // }
+            // } DELME end 
+
             _mesh.vertices = vertices;
             _mesh.normals = normals; // TEMP
             _mesh.bounds = GetMeshBounds ( offsetX, offsetY, halfWidthScaled * 2.0f, halfHeightScaled * 2.0f );

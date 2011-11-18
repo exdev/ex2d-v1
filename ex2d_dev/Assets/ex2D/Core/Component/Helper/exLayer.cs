@@ -20,7 +20,7 @@ using System.Collections.Generic;
 ///////////////////////////////////////////////////////////////////////////////
 
 [ExecuteInEditMode]
-[AddComponentMenu("ex2D Helper/Layer 2D")]
+[AddComponentMenu("ex2D Helper/Layer")]
 public class exLayer : MonoBehaviour {
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -35,31 +35,41 @@ public class exLayer : MonoBehaviour {
                 return;
             }
 
-            if ( value == this ) {
-                Debug.LogWarning("can't add self as parent");
-                return;
+            // check if it is parent layer or child
+            exLayer parentLayer = value;
+            exLayer lastLayer = value;
+            while ( parentLayer != null ) {
+                if ( parentLayer == this ) {
+                    Debug.LogWarning("can't add self or child as parent");
+                    return;
+                } 
+                lastLayer = parentLayer;
+                parentLayer = lastLayer.parent;
             }
 
-            //
+            // remove self from old parent's child list
             if ( parent_ ) {
                 parent_.children_.Remove(this);
             }
+
+            // add self to new parent
             if ( value ) {
                 value.children_.Add(this);
             }
 
-            // TEMP { 
-            exLayer parentLayer = parent_;
-            exLayer lastLayer = this;
-            while ( parentLayer != null ) {
-                lastLayer = parentLayer;
-                parentLayer = lastLayer.parent;
+            // update layer mng
+            if ( lastLayer == null ) {
+                parentLayer = parent_;
+                lastLayer = this;
+                while ( parentLayer != null ) {
+                    lastLayer = parentLayer;
+                    parentLayer = lastLayer.parent;
+                }
             }
             exLayerMng layerMng = lastLayer as exLayerMng;
             if ( layerMng ) {
                 layerMng.UpdateLayer();
             }
-            // } TEMP end 
 
             //
             parent_ = value;
@@ -76,11 +86,13 @@ public class exLayer : MonoBehaviour {
         }
     }
 
-    // editor only data
-    public bool foldout = true;
-    public int indentLevel = -1;
+    //
     // TODO: public bool dynamic = false; // if static, the layer will not update when running the game
     // TODO: public float range = 100.0f;
+
+    // editor only data
+    public bool foldout = true;
+    [System.NonSerialized] public int indentLevel = -1;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -94,8 +106,16 @@ public class exLayer : MonoBehaviour {
         // relink layers
         // NOTE: this happends when we clone a GameObject
 
-        if ( parent_ && parent_.children.IndexOf(this) == -1 ) {
-            parent_.children_.Add(this);
+        if ( children_ == null )
+            children_ = new List<exLayer>();
+
+        if ( parent_ ) {
+            if ( parent_.children_ == null ) {
+                parent_.children_ = new List<exLayer>();
+            }
+            if ( parent_.children.IndexOf(this) == -1 ) {
+                parent_.children_.Add(this);
+            }
         }
 
         for ( int i = 0; i < children_.Count; ++i ) {
@@ -138,5 +158,49 @@ public class exLayer : MonoBehaviour {
             children_.Insert ( _index, _layer );
             _layer.parent_ = this;
         }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // for editor
+    // ------------------------------------------------------------------ 
+
+    public void ForceSetParent ( exLayer _parent ) {
+        // check if it is parent layer or child
+        exLayer parentLayer = _parent;
+        exLayer lastLayer = this;
+        while ( parentLayer != null ) {
+            if ( parentLayer == this ) {
+                Debug.LogWarning("can't add self or child as parent");
+                return;
+            } 
+            lastLayer = parentLayer;
+            parentLayer = lastLayer.parent;
+        }
+
+        //
+        if ( parent_ ) {
+            parent_.children_.Remove(this);
+        }
+
+        //
+        if ( _parent ) {
+            _parent.children_.Add(this);
+        }
+
+        // update layer mng
+        parentLayer = (parent_ == null ? _parent : parent_);
+        lastLayer = this;
+        while ( parentLayer != null ) {
+            lastLayer = parentLayer;
+            parentLayer = lastLayer.parent;
+        }
+        exLayerMng layerMng = lastLayer as exLayerMng;
+        if ( layerMng ) {
+            layerMng.UpdateLayer();
+        }
+
+        //
+        parent_ = _parent;
     }
 }

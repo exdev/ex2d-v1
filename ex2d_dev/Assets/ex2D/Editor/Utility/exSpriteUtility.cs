@@ -91,11 +91,6 @@ public static class exSpriteUtility {
             _sprite.meshFilter.sharedMesh = newMesh; 
         }
 
-        // update layer2d
-        if ( _sprite.layer2d ) {
-            _sprite.layer2d.RecursivelyUpdateLayer ();
-        }
-
         // update collider
         if ( _sprite.collisionHelper ) {
             _sprite.collisionHelper.UpdateCollider ();
@@ -119,17 +114,22 @@ public static class exSpriteUtility {
         }
 
         //
-        switch ( sprite.plane ) {
-        case exSprite.Plane.XY:
-            sprite.scale = new Vector2( sprite.scale.x * _trans.lossyScale.x, sprite.scale.y * _trans.lossyScale.y );
-            break;
-        case exSprite.Plane.XZ:
-            sprite.scale = new Vector2( sprite.scale.x * _trans.lossyScale.x, sprite.scale.y * _trans.lossyScale.z );
-            break;
-        case exSprite.Plane.ZY:
-            sprite.scale = new Vector2( sprite.scale.x * _trans.lossyScale.z, sprite.scale.y * _trans.lossyScale.y );
-            break;
-        }
+        sprite.scale = new Vector2( sprite.scale.x * _trans.lossyScale.x, sprite.scale.y * _trans.lossyScale.y );
+
+        // DELME { 
+        // //
+        // switch ( sprite.plane ) {
+        // case exSprite.Plane.XY:
+        //     sprite.scale = new Vector2( sprite.scale.x * _trans.lossyScale.x, sprite.scale.y * _trans.lossyScale.y );
+        //     break;
+        // case exSprite.Plane.XZ:
+        //     sprite.scale = new Vector2( sprite.scale.x * _trans.lossyScale.x, sprite.scale.y * _trans.lossyScale.z );
+        //     break;
+        // case exSprite.Plane.ZY:
+        //     sprite.scale = new Vector2( sprite.scale.x * _trans.lossyScale.z, sprite.scale.y * _trans.lossyScale.y );
+        //     break;
+        // }
+        // } DELME end 
 
         //
         if ( _trans.parent != null ) {

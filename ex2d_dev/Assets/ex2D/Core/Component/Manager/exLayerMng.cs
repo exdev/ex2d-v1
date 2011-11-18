@@ -20,6 +20,7 @@ using System.Collections.Generic;
 ///////////////////////////////////////////////////////////////////////////////
 
 [ExecuteInEditMode]
+[AddComponentMenu("ex2D Helper/Layer Manager")]
 public class exLayerMng : exLayer {
 
     bool needsUpdate = false;

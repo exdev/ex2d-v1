@@ -148,33 +148,6 @@ public class exPlaneEditor : Editor {
         }
 
         // ======================================================== 
-        // use layer 2D
-        // ======================================================== 
-
-        GUILayout.BeginHorizontal();
-        GUILayout.Space(15);
-            GUI.enabled = !inAnimMode;
-            bool hasLayer2D = editPlane.layer2d != null; 
-            bool useLayer2D = GUILayout.Toggle ( hasLayer2D, "Use Layer 2D" ); 
-            if ( useLayer2D != hasLayer2D ) {
-                if ( useLayer2D ) {
-                    switch ( editPlane.plane ) {
-                    case exPlane.Plane.XY: editPlane.gameObject.AddComponent<exLayerXY>(); break;
-                    case exPlane.Plane.XZ: editPlane.gameObject.AddComponent<exLayerXZ>(); break;
-                    case exPlane.Plane.ZY: editPlane.gameObject.AddComponent<exLayerZY>(); break;
-                    }
-                    editPlane.layer2d.plane = editPlane;
-                    editPlane.layer2d.UpdateDepth();
-                }
-                else {
-                    Object.DestroyImmediate(editPlane.layer2d,true);
-                }
-                GUI.changed = true;
-            }
-            GUI.enabled = true;
-        GUILayout.EndHorizontal();
-
-        // ======================================================== 
         // use animation helper 
         // ======================================================== 
 
@@ -228,14 +201,16 @@ public class exPlaneEditor : Editor {
         }
         EditorGUIUtility.LookLikeInspector ();
 
-        // ======================================================== 
-        // plane type
-        // ======================================================== 
+        // DELME { 
+        // // ======================================================== 
+        // // plane type
+        // // ======================================================== 
 
-        GUI.enabled = !inAnimMode;
-        EditorGUIUtility.LookLikeControls ();
-        editPlane.plane = (exPlane.Plane)EditorGUILayout.EnumPopup( "Plane", editPlane.plane, GUILayout.Width(165) );
-        EditorGUIUtility.LookLikeInspector ();
+        // GUI.enabled = !inAnimMode;
+        // EditorGUIUtility.LookLikeControls ();
+        // editPlane.plane = (exPlane.Plane)EditorGUILayout.EnumPopup( "Plane", editPlane.plane, GUILayout.Width(165) );
+        // EditorGUIUtility.LookLikeInspector ();
+        // } DELME end 
 
         // ======================================================== 
         // anchor

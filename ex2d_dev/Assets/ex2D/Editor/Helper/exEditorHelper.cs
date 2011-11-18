@@ -807,11 +807,6 @@ public static class exEditorHelper {
             //                                   "Build Sprite " + spBase.gameObject.name, progress );    
             // } DISABLE end 
 
-            // update layer
-            if ( spBase.layer2d ) {
-                spBase.layer2d.RecursivelyUpdateLayer ();
-            }
-
             // if sprite
             if ( spBase is exSprite ) {
                 exSprite sp = spBase as exSprite;

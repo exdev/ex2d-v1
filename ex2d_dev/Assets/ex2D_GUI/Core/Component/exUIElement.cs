@@ -146,19 +146,23 @@ public class exUIElement : exPlane {
         BoxCollider boxCollider = GetComponent<BoxCollider>();
         if ( boxCollider == null ) {
             boxCollider = gameObject.AddComponent<BoxCollider>();
-            switch ( plane ) {
-            case exSprite.Plane.XY:
-                boxCollider.center = new Vector3( boxCollider.center.x, boxCollider.center.y, 0.2f );
-                break;
+            boxCollider.center = new Vector3( boxCollider.center.x, boxCollider.center.y, 0.2f );
 
-            case exSprite.Plane.XZ:
-                boxCollider.center = new Vector3( boxCollider.center.x, 0.2f, boxCollider.center.z );
-                break;
+            // DELME { 
+            // switch ( plane ) {
+            // case exSprite.Plane.XY:
+            //     boxCollider.center = new Vector3( boxCollider.center.x, boxCollider.center.y, 0.2f );
+            //     break;
 
-            case exSprite.Plane.ZY:
-                boxCollider.center = new Vector3( 0.2f, boxCollider.center.y, boxCollider.center.z );
-                break;
-            }
+            // case exSprite.Plane.XZ:
+            //     boxCollider.center = new Vector3( boxCollider.center.x, 0.2f, boxCollider.center.z );
+            //     break;
+
+            // case exSprite.Plane.ZY:
+            //     boxCollider.center = new Vector3( 0.2f, boxCollider.center.y, boxCollider.center.z );
+            //     break;
+            // }
+            // } DELME end 
         }
 
         // add collision helper

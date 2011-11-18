@@ -78,22 +78,27 @@ public class exUIButton : exUIElement {
 
         if ( font ) {
             BoxCollider boxCollider = GetComponent<BoxCollider>();
-            switch ( plane ) {
-            case exSprite.Plane.XY:
-                font.transform.localPosition 
-                    = new Vector3( boxCollider.center.x, boxCollider.center.y, font.transform.localPosition.z );
-                break;
+            font.transform.localPosition 
+                = new Vector3( boxCollider.center.x, boxCollider.center.y, font.transform.localPosition.z );
 
-            case exSprite.Plane.XZ:
-                font.transform.localPosition 
-                    = new Vector3( boxCollider.center.x, font.transform.localPosition.y, boxCollider.center.z );
-                break;
+            // DELME { 
+            // switch ( plane ) {
+            // case exSprite.Plane.XY:
+            //     font.transform.localPosition 
+            //         = new Vector3( boxCollider.center.x, boxCollider.center.y, font.transform.localPosition.z );
+            //     break;
 
-            case exSprite.Plane.ZY:
-                font.transform.localPosition 
-                    = new Vector3( font.transform.localPosition.x, boxCollider.center.y, boxCollider.center.z );
-                break;
-            }
+            // case exSprite.Plane.XZ:
+            //     font.transform.localPosition 
+            //         = new Vector3( boxCollider.center.x, font.transform.localPosition.y, boxCollider.center.z );
+            //     break;
+
+            // case exSprite.Plane.ZY:
+            //     font.transform.localPosition 
+            //         = new Vector3( font.transform.localPosition.x, boxCollider.center.y, boxCollider.center.z );
+            //     break;
+            // }
+            // } DELME end 
         }
     }
 

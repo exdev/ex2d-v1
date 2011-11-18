@@ -19,31 +19,33 @@ using System.Collections;
 
 public static class upgrade_to_v111 {
 
-    [MenuItem("Edit/ex2D Upgrade/upgrade to v1.1.1")]
-    static void Exec () {
-        EditorUtility.DisplayProgressBar( "Update Scene Sprite Layers...", 
-                                          "Update Scene Sprite Layers...", 
-                                          0.5f );    
+    // DELME: no use { 
+    // [MenuItem("Edit/ex2D Upgrade/upgrade to v1.1.1")]
+    // static void Exec () {
+    //     EditorUtility.DisplayProgressBar( "Update Scene Sprite Layers...", 
+    //                                       "Update Scene Sprite Layers...", 
+    //                                       0.5f );    
 
-        exLayer2D[] layerObjs = Resources.FindObjectsOfTypeAll(typeof(exLayer2D)) as exLayer2D[];
-        for ( int i = 0; i < layerObjs.Length; ++i ) {
-            exLayer2D layer2d = layerObjs[i]; 
-            exPlane plane = layer2d.GetComponent<exPlane>();
+    //     exLayer2D[] layerObjs = Resources.FindObjectsOfTypeAll(typeof(exLayer2D)) as exLayer2D[];
+    //     for ( int i = 0; i < layerObjs.Length; ++i ) {
+    //         exLayer2D layer2d = layerObjs[i]; 
+    //         exPlane plane = layer2d.GetComponent<exPlane>();
 
-            int layer = 0;
-            float bias = 0.0f;
-            if ( layer2d ) {
-                layer = layer2d.layer; 
-                bias = layer2d.bias; 
-                Object.DestroyImmediate(layer2d,true);
-            }
-            switch ( plane.plane ) {
-            case exPlane.Plane.XY: plane.gameObject.AddComponent<exLayerXY>(); break;
-            case exPlane.Plane.XZ: plane.gameObject.AddComponent<exLayerXZ>(); break;
-            case exPlane.Plane.ZY: plane.gameObject.AddComponent<exLayerZY>(); break;
-            }
-            plane.layer2d.SetLayer( layer, bias );
-        }
-        EditorUtility.ClearProgressBar();
-    }
+    //         int layer = 0;
+    //         float bias = 0.0f;
+    //         if ( layer2d ) {
+    //             layer = layer2d.layer; 
+    //             bias = layer2d.bias; 
+    //             Object.DestroyImmediate(layer2d,true);
+    //         }
+    //         switch ( plane.plane ) {
+    //         case exPlane.Plane.XY: plane.gameObject.AddComponent<exLayerXY>(); break;
+    //         case exPlane.Plane.XZ: plane.gameObject.AddComponent<exLayerXZ>(); break;
+    //         case exPlane.Plane.ZY: plane.gameObject.AddComponent<exLayerZY>(); break;
+    //         }
+    //         plane.layer2d.SetLayer( layer, bias );
+    //     }
+    //     EditorUtility.ClearProgressBar();
+    // }
+    // } DELME end 
 }

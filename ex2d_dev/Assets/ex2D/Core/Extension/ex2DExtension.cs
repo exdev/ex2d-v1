@@ -164,19 +164,23 @@ public static class ex2DExtension {
                                    float _dx, 
                                    float _dy )
     {
-        switch ( _plane.plane ) {
-        case exPlane.Plane.XY:
-            _plane.transform.Translate ( _dx, _dy, 0.0f );
-            break;
+        _plane.transform.Translate ( _dx, _dy, 0.0f );
 
-        case exPlane.Plane.XZ:
-            _plane.transform.Translate ( _dx, 0.0f, _dy );
-            break;
+        // DELME { 
+        // switch ( _plane.plane ) {
+        // case exPlane.Plane.XY:
+        //     _plane.transform.Translate ( _dx, _dy, 0.0f );
+        //     break;
 
-        case exPlane.Plane.ZY:
-            _plane.transform.Translate ( 0.0f, _dy, _dx );
-            break;
-        }
+        // case exPlane.Plane.XZ:
+        //     _plane.transform.Translate ( _dx, 0.0f, _dy );
+        //     break;
+
+        // case exPlane.Plane.ZY:
+        //     _plane.transform.Translate ( 0.0f, _dy, _dx );
+        //     break;
+        // }
+        // } DELME end 
     }
 
     // ------------------------------------------------------------------ 
@@ -195,22 +199,27 @@ public static class ex2DExtension {
             float center_x = _plane.boundingRect.x + _plane.boundingRect.width * 0.5f; 
             float center_y = _plane.boundingRect.y + _plane.boundingRect.height * 0.5f; 
 
-            switch ( _plane.plane ) {
-            case exSprite.Plane.XY:
-                boxCollider.center = new Vector3 ( center_x, center_y, boxCollider.center.z );
-                boxCollider.size = new Vector3( boundingRect.width, boundingRect.height, _length );
-                break;
+            boxCollider.center = new Vector3 ( center_x, center_y, boxCollider.center.z );
+            boxCollider.size = new Vector3( boundingRect.width, boundingRect.height, _length );
 
-            case exSprite.Plane.XZ:
-                boxCollider.center = new Vector3 ( center_x, boxCollider.center.y, center_y );
-                boxCollider.size = new Vector3( boundingRect.width, _length, boundingRect.height );
-                break;
+            // DELME { 
+            // switch ( _plane.plane ) {
+            // case exSprite.Plane.XY:
+            //     boxCollider.center = new Vector3 ( center_x, center_y, boxCollider.center.z );
+            //     boxCollider.size = new Vector3( boundingRect.width, boundingRect.height, _length );
+            //     break;
 
-            case exSprite.Plane.ZY:
-                boxCollider.center = new Vector3 ( boxCollider.center.x, center_y, center_x );
-                boxCollider.size = new Vector3( _length, boundingRect.height, boundingRect.width );
-                break;
-            }
+            // case exSprite.Plane.XZ:
+            //     boxCollider.center = new Vector3 ( center_x, boxCollider.center.y, center_y );
+            //     boxCollider.size = new Vector3( boundingRect.width, _length, boundingRect.height );
+            //     break;
+
+            // case exSprite.Plane.ZY:
+            //     boxCollider.center = new Vector3 ( boxCollider.center.x, center_y, center_x );
+            //     boxCollider.size = new Vector3( _length, boundingRect.height, boundingRect.width );
+            //     break;
+            // }
+            // } DELME end 
 
             return;
         }

@@ -713,20 +713,26 @@ public class exSpriteFont : exSpriteBase {
                             y += old_x * shear_.y;
 
                             // build vertices and normals
-                            switch ( plane ) {
-                            case Plane.XY:
-                                vertices[vert_id+j] = new Vector3( x, y, 0.0f );
-                                // normals[vert_id+j] = new Vector3( 0.0f, 0.0f, -1.0f );
-                                break;
-                            case Plane.XZ:
-                                vertices[vert_id+j] = new Vector3( x, 0.0f, y );
-                                // normals[vert_id+j] = new Vector3( 0.0f, 1.0f, 0.0f );
-                                break;
-                            case Plane.ZY:
-                                vertices[vert_id+j] = new Vector3( 0.0f, y, x );
-                                // normals[vert_id+j] = new Vector3( 1.0f, 0.0f, 0.0f );
-                                break;
-                            }
+                            vertices[vert_id+j] = new Vector3( x, y, 0.0f );
+                            // normals[vert_id+j] = new Vector3( 0.0f, 0.0f, -1.0f );
+
+                            // DELME { 
+                            // // build vertices and normals
+                            // switch ( plane ) {
+                            // case Plane.XY:
+                            //     vertices[vert_id+j] = new Vector3( x, y, 0.0f );
+                            //     // normals[vert_id+j] = new Vector3( 0.0f, 0.0f, -1.0f );
+                            //     break;
+                            // case Plane.XZ:
+                            //     vertices[vert_id+j] = new Vector3( x, 0.0f, y );
+                            //     // normals[vert_id+j] = new Vector3( 0.0f, 1.0f, 0.0f );
+                            //     break;
+                            // case Plane.ZY:
+                            //     vertices[vert_id+j] = new Vector3( 0.0f, y, x );
+                            //     // normals[vert_id+j] = new Vector3( 1.0f, 0.0f, 0.0f );
+                            //     break;
+                            // }
+                            // } DELME end 
                         }
                     }
 
@@ -895,17 +901,22 @@ public class exSpriteFont : exSpriteBase {
                             y += x * shear_.y;
 
                             // build vertices
-                            switch ( plane ) {
-                            case Plane.XY:
-                                vertices[vert_id+j] = new Vector3( x, y, 0.0f );
-                                break;
-                            case Plane.XZ:
-                                vertices[vert_id+j] = new Vector3( x, 0.0f, y );
-                                break;
-                            case Plane.ZY:
-                                vertices[vert_id+j] = new Vector3( 0.0f, y, x );
-                                break;
-                            }
+                            vertices[vert_id+j] = new Vector3( x, y, 0.0f );
+
+                            // DELME { 
+                            // // build vertices
+                            // switch ( plane ) {
+                            // case Plane.XY:
+                            //     vertices[vert_id+j] = new Vector3( x, y, 0.0f );
+                            //     break;
+                            // case Plane.XZ:
+                            //     vertices[vert_id+j] = new Vector3( x, 0.0f, y );
+                            //     break;
+                            // case Plane.ZY:
+                            //     vertices[vert_id+j] = new Vector3( 0.0f, y, x );
+                            //     break;
+                            // }
+                            // } DELME end 
                         }
                     }
 

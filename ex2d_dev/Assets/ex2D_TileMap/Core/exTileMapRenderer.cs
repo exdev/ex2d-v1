@@ -156,17 +156,22 @@ public class exTileMapRenderer : exPlane {
                             float y = -curY + halfHeight - r * tileMap_.tileSheet.tileHeight + (tileMap_.tileSheet.tileHeight - tileMap_.tileHeight) + tileMap_.tileOffsetY; // last thing adjust mesh start from left-bottom
 
                             // build vertices and normals
-                            switch ( plane ) {
-                            case Plane.XY:
-                                vertices[4*ii+j] = new Vector3( x - offsetX, y + offsetY, 0.0f );
-                                break;
-                            case Plane.XZ:
-                                vertices[4*ii+j] = new Vector3( x - offsetX, 0.0f, y + offsetY );
-                                break;
-                            case Plane.ZY:
-                                vertices[4*ii+j] = new Vector3( 0.0f, y + offsetY, x - offsetX );
-                                break;
-                            }
+                            vertices[4*ii+j] = new Vector3( x - offsetX, y + offsetY, 0.0f );
+
+                            // DELME { 
+                            // // build vertices and normals
+                            // switch ( plane ) {
+                            // case Plane.XY:
+                            //     vertices[4*ii+j] = new Vector3( x - offsetX, y + offsetY, 0.0f );
+                            //     break;
+                            // case Plane.XZ:
+                            //     vertices[4*ii+j] = new Vector3( x - offsetX, 0.0f, y + offsetY );
+                            //     break;
+                            // case Plane.ZY:
+                            //     vertices[4*ii+j] = new Vector3( 0.0f, y + offsetY, x - offsetX );
+                            //     break;
+                            // }
+                            // } DELME end 
                         }
                     }
                     ++ii;
@@ -337,46 +342,61 @@ public class exTileMapRenderer : exPlane {
         // draw grid by plane
         Color old = Gizmos.color;
         Gizmos.color = Color.gray;
-        switch ( plane ) {
-        case Plane.XY:
-            for ( int i = 0; i <= tileMap_.col; ++i ) {
-                float x = -halfWidth + i * tileMap_.tileWidth - offsetX;
-                Gizmos.DrawLine ( transform.position + new Vector3( x, -halfHeight + offsetY, 0.0f ) , 
-                                  transform.position + new Vector3( x,  halfHeight + offsetY, 0.0f ) );
-            }
-            for ( int i = 0; i <= tileMap_.row; ++i ) {
-                float y = halfHeight - i * tileMap_.tileHeight + offsetY;
-                Gizmos.DrawLine ( transform.position + new Vector3( -halfWidth - offsetX, y, 0.0f ) , 
-                                  transform.position + new Vector3(  halfWidth - offsetX, y, 0.0f ) );
-            }
-            break;
 
-        case Plane.XZ:
-            for ( int i = 0; i <= tileMap_.col; ++i ) {
-                float x = -halfWidth + i * tileMap_.tileWidth - offsetX;
-                Gizmos.DrawLine ( transform.position + new Vector3( x, 0.0f, -halfHeight + offsetY ) , 
-                                  transform.position + new Vector3( x, 0.0f,  halfHeight + offsetY ) );
-            }
-            for ( int i = 0; i <= tileMap_.row; ++i ) {
-                float y = halfHeight - i * tileMap_.tileHeight + offsetY;
-                Gizmos.DrawLine ( transform.position + new Vector3( -halfWidth - offsetX, 0.0f, y ) , 
-                                  transform.position + new Vector3(  halfWidth - offsetX, 0.0f, y ) );
-            }
-            break;
-
-        case Plane.ZY:
-            for ( int i = 0; i <= tileMap_.col; ++i ) {
-                float x = -halfWidth + i * tileMap_.tileWidth - offsetX;
-                Gizmos.DrawLine ( transform.position + new Vector3( 0.0f, -halfHeight + offsetY, x ) , 
-                                  transform.position + new Vector3( 0.0f,  halfHeight + offsetY, x ) );
-            }
-            for ( int i = 0; i <= tileMap_.row; ++i ) {
-                float y = halfHeight - i * tileMap_.tileHeight + offsetY;
-                Gizmos.DrawLine ( transform.position + new Vector3( 0.0f, y, -halfWidth - offsetX ) , 
-                                  transform.position + new Vector3( 0.0f, y,  halfWidth - offsetX ) );
-            }
-            break;
+        for ( int i = 0; i <= tileMap_.col; ++i ) {
+            float x = -halfWidth + i * tileMap_.tileWidth - offsetX;
+            Gizmos.DrawLine ( transform.position + new Vector3( x, -halfHeight + offsetY, 0.0f ) , 
+                              transform.position + new Vector3( x,  halfHeight + offsetY, 0.0f ) );
         }
+        for ( int i = 0; i <= tileMap_.row; ++i ) {
+            float y = halfHeight - i * tileMap_.tileHeight + offsetY;
+            Gizmos.DrawLine ( transform.position + new Vector3( -halfWidth - offsetX, y, 0.0f ) , 
+                              transform.position + new Vector3(  halfWidth - offsetX, y, 0.0f ) );
+        }
+
+        // DELME { 
+        // switch ( plane ) {
+        // case Plane.XY:
+        //     for ( int i = 0; i <= tileMap_.col; ++i ) {
+        //         float x = -halfWidth + i * tileMap_.tileWidth - offsetX;
+        //         Gizmos.DrawLine ( transform.position + new Vector3( x, -halfHeight + offsetY, 0.0f ) , 
+        //                           transform.position + new Vector3( x,  halfHeight + offsetY, 0.0f ) );
+        //     }
+        //     for ( int i = 0; i <= tileMap_.row; ++i ) {
+        //         float y = halfHeight - i * tileMap_.tileHeight + offsetY;
+        //         Gizmos.DrawLine ( transform.position + new Vector3( -halfWidth - offsetX, y, 0.0f ) , 
+        //                           transform.position + new Vector3(  halfWidth - offsetX, y, 0.0f ) );
+        //     }
+        //     break;
+
+        // case Plane.XZ:
+        //     for ( int i = 0; i <= tileMap_.col; ++i ) {
+        //         float x = -halfWidth + i * tileMap_.tileWidth - offsetX;
+        //         Gizmos.DrawLine ( transform.position + new Vector3( x, 0.0f, -halfHeight + offsetY ) , 
+        //                           transform.position + new Vector3( x, 0.0f,  halfHeight + offsetY ) );
+        //     }
+        //     for ( int i = 0; i <= tileMap_.row; ++i ) {
+        //         float y = halfHeight - i * tileMap_.tileHeight + offsetY;
+        //         Gizmos.DrawLine ( transform.position + new Vector3( -halfWidth - offsetX, 0.0f, y ) , 
+        //                           transform.position + new Vector3(  halfWidth - offsetX, 0.0f, y ) );
+        //     }
+        //     break;
+
+        // case Plane.ZY:
+        //     for ( int i = 0; i <= tileMap_.col; ++i ) {
+        //         float x = -halfWidth + i * tileMap_.tileWidth - offsetX;
+        //         Gizmos.DrawLine ( transform.position + new Vector3( 0.0f, -halfHeight + offsetY, x ) , 
+        //                           transform.position + new Vector3( 0.0f,  halfHeight + offsetY, x ) );
+        //     }
+        //     for ( int i = 0; i <= tileMap_.row; ++i ) {
+        //         float y = halfHeight - i * tileMap_.tileHeight + offsetY;
+        //         Gizmos.DrawLine ( transform.position + new Vector3( 0.0f, y, -halfWidth - offsetX ) , 
+        //                           transform.position + new Vector3( 0.0f, y,  halfWidth - offsetX ) );
+        //     }
+        //     break;
+        // }
+        // } DELME end 
+
         Gizmos.color = old;
     }
 }

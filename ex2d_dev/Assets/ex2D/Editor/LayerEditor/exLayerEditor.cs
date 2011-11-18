@@ -48,8 +48,12 @@ public class exLayerEditor : EditorWindow {
 
     protected bool inDragState = false;
     protected bool doDrag = false;
+    protected bool doShiftSelect = false;
     protected Vector2 scrollPos = Vector2.zero;
     protected bool sortSelection = false;
+    protected exLayer shiftClickStart = null;
+    protected exLayer curShiftClick = null;
+    protected exLayer lastShiftClick = null;
 
     protected List<exLayer> layers = new List<exLayer>();
     protected List<exLayer> selectedLayers = new List<exLayer>();
@@ -167,7 +171,25 @@ public class exLayerEditor : EditorWindow {
         // ======================================================== 
 
         GUILayout.BeginHorizontal ( EditorStyles.toolbar );
+
+            // ======================================================== 
+            // update button
+            // ======================================================== 
+
             GUILayout.FlexibleSpace();
+            exLayerMng layerMng = curLayer as exLayerMng;
+            GUI.enabled = (layerMng != null);
+            if ( GUILayout.Button( "Update", EditorStyles.toolbarButton ) ) {
+                layerMng.UpdateLayer();
+                EditorUtility.SetDirty(layerMng);
+            }
+            GUI.enabled = true;
+            GUILayout.Space(5);
+
+            // ======================================================== 
+            // lock button
+            // ======================================================== 
+
             lockSelection = GUILayout.Toggle ( lockSelection, "Lock", EditorStyles.toolbarButton );
         GUILayout.EndHorizontal ();
 
@@ -190,6 +212,29 @@ public class exLayerEditor : EditorWindow {
         float space = 5.0f;
         Rect lastRect = GUILayoutUtility.GetLastRect ();  
         LayerTreeField ( space, lastRect.yMax, curLayer );
+        GUILayout.Space(5);
+
+        // ======================================================== 
+        // Clear All Layer Button 
+        // ======================================================== 
+
+        Color oldBGColor = GUI.backgroundColor;
+        Color oldCTColor = GUI.contentColor;
+        GUI.backgroundColor = Color.red;
+        GUI.contentColor = Color.yellow;
+            GUILayout.BeginHorizontal();
+            GUILayout.FlexibleSpace();
+                if ( GUILayout.Button("Remove All Layer", GUILayout.Width(120) ) ) {
+                    bool doRemove = EditorUtility.DisplayDialog( "Warning!",
+                                                                 "This operation will remove all exLayer Component in the editor, do you want to continue operation",
+                                                                 "Yes", "No" );
+                    if ( doRemove ) {
+                        RecursivelyDestroyLayer (curLayer);
+                    }
+                }
+            GUILayout.EndHorizontal();
+        GUI.backgroundColor = oldBGColor;
+        GUI.contentColor = oldCTColor;
 
         // ======================================================== 
         // process mouse event 
@@ -231,6 +276,7 @@ public class exLayerEditor : EditorWindow {
             oldSelActiveObject = Selection.activeObject;
 
             //
+            List<exLayer> addedLayers = new List<exLayer>(); 
             List<exLayer> newLayers = new List<exLayer>(); 
             foreach ( Object o in DragAndDrop.objectReferences ) {
                 // never add self, it cause dead loop
@@ -246,17 +292,36 @@ public class exLayerEditor : EditorWindow {
                         exLayer layer = go.GetComponent<exLayer>();
                         if ( layer == null ) {
                             layer = go.AddComponent<exLayer>();
-                        }
-                        if ( newLayers.IndexOf(layer) == -1 ) {
                             newLayers.Add(layer);
+                        }
+                        if ( addedLayers.IndexOf(layer) == -1 ) {
+                            addedLayers.Add(layer);
                         }
                     }
                 }
             }
 
+            // sync new layer's parent
+            foreach ( exLayer layer in newLayers ) {
+                Transform parent = layer.transform.parent;
+                while ( parent != null ) {
+                    exLayer parentLayer = parent.GetComponent<exLayer>();
+                    if ( parentLayer ) {
+                        layer.parent = parentLayer;
+                        break;
+                    }
+                }
+            }
+
             //
-            foreach ( exLayer li in newLayers ) {
-                li.parent = curLayer;
+            List<exLayer> parentOfNewLayers = new List<exLayer>(); 
+            foreach ( exLayer li in addedLayers ) {
+                if ( addedLayers.IndexOf(li.parent) == -1 ) {
+                    parentOfNewLayers.Add(li);
+                }
+            }
+            foreach ( exLayer li in parentOfNewLayers ) {
+                li.ForceSetParent(curLayer);
                 EditorUtility.SetDirty(li);
             }
             EditorUtility.SetDirty(curLayer);
@@ -282,17 +347,13 @@ public class exLayerEditor : EditorWindow {
         Rect layerFieldRect = new Rect ( _x, _y, position.width - 2.0f * _x, layerFieldHeight );
         float totalLayerHeight = LayerField ( layerFieldRect, 0, _layer ); 
 
-        // DISABLE { 
-        // if ( sortSelection ) {
-        //     SortSelection();
-        //     sortSelection = false;
-        // }
-        // } DISABLE end 
-
         //
-        GUILayoutUtility.GetRect ( position.width, totalLayerHeight );
+        GUILayoutUtility.GetRect ( layerFieldRect.width, totalLayerHeight );
 
-        //
+        // ======================================================== 
+        // process drag 
+        // ======================================================== 
+
         if ( inDragState && layerCursorIn != null ) {
             bool insertLayerSelected = selectedLayers.IndexOf(layerCursorIn) != -1;
             int index = 0;
@@ -428,6 +489,68 @@ public class exLayerEditor : EditorWindow {
                 Repaint();
             }
         }
+
+        // ======================================================== 
+        // do shift select 
+        // ======================================================== 
+
+        if ( doShiftSelect ) {
+            doShiftSelect = false;
+
+            //
+            int idx1 = layers.IndexOf(shiftClickStart);
+            int idx2 = layers.IndexOf(lastShiftClick);
+            if ( idx1 != -1 && idx2 != -1 ) {
+                if ( idx1 > idx2 ) {
+                    int tmp = idx1;
+                    idx1 = idx2;
+                    idx2 = tmp;
+                }
+                for ( int i = idx1; i <= idx2; ++i ) {
+                    RemoveSelected(layers[i]);
+                }
+            }
+
+            //
+            idx1 = layers.IndexOf(shiftClickStart);
+            idx2 = layers.IndexOf(curShiftClick);
+            if ( idx1 != -1 && idx2 != -1 ) {
+                if ( idx1 > idx2 ) {
+                    int tmp = idx1;
+                    idx1 = idx2;
+                    idx2 = tmp;
+                }
+                for ( int i = idx1; i <= idx2; ++i ) {
+                    AddSelected(layers[i]);
+                }
+            }
+        }
+
+        // ======================================================== 
+        // process delete 
+        // ======================================================== 
+
+        if ( Event.current.type == EventType.KeyDown && 
+             ( Event.current.keyCode == KeyCode.Delete ||
+               Event.current.keyCode == KeyCode.Backspace ) ) 
+        {
+            List<exLayer> deleteList = new List<exLayer>();
+            foreach ( exLayer layer in selectedLayers ) {
+                if ( selectedLayers.IndexOf(layer.parent) == -1 ) {
+                    deleteList.Add(layer);
+                }
+            }
+            selectedLayers.Clear();
+            foreach ( exLayer layer in deleteList ) {
+                layer.parent = null;
+                EditorUtility.SetDirty(layer);
+            }
+
+            //
+            EditorUtility.SetDirty(curLayer);
+            Event.current.Use();
+            Repaint();
+        }
     }
 
     // ------------------------------------------------------------------ 
@@ -451,11 +574,8 @@ public class exLayerEditor : EditorWindow {
         curX += _indentLevel * 15.0f + 10.0f;
         if ( _layer.children.Count > 0 ) {
             _layer.foldout = EditorGUI.Foldout ( new Rect ( curX, curY + 2, 10, _rect.height-2 ), _layer.foldout, "" );
-            curX += 15;
         }
-        else {
-            curX += 10;
-        }
+        curX += 15;
         _layer.indentLevel = _indentLevel;
 
         GUI.Label ( new Rect ( curX, curY + 1, _rect.width - curX, _rect.height ), _layer.name );
@@ -472,10 +592,16 @@ public class exLayerEditor : EditorWindow {
                     if ( e.command || e.control ) {
                         ToggleSelected(_layer);
                     }
+                    else if ( e.shift ) {
+                        doShiftSelect = true;
+                        lastShiftClick = curShiftClick;
+                        curShiftClick = _layer;
+                    }
                     else {
                         if ( selected == false ) {
                             selectedLayers.Clear();
                             AddSelected(_layer);
+                            shiftClickStart = _layer;
                         }
                     }
                     layerCursorIn = null;
@@ -489,7 +615,8 @@ public class exLayerEditor : EditorWindow {
                       e.button == 0 && 
                       e.clickCount == 1 &&
                       e.command == false &&
-                      e.control == false ) 
+                      e.control == false &&
+                      e.shift == false ) 
             {
                 if ( _layer != curLayer ) {
                     selectedLayers.Clear();
@@ -543,7 +670,13 @@ public class exLayerEditor : EditorWindow {
                 AddSelected (l);
             }
         }
+
         sortSelection = true;
+        List<GameObject> goList = new List<GameObject>();
+        foreach ( exLayer layer in selectedLayers ) {
+            goList.Add(layer.gameObject);
+        }
+        Selection.objects = goList.ToArray();
     }
 
     // ------------------------------------------------------------------ 
@@ -570,6 +703,11 @@ public class exLayerEditor : EditorWindow {
         }
 
         sortSelection = true;
+        List<GameObject> goList = new List<GameObject>();
+        foreach ( exLayer layer in selectedLayers ) {
+            goList.Add(layer.gameObject);
+        }
+        Selection.objects = goList.ToArray();
     }
 
     // ------------------------------------------------------------------ 
@@ -627,4 +765,18 @@ public class exLayerEditor : EditorWindow {
         }
         return false;
     }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void RecursivelyDestroyLayer ( exLayer _layer ) {
+        for ( int i = _layer.children.Count-1; i >= 0; --i ) {
+            exLayer childLayer = _layer.children[i];
+            RecursivelyDestroyLayer (childLayer);
+            GameObject.DestroyImmediate(childLayer);
+        }
+        if ( (_layer is exLayerMng) == false )
+            GameObject.DestroyImmediate(_layer);
+    } 
 }

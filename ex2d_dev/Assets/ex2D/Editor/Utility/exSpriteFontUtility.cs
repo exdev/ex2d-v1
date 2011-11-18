@@ -78,11 +78,6 @@ public static class exSpriteFontUtility {
             _spriteFont.meshFilter.sharedMesh = newMesh;
         }
 
-        // update layer2d
-        if ( _spriteFont.layer2d ) {
-            _spriteFont.layer2d.RecursivelyUpdateLayer ();
-        }
-
         // update collider
         if ( _spriteFont.collisionHelper ) {
             _spriteFont.collisionHelper.UpdateCollider ();

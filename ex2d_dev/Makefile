@@ -27,10 +27,10 @@ EX2D_TARGET_DIR = ../ex2d_submit/Assets/ex2D
 EX2D_RUNTIME_TARGET = $(EX2D_TARGET_DIR)/Core/ex2D.Runtime.dll
 EX2D_EDITOR_TARGET = $(EX2D_TARGET_DIR)/Editor/ex2D.Editor.dll
 
-# ex2D TileMap Target
-EX2D_TILEMAP_TARGET_DIR = ../ex2d_tilemap_submit/Assets/ex2D_TileMap
-EX2D_TILEMAP_RUNTIME_TARGET = $(EX2D_TILEMAP_TARGET_DIR)/Core/ex2D.TileMap.Runtime.dll
-EX2D_TILEMAP_EDITOR_TARGET = $(EX2D_TILEMAP_TARGET_DIR)/Editor/ex2D.TileMap.Editor.dll
+#  # ex2D TileMap Target
+#  EX2D_TILEMAP_TARGET_DIR = ../ex2d_tilemap_submit/Assets/ex2D_TileMap
+#  EX2D_TILEMAP_RUNTIME_TARGET = $(EX2D_TILEMAP_TARGET_DIR)/Core/ex2D.TileMap.Runtime.dll
+#  EX2D_TILEMAP_EDITOR_TARGET = $(EX2D_TILEMAP_TARGET_DIR)/Editor/ex2D.TileMap.Editor.dll
 
 #  # ex2D GUI Target
 #  EX2D_GUI_TARGET_DIR = ../ex2d_gui_submit/Assets/ex2D_GUI
@@ -49,11 +49,11 @@ clean_ex2d:
 	$(RM) $(EX2D_EDITOR_TARGET)
 rebuild_ex2d: |clean_ex2d ex2d 
 
-tilemap: $(EX2D_TILEMAP_RUNTIME_TARGET) $(EX2D_TILEMAP_EDITOR_TARGET)
-clean_tilemap: 
-	$(RM) $(EX2D_TILEMAP_RUNTIME_TARGET) 
-	$(RM) $(EX2D_TILEMAP_EDITOR_TARGET)
-rebuild_tilemap: |clean_tilemap tilemap 
+#  tilemap: $(EX2D_TILEMAP_RUNTIME_TARGET) $(EX2D_TILEMAP_EDITOR_TARGET)
+#  clean_tilemap: 
+#      $(RM) $(EX2D_TILEMAP_RUNTIME_TARGET) 
+#      $(RM) $(EX2D_TILEMAP_EDITOR_TARGET)
+#  rebuild_tilemap: |clean_tilemap tilemap 
 
 #  gui: $(EX2D_GUI_RUNTIME_TARGET) $(EX2D_GUI_EDITOR_TARGET) 
 #  clean_gui: 
@@ -61,8 +61,8 @@ rebuild_tilemap: |clean_tilemap tilemap
 #      $(RM) $(EX2D_GUI_EDITOR_TARGET) 
 #  rebuild_gui: |clean_gui gui 
 
-clean_all: |clean_ex2d clean_tilemap
-all: |ex2d tilemap
+clean_all: |clean_ex2d
+all: |ex2d
 rebuild_all: |clean_all all
 
 # defines
@@ -79,8 +79,9 @@ EX2D_RUNTIME_SOURCE_DIRS += Assets/ex2D/Core/Component/
 EX2D_RUNTIME_SOURCE_DIRS += Assets/ex2D/Core/Component/AnimationHelper/
 EX2D_RUNTIME_SOURCE_DIRS += Assets/ex2D/Core/Component/Camera/
 EX2D_RUNTIME_SOURCE_DIRS += Assets/ex2D/Core/Component/Helper/
-EX2D_RUNTIME_SOURCE_DIRS += Assets/ex2D/Core/Component/Manager//
+EX2D_RUNTIME_SOURCE_DIRS += Assets/ex2D/Core/Component/Manager/
 EX2D_RUNTIME_SOURCE_DIRS += Assets/ex2D/Core/Component/Sprite/
+EX2D_RUNTIME_SOURCE_DIRS += Assets/ex2D/Core/Deprecated/
 EX2D_RUNTIME_SOURCE_DIRS += Assets/ex2D/Core/Extension/
 EX2D_RUNTIME_SOURCE_DIRS += Assets/ex2D/Core/Helper/
 EX2D_RUNTIME_SOURCE = $(wildcard $(addsuffix *.cs,$(EX2D_RUNTIME_SOURCE_DIRS)))
@@ -118,9 +119,11 @@ EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/AtlasEditor/
 EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/BitmapFontEditor/
 EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/ComponentEditors/
 EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/DB/
+EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/GUIBorderEditor/
 EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/GroupImportEditor/
 EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/Helper/
-EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/GUIBorderEditor/
+EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/LayerEditor/
+EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/Misc/
 EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/SpriteAnimationEditor/
 EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/Utility/
 EX2D_EDITOR_SOURCE = $(wildcard $(addsuffix *.cs,$(EX2D_EDITOR_SOURCE_DIRS)))

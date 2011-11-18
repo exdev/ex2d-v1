@@ -119,46 +119,59 @@ public class exUIScrollView : exUIElement {
         clipRect.height = height;
         clipRect.transform.localPosition = Vector3.zero;
 
-        switch ( plane ) {
-        case exPlane.Plane.XY:
-            if ( contentAnchor )
-                contentAnchor.transform.localPosition = new Vector3 ( startX, startY, 0.0f );
-            if ( horizontalBar )
-                horizontalBar.transform.localPosition = new Vector3 ( startX, endY, 0.0f );
-            if ( horizontalSlider )
-                horizontalSlider.transform.localPosition = new Vector3 ( startX, endY, 0.0f );
-            if ( verticalBar )
-                verticalBar.transform.localPosition = new Vector3 ( endX, startY, 0.0f );
-            if ( verticalSlider )
-                verticalSlider.transform.localPosition = new Vector3 ( endX, startY, 0.0f );
-            break;
+        if ( contentAnchor )
+            contentAnchor.transform.localPosition = new Vector3 ( startX, startY, 0.0f );
+        if ( horizontalBar )
+            horizontalBar.transform.localPosition = new Vector3 ( startX, endY, 0.0f );
+        if ( horizontalSlider )
+            horizontalSlider.transform.localPosition = new Vector3 ( startX, endY, 0.0f );
+        if ( verticalBar )
+            verticalBar.transform.localPosition = new Vector3 ( endX, startY, 0.0f );
+        if ( verticalSlider )
+            verticalSlider.transform.localPosition = new Vector3 ( endX, startY, 0.0f );
 
-        case exPlane.Plane.XZ:
-            if ( contentAnchor )
-                contentAnchor.transform.localPosition = new Vector3 ( startX, 0.0f, startY );
-            if ( horizontalBar )
-                horizontalBar.transform.localPosition = new Vector3 ( startX, 0.0f, endY );
-            if ( horizontalSlider )
-                horizontalSlider.transform.localPosition = new Vector3 ( startX, 0.0f, endY );
-            if ( verticalBar )
-                verticalBar.transform.localPosition = new Vector3 ( endX, 0.0f, startY );
-            if ( verticalSlider )
-                verticalSlider.transform.localPosition = new Vector3 ( endX, 0.0f, startY );
-            break;
+        // DELME { 
+        // switch ( plane ) {
+        // case exPlane.Plane.XY:
+        //     if ( contentAnchor )
+        //         contentAnchor.transform.localPosition = new Vector3 ( startX, startY, 0.0f );
+        //     if ( horizontalBar )
+        //         horizontalBar.transform.localPosition = new Vector3 ( startX, endY, 0.0f );
+        //     if ( horizontalSlider )
+        //         horizontalSlider.transform.localPosition = new Vector3 ( startX, endY, 0.0f );
+        //     if ( verticalBar )
+        //         verticalBar.transform.localPosition = new Vector3 ( endX, startY, 0.0f );
+        //     if ( verticalSlider )
+        //         verticalSlider.transform.localPosition = new Vector3 ( endX, startY, 0.0f );
+        //     break;
 
-        case exPlane.Plane.ZY:
-            if ( contentAnchor )
-                contentAnchor.transform.localPosition = new Vector3 ( 0.0f, startY, startX );
-            if ( horizontalBar )
-                horizontalBar.transform.localPosition = new Vector3 ( 0.0f, endY, startX );
-            if ( horizontalSlider )
-                horizontalSlider.transform.localPosition = new Vector3 ( 0.0f, endY, startX );
-            if ( verticalBar )
-                verticalBar.transform.localPosition = new Vector3 ( 0.0f, endX, startY );
-            if ( verticalSlider )
-                verticalSlider.transform.localPosition = new Vector3 ( 0.0f, endX, startY );
-            break;
-        }
+        // case exPlane.Plane.XZ:
+        //     if ( contentAnchor )
+        //         contentAnchor.transform.localPosition = new Vector3 ( startX, 0.0f, startY );
+        //     if ( horizontalBar )
+        //         horizontalBar.transform.localPosition = new Vector3 ( startX, 0.0f, endY );
+        //     if ( horizontalSlider )
+        //         horizontalSlider.transform.localPosition = new Vector3 ( startX, 0.0f, endY );
+        //     if ( verticalBar )
+        //         verticalBar.transform.localPosition = new Vector3 ( endX, 0.0f, startY );
+        //     if ( verticalSlider )
+        //         verticalSlider.transform.localPosition = new Vector3 ( endX, 0.0f, startY );
+        //     break;
+
+        // case exPlane.Plane.ZY:
+        //     if ( contentAnchor )
+        //         contentAnchor.transform.localPosition = new Vector3 ( 0.0f, startY, startX );
+        //     if ( horizontalBar )
+        //         horizontalBar.transform.localPosition = new Vector3 ( 0.0f, endY, startX );
+        //     if ( horizontalSlider )
+        //         horizontalSlider.transform.localPosition = new Vector3 ( 0.0f, endY, startX );
+        //     if ( verticalBar )
+        //         verticalBar.transform.localPosition = new Vector3 ( 0.0f, endX, startY );
+        //     if ( verticalSlider )
+        //         verticalSlider.transform.localPosition = new Vector3 ( 0.0f, endX, startY );
+        //     break;
+        // }
+        // } DELME end 
 
         //
         float hbarHeight = (horizontalBar && horizontalBar.guiBorder) ? horizontalBar.guiBorder.border.vertical : 0.0f;
@@ -336,25 +349,31 @@ public class exUIScrollView : exUIElement {
         }
         float hsliderY = horizontalSlider.transform.localPosition.y;
 
-        switch ( plane ) {
-        case exPlane.Plane.XY:
-            contentAnchor.transform.localPosition = new Vector3( startX-_offset.x, startY-_offset.y, 0.0f );
-            verticalSlider.transform.localPosition = new Vector3( vsliderX, vsliderY, 0.0f );
-            horizontalSlider.transform.localPosition = new Vector3( hsliderX, hsliderY, 0.0f );
-            break;
+        contentAnchor.transform.localPosition = new Vector3( startX-_offset.x, startY-_offset.y, 0.0f );
+        verticalSlider.transform.localPosition = new Vector3( vsliderX, vsliderY, 0.0f );
+        horizontalSlider.transform.localPosition = new Vector3( hsliderX, hsliderY, 0.0f );
 
-        case exPlane.Plane.XZ:
-            contentAnchor.transform.localPosition = new Vector3( startX-_offset.x, 0.0f, startY-_offset.y );
-            verticalSlider.transform.localPosition = new Vector3( vsliderX, 0.0f, vsliderY );
-            horizontalSlider.transform.localPosition = new Vector3( hsliderX, 0.0f, hsliderY );
-            break;
+        // DELME { 
+        // switch ( plane ) {
+        // case exPlane.Plane.XY:
+        //     contentAnchor.transform.localPosition = new Vector3( startX-_offset.x, startY-_offset.y, 0.0f );
+        //     verticalSlider.transform.localPosition = new Vector3( vsliderX, vsliderY, 0.0f );
+        //     horizontalSlider.transform.localPosition = new Vector3( hsliderX, hsliderY, 0.0f );
+        //     break;
 
-        case exPlane.Plane.ZY:
-            contentAnchor.transform.localPosition = new Vector3( 0.0f, startY-_offset.y, startX-_offset.x );
-            verticalSlider.transform.localPosition = new Vector3( 0.0f, vsliderY, vsliderX ); 
-            horizontalSlider.transform.localPosition = new Vector3( 0.0f, hsliderY, hsliderX );
-            break;
-        }
+        // case exPlane.Plane.XZ:
+        //     contentAnchor.transform.localPosition = new Vector3( startX-_offset.x, 0.0f, startY-_offset.y );
+        //     verticalSlider.transform.localPosition = new Vector3( vsliderX, 0.0f, vsliderY );
+        //     horizontalSlider.transform.localPosition = new Vector3( hsliderX, 0.0f, hsliderY );
+        //     break;
+
+        // case exPlane.Plane.ZY:
+        //     contentAnchor.transform.localPosition = new Vector3( 0.0f, startY-_offset.y, startX-_offset.x );
+        //     verticalSlider.transform.localPosition = new Vector3( 0.0f, vsliderY, vsliderX ); 
+        //     horizontalSlider.transform.localPosition = new Vector3( 0.0f, hsliderY, hsliderX );
+        //     break;
+        // }
+        // } DELME end 
     }
 
     // ------------------------------------------------------------------ 

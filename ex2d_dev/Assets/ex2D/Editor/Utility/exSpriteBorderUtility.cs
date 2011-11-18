@@ -85,11 +85,6 @@ public static class exSpriteBorderUtility {
             _spriteBorder.meshFilter.sharedMesh = newMesh; 
         }
 
-        // update layer2d
-        if ( _spriteBorder.layer2d ) {
-            _spriteBorder.layer2d.RecursivelyUpdateLayer ();
-        }
-
         // update collider
         if ( _spriteBorder.collisionHelper ) {
             _spriteBorder.collisionHelper.UpdateCollider ();

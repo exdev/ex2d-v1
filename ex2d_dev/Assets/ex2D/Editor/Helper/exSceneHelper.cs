@@ -45,23 +45,52 @@ public static class exSceneHelper {
         EditorUtility.ClearProgressBar();
     }
 
-    // ------------------------------------------------------------------ 
-    /// update GameObject with exLayer2D component in the current scene
-    // ------------------------------------------------------------------ 
+    // DELME, TODO: change to a update button in exLayerMng { 
+    // // ------------------------------------------------------------------ 
+    // /// update GameObject with exLayer2D component in the current scene
+    // // ------------------------------------------------------------------ 
 
-    [MenuItem ("Edit/ex2D/Update Scene Layers %&l")]
-    public static void UpdateSceneSpriteLayers () {
-        EditorUtility.DisplayProgressBar( "Update Scene Layers...", 
-                                          "Update Scene Layers...", 
-                                          0.5f );    
+    // [MenuItem ("Edit/ex2D/Update Scene Layers %&l")]
+    // public static void UpdateSceneSpriteLayers () {
+    //     EditorUtility.DisplayProgressBar( "Update Scene Layers...", 
+    //                                       "Update Scene Layers...", 
+    //                                       0.5f );    
 
-        exLayer2D[] layerObjs = GameObject.FindObjectsOfType(typeof(exLayer2D)) as exLayer2D[];
-        for ( int i = 0; i < layerObjs.Length; ++i ) {
-            exLayer2D layerObj = layerObjs[i]; 
-            layerObj.RecursivelyUpdateLayer ();
-        }
-        EditorUtility.ClearProgressBar();
-    }
+    //     exLayer2D[] layerObjs = GameObject.FindObjectsOfType(typeof(exLayer2D)) as exLayer2D[];
+    //     for ( int i = 0; i < layerObjs.Length; ++i ) {
+    //         exLayer2D layerObj = layerObjs[i]; 
+    //         layerObj.RecursivelyUpdateLayer ();
+    //     }
+    //     EditorUtility.ClearProgressBar();
+    // }
+    // } DELME end 
+
+    // DISABLE: no use, just can locate the missing component, but can't delete it. { 
+    // // ------------------------------------------------------------------ 
+    // // Desc: 
+    // // ------------------------------------------------------------------ 
+
+    // [MenuItem ("Edit/ex2D/Remove Missing Components")]
+    // static void RemoveMissingComponents () {
+    //     EditorUtility.DisplayProgressBar( "Remove Missing Components...", 
+    //                                       "Remove Missing Components...", 
+    //                                       0.5f );    
+
+    //     Transform[] trans = GameObject.FindObjectsOfType(typeof(Transform)) as Transform[];
+    //     for ( int i = 0; i < trans.Length; ++i ) {
+    //         Transform t = trans[i];
+    //         Component[] comps = t.GetComponents<Component>();
+    //         for ( int j = 0; j < comps.Length; ++j ) {
+    //             Component c = comps[j];
+    //             if ( c == null ) {
+    //                 Debug.Log("Remove Missing Component from " + t.name);
+    //                 GameObject.DestroyImmediate(c);
+    //             }
+    //         }
+    //     }
+    //     EditorUtility.ClearProgressBar();
+    // }
+    // } DISABLE end 
 
     // ------------------------------------------------------------------ 
     /// rebuild the sprites in the current scene

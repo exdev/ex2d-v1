@@ -118,28 +118,36 @@ public class exUIElementEditor : exPlaneEditor {
         }
 
         //
-        switch ( editElement.plane ) {
-        case exPlane.Plane.XY:
-            vertices[0] = new Vector3 (-halfWidthScaled-offsetX,  halfHeightScaled+offsetY, 0.0f );
-            vertices[1] = new Vector3 ( halfWidthScaled-offsetX,  halfHeightScaled+offsetY, 0.0f );
-            vertices[2] = new Vector3 ( halfWidthScaled-offsetX, -halfHeightScaled+offsetY, 0.0f );
-            vertices[3] = new Vector3 (-halfWidthScaled-offsetX, -halfHeightScaled+offsetY, 0.0f );
-            break;
+        vertices[0] = new Vector3 (-halfWidthScaled-offsetX,  halfHeightScaled+offsetY, 0.0f );
+        vertices[1] = new Vector3 ( halfWidthScaled-offsetX,  halfHeightScaled+offsetY, 0.0f );
+        vertices[2] = new Vector3 ( halfWidthScaled-offsetX, -halfHeightScaled+offsetY, 0.0f );
+        vertices[3] = new Vector3 (-halfWidthScaled-offsetX, -halfHeightScaled+offsetY, 0.0f );
 
-        case exPlane.Plane.XZ:
-            vertices[0] = new Vector3 (-halfWidthScaled-offsetX, 0.0f,  halfHeightScaled+offsetY );
-            vertices[1] = new Vector3 ( halfWidthScaled-offsetX, 0.0f,  halfHeightScaled+offsetY );
-            vertices[2] = new Vector3 ( halfWidthScaled-offsetX, 0.0f, -halfHeightScaled+offsetY );
-            vertices[3] = new Vector3 (-halfWidthScaled-offsetX, 0.0f, -halfHeightScaled+offsetY );
-            break;
+        // DELME { 
+        // //
+        // switch ( editElement.plane ) {
+        // case exPlane.Plane.XY:
+        //     vertices[0] = new Vector3 (-halfWidthScaled-offsetX,  halfHeightScaled+offsetY, 0.0f );
+        //     vertices[1] = new Vector3 ( halfWidthScaled-offsetX,  halfHeightScaled+offsetY, 0.0f );
+        //     vertices[2] = new Vector3 ( halfWidthScaled-offsetX, -halfHeightScaled+offsetY, 0.0f );
+        //     vertices[3] = new Vector3 (-halfWidthScaled-offsetX, -halfHeightScaled+offsetY, 0.0f );
+        //     break;
 
-        case exPlane.Plane.ZY:
-            vertices[0] = new Vector3 (0.0f,  halfHeightScaled+offsetY, -halfWidthScaled-offsetX );
-            vertices[1] = new Vector3 (0.0f,  halfHeightScaled+offsetY,  halfWidthScaled-offsetX );
-            vertices[2] = new Vector3 (0.0f, -halfHeightScaled+offsetY,  halfWidthScaled-offsetX );
-            vertices[3] = new Vector3 (0.0f, -halfHeightScaled+offsetY, -halfWidthScaled-offsetX );
-            break;
-        }
+        // case exPlane.Plane.XZ:
+        //     vertices[0] = new Vector3 (-halfWidthScaled-offsetX, 0.0f,  halfHeightScaled+offsetY );
+        //     vertices[1] = new Vector3 ( halfWidthScaled-offsetX, 0.0f,  halfHeightScaled+offsetY );
+        //     vertices[2] = new Vector3 ( halfWidthScaled-offsetX, 0.0f, -halfHeightScaled+offsetY );
+        //     vertices[3] = new Vector3 (-halfWidthScaled-offsetX, 0.0f, -halfHeightScaled+offsetY );
+        //     break;
+
+        // case exPlane.Plane.ZY:
+        //     vertices[0] = new Vector3 (0.0f,  halfHeightScaled+offsetY, -halfWidthScaled-offsetX );
+        //     vertices[1] = new Vector3 (0.0f,  halfHeightScaled+offsetY,  halfWidthScaled-offsetX );
+        //     vertices[2] = new Vector3 (0.0f, -halfHeightScaled+offsetY,  halfWidthScaled-offsetX );
+        //     vertices[3] = new Vector3 (0.0f, -halfHeightScaled+offsetY, -halfWidthScaled-offsetX );
+        //     break;
+        // }
+        // } DELME end 
 
         // 0 -- 1
         // |    |
@@ -345,20 +353,22 @@ public class exUIElementEditor : exPlaneEditor {
     // ------------------------------------------------------------------ 
 
     void GetDelatSize ( Vector3 _deltaVec, out float _dx, out float _dy ) {
-        _dx = 0.0f; _dy = 0.0f;
+        _dx = _deltaVec.x; _dy = _deltaVec.y;
 
-        switch ( editElement.plane ) {
-        case exPlane.Plane.XY:
-            _dx = _deltaVec.x; _dy = _deltaVec.y;
-            break;
+        // DELME { 
+        // switch ( editElement.plane ) {
+        // case exPlane.Plane.XY:
+        //     _dx = _deltaVec.x; _dy = _deltaVec.y;
+        //     break;
 
-        case exPlane.Plane.XZ:
-            _dx = _deltaVec.x; _dy = _deltaVec.z;
-            break;
+        // case exPlane.Plane.XZ:
+        //     _dx = _deltaVec.x; _dy = _deltaVec.z;
+        //     break;
 
-        case exPlane.Plane.ZY:
-            _dx = _deltaVec.z; _dy = _deltaVec.y;
-            break;
-        }
+        // case exPlane.Plane.ZY:
+        //     _dx = _deltaVec.z; _dy = _deltaVec.y;
+        //     break;
+        // }
+        // } DELME end 
     }
 }
