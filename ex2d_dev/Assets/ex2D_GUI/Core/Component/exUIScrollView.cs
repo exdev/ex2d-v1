@@ -117,18 +117,18 @@ public class exUIScrollView : exUIElement {
         clipRect.anchor = anchor;
         clipRect.width = width;
         clipRect.height = height;
-        clipRect.transform.localPosition = Vector3.zero;
+        clipRect.transform.localPosition = new Vector3 ( 0.0f, 0.0f, clipRect.transform.localPosition.z );
 
         if ( contentAnchor )
-            contentAnchor.transform.localPosition = new Vector3 ( startX, startY, 0.0f );
+            contentAnchor.transform.localPosition = new Vector3 ( startX, startY, contentAnchor.transform.localPosition.z );
         if ( horizontalBar )
-            horizontalBar.transform.localPosition = new Vector3 ( startX, endY, 0.0f );
+            horizontalBar.transform.localPosition = new Vector3 ( startX, endY, horizontalBar.transform.localPosition.z );
         if ( horizontalSlider )
-            horizontalSlider.transform.localPosition = new Vector3 ( startX, endY, 0.0f );
+            horizontalSlider.transform.localPosition = new Vector3 ( startX, endY, horizontalSlider.transform.localPosition.z );
         if ( verticalBar )
-            verticalBar.transform.localPosition = new Vector3 ( endX, startY, 0.0f );
+            verticalBar.transform.localPosition = new Vector3 ( endX, startY, verticalBar.transform.localPosition.z );
         if ( verticalSlider )
-            verticalSlider.transform.localPosition = new Vector3 ( endX, startY, 0.0f );
+            verticalSlider.transform.localPosition = new Vector3 ( endX, startY, verticalSlider.transform.localPosition.z );
 
         // DELME { 
         // switch ( plane ) {
@@ -349,9 +349,9 @@ public class exUIScrollView : exUIElement {
         }
         float hsliderY = horizontalSlider.transform.localPosition.y;
 
-        contentAnchor.transform.localPosition = new Vector3( startX-_offset.x, startY-_offset.y, 0.0f );
-        verticalSlider.transform.localPosition = new Vector3( vsliderX, vsliderY, 0.0f );
-        horizontalSlider.transform.localPosition = new Vector3( hsliderX, hsliderY, 0.0f );
+        contentAnchor.transform.localPosition = new Vector3( startX-_offset.x, startY-_offset.y, contentAnchor.transform.localPosition.z );
+        verticalSlider.transform.localPosition = new Vector3( vsliderX, vsliderY, verticalSlider.transform.localPosition.z );
+        horizontalSlider.transform.localPosition = new Vector3( hsliderX, hsliderY, horizontalSlider.transform.localPosition.z );
 
         // DELME { 
         // switch ( plane ) {

@@ -51,7 +51,7 @@ public class exUIPanel : exUIElement {
             background.anchor = anchor;
             background.width = width;
             background.height = height;
-            background.transform.localPosition = Vector3.zero;
+            background.transform.localPosition = new Vector3 ( 0.0f, 0.0f, background.transform.localPosition.z );
         }
     }
 
@@ -62,30 +62,40 @@ public class exUIPanel : exUIElement {
     public override bool OnEvent ( exUIEvent _e ) {
         switch ( _e.type ) {
         case exUIEvent.Type.HoverIn: 
-            if ( OnHoverIn != null )
+            if ( OnHoverIn != null ) {
                 OnHoverIn ();
-            return true;
+                return true;
+            }
+            return false;
 
         case exUIEvent.Type.HoverOut: 
-            if ( OnHoverOut != null )
+            if ( OnHoverOut != null ) {
                 OnHoverOut ();
-            return true;
+                return true;
+            }
+            return false;
 
         case exUIEvent.Type.PointerPress: 
             exUIMng.instance.activeElement = this;
-            if ( OnButtonPress != null )
+            if ( OnButtonPress != null ) {
                 OnButtonPress ();
-            return true;
+                return true;
+            }
+            return false;
 
         case exUIEvent.Type.PointerRelease: 
             exUIMng.instance.activeElement = null;
-            if ( OnButtonRelease != null )
+            if ( OnButtonRelease != null ) {
                 OnButtonRelease ();
-            return true;
+                return true;
+            }
+            return false;
 
         case exUIEvent.Type.PointerMove: 
-            if ( OnPointerMove != null )
+            if ( OnPointerMove != null ) {
                 OnPointerMove ();
+                return false;
+            }
             return true;
         }
 

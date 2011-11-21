@@ -73,7 +73,7 @@ public class exUIButton : exUIElement {
             border.anchor = anchor;
             border.width = width;
             border.height = height;
-            border.transform.localPosition = Vector3.zero;
+            border.transform.localPosition = new Vector3 ( 0.0f, 0.0f, border.transform.localPosition.z );
         }
 
         if ( font ) {

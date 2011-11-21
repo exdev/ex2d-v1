@@ -93,6 +93,8 @@ public class exLayer : MonoBehaviour {
     // editor only data
     public bool foldout = true;
     [System.NonSerialized] public int indentLevel = -1;
+    [System.NonSerialized] public bool updated = false;
+    [System.NonSerialized] public int index = -1;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -109,6 +111,7 @@ public class exLayer : MonoBehaviour {
         if ( children_ == null )
             children_ = new List<exLayer>();
 
+        //
         if ( parent_ ) {
             if ( parent_.children_ == null ) {
                 parent_.children_ = new List<exLayer>();
@@ -118,11 +121,11 @@ public class exLayer : MonoBehaviour {
             }
         }
 
-        for ( int i = 0; i < children_.Count; ++i ) {
+        //
+        for ( int i = children_.Count-1; i >= 0; --i ) {
             exLayer childLayer = children_[i];
-            if ( childLayer.parent != this ) {
+            if ( childLayer == null || childLayer.parent != this ) {
                 children_.RemoveAt(i);
-                --i;
             }
         }
     }

@@ -558,6 +558,9 @@ public class exLayerEditor : EditorWindow {
     // ------------------------------------------------------------------ 
 
     float LayerField ( Rect _rect, int _indentLevel, exLayer _layer ) {
+        if ( _layer == null )
+            return _rect.y;
+
         // get selected
         bool selected = selectedLayers.IndexOf(_layer) != -1;
 
@@ -664,6 +667,9 @@ public class exLayerEditor : EditorWindow {
     // ------------------------------------------------------------------ 
 
     void AddSelected ( exLayer _l ) {
+        if ( _l == null )
+            return;
+
         if ( selectedLayers.IndexOf(_l) == -1 ) {
             selectedLayers.Add(_l);
             foreach ( exLayer l in _l.children ) {
@@ -684,6 +690,9 @@ public class exLayerEditor : EditorWindow {
     // ------------------------------------------------------------------ 
 
     void RemoveSelected ( exLayer _l ) {
+        if ( _l == null )
+            return;
+
         bool parentInSelect = false;
         exLayer parent = _l.parent;
         while ( parent != null ) {
