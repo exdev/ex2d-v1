@@ -27,7 +27,11 @@ public class exLayer : MonoBehaviour {
     // properties
     ///////////////////////////////////////////////////////////////////////////////
 
+    // ------------------------------------------------------------------ 
     [SerializeField] protected exLayer parent_ = null;
+    /// the parent of the layer
+    // ------------------------------------------------------------------ 
+
     public exLayer parent {
         set {
             // already the parent
@@ -79,7 +83,11 @@ public class exLayer : MonoBehaviour {
         }
     }
 
+    // ------------------------------------------------------------------ 
     [SerializeField] protected List<exLayer> children_ = new List<exLayer>();
+    /// the children of the layer
+    // ------------------------------------------------------------------ 
+
     public List<exLayer> children {
         get {
             return children_;
@@ -139,7 +147,10 @@ public class exLayer : MonoBehaviour {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _index insert layer before the index of the children 
+    /// \param _layer the layer to insert
+    /// 
+    /// Insert the _layer at the given _index of the children
     // ------------------------------------------------------------------ 
 
     public void InsertAt ( int _index, exLayer _layer ) {

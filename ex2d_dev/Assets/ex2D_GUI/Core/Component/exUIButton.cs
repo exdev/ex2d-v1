@@ -137,14 +137,27 @@ public class exUIButton : exUIElement {
                  _e.buttons == exUIEvent.PointerButtonFlags.Touch ) {
                 exUIMng.instance.activeElement = null;
                 if ( isPressing ) {
-                    if ( OnButtonRelease != null )
-                        OnButtonRelease ();
-                    isPressing = false;
+                    StartCoroutine ( DelayButtonRelease(0.5f) );
                 }
             }
             return true;
         }
 
         return false;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    IEnumerator DelayButtonRelease ( float _delay ) {
+        float delay = _delay;
+        while ( delay > 0.0f ) {
+            delay -= Time.deltaTime;
+            yield return false;
+        }
+        if ( OnButtonRelease != null )
+            OnButtonRelease ();
+        isPressing = false;
     }
 }

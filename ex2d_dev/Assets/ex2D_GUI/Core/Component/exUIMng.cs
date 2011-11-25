@@ -37,6 +37,34 @@ public class RaycastSorter : IComparer {
 // Desc: 
 // ------------------------------------------------------------------ 
 
+public class ElementSorter: IComparer<exUIElement> {
+    public int Compare( exUIElement _a, exUIElement _b ) {
+        exUIElement parent = null;
+        int level_a = 0;
+        int level_b = 0;
+
+        // a level
+        parent = _a.parent;
+        while ( parent ) {
+            ++level_a; 
+            parent = parent.parent;
+        }
+
+        // b level
+        parent = _b.parent;
+        while ( parent ) {
+            ++level_b; 
+            parent = parent.parent;
+        }
+
+        return level_a - level_b;
+    }
+}
+
+// ------------------------------------------------------------------ 
+// Desc: 
+// ------------------------------------------------------------------ 
+
 public class exUIEvent {
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -100,8 +128,8 @@ public class exUIMng : MonoBehaviour {
 
 
     //
-    private RaycastSorter raycastSorter = new RaycastSorter();
-    private RaycastHit[] sortedHits;
+    // private RaycastSorter raycastSorter = new RaycastSorter();
+    private ElementSorter elementSorter = new ElementSorter();
 
     // internal ui status
     private bool initialized = false;
@@ -181,22 +209,6 @@ public class exUIMng : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public RaycastHit[] GetLastHits () { return sortedHits; }
-    public bool GetLastHit ( out RaycastHit _r, GameObject _go ) { 
-        foreach ( RaycastHit r in sortedHits ) {
-            if ( r.collider.gameObject == _go ) {
-                _r = r;
-                return true;
-            }
-        }
-        _r = new RaycastHit();
-        return false;
-    }
-
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
     void QueueEvents () {
         ProcessPointer ();
     }
@@ -264,7 +276,7 @@ public class exUIMng : MonoBehaviour {
                         deltaPos = touch.deltaPosition;
                     }
                     curPointerPos = touch.position;
-                    hotElement = PickTopElement(touch.position);
+                    hotElement = PickElement(touch.position);
                 }
             }
 
@@ -277,7 +289,7 @@ public class exUIMng : MonoBehaviour {
         else {
             foreach ( Touch touch in Input.touches ) {
                 if ( touch.phase == TouchPhase.Began ) {
-                    hotElement = PickTopElement(touch.position);
+                    hotElement = PickElement(touch.position);
                     if ( hotElement != null ) {
                         curPointerPos = touch.position;
                         touchID = touch.fingerId;
@@ -397,7 +409,7 @@ public class exUIMng : MonoBehaviour {
         
         // get hot element
         exUIElement lastHotElement = hotElement;
-        hotElement = PickTopElement(curPointerPos);
+        hotElement = PickElement(curPointerPos);
 
         // process hover event
         if ( lastHotElement != hotElement ) {
@@ -462,20 +474,37 @@ public class exUIMng : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    exUIElement PickTopElement ( Vector2 _pos ) {
+    exUIElement PickElement ( Vector2 _pos ) {
         Ray ray = camera.ScreenPointToRay ( _pos );
         ray.origin = new Vector3 ( ray.origin.x, ray.origin.y, camera.transform.position.z );
-        sortedHits = Physics.RaycastAll(ray);
-        System.Array.Sort(sortedHits, raycastSorter);
-        if ( sortedHits.Length > 0 ) {
-            for ( int i = 0; i < sortedHits.Length; ++i ) {
-                RaycastHit hit = sortedHits[i];
-                GameObject go = hit.collider.gameObject;
-                exUIElement el = go.GetComponent<exUIElement>();
-                if ( el && el.enabled ) {
-                    return el;
-                }
+        RaycastHit[] hits = Physics.RaycastAll(ray);
+        // DISABLE { 
+        // System.Array.Sort(hits, raycastSorter);
+        // if ( hits.Length > 0 ) {
+        //     for ( int i = 0; i < hits.Length; ++i ) {
+        //         RaycastHit hit = hits[i];
+        //         GameObject go = hit.collider.gameObject;
+        //         exUIElement el = go.GetComponent<exUIElement>();
+        //         if ( el && el.enabled ) {
+        //             return el;
+        //         }
+        //     }
+        // }
+        // return null;
+        // } DISABLE end 
+
+        List<exUIElement> elements = new List<exUIElement>();
+        for ( int i = 0; i < hits.Length; ++i ) {
+            RaycastHit hit = hits[i];
+            GameObject go = hit.collider.gameObject;
+            exUIElement el = go.GetComponent<exUIElement>();
+            if ( el && el.enabled ) {
+                elements.Add(el);
             }
+        }
+        if ( elements.Count > 0 ) {
+            elements.Sort(elementSorter);
+            return elements[elements.Count-1]; 
         }
         return null;
     }

@@ -93,7 +93,7 @@ public class exLayerEditor : EditorWindow {
     }
 
     // ------------------------------------------------------------------ 
-    /// \param _obj
+    /// \param _go The GameObject to edit
     /// Check if the object is valid atlas and open it in atlas editor.
     // ------------------------------------------------------------------ 
 
