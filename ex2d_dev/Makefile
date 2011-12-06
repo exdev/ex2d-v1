@@ -96,6 +96,8 @@ $(EX2D_RUNTIME_TARGET):
 	@echo "========================================================" 
 	@echo Building ex2D.Runtime.dll...
 	@echo "========================================================" 
+	rm -rf $(EX2D_TARGET_DIR)/Core/Shaders/
+	cp -r Assets/ex2D/Core/Shaders/ $(EX2D_TARGET_DIR)/Core/Shaders
 	$(COMPILER) -target:library -out:$(EX2D_RUNTIME_TARGET) $(EX2D_RUNTIME_ARGUMENT) $(EX2D_RUNTIME_SOURCE)
 	@echo done!
 	@echo 
@@ -136,6 +138,8 @@ $(EX2D_EDITOR_TARGET):
 	@echo "========================================================" 
 	@echo building ex2D.Editor.dll...
 	@echo "========================================================" 
+	rm -rf $(EX2D_TARGET_DIR)/Editor/Resource/
+	cp -r Assets/ex2D/Editor/Resource/ $(EX2D_TARGET_DIR)/Editor/Resource
 	$(COMPILER) -target:library -out:$(EX2D_EDITOR_TARGET) $(EX2D_EDITOR_ARGUMENT) $(EX2D_EDITOR_SOURCE)
 	@echo done!
 	@echo

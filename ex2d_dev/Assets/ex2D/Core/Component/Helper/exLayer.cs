@@ -23,6 +23,16 @@ using System.Collections.Generic;
 [AddComponentMenu("ex2D Helper/Layer")]
 public class exLayer : MonoBehaviour {
 
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public enum Type {
+        Normal = 0,
+        Abstract,
+        Dynamic
+    }
+
     ///////////////////////////////////////////////////////////////////////////////
     // properties
     ///////////////////////////////////////////////////////////////////////////////
@@ -94,9 +104,12 @@ public class exLayer : MonoBehaviour {
         }
     }
 
-    //
-    // TODO: public bool dynamic = false; // if static, the layer will not update when running the game
-    // TODO: public float range = 100.0f;
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public Type type = Type.Normal;
+    public float range = 100.0f;
 
     // editor only data
     public bool foldout = true;

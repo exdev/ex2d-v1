@@ -224,7 +224,7 @@ public class exLayerEditor : EditorWindow {
         GUI.contentColor = Color.yellow;
             GUILayout.BeginHorizontal();
             GUILayout.FlexibleSpace();
-                if ( GUILayout.Button("Remove All Layer", GUILayout.Width(120) ) ) {
+                if ( GUILayout.Button("Remove All Layers", GUILayout.Width(120) ) ) {
                     bool doRemove = EditorUtility.DisplayDialog( "Warning!",
                                                                  "This operation will remove all exLayer Component in the editor, do you want to continue operation",
                                                                  "Yes", "No" );
@@ -310,6 +310,7 @@ public class exLayerEditor : EditorWindow {
                         layer.parent = parentLayer;
                         break;
                     }
+                    parent = parent.parent;
                 }
             }
 

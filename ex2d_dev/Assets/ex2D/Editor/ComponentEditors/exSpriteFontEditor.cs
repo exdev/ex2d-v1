@@ -66,7 +66,9 @@ class exSpriteFontEditor : exSpriteBaseEditor {
         // 
         // ======================================================== 
 
-        bool needRebuild = false;
+        // DELME { 
+        // bool needRebuild = false;
+        // } DELME end 
 
         EditorGUIUtility.LookLikeInspector ();
         EditorGUI.indentLevel = 1;
@@ -153,15 +155,17 @@ class exSpriteFontEditor : exSpriteBaseEditor {
         GUILayout.EndHorizontal();
         GUI.enabled = true;
 
-        // check if fontInfo change to null
-        if ( editSpriteFont.fontInfo == null ) {
-            editSpriteFont.Clear ();
-        }
-        else {
-            if ( isPrefab == false && editSpriteFont.meshFilter.sharedMesh == null ) {
-                needRebuild = true;
-            }
-        }
+        // DELME { 
+        // // check if fontInfo change to null
+        // if ( editSpriteFont.fontInfo == null ) {
+        //     editSpriteFont.Clear ();
+        // }
+        // else {
+        //     if ( isPrefab == false && editSpriteFont.meshFilter.sharedMesh == null ) {
+        //         needRebuild = true;
+        //     }
+        // }
+        // } DELME end 
 
         // ======================================================== 
         // use kerning
@@ -269,7 +273,7 @@ class exSpriteFontEditor : exSpriteBaseEditor {
         GUILayout.BeginHorizontal();
         GUILayout.FlexibleSpace();
         if ( GUILayout.Button("Rebuild...", GUILayout.Height(20) ) ) {
-            needRebuild = true;
+            // needRebuild = true;
         }
         GUILayout.EndHorizontal();
         GUI.enabled = true;
@@ -277,11 +281,14 @@ class exSpriteFontEditor : exSpriteBaseEditor {
 
         // if dirty, build it.
         if ( !EditorApplication.isPlaying && !AnimationUtility.InAnimationMode() ) {
-            if ( needRebuild ) {
-                EditorUtility.ClearProgressBar();
-                editSpriteFont.Build();
-            }
-            else if ( GUI.changed ) {
+            // DELME { 
+            // if ( needRebuild ) {
+            //     EditorUtility.ClearProgressBar();
+            //     editSpriteFont.Build();
+            // }
+            // else 
+            // } DELME end 
+            if ( GUI.changed ) {
                 if ( editSpriteFont.meshFilter.sharedMesh != null )
                     editSpriteFont.UpdateMesh( editSpriteFont.meshFilter.sharedMesh );
                 EditorUtility.SetDirty(editSpriteFont);

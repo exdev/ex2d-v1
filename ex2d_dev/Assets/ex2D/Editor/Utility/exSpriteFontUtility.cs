@@ -53,7 +53,6 @@ public static class exSpriteFontUtility {
         // when build, alway set dirty
         EditorUtility.SetDirty (_spriteFont);
 
-        //
         if ( _spriteFont.fontInfo == null ) {
             GameObject.DestroyImmediate( _spriteFont.meshFilter.sharedMesh, true );
             _spriteFont.meshFilter.sharedMesh = null; 
