@@ -740,6 +740,7 @@ public class exSprite : exSpriteBase {
 
     public void SetSprite ( exAtlas _atlas, int _index ) {
         bool checkVertex = false;
+        bool createMesh = false;
 
         // pre-check
         if ( _atlas == null || 
@@ -749,6 +750,11 @@ public class exSprite : exSpriteBase {
         {
             Debug.LogWarning ( "Invalid input in SetSprite. atlas = " + (_atlas ? _atlas.name : "null") + ", index = " + _index );
             return;
+        }
+
+        // it is possible that the atlas is null and we don't have mesh
+        if ( atlas_ == null ) {
+            createMesh = true;
         }
 
         //
@@ -767,7 +773,7 @@ public class exSprite : exSpriteBase {
         }
 
         //
-        if ( checkVertex  ) {
+        if ( checkVertex ) {
 
             // NOTE: if we use texture offset, it always need to update vertex
             if ( useTextureOffset_ ) {
@@ -793,6 +799,19 @@ public class exSprite : exSpriteBase {
                     height_ = newHeight;
                     updateFlags |= UpdateFlags.Vertex;
                 }
+            }
+        }
+
+        //
+        if ( createMesh ) {
+            // create mesh ( in editor, this can duplicate mesh to prevent shared mesh for sprite)
+            meshFilter_.mesh = new Mesh();
+            updateFlags = UpdateFlags.Vertex | UpdateFlags.UV | UpdateFlags.Color | UpdateFlags.Index;
+
+            // check if update mesh collider
+            MeshCollider meshCollider = collider as MeshCollider;  
+            if ( meshCollider && meshCollider.sharedMesh == null ) {
+                this.UpdateColliderSize(0.2f);
             }
         }
     }

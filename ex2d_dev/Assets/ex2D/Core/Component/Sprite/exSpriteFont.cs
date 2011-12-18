@@ -48,9 +48,25 @@ public class exSpriteFont : exSpriteBase {
         get { return fontInfo_; }
         set {
             if ( fontInfo_ != value ) {
+                bool createMesh = false;
+                if ( fontInfo_ == null && value != null ) {
+                    createMesh = true;
+                }
                 fontInfo_ = value;
-                if ( fontInfo_ != null && fontInfo_.pageInfos.Count == 1 )
+
+                if ( createMesh ) {
+                    meshFilter_.mesh = new Mesh();
+                    updateFlags |= UpdateFlags.Color;
+                }
+
+                if ( fontInfo_ != null && fontInfo_.pageInfos.Count == 1 ) {
                     renderer.sharedMaterial = fontInfo_.pageInfos[0].material;
+                }
+                else {
+                    GameObject.DestroyImmediate( meshFilter_.sharedMesh, true );
+                    meshFilter_.sharedMesh = null; 
+                    renderer.sharedMaterial = null;
+                }
 
                 updateFlags |= UpdateFlags.Text;
             }
@@ -356,19 +372,19 @@ public class exSpriteFont : exSpriteBase {
 
         // calculate anchor offset
         switch ( anchor_ ) {
-        case Anchor.TopLeft     : _offsetX = -_halfWidthScaled;  _offsetY = -_halfHeightScaled;  break;
-        case Anchor.TopCenter   : _offsetX = 0.0f;         _offsetY = -_halfHeightScaled;  break;
-        case Anchor.TopRight    : _offsetX = _halfWidthScaled;   _offsetY = -_halfHeightScaled;  break;
+        case Anchor.TopLeft     : _offsetX = -_halfWidthScaled;  _offsetY = -_halfHeightScaled; break;
+        case Anchor.TopCenter   : _offsetX = 0.0f;               _offsetY = -_halfHeightScaled; break;
+        case Anchor.TopRight    : _offsetX = _halfWidthScaled;   _offsetY = -_halfHeightScaled; break;
 
-        case Anchor.MidLeft     : _offsetX = -_halfWidthScaled;  _offsetY = 0.0f;          break;
-        case Anchor.MidCenter   : _offsetX = 0.0f;         _offsetY = 0.0f;          break;
-        case Anchor.MidRight    : _offsetX = _halfWidthScaled;   _offsetY = 0.0f;          break;
+        case Anchor.MidLeft     : _offsetX = -_halfWidthScaled;  _offsetY = 0.0f;               break;
+        case Anchor.MidCenter   : _offsetX = 0.0f;               _offsetY = 0.0f;               break;
+        case Anchor.MidRight    : _offsetX = _halfWidthScaled;   _offsetY = 0.0f;               break;
 
-        case Anchor.BotLeft     : _offsetX = -_halfWidthScaled;  _offsetY = _halfHeightScaled;   break;
-        case Anchor.BotCenter   : _offsetX = 0.0f;         _offsetY = _halfHeightScaled;   break;
-        case Anchor.BotRight    : _offsetX = _halfWidthScaled;   _offsetY = _halfHeightScaled;   break;
+        case Anchor.BotLeft     : _offsetX = -_halfWidthScaled;  _offsetY = _halfHeightScaled;  break;
+        case Anchor.BotCenter   : _offsetX = 0.0f;               _offsetY = _halfHeightScaled;  break;
+        case Anchor.BotRight    : _offsetX = _halfWidthScaled;   _offsetY = _halfHeightScaled;  break;
 
-        default                 : _offsetX = 0.0f;         _offsetY = 0.0f;          break;
+        default                 : _offsetX = 0.0f;               _offsetY = 0.0f;               break;
         }
         _offsetX -= offset_.x;
         _offsetY += offset_.y;
@@ -649,7 +665,7 @@ public class exSpriteFont : exSpriteBase {
                             curX = halfWidthScaled * 2.0f - lineWidths[curLine] * scale_.x;
                             break;
                         }
-                        curY = curY + fontInfo_.lineHeight * scale_.y + lineSpacing_;
+                        curY = curY + (fontInfo_.lineHeight + lineSpacing_) * scale_.y;
                     }
                     continue;
                 }
@@ -770,7 +786,7 @@ public class exSpriteFont : exSpriteBase {
                     indices[idx_id + 5] = vert_id + 3;
 
                     //
-                    curX = curX + charInfo.xadvance * scale_.x + tracking_;
+                    curX = curX + (charInfo.xadvance + tracking_) * scale_.x;
                     if ( useKerning_ ) {
                         if ( i < text_.Length - 1 ) {
                             curX += kernings[i] * scale_.x;
@@ -873,7 +889,7 @@ public class exSpriteFont : exSpriteBase {
                             curX = halfWidthScaled * 2.0f - lineWidths[curLine] * scale_.x;
                             break;
                         }
-                        curY = curY + fontInfo_.lineHeight * scale_.y + lineSpacing_;
+                        curY = curY + (fontInfo_.lineHeight + lineSpacing_) * scale_.y;
                     }
                     continue;
                 }
@@ -921,7 +937,7 @@ public class exSpriteFont : exSpriteBase {
                     }
 
                     //
-                    curX = curX + charInfo.xadvance * scale_.x + tracking_;
+                    curX = curX + (charInfo.xadvance + tracking_) * scale_.x;
                     if ( useKerning_ ) {
                         if ( i < text_.Length - 1 ) {
                             curX += kernings[i] * scale_.x;
@@ -1079,6 +1095,134 @@ public class exSpriteFont : exSpriteBase {
         if ( meshFilter ) {
             DestroyImmediate( meshFilter_.sharedMesh, true );
             meshFilter_.sharedMesh = null;
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public Rect GetCharRect ( int _idx ) {
+        if ( meshFilter ) {
+            if ( meshFilter_.sharedMesh != null ) {
+
+                // ======================================================== 
+                // init value 
+                // ======================================================== 
+
+                int numVerts = text_.Length * 4;
+                int vertexCount = 0;
+
+                // first shadow
+                if ( useShadow_ ) {
+                    vertexCount += numVerts;
+                }
+
+                // second outline
+                if ( useOutline_ ) {
+                    vertexCount += 8 * numVerts;
+                }
+
+                // finally normal
+                int vertexStartAt = vertexCount;
+                vertexCount += numVerts;
+
+                //
+                int vert_id = vertexStartAt + 4 * _idx;
+                Vector3[] verts = meshFilter_.sharedMesh.vertices;
+                return new Rect ( verts[vert_id].x, 
+                                  verts[vert_id].y, 
+                                  verts[vert_id+3].x - verts[vert_id].x,
+                                  verts[vert_id+3].y - verts[vert_id].y );
+            }
+        }
+        return new Rect ( 0.0f, 0.0f, 0.0f, 0.0f );
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void SetCharAlpha ( int _idx, float _alpha ) {
+        if ( meshFilter ) {
+            if ( meshFilter_.sharedMesh != null ) {
+
+                // ======================================================== 
+                // init value 
+                // ======================================================== 
+
+                int numVerts = text_.Length * 4;
+                int vertexCount = 0;
+
+                // first shadow
+                int shadowVertexStartAt = -1;
+                if ( useShadow_ ) {
+                    shadowVertexStartAt = vertexCount;
+                    vertexCount += numVerts;
+                }
+
+                // second outline
+                int outlineVertexStartAt = -1;
+                if ( useOutline_ ) {
+                    outlineVertexStartAt = vertexCount;
+                    vertexCount += 8 * numVerts;
+                }
+
+                // finally normal
+                int vertexStartAt = vertexCount;
+                vertexCount += numVerts;
+
+                // ======================================================== 
+                // Update Color
+                // ======================================================== 
+
+                Color[] colors = new Color[vertexCount];
+                for ( int i = 0; i < text_.Length; ++i ) {
+                    Color clrTop = topColor_;
+                    Color clrBot = botColor_;
+                    Color clrOutline = outlineColor_;
+                    Color clrShadow = shadowColor_;
+                    if ( i == _idx ) {
+                        clrTop.a = _alpha;
+                        clrBot.a = _alpha;
+                        clrOutline.a = _alpha;
+                        clrShadow.a = _alpha;
+                    }
+
+                    int vert_id = vertexStartAt + 4 * i;
+                    colors[vert_id+0] = colors[vert_id+1] = clrTop;
+                    colors[vert_id+2] = colors[vert_id+3] = clrBot;
+
+
+                    if ( outlineVertexStartAt != -1 ) {
+                        vert_id = 4 * i;
+                        int[] vi = new int[] {
+                            outlineVertexStartAt + vert_id + 0 * numVerts,
+                            outlineVertexStartAt + vert_id + 1 * numVerts,
+                            outlineVertexStartAt + vert_id + 2 * numVerts,
+                            outlineVertexStartAt + vert_id + 3 * numVerts,
+                            outlineVertexStartAt + vert_id + 4 * numVerts,
+                            outlineVertexStartAt + vert_id + 5 * numVerts,
+                            outlineVertexStartAt + vert_id + 6 * numVerts,
+                            outlineVertexStartAt + vert_id + 7 * numVerts
+                        };
+                        for ( int k = 0; k < vi.Length; ++k ) {
+                            colors[vi[k]+0] = 
+                            colors[vi[k]+1] = 
+                            colors[vi[k]+2] = 
+                            colors[vi[k]+3] = clrOutline;
+                        }
+                    }
+                    if ( shadowVertexStartAt != -1 ) {
+                        vert_id = shadowVertexStartAt + 4 * i;
+                        colors[vert_id+0] = 
+                        colors[vert_id+1] = 
+                        colors[vert_id+2] = 
+                        colors[vert_id+3] = clrShadow;
+                    }
+                }
+                meshFilter_.sharedMesh.colors = colors;
+            }
         }
     }
 }

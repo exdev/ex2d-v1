@@ -93,7 +93,7 @@ public class exLayerEditor : EditorWindow {
     }
 
     // ------------------------------------------------------------------ 
-    /// \param _obj
+    /// \param _go The GameObject to edit
     /// Check if the object is valid atlas and open it in atlas editor.
     // ------------------------------------------------------------------ 
 
@@ -224,7 +224,7 @@ public class exLayerEditor : EditorWindow {
         GUI.contentColor = Color.yellow;
             GUILayout.BeginHorizontal();
             GUILayout.FlexibleSpace();
-                if ( GUILayout.Button("Remove All Layer", GUILayout.Width(120) ) ) {
+                if ( GUILayout.Button("Remove All Layers", GUILayout.Width(120) ) ) {
                     bool doRemove = EditorUtility.DisplayDialog( "Warning!",
                                                                  "This operation will remove all exLayer Component in the editor, do you want to continue operation",
                                                                  "Yes", "No" );
@@ -310,6 +310,7 @@ public class exLayerEditor : EditorWindow {
                         layer.parent = parentLayer;
                         break;
                     }
+                    parent = parent.parent;
                 }
             }
 
@@ -558,6 +559,9 @@ public class exLayerEditor : EditorWindow {
     // ------------------------------------------------------------------ 
 
     float LayerField ( Rect _rect, int _indentLevel, exLayer _layer ) {
+        if ( _layer == null )
+            return _rect.y;
+
         // get selected
         bool selected = selectedLayers.IndexOf(_layer) != -1;
 
@@ -664,6 +668,9 @@ public class exLayerEditor : EditorWindow {
     // ------------------------------------------------------------------ 
 
     void AddSelected ( exLayer _l ) {
+        if ( _l == null )
+            return;
+
         if ( selectedLayers.IndexOf(_l) == -1 ) {
             selectedLayers.Add(_l);
             foreach ( exLayer l in _l.children ) {
@@ -684,6 +691,9 @@ public class exLayerEditor : EditorWindow {
     // ------------------------------------------------------------------ 
 
     void RemoveSelected ( exLayer _l ) {
+        if ( _l == null )
+            return;
+
         bool parentInSelect = false;
         exLayer parent = _l.parent;
         while ( parent != null ) {

@@ -73,7 +73,7 @@ public class exUIButton : exUIElement {
             border.anchor = anchor;
             border.width = width;
             border.height = height;
-            border.transform.localPosition = Vector3.zero;
+            border.transform.localPosition = new Vector3 ( 0.0f, 0.0f, border.transform.localPosition.z );
         }
 
         if ( font ) {
@@ -137,14 +137,27 @@ public class exUIButton : exUIElement {
                  _e.buttons == exUIEvent.PointerButtonFlags.Touch ) {
                 exUIMng.instance.activeElement = null;
                 if ( isPressing ) {
-                    if ( OnButtonRelease != null )
-                        OnButtonRelease ();
-                    isPressing = false;
+                    StartCoroutine ( DelayButtonRelease(0.5f) );
                 }
             }
             return true;
         }
 
         return false;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    IEnumerator DelayButtonRelease ( float _delay ) {
+        float delay = _delay;
+        while ( delay > 0.0f ) {
+            delay -= Time.deltaTime;
+            yield return false;
+        }
+        if ( OnButtonRelease != null )
+            OnButtonRelease ();
+        isPressing = false;
     }
 }

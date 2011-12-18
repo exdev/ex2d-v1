@@ -23,11 +23,25 @@ using System.Collections.Generic;
 [AddComponentMenu("ex2D Helper/Layer")]
 public class exLayer : MonoBehaviour {
 
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public enum Type {
+        Normal = 0,
+        Abstract,
+        Dynamic
+    }
+
     ///////////////////////////////////////////////////////////////////////////////
     // properties
     ///////////////////////////////////////////////////////////////////////////////
 
+    // ------------------------------------------------------------------ 
     [SerializeField] protected exLayer parent_ = null;
+    /// the parent of the layer
+    // ------------------------------------------------------------------ 
+
     public exLayer parent {
         set {
             // already the parent
@@ -79,20 +93,29 @@ public class exLayer : MonoBehaviour {
         }
     }
 
+    // ------------------------------------------------------------------ 
     [SerializeField] protected List<exLayer> children_ = new List<exLayer>();
+    /// the children of the layer
+    // ------------------------------------------------------------------ 
+
     public List<exLayer> children {
         get {
             return children_;
         }
     }
 
-    //
-    // TODO: public bool dynamic = false; // if static, the layer will not update when running the game
-    // TODO: public float range = 100.0f;
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public Type type = Type.Normal;
+    public float range = 100.0f;
 
     // editor only data
     public bool foldout = true;
     [System.NonSerialized] public int indentLevel = -1;
+    [System.NonSerialized] public bool updated = false;
+    [System.NonSerialized] public int index = -1;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -109,6 +132,7 @@ public class exLayer : MonoBehaviour {
         if ( children_ == null )
             children_ = new List<exLayer>();
 
+        //
         if ( parent_ ) {
             if ( parent_.children_ == null ) {
                 parent_.children_ = new List<exLayer>();
@@ -118,11 +142,11 @@ public class exLayer : MonoBehaviour {
             }
         }
 
-        for ( int i = 0; i < children_.Count; ++i ) {
+        //
+        for ( int i = children_.Count-1; i >= 0; --i ) {
             exLayer childLayer = children_[i];
-            if ( childLayer.parent != this ) {
+            if ( childLayer == null || childLayer.parent != this ) {
                 children_.RemoveAt(i);
-                --i;
             }
         }
     }
@@ -136,7 +160,10 @@ public class exLayer : MonoBehaviour {
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _index insert layer before the index of the children 
+    /// \param _layer the layer to insert
+    /// 
+    /// Insert the _layer at the given _index of the children
     // ------------------------------------------------------------------ 
 
     public void InsertAt ( int _index, exLayer _layer ) {
