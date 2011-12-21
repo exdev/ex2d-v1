@@ -124,25 +124,31 @@ class exBitmapFontWizard : ScriptableWizard {
     // ------------------------------------------------------------------ 
 
     void CreateNewBitmapFont ( string _path, string _name, Object _fontInfo ) {
-        // create atlas info
-        EditorUtility.DisplayProgressBar( "Creating BitmapFont...",
-                                          "Creating BitmapFont Asset...",
-                                          0.1f );    
+        try {
+            // create atlas info
+            EditorUtility.DisplayProgressBar( "Creating BitmapFont...",
+                                              "Creating BitmapFont Asset...",
+                                              0.1f );    
 
-        // check if there have 
-        exBitmapFont bitmapFont = exBitmapFontUtility.Create( _path, _name );
+            // check if there have 
+            exBitmapFont bitmapFont = exBitmapFontUtility.Create( _path, _name );
 
-        // check if we have the texture and textasset with the same name of bitmapfont 
-        EditorUtility.DisplayProgressBar( "Creating BitmapFont...",
-                                          "Check building ...",
-                                          0.2f );    
+            // check if we have the texture and textasset with the same name of bitmapfont 
+            EditorUtility.DisplayProgressBar( "Creating BitmapFont...",
+                                              "Check building ...",
+                                              0.2f );    
 
-        // if we have enough information, try to build the exBitmapFont asset
-        bitmapFont.Build ( _fontInfo );
-        EditorUtility.ClearProgressBar();    
+            // if we have enough information, try to build the exBitmapFont asset
+            bitmapFont.Build ( _fontInfo );
+            EditorUtility.ClearProgressBar();    
 
-        //
-        Selection.activeObject = bitmapFont;
-        EditorGUIUtility.PingObject(bitmapFont);
+            //
+            Selection.activeObject = bitmapFont;
+            EditorGUIUtility.PingObject(bitmapFont);
+        } 
+        catch ( System.Exception ) {
+            EditorUtility.ClearProgressBar();    
+            throw;
+        }
     }
 }

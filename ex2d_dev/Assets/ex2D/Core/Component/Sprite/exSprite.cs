@@ -643,9 +643,11 @@ public class exSprite : exSpriteBase {
         if ( spanim == null ) {
             spanim = GetComponent<exSpriteAnimation>(); 
         }
-        if ( spanim ) {
-            spanim.Stop();
-        }
+        // DISABLE { 
+        // if ( spanim ) {
+        //     spanim.Stop();
+        // }
+        // } DISABLE end 
     }
 
     // ------------------------------------------------------------------ 

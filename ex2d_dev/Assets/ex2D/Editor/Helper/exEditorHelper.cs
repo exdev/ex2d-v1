@@ -751,13 +751,19 @@ public static class exEditorHelper {
 
     [MenuItem ("Edit/ex2D/Rebuild Prefabs")]
     static void ex2D_RebuildPrefabs () {
-        EditorUtility.DisplayProgressBar( "Rebuilding Prefabs...", "Rebuilding...", 0.5f );    
+        try {
+            EditorUtility.DisplayProgressBar( "Rebuilding Prefabs...", "Rebuilding...", 0.5f );    
             List<exSpriteBase> sprites = new List<exSpriteBase>();
             GetSpritesFromPrefabs ( "Assets", ref sprites );
             RebuildSprites(sprites.ToArray());
             sprites.Clear();
-        EditorUtility.UnloadUnusedAssets();
-        EditorUtility.ClearProgressBar();    
+            EditorUtility.UnloadUnusedAssets();
+            EditorUtility.ClearProgressBar();    
+        }
+        catch ( System.Exception ) {
+            EditorUtility.ClearProgressBar();    
+            throw;
+        }
     }
 
     // ------------------------------------------------------------------ 
@@ -795,54 +801,60 @@ public static class exEditorHelper {
     // ------------------------------------------------------------------ 
 
     public static void RebuildSprites ( exSpriteBase[] _sprites ) {
-        EditorUtility.DisplayProgressBar( "Rebuild Scene Sprites...", 
-                                          "Rebuild Scene Sprites...", 
-                                          0.5f );    
+        try {
+            EditorUtility.DisplayProgressBar( "Rebuild Scene Sprites...", 
+                                              "Rebuild Scene Sprites...", 
+                                              0.5f );    
 
-        for ( int i = 0; i < _sprites.Length; ++i ) {
-            exSpriteBase spBase = _sprites[i]; 
-            // DISABLE: it is too slow { 
-            // float progress = (float)i/(float)_sprites.Length;
-            // EditorUtility.DisplayProgressBar( "Rebuild Scene Sprites...", 
-            //                                   "Build Sprite " + spBase.gameObject.name, progress );    
-            // } DISABLE end 
+            for ( int i = 0; i < _sprites.Length; ++i ) {
+                exSpriteBase spBase = _sprites[i]; 
+                // DISABLE: it is too slow { 
+                // float progress = (float)i/(float)_sprites.Length;
+                // EditorUtility.DisplayProgressBar( "Rebuild Scene Sprites...", 
+                //                                   "Build Sprite " + spBase.gameObject.name, progress );    
+                // } DISABLE end 
 
-            // if sprite
-            if ( spBase is exSprite ) {
-                exSprite sp = spBase as exSprite;
-                exAtlasDB.ElementInfo elInfo = exAtlasDB.GetElementInfo(sp.textureGUID);
-                exSpriteEditor.UpdateAtlas( sp, elInfo );
+                // if sprite
+                if ( spBase is exSprite ) {
+                    exSprite sp = spBase as exSprite;
+                    exAtlasDB.ElementInfo elInfo = exAtlasDB.GetElementInfo(sp.textureGUID);
+                    exSpriteEditor.UpdateAtlas( sp, elInfo );
 
-                Texture2D texture = null;
-                if ( sp.useAtlas == false ) {
-                    texture = exEditorHelper.LoadAssetFromGUID<Texture2D>(sp.textureGUID );
-                }
-                sp.Build(texture);
-            }
-
-            // if sprite font
-            if ( spBase is exSpriteFont ) {
-                exSpriteFont spFont = spBase as exSpriteFont;
-                spFont.Build();
-            }
-
-            // if sprite border
-            if ( spBase is exSpriteBorder ) {
-                exSpriteBorder spBorder = spBase as exSpriteBorder; 
-
-                Texture2D texture = null;
-                if ( spBorder.guiBorder ) {
-                    exAtlasDB.ElementInfo elInfo = exAtlasDB.GetElementInfo(spBorder.guiBorder.textureGUID);
-                    exSpriteBorderEditor.UpdateAtlas( spBorder, elInfo );
-
-                    if ( spBorder.useAtlas == false ) {
-                        texture = exEditorHelper.LoadAssetFromGUID<Texture2D>(spBorder.guiBorder.textureGUID );
+                    Texture2D texture = null;
+                    if ( sp.useAtlas == false ) {
+                        texture = exEditorHelper.LoadAssetFromGUID<Texture2D>(sp.textureGUID );
                     }
+                    sp.Build(texture);
                 }
-                spBorder.Build(texture);
+
+                // if sprite font
+                if ( spBase is exSpriteFont ) {
+                    exSpriteFont spFont = spBase as exSpriteFont;
+                    spFont.Build();
+                }
+
+                // if sprite border
+                if ( spBase is exSpriteBorder ) {
+                    exSpriteBorder spBorder = spBase as exSpriteBorder; 
+
+                    Texture2D texture = null;
+                    if ( spBorder.guiBorder ) {
+                        exAtlasDB.ElementInfo elInfo = exAtlasDB.GetElementInfo(spBorder.guiBorder.textureGUID);
+                        exSpriteBorderEditor.UpdateAtlas( spBorder, elInfo );
+
+                        if ( spBorder.useAtlas == false ) {
+                            texture = exEditorHelper.LoadAssetFromGUID<Texture2D>(spBorder.guiBorder.textureGUID );
+                        }
+                    }
+                    spBorder.Build(texture);
+                }
             }
+            EditorUtility.ClearProgressBar();    
         }
-        EditorUtility.ClearProgressBar();    
+        catch ( System.Exception ) {
+            EditorUtility.ClearProgressBar();    
+            throw;
+        }
     }
 
     // TEMP { 

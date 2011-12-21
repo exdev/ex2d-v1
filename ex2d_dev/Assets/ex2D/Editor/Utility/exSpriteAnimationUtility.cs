@@ -90,32 +90,38 @@ public static class exSpriteAnimationUtility {
     // ------------------------------------------------------------------ 
 
     public static void Build ( this exSpriteAnimClip _animClip ) {
-        EditorUtility.DisplayProgressBar( "Building Sprite Animation Clip " + _animClip.name,
-                                          "Building Frames...",
-                                          0.1f );
+        try {
+            EditorUtility.DisplayProgressBar( "Building Sprite Animation Clip " + _animClip.name,
+                                              "Building Frames...",
+                                              0.1f );
 
-        bool hasError = false;
-        foreach ( exSpriteAnimClip.FrameInfo fi in _animClip.frameInfos ) {
-            exAtlasDB.ElementInfo elInfo = exAtlasDB.GetElementInfo (fi.textureGUID);
-            if ( elInfo != null ) {
-                fi.atlas = exEditorHelper.LoadAssetFromGUID<exAtlas>(elInfo.guidAtlas);
-                fi.index = elInfo.indexInAtlas;
+            bool hasError = false;
+            foreach ( exSpriteAnimClip.FrameInfo fi in _animClip.frameInfos ) {
+                exAtlasDB.ElementInfo elInfo = exAtlasDB.GetElementInfo (fi.textureGUID);
+                if ( elInfo != null ) {
+                    fi.atlas = exEditorHelper.LoadAssetFromGUID<exAtlas>(elInfo.guidAtlas);
+                    fi.index = elInfo.indexInAtlas;
+                }
+                else {
+                    string texturePath = AssetDatabase.GUIDToAssetPath(fi.textureGUID);
+                    Texture2D tex2D = (Texture2D)AssetDatabase.LoadAssetAtPath( texturePath, typeof(Texture2D));
+                    Debug.LogError ( "Failed to build sprite animation clip: " + _animClip.name + ", can't find texture " 
+                                     + ((tex2D != null) ? tex2D.name : "null") 
+                                     + " in exAtlasInfo." );
+                    fi.atlas = null;
+                    fi.index = -1;
+                    hasError = true;
+                }
             }
-            else {
-                string texturePath = AssetDatabase.GUIDToAssetPath(fi.textureGUID);
-                Texture2D tex2D = (Texture2D)AssetDatabase.LoadAssetAtPath( texturePath, typeof(Texture2D));
-                Debug.LogError ( "Failed to build sprite animation clip: " + _animClip.name + ", can't find texture " 
-                                 + ((tex2D != null) ? tex2D.name : "null") 
-                                 + " in exAtlasInfo." );
-                fi.atlas = null;
-                fi.index = -1;
-                hasError = true;
-            }
+            EditorUtility.ClearProgressBar();
+
+            _animClip.editorNeedRebuild = hasError;
+            EditorUtility.SetDirty(_animClip);
         }
-        EditorUtility.ClearProgressBar();
-
-        _animClip.editorNeedRebuild = hasError;
-        EditorUtility.SetDirty(_animClip);
+        catch ( System.Exception ) {
+            EditorUtility.ClearProgressBar();
+            throw;
+        }
     }
 
     // ------------------------------------------------------------------ 

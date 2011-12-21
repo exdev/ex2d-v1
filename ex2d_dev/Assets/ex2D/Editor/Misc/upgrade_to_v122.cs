@@ -25,39 +25,45 @@ public static class upgrade_to_v122 {
 
     [MenuItem("Edit/ex2D Upgrade/Use Layer Manager (v 1.2.2)")]
     static void Exec () {
-        EditorUtility.DisplayProgressBar( "Update Scene Sprite Layers...", 
-                                          "Update Scene Sprite Layers...", 
-                                          0.5f );    
+        try {
+            EditorUtility.DisplayProgressBar( "Update Scene Sprite Layers...", 
+                                              "Update Scene Sprite Layers...", 
+                                              0.5f );    
 
-        // add layer
-        Transform[] transforms = GameObject.FindObjectsOfType(typeof(Transform)) as Transform[];
-        for ( int i = 0; i < transforms.Length; ++i ) {
-            Transform trans = transforms[i]; 
-            if ( trans.root != trans )
-                continue;
-
-            RecursivelyAddLayer (trans);
-        }
-
-        // add layer manager
-        if ( Camera.main ) {
-            exLayerMng layerMng = Camera.main.gameObject.AddComponent<exLayerMng>();
-
-            // add layers to layer manager
+            // add layer
+            Transform[] transforms = GameObject.FindObjectsOfType(typeof(Transform)) as Transform[];
             for ( int i = 0; i < transforms.Length; ++i ) {
                 Transform trans = transforms[i]; 
                 if ( trans.root != trans )
                     continue;
 
-                exLayer layer = trans.GetComponent<exLayer>();
-                if ( layer && layer != layerMng )
-                    layer.parent = layerMng;
+                RecursivelyAddLayer (trans);
             }
-            layerMng.UpdateLayer();
-            EditorUtility.SetDirty(layerMng);
+
+            // add layer manager
+            if ( Camera.main ) {
+                exLayerMng layerMng = Camera.main.gameObject.AddComponent<exLayerMng>();
+
+                // add layers to layer manager
+                for ( int i = 0; i < transforms.Length; ++i ) {
+                    Transform trans = transforms[i]; 
+                    if ( trans.root != trans )
+                        continue;
+
+                    exLayer layer = trans.GetComponent<exLayer>();
+                    if ( layer && layer != layerMng )
+                        layer.parent = layerMng;
+                }
+                layerMng.AddDirtyLayer(layerMng);
+                EditorUtility.SetDirty(layerMng);
+            }
+
+            EditorUtility.ClearProgressBar();
         }
-        
-        EditorUtility.ClearProgressBar();
+        catch ( System.Exception ) {
+            EditorUtility.ClearProgressBar();
+            throw;
+        }
     }
 
     // ------------------------------------------------------------------ 

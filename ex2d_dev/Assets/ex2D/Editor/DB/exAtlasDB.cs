@@ -119,10 +119,16 @@ public class exAtlasDB : ScriptableObject {
         db.elementInfos.Clear();
         db.texGUIDToElementInfo.Clear();
 
-        EditorUtility.DisplayProgressBar( "Syncing exAtlasDB...", "Syncing...", 0.5f );    
-        SyncDirectory ("Assets");
-        EditorUtility.UnloadUnusedAssetsIgnoreManagedReferences();
-        EditorUtility.ClearProgressBar();    
+        try {
+            EditorUtility.DisplayProgressBar( "Syncing exAtlasDB...", "Syncing...", 0.5f );    
+            SyncDirectory ("Assets");
+            EditorUtility.UnloadUnusedAssetsIgnoreManagedReferences();
+            EditorUtility.ClearProgressBar();    
+        }
+        catch ( System.Exception ) {
+            EditorUtility.ClearProgressBar();    
+            throw;
+        }
 
         EditorUtility.SetDirty(db);
     }

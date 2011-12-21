@@ -388,11 +388,17 @@ partial class exAtlasEditor : EditorWindow {
                 // } TODO end 
 
                 if ( GUILayout.Button ( "Apply" ) ) {
-                    EditorUtility.DisplayProgressBar( "Layout Elements...", "Layout Elements...", 0.5f  );    
-                    // register undo
-                    Undo.RegisterUndo ( curEdit, "Apply.LayoutElements" );
-                    curEdit.LayoutElements ();
-                    EditorUtility.ClearProgressBar();
+                    try {
+                        EditorUtility.DisplayProgressBar( "Layout Elements...", "Layout Elements...", 0.5f  );    
+                        // register undo
+                        Undo.RegisterUndo ( curEdit, "Apply.LayoutElements" );
+                        curEdit.LayoutElements ();
+                        EditorUtility.ClearProgressBar();
+                    }
+                    catch ( System.Exception ) {
+                        EditorUtility.ClearProgressBar();
+                        throw;
+                    }
                 }
                 // GUI.enabled = true;
 
@@ -724,10 +730,16 @@ partial class exAtlasEditor : EditorWindow {
     // ------------------------------------------------------------------ 
 
     void ImportObjects () {
-        EditorUtility.DisplayProgressBar( "Adding Textures...", "Start adding ", 0.2f );
-        curEdit.ImportObjects ( importObjects.ToArray() );
-        importObjects.Clear();
-        EditorUtility.ClearProgressBar();    
+        try {
+            EditorUtility.DisplayProgressBar( "Adding Textures...", "Start adding ", 0.2f );
+            curEdit.ImportObjects ( importObjects.ToArray() );
+            importObjects.Clear();
+            EditorUtility.ClearProgressBar();    
+        }
+        catch ( System.Exception ) {
+            EditorUtility.ClearProgressBar();    
+            throw;
+        }
     } 
 
     // ------------------------------------------------------------------ 

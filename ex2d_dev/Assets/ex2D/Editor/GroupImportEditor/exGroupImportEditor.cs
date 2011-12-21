@@ -115,72 +115,84 @@ class exGroupImportEditor : EditorWindow {
             string path = AssetDatabase.GetAssetPath(Selection.activeObject);
             TextureImporter firstImporter = TextureImporter.GetAtPath(path) as TextureImporter;
 
-            int i = 0;
-            foreach ( Object o in Selection.objects ) {
-                if ( (o is Texture2D) == false )
-                    continue;
+            try {
+                int i = 0;
+                foreach ( Object o in Selection.objects ) {
+                    if ( (o is Texture2D) == false )
+                        continue;
 
-                path = AssetDatabase.GetAssetPath(o);
-                TextureImporter importer = TextureImporter.GetAtPath(path) as TextureImporter;
+                    path = AssetDatabase.GetAssetPath(o);
+                    TextureImporter importer = TextureImporter.GetAtPath(path) as TextureImporter;
 
-                importer.textureFormat           = firstImporter.textureFormat;                             
-                importer.maxTextureSize          = firstImporter.maxTextureSize;         
-                importer.grayscaleToAlpha        = firstImporter.grayscaleToAlpha;       
-                importer.generateCubemap         = firstImporter.generateCubemap;
-                importer.npotScale               = firstImporter.npotScale;
-                importer.isReadable              = firstImporter.isReadable;
-                importer.mipmapEnabled           = firstImporter.mipmapEnabled;
-                importer.borderMipmap            = firstImporter.borderMipmap;
-                importer.correctGamma            = firstImporter.correctGamma;
-                importer.mipmapFilter            = firstImporter.mipmapFilter;
-                importer.fadeout                 = firstImporter.fadeout;
-                importer.mipmapFadeDistanceStart = firstImporter.mipmapFadeDistanceStart;
-                importer.mipmapFadeDistanceEnd   = firstImporter.mipmapFadeDistanceEnd;
-                importer.convertToNormalmap      = firstImporter.convertToNormalmap;
-                importer.normalmap               = firstImporter.normalmap;
-                importer.normalmapFilter         = firstImporter.normalmapFilter;
-                importer.heightmapScale          = firstImporter.heightmapScale;
-                importer.lightmap                = firstImporter.lightmap;
-                importer.anisoLevel              = firstImporter.anisoLevel;
-                importer.filterMode              = firstImporter.filterMode;
-                importer.wrapMode                = firstImporter.wrapMode;
-                importer.mipMapBias              = firstImporter.mipMapBias;
-                importer.textureType             = firstImporter.textureType;
+                    importer.textureFormat           = firstImporter.textureFormat;                             
+                    importer.maxTextureSize          = firstImporter.maxTextureSize;         
+                    importer.grayscaleToAlpha        = firstImporter.grayscaleToAlpha;       
+                    importer.generateCubemap         = firstImporter.generateCubemap;
+                    importer.npotScale               = firstImporter.npotScale;
+                    importer.isReadable              = firstImporter.isReadable;
+                    importer.mipmapEnabled           = firstImporter.mipmapEnabled;
+                    importer.borderMipmap            = firstImporter.borderMipmap;
+                    importer.correctGamma            = firstImporter.correctGamma;
+                    importer.mipmapFilter            = firstImporter.mipmapFilter;
+                    importer.fadeout                 = firstImporter.fadeout;
+                    importer.mipmapFadeDistanceStart = firstImporter.mipmapFadeDistanceStart;
+                    importer.mipmapFadeDistanceEnd   = firstImporter.mipmapFadeDistanceEnd;
+                    importer.convertToNormalmap      = firstImporter.convertToNormalmap;
+                    importer.normalmap               = firstImporter.normalmap;
+                    importer.normalmapFilter         = firstImporter.normalmapFilter;
+                    importer.heightmapScale          = firstImporter.heightmapScale;
+                    importer.lightmap                = firstImporter.lightmap;
+                    importer.anisoLevel              = firstImporter.anisoLevel;
+                    importer.filterMode              = firstImporter.filterMode;
+                    importer.wrapMode                = firstImporter.wrapMode;
+                    importer.mipMapBias              = firstImporter.mipMapBias;
+                    importer.textureType             = firstImporter.textureType;
 
-                EditorUtility.DisplayProgressBar( "Process Textures...",
-                                                  "Process Texture " + o.name,
-                                                  (float)i/(float)Selection.objects.Length );    
-                AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate|ImportAssetOptions.ForceSynchronousImport);
-                ++i;
+                    EditorUtility.DisplayProgressBar( "Process Textures...",
+                                                      "Process Texture " + o.name,
+                                                      (float)i/(float)Selection.objects.Length );    
+                    AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate|ImportAssetOptions.ForceSynchronousImport);
+                    ++i;
+                }
+                EditorUtility.ClearProgressBar();
             }
-            EditorUtility.ClearProgressBar();
+            catch ( System.Exception ) {
+                EditorUtility.ClearProgressBar();
+                throw;
+            }
         }
         else if ( Selection.activeObject is AudioClip ) {
             string path = AssetDatabase.GetAssetPath(Selection.activeObject);
             AudioImporter firstImporter = AudioImporter.GetAtPath(path) as AudioImporter;
 
-            int i = 0;
-            foreach ( Object o in Selection.objects ) {
-                if ( (o is AudioClip) == false  )
-                    continue;
+            try {
+                int i = 0;
+                foreach ( Object o in Selection.objects ) {
+                    if ( (o is AudioClip) == false  )
+                        continue;
 
-                path = AssetDatabase.GetAssetPath(o);
-                AudioImporter importer = AudioImporter.GetAtPath(path) as AudioImporter;
+                    path = AssetDatabase.GetAssetPath(o);
+                    AudioImporter importer = AudioImporter.GetAtPath(path) as AudioImporter;
 
-                importer.format             = firstImporter.format;                             
-                importer.compressionBitrate = firstImporter.compressionBitrate;         
-                importer.threeD             = firstImporter.threeD;       
-                importer.forceToMono        = firstImporter.forceToMono;
-                importer.hardware           = firstImporter.hardware;
-                importer.loopable           = firstImporter.loopable;
+                    importer.format             = firstImporter.format;                             
+                    importer.compressionBitrate = firstImporter.compressionBitrate;         
+                    importer.threeD             = firstImporter.threeD;       
+                    importer.forceToMono        = firstImporter.forceToMono;
+                    importer.hardware           = firstImporter.hardware;
+                    importer.loopable           = firstImporter.loopable;
 
-                EditorUtility.DisplayProgressBar( "Process AudioClips...",
-                                                  "Process AudioClip " + o.name,
-                                                  (float)i/(float)Selection.objects.Length );    
-                AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate|ImportAssetOptions.ForceSynchronousImport);
-                ++i;
+                    EditorUtility.DisplayProgressBar( "Process AudioClips...",
+                                                      "Process AudioClip " + o.name,
+                                                      (float)i/(float)Selection.objects.Length );    
+                    AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate|ImportAssetOptions.ForceSynchronousImport);
+                    ++i;
+                }
+                EditorUtility.ClearProgressBar();
             }
-            EditorUtility.ClearProgressBar();
+            catch ( System.Exception ) {
+                EditorUtility.ClearProgressBar();
+                throw;
+            }
         }
     }
 }

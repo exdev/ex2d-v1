@@ -74,87 +74,93 @@ public static partial class exAtlasInfoUtility {
     // ------------------------------------------------------------------ 
 
     public static exAtlasInfo CreateAtlasInfo ( string _path, string _name, int _width, int _height ) {
-        // create atlas info
-        EditorUtility.DisplayProgressBar( "Creating Atlas...",
-                                          "Creating Atlas Asset...",
-                                          0.1f );    
-        exAtlasInfo newAtlasInfo = exAtlasInfo.Create( _path, _name + " - EditorInfo" );
-        newAtlasInfo.width = _width; 
-        newAtlasInfo.height = _height; 
+        try {
+            // create atlas info
+            EditorUtility.DisplayProgressBar( "Creating Atlas...",
+                                              "Creating Atlas Asset...",
+                                              0.1f );    
+            exAtlasInfo newAtlasInfo = exAtlasInfo.Create( _path, _name + " - EditorInfo" );
+            newAtlasInfo.width = _width; 
+            newAtlasInfo.height = _height; 
 
-        // create texture
-        EditorUtility.DisplayProgressBar( "Creating Atlas...",
-                                          "Creating Atlas Texture...",
-                                          0.2f );    
-        Texture2D tex = new Texture2D( newAtlasInfo.width, 
-                                       newAtlasInfo.height, 
-                                       TextureFormat.ARGB32, 
-                                       false );
-        Color32 buildColor = new Color ( newAtlasInfo.buildColor.r,
-                                       newAtlasInfo.buildColor.g,
-                                       newAtlasInfo.buildColor.b,
-                                       0.0f );
-        Color32[] colors = new Color32[newAtlasInfo.width*newAtlasInfo.height];
-        for ( int i = 0; i < newAtlasInfo.width * newAtlasInfo.height; ++i )
-            colors[i] = buildColor;
-        tex.SetPixels32( colors );
-        tex.Apply(false);
+            // create texture
+            EditorUtility.DisplayProgressBar( "Creating Atlas...",
+                                              "Creating Atlas Texture...",
+                                              0.2f );    
+            Texture2D tex = new Texture2D( newAtlasInfo.width, 
+                                           newAtlasInfo.height, 
+                                           TextureFormat.ARGB32, 
+                                           false );
+            Color32 buildColor = new Color ( newAtlasInfo.buildColor.r,
+                                             newAtlasInfo.buildColor.g,
+                                             newAtlasInfo.buildColor.b,
+                                             0.0f );
+            Color32[] colors = new Color32[newAtlasInfo.width*newAtlasInfo.height];
+            for ( int i = 0; i < newAtlasInfo.width * newAtlasInfo.height; ++i )
+                colors[i] = buildColor;
+            tex.SetPixels32( colors );
+            tex.Apply(false);
 
-        // save texture to png
-        EditorUtility.DisplayProgressBar( "Creating Atlas...",
-                                          "Saving Atlas Texture as PNG file...",
-                                          0.3f );    
-        string atlasTexturePath = Path.Combine( _path, _name + ".png" );
-        byte[] pngData = tex.EncodeToPNG();
-        if (pngData != null)
-            File.WriteAllBytes(atlasTexturePath, pngData);
-        Object.DestroyImmediate(tex);
-        AssetDatabase.ImportAsset( atlasTexturePath );
+            // save texture to png
+            EditorUtility.DisplayProgressBar( "Creating Atlas...",
+                                              "Saving Atlas Texture as PNG file...",
+                                              0.3f );    
+            string atlasTexturePath = Path.Combine( _path, _name + ".png" );
+            byte[] pngData = tex.EncodeToPNG();
+            if (pngData != null)
+                File.WriteAllBytes(atlasTexturePath, pngData);
+            Object.DestroyImmediate(tex);
+            AssetDatabase.ImportAsset( atlasTexturePath );
 
-        // import texture
-        EditorUtility.DisplayProgressBar( "Creating Atlas...",
-                                          "Import Texture " + atlasTexturePath + "...",
-                                          0.5f );    
-        TextureImporter importSettings = TextureImporter.GetAtPath(atlasTexturePath) as TextureImporter;
-        importSettings.maxTextureSize = Mathf.Max( newAtlasInfo.width, newAtlasInfo.height );
-        importSettings.textureFormat = TextureImporterFormat.AutomaticTruecolor;
-        importSettings.isReadable = false;
-        importSettings.mipmapEnabled = false;
-        importSettings.textureType = TextureImporterType.Advanced;
-        importSettings.npotScale = TextureImporterNPOTScale.None;
-        AssetDatabase.ImportAsset( atlasTexturePath );
+            // import texture
+            EditorUtility.DisplayProgressBar( "Creating Atlas...",
+                                              "Import Texture " + atlasTexturePath + "...",
+                                              0.5f );    
+            TextureImporter importSettings = TextureImporter.GetAtPath(atlasTexturePath) as TextureImporter;
+            importSettings.maxTextureSize = Mathf.Max( newAtlasInfo.width, newAtlasInfo.height );
+            importSettings.textureFormat = TextureImporterFormat.AutomaticTruecolor;
+            importSettings.isReadable = false;
+            importSettings.mipmapEnabled = false;
+            importSettings.textureType = TextureImporterType.Advanced;
+            importSettings.npotScale = TextureImporterNPOTScale.None;
+            AssetDatabase.ImportAsset( atlasTexturePath );
 
-        // create default material
-        EditorUtility.DisplayProgressBar( "Creating Atlas...",
-                                          "Create New Material...",
-                                          0.7f );    
-        Material newMaterial = new Material( Shader.Find("ex2D/Alpha Blended") );
-        AssetDatabase.CreateAsset( newMaterial, Path.Combine( _path, _name + ".mat" ) );
+            // create default material
+            EditorUtility.DisplayProgressBar( "Creating Atlas...",
+                                              "Create New Material...",
+                                              0.7f );    
+            Material newMaterial = new Material( Shader.Find("ex2D/Alpha Blended") );
+            AssetDatabase.CreateAsset( newMaterial, Path.Combine( _path, _name + ".mat" ) );
 
-        // setup atlas info
-        EditorUtility.DisplayProgressBar( "Creating Atlas...",
-                                          "Setup New Atlas Asset...",
-                                          0.9f );    
-        newAtlasInfo.atlasName = _name;
-        newAtlasInfo.texture = (Texture2D)AssetDatabase.LoadAssetAtPath( atlasTexturePath, typeof(Texture2D) );
-        newAtlasInfo.material = newMaterial;
-        newAtlasInfo.material.mainTexture = newAtlasInfo.texture;
+            // setup atlas info
+            EditorUtility.DisplayProgressBar( "Creating Atlas...",
+                                              "Setup New Atlas Asset...",
+                                              0.9f );    
+            newAtlasInfo.atlasName = _name;
+            newAtlasInfo.texture = (Texture2D)AssetDatabase.LoadAssetAtPath( atlasTexturePath, typeof(Texture2D) );
+            newAtlasInfo.material = newMaterial;
+            newAtlasInfo.material.mainTexture = newAtlasInfo.texture;
 
-        // create new atlas and setup it for both atlas info and atlas asset
-        exAtlas newAtlas = CreateAtlas( _path, _name );
-        newAtlas.texture = newAtlasInfo.texture;
-        newAtlas.material = newAtlasInfo.material;
-        newAtlasInfo.atlas = newAtlas;
+            // create new atlas and setup it for both atlas info and atlas asset
+            exAtlas newAtlas = CreateAtlas( _path, _name );
+            newAtlas.texture = newAtlasInfo.texture;
+            newAtlas.material = newAtlasInfo.material;
+            newAtlasInfo.atlas = newAtlas;
 
-        //
-        EditorUtility.SetDirty(newAtlasInfo);
-        EditorUtility.UnloadUnusedAssets();
-        EditorUtility.ClearProgressBar();
+            //
+            EditorUtility.SetDirty(newAtlasInfo);
+            EditorUtility.UnloadUnusedAssets();
+            EditorUtility.ClearProgressBar();
 
-        //
-        Selection.activeObject = newAtlasInfo;
-        EditorGUIUtility.PingObject(newAtlasInfo);
-        return newAtlasInfo;
+            //
+            Selection.activeObject = newAtlasInfo;
+            EditorGUIUtility.PingObject(newAtlasInfo);
+            return newAtlasInfo;
+        }
+        catch ( System.Exception ) {
+            EditorUtility.ClearProgressBar();
+            throw;
+        }
     }
 
     // ------------------------------------------------------------------ 
@@ -204,56 +210,62 @@ public static partial class exAtlasInfoUtility {
             colors[i] = buildColor;
         tex.SetPixels32( colors );
 
-        EditorUtility.DisplayProgressBar( "Building Atlas " + _atlasInfo.name, "Building Atlas...", 0.1f );    
+        try {
+            EditorUtility.DisplayProgressBar( "Building Atlas " + _atlasInfo.name, "Building Atlas...", 0.1f );    
 
-        // build atlas texture
-        _atlasInfo.elements.Sort( exAtlasInfo.CompareByName );
-        FillAtlasTexture ( tex, _atlasInfo, _noImport );
-        EditorUtility.DisplayProgressBar( "Building Atlas " + _atlasInfo.name,
-                                          "Import Atlas",
-                                          0.9f );    
+            // build atlas texture
+            _atlasInfo.elements.Sort( exAtlasInfo.CompareByName );
+            FillAtlasTexture ( tex, _atlasInfo, _noImport );
+            EditorUtility.DisplayProgressBar( "Building Atlas " + _atlasInfo.name,
+                                              "Import Atlas",
+                                              0.9f );    
 
-        // write to disk
-        byte[] pngData = tex.EncodeToPNG();
-        if (pngData != null)
-            File.WriteAllBytes(path, pngData);
-        Object.DestroyImmediate(tex);
-        AssetDatabase.ImportAsset( path );
+            // write to disk
+            byte[] pngData = tex.EncodeToPNG();
+            if (pngData != null)
+                File.WriteAllBytes(path, pngData);
+            Object.DestroyImmediate(tex);
+            AssetDatabase.ImportAsset( path );
 
-        // now we finish atlas texture filling, we should turn off Read/Write settings, that will save memory a lot!
-        TextureImporter importSettings = TextureImporter.GetAtPath(path) as TextureImporter;
-        importSettings.isReadable = false;
-        AssetDatabase.ImportAsset( path );
+            // now we finish atlas texture filling, we should turn off Read/Write settings, that will save memory a lot!
+            TextureImporter importSettings = TextureImporter.GetAtPath(path) as TextureImporter;
+            importSettings.isReadable = false;
+            AssetDatabase.ImportAsset( path );
 
-        //
-        atlas.elements = new exAtlas.Element[_atlasInfo.elements.Count];
-        for ( int i = 0; i < _atlasInfo.elements.Count; ++i ) {
-            exAtlasInfo.Element el = _atlasInfo.elements[i];
-            exAtlas.Element el2 = new exAtlas.Element ();
+            //
+            atlas.elements = new exAtlas.Element[_atlasInfo.elements.Count];
+            for ( int i = 0; i < _atlasInfo.elements.Count; ++i ) {
+                exAtlasInfo.Element el = _atlasInfo.elements[i];
+                exAtlas.Element el2 = new exAtlas.Element ();
 
-            int coord_x = el.coord[0];
-            int coord_y = el.atlasInfo.height - el.coord[1] - (int)el.Height();
-            float xStart  = (float)coord_x / (float)el.atlasInfo.width;
-            float yStart  = (float)coord_y / (float)el.atlasInfo.height;
-            float xEnd    = (float)(coord_x + el.Width()) / (float)el.atlasInfo.width;
-            float yEnd    = (float)(coord_y + el.Height()) / (float)el.atlasInfo.height;
-            el2.name = el.texture.name; 
-            el2.coords = new Rect ( xStart, yStart, xEnd - xStart, yEnd - yStart );
-            el2.rotated = el.rotated;
-            el2.originalWidth = el.texture.width; 
-            el2.originalHeight = el.texture.height; 
-            el2.trimRect = el.trimRect;
-            atlas.elements[i] = el2;
+                int coord_x = el.coord[0];
+                int coord_y = el.atlasInfo.height - el.coord[1] - (int)el.Height();
+                float xStart  = (float)coord_x / (float)el.atlasInfo.width;
+                float yStart  = (float)coord_y / (float)el.atlasInfo.height;
+                float xEnd    = (float)(coord_x + el.Width()) / (float)el.atlasInfo.width;
+                float yEnd    = (float)(coord_y + el.Height()) / (float)el.atlasInfo.height;
+                el2.name = el.texture.name; 
+                el2.coords = new Rect ( xStart, yStart, xEnd - xStart, yEnd - yStart );
+                el2.rotated = el.rotated;
+                el2.originalWidth = el.texture.width; 
+                el2.originalHeight = el.texture.height; 
+                el2.trimRect = el.trimRect;
+                atlas.elements[i] = el2;
 
-            // update the index in exAtlasDB
-            if ( el.isFontElement == false ) {
-                exAtlasDB.UpdateElementInfo( el, i );
+                // update the index in exAtlasDB
+                if ( el.isFontElement == false ) {
+                    exAtlasDB.UpdateElementInfo( el, i );
+                }
             }
+            atlas.texture = texture; 
+            atlas.material = material; 
+            EditorUtility.SetDirty(atlas);
+            EditorUtility.ClearProgressBar();
         }
-        atlas.texture = texture; 
-        atlas.material = material; 
-        EditorUtility.SetDirty(atlas);
-        EditorUtility.ClearProgressBar();
+        catch ( System.Exception ) {
+            EditorUtility.ClearProgressBar();
+            throw;
+        }
 
         // save the needRebuild setting
         _atlasInfo.needRebuild = false;
@@ -266,21 +278,26 @@ public static partial class exAtlasInfoUtility {
     // ------------------------------------------------------------------ 
 
     public static void BuildSpAnimClipsFromRebuildList ( exAtlasInfo _atlasInfo ) {
-
-        EditorUtility.DisplayProgressBar( "Building Sprite Animation Clips...",
-                                          "Building Sprite Animation Clips...",
-                                          0.5f );    
-        for ( int i = 0; i < _atlasInfo.rebuildAnimClipGUIDs.Count; ++i ) {
-            string guidAnimClip = _atlasInfo.rebuildAnimClipGUIDs[i];
-            exSpriteAnimClip sp = 
-                exEditorHelper.LoadAssetFromGUID<exSpriteAnimClip>(guidAnimClip);
-            if ( sp ) {
-                sp.editorNeedRebuild = true;
-                sp.Build();
+        try {
+            EditorUtility.DisplayProgressBar( "Building Sprite Animation Clips...",
+                                              "Building Sprite Animation Clips...",
+                                              0.5f );    
+            for ( int i = 0; i < _atlasInfo.rebuildAnimClipGUIDs.Count; ++i ) {
+                string guidAnimClip = _atlasInfo.rebuildAnimClipGUIDs[i];
+                exSpriteAnimClip sp = 
+                    exEditorHelper.LoadAssetFromGUID<exSpriteAnimClip>(guidAnimClip);
+                if ( sp ) {
+                    sp.editorNeedRebuild = true;
+                    sp.Build();
+                }
             }
+            _atlasInfo.rebuildAnimClipGUIDs.Clear();
+            EditorUtility.ClearProgressBar();
         }
-        _atlasInfo.rebuildAnimClipGUIDs.Clear();
-        EditorUtility.ClearProgressBar();
+        catch ( System.Exception ) {
+            EditorUtility.ClearProgressBar();
+            throw;
+        }
     }
 
     // ------------------------------------------------------------------ 

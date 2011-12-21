@@ -119,10 +119,16 @@ public class exSpriteAnimationDB : ScriptableObject {
         db.guidInfos.Clear();
         db.texGuidToAnimClipGUIDs.Clear();
 
-        EditorUtility.DisplayProgressBar( "Syncing exSpriteAnimationDB...", "Syncing...", 0.5f );    
-        SyncDirectory ("Assets");
-        EditorUtility.UnloadUnusedAssetsIgnoreManagedReferences();
-        EditorUtility.ClearProgressBar();    
+        try {
+            EditorUtility.DisplayProgressBar( "Syncing exSpriteAnimationDB...", "Syncing...", 0.5f );    
+            SyncDirectory ("Assets");
+            EditorUtility.UnloadUnusedAssetsIgnoreManagedReferences();
+            EditorUtility.ClearProgressBar();    
+        }
+        catch ( System.Exception ) {
+            EditorUtility.ClearProgressBar();    
+            throw;
+        }
 
         EditorUtility.SetDirty(db);
     }

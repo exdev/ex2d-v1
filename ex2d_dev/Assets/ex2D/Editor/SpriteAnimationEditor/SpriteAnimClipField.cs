@@ -380,32 +380,38 @@ partial class exSpriteAnimClipEditor {
                 Object oldSelActiveObject = Selection.activeObject;
 
                 //
-                EditorUtility.DisplayProgressBar( "Adding Textures...",
-                                                  "Start adding ",
-                                                  0.5f );    
-                // sort
-                List<Object> objList = new List<Object>(DragAndDrop.objectReferences.Length);
-                foreach ( Object o in DragAndDrop.objectReferences ) {
-                    if ( exEditorHelper.IsDirectory(o) ) {
-                        Selection.activeObject = o;
-                        Object[] objs = Selection.GetFiltered( typeof(Texture2D), SelectionMode.DeepAssets);
-                        objList.AddRange(objs);
+                try {
+                    EditorUtility.DisplayProgressBar( "Adding Textures...",
+                                                      "Start adding ",
+                                                      0.5f );    
+                    // sort
+                    List<Object> objList = new List<Object>(DragAndDrop.objectReferences.Length);
+                    foreach ( Object o in DragAndDrop.objectReferences ) {
+                        if ( exEditorHelper.IsDirectory(o) ) {
+                            Selection.activeObject = o;
+                            Object[] objs = Selection.GetFiltered( typeof(Texture2D), SelectionMode.DeepAssets);
+                            objList.AddRange(objs);
+                        }
+                        else if ( o is Texture2D ) {
+                            objList.Add(o);
+                        }
                     }
-                    else if ( o is Texture2D ) {
-                        objList.Add(o);
-                    }
+                    objList.Sort(exEditorHelper.CompareObjectByName);
+
+                    // DELME { 
+                    // // sort
+                    // Object[] objList = Selection.GetFiltered( typeof(Texture2D), SelectionMode.DeepAssets);
+                    // System.Array.Sort( objList, exEditorHelper.CompareObjectByName );
+                    // } DELME end 
+
+                    // add objects as frames
+                    _animClip.AddFrames( objList.ToArray() );
+                    EditorUtility.ClearProgressBar();    
                 }
-                objList.Sort(exEditorHelper.CompareObjectByName);
-
-                // DELME { 
-                // // sort
-                // Object[] objList = Selection.GetFiltered( typeof(Texture2D), SelectionMode.DeepAssets);
-                // System.Array.Sort( objList, exEditorHelper.CompareObjectByName );
-                // } DELME end 
-
-                // add objects as frames
-                _animClip.AddFrames( objList.ToArray() );
-                EditorUtility.ClearProgressBar();    
+                catch ( System.Exception ) {
+                    EditorUtility.ClearProgressBar();    
+                    throw;
+                }
 
                 //
                 CalculatePreviewScale();
