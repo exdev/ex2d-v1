@@ -75,32 +75,38 @@ public class exLayerMng : exLayer {
             float unitLayer = totalDepth/totalLayerCount;
 
             // normal layer depth calcualte
-            int specialIndentLevel = 99999;
+            const int MAX_INDENT = 99999;
+            int specialIndentLevel = MAX_INDENT;
             float curDepth = startFrom + unitLayer; // skip layerMng
             for ( int i = 0; i < layerList.Count; ++i ) {
                 exLayer layer = layerList[i];
                 layer.depth = curDepth;
 
-                if ( specialIndentLevel >= layer.indentLevel )
-                    specialIndentLevel = 99999;
+                if ( layer.type != exLayer.Type.Normal ) {
+                    specialLayerList.Add (layer);
 
-                if ( specialIndentLevel < layer.indentLevel && layer.type == exLayer.Type.Normal ) {
-                    curDepth += unitLayer; 
-                }
-                else {
                     specialIndentLevel = layer.indentLevel;
                     if ( layer.type == exLayer.Type.Dynamic )
                         curDepth += layer.range; 
-                    specialLayerList.Add (layer);
+                    else if ( layer.type == exLayer.Type.Abstract )
+                        curDepth += unitLayer;
+                }
+                else {
+                    if ( layer.indentLevel <= specialIndentLevel ) {
+                        specialIndentLevel = MAX_INDENT;
+                        curDepth += unitLayer; 
+                    }
                 }
             }
 
             // special layer depth calculate 
             for ( int i = 0; i < specialLayerList.Count; ++i ) {
-                if ( specialLayerList[i].type == exLayer.Type.Dynamic )
-                    CalculateDepthForDynamicLayer ( specialLayerList[i], false );
-                else if ( specialLayerList[i].type == exLayer.Type.Abstract )
-                    CalculateDepthForAbstractLayer ( specialLayerList[i], false );
+                exLayer layer = specialLayerList[i];
+
+                if ( layer.type == exLayer.Type.Dynamic )
+                    CalculateDepthForDynamicLayer ( layer, false );
+                else if ( layer.type == exLayer.Type.Abstract )
+                    CalculateDepthForAbstractLayer ( layer, false );
             }
 
             // assignment
@@ -133,7 +139,7 @@ public class exLayerMng : exLayer {
     void RecursivelyUpdateLayer ( Transform _trans ) {
         //
         exLayer layer = _trans.GetComponent<exLayer>(); 
-        if ( layer != null && layer.isDirty == true ) {
+        if ( layer != null && layer.isDirty ) {
             layer.isDirty = false;
             _trans.position = new Vector3 ( _trans.position.x, _trans.position.y, layer.depth );
         }
@@ -190,12 +196,13 @@ public class exLayerMng : exLayer {
     void CalculateDepthForDynamicLayer ( exLayer _curLayer, bool _doAssign ) {
         List<exLayer> layerList = new List<exLayer>();
         int totalLayerCount = AddLayerRecursively ( _curLayer, true, ref layerList );
-        float unitLayer = _curLayer.range/totalLayerCount;
+        float unitLayer = _curLayer.range/(totalLayerCount-1);
         float curDepth = _curLayer.depth;
 
         for ( int i = 0; i < layerList.Count; ++i ) {
             exLayer layer = layerList[i];
             layer.depth = curDepth;
+            layer.isDirty = true;
             if ( layer.type == exLayer.Type.Normal ) {
                 curDepth += unitLayer; 
             }
@@ -225,6 +232,7 @@ public class exLayerMng : exLayer {
         for ( int i = 0; i < layerList.Count; ++i ) {
             exLayer layer = layerList[i];
             layer.depth = curDepth;
+            layer.isDirty = true;
         }
 
         // assignment

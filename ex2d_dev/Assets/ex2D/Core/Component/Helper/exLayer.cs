@@ -94,7 +94,7 @@ public class exLayer : MonoBehaviour {
                 parentLayer = specialLayerToAdd.parent;
             }
             if ( specialLayerToAdd != null && specialLayerToAdd.isDirty == false ) {
-                layerMng.AddDirtyLayer(specialLayerToAdd);
+                if ( layerMng ) layerMng.AddDirtyLayer(specialLayerToAdd);
             }
 
             // get special layer to remove
@@ -107,7 +107,7 @@ public class exLayer : MonoBehaviour {
                 parentLayer = specialLayerToRemove.parent;
             }
             if ( specialLayerToRemove != null && specialLayerToRemove.isDirty == false ) {
-                layerMng.AddDirtyLayer(specialLayerToRemove);
+                if ( layerMng ) layerMng.AddDirtyLayer(specialLayerToRemove);
             }
 
             //
@@ -226,7 +226,6 @@ public class exLayer : MonoBehaviour {
     protected virtual void Awake () {
         // relink layers
         // NOTE: this happends when we clone a GameObject
-        depth = transform.position.z;
 
         if ( children_ == null )
             children_ = new List<exLayer>();
