@@ -68,7 +68,7 @@ public class exLayerMng : exLayer {
 
             int totalLayerCount = 0;
             foreach ( exLayer childLayer in children ) {
-                totalLayerCount += AddLayerRecursively ( childLayer, true, ref layerList );
+                totalLayerCount += AddLayerRecursively ( childLayer, true, ref totalDepth, ref layerList );
             }
 
             //
@@ -156,6 +156,7 @@ public class exLayerMng : exLayer {
 
     int AddLayerRecursively ( exLayer _curLayer, 
                               bool _doCount, 
+                              ref float _totalDepth,
                               ref List<exLayer> _layerList ) {
         int count = 1;
         bool doCount = _doCount;
@@ -167,11 +168,14 @@ public class exLayerMng : exLayer {
         //
         if ( _curLayer.type != exLayer.Type.Normal ) {
             doCount = false;
+            if ( _curLayer.type == exLayer.Type.Dynamic ) {
+                totalDepth -= _curLayer.range;
+            }
         }
 
         //
         foreach ( exLayer childLayer in _curLayer.children ) {
-            count += AddLayerRecursively ( childLayer, doCount, ref _layerList );
+            count += AddLayerRecursively ( childLayer, doCount, ref _totalDepth, ref _layerList );
         }
 
         return count;
@@ -194,28 +198,32 @@ public class exLayerMng : exLayer {
     // ------------------------------------------------------------------ 
 
     void CalculateDepthForDynamicLayer ( exLayer _curLayer, bool _doAssign ) {
+        float totalDepth = 0.0f;
         List<exLayer> layerList = new List<exLayer>();
-        int totalLayerCount = AddLayerRecursively ( _curLayer, true, ref layerList );
-        float unitLayer = _curLayer.range/(totalLayerCount-1);
-        float curDepth = _curLayer.depth;
+        int totalLayerCount = AddLayerRecursively ( _curLayer, true, ref totalDepth, ref layerList );
 
-        for ( int i = 0; i < layerList.Count; ++i ) {
-            exLayer layer = layerList[i];
-            layer.depth = curDepth;
-            layer.isDirty = true;
-            if ( layer.type == exLayer.Type.Normal ) {
-                curDepth += unitLayer; 
-            }
-        }
+        if ( totalLayerCount > 1 ) {
+            float unitLayer = _curLayer.range/(totalLayerCount-1);
+            float curDepth = _curLayer.depth;
 
-        // assignment
-        if ( _doAssign ) {
             for ( int i = 0; i < layerList.Count; ++i ) {
                 exLayer layer = layerList[i];
-                if ( layer.isDirty == false )
-                    continue;
+                layer.depth = curDepth;
+                layer.isDirty = true;
+                if ( layer.type == exLayer.Type.Normal ) {
+                    curDepth += unitLayer; 
+                }
+            }
 
-                RecursivelyUpdateLayer ( layer.transform.root );
+            // assignment
+            if ( _doAssign ) {
+                for ( int i = 0; i < layerList.Count; ++i ) {
+                    exLayer layer = layerList[i];
+                    if ( layer.isDirty == false )
+                        continue;
+
+                    RecursivelyUpdateLayer ( layer.transform.root );
+                }
             }
         }
     }
@@ -225,8 +233,9 @@ public class exLayerMng : exLayer {
     // ------------------------------------------------------------------ 
 
     void CalculateDepthForAbstractLayer ( exLayer _curLayer, bool _doAssign ) {
+        float totalDepth = 0.0f;
         List<exLayer> layerList = new List<exLayer>();
-        AddLayerRecursively ( _curLayer, true, ref layerList );
+        AddLayerRecursively ( _curLayer, true, ref totalDepth, ref layerList );
         float curDepth = _curLayer.depth;
 
         for ( int i = 0; i < layerList.Count; ++i ) {

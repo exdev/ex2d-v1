@@ -32,7 +32,6 @@ public class exSpriteBaseEditor : exPlaneEditor {
     ///////////////////////////////////////////////////////////////////////////////
 
     private exSpriteBase editSpriteBase;
-    protected bool hasPixelPerfectComponent = false;
     protected CollisionType collisionType = CollisionType.None;
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -151,7 +150,7 @@ public class exSpriteBaseEditor : exPlaneEditor {
         GUILayout.Space(15);
             GUI.enabled = !inAnimMode;
             exPixelPerfect compPixelPerfect = editSpriteBase.GetComponent<exPixelPerfect>();
-            hasPixelPerfectComponent = compPixelPerfect != null; 
+            bool hasPixelPerfectComponent = compPixelPerfect != null; 
             bool usePixelPerfect = GUILayout.Toggle ( hasPixelPerfectComponent, "Use Pixel Perfect" ); 
             if ( usePixelPerfect != hasPixelPerfectComponent ) {
                 if ( usePixelPerfect )
@@ -167,11 +166,9 @@ public class exSpriteBaseEditor : exPlaneEditor {
         // scale 
         // ======================================================== 
 
-        GUI.enabled = !hasPixelPerfectComponent;
         EditorGUIUtility.LookLikeControls ();
         editSpriteBase.scale = EditorGUILayout.Vector2Field ( "Scale", editSpriteBase.scale );
         EditorGUIUtility.LookLikeInspector ();
-        GUI.enabled = true;
 
         // ======================================================== 
         // HFlip, VFlip, Reset to Pixel Perfect

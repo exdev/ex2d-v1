@@ -19,7 +19,7 @@ using System.IO;
 ///////////////////////////////////////////////////////////////////////////////
 
 [CustomEditor(typeof(exScreenPosition))]
-class exScreenPositionEditor : Editor {
+public class exScreenPositionEditor : Editor {
 
     static string[] anchorTexts = new string[] {
         "", "", "", 

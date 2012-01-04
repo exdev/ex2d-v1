@@ -365,8 +365,9 @@ public class exSpriteFont : exSpriteBase {
             _lineWidths[curLine] = curWidth;
         }
 
-        _halfWidthScaled = maxWidth * scale_.x * 0.5f;
-        _halfHeightScaled = height * scale_.y * 0.5f;
+        Vector2 finalScale = new Vector2 ( scale_.x * ppfScale_.x, scale_.y * ppfScale_.y );
+        _halfWidthScaled = maxWidth * finalScale.x * 0.5f;
+        _halfHeightScaled = height * finalScale.y * 0.5f;
         _offsetX = 0.0f;
         _offsetY = 0.0f;
 
@@ -629,6 +630,7 @@ public class exSpriteFont : exSpriteBase {
             Vector3[] vertices  = new Vector3[vertexCount];
             Vector2[] uvs       = new Vector2[vertexCount];
             int[] indices       = new int[indexCount];
+            Vector2 finalScale  = new Vector2 ( scale_.x * ppfScale_.x, scale_.y * ppfScale_.y );
 
             //
             int curLine = 0;
@@ -639,10 +641,10 @@ public class exSpriteFont : exSpriteBase {
                     curX = 0.0f;
                     break;
                 case TextAlign.Center:
-                    curX = halfWidthScaled - lineWidths[curLine] * 0.5f * scale_.x;
+                    curX = halfWidthScaled - lineWidths[curLine] * 0.5f * finalScale.x;
                     break;
                 case TextAlign.Right:
-                    curX = halfWidthScaled * 2.0f - lineWidths[curLine] * scale_.x;
+                    curX = halfWidthScaled * 2.0f - lineWidths[curLine] * finalScale.x;
                     break;
                 }
             }
@@ -659,13 +661,13 @@ public class exSpriteFont : exSpriteBase {
                             curX = 0.0f;
                             break;
                         case TextAlign.Center:
-                            curX = halfWidthScaled - lineWidths[curLine] * 0.5f * scale_.x;
+                            curX = halfWidthScaled - lineWidths[curLine] * 0.5f * finalScale.x;
                             break;
                         case TextAlign.Right:
-                            curX = halfWidthScaled * 2.0f - lineWidths[curLine] * scale_.x;
+                            curX = halfWidthScaled * 2.0f - lineWidths[curLine] * finalScale.x;
                             break;
                         }
-                        curY = curY + (fontInfo_.lineHeight + lineSpacing_) * scale_.y;
+                        curY = curY + (fontInfo_.lineHeight + lineSpacing_) * finalScale.y;
                     }
                     continue;
                 }
@@ -689,32 +691,32 @@ public class exSpriteFont : exSpriteBase {
                             int j = r * 2 + c;
 
                             // calculate the base pos
-                            float x = curX - halfWidthScaled + c * charInfo.width * scale_.x + charInfo.xoffset * scale_.x;
-                            float y = -curY + halfHeightScaled - r * charInfo.height * scale_.y - charInfo.yoffset * scale_.y;
+                            float x = curX - halfWidthScaled + c * charInfo.width * finalScale.x + charInfo.xoffset * finalScale.x;
+                            float y = -curY + halfHeightScaled - r * charInfo.height * finalScale.y - charInfo.yoffset * finalScale.y;
 
                             // do clip
                             if ( clipInfo_.clipped ) {
                                 //
                                 if ( x <= xMinClip ) {
                                     if ( j == 0 )
-                                        charClipLeft = (xMinClip - x) / (charInfo.width * scale_.x); 
+                                        charClipLeft = (xMinClip - x) / (charInfo.width * finalScale.x); 
                                     x = xMinClip;
                                 }
                                 else if ( x >= xMaxClip ) {
                                     if ( j == 3 )
-                                        charClipRight = (x - xMaxClip) / (charInfo.width * scale_.x); 
+                                        charClipRight = (x - xMaxClip) / (charInfo.width * finalScale.x); 
                                     x = xMaxClip;
                                 }
 
                                 //
                                 if ( y <= yMinClip ) {
                                     if ( j == 3 )
-                                        charClipTop = (yMinClip - y) / (charInfo.height * scale_.y); 
+                                        charClipTop = (yMinClip - y) / (charInfo.height * finalScale.y); 
                                     y = yMinClip;
                                 }
                                 else if ( y >= yMaxClip ) {
                                     if ( j == 0 )
-                                        charClipBottom = (y - yMaxClip) / (charInfo.height * scale_.y); 
+                                        charClipBottom = (y - yMaxClip) / (charInfo.height * finalScale.y); 
                                     y = yMaxClip;
                                 }
                             }
@@ -786,10 +788,10 @@ public class exSpriteFont : exSpriteBase {
                     indices[idx_id + 5] = vert_id + 3;
 
                     //
-                    curX = curX + (charInfo.xadvance + tracking_) * scale_.x;
+                    curX = curX + (charInfo.xadvance + tracking_) * finalScale.x;
                     if ( useKerning_ ) {
                         if ( i < text_.Length - 1 ) {
-                            curX += kernings[i] * scale_.x;
+                            curX += kernings[i] * finalScale.x;
                         }
                     }
                 }
@@ -853,6 +855,7 @@ public class exSpriteFont : exSpriteBase {
 
             //
             Vector3[] vertices  = new Vector3[vertexCount];
+            Vector2 finalScale  = new Vector2 ( scale_.x * ppfScale_.x, scale_.y * ppfScale_.y );
 
             //
             int curLine = 0;
@@ -863,10 +866,10 @@ public class exSpriteFont : exSpriteBase {
                     curX = 0.0f;
                     break;
                 case TextAlign.Center:
-                    curX = halfWidthScaled - lineWidths[curLine] * 0.5f * scale_.x;
+                    curX = halfWidthScaled - lineWidths[curLine] * 0.5f * finalScale.x;
                     break;
                 case TextAlign.Right:
-                    curX = halfWidthScaled * 2.0f - lineWidths[curLine] * scale_.x;
+                    curX = halfWidthScaled * 2.0f - lineWidths[curLine] * finalScale.x;
                     break;
                 }
             }
@@ -883,13 +886,13 @@ public class exSpriteFont : exSpriteBase {
                             curX = 0.0f;
                             break;
                         case TextAlign.Center:
-                            curX = halfWidthScaled - lineWidths[curLine] * 0.5f * scale_.x;
+                            curX = halfWidthScaled - lineWidths[curLine] * 0.5f * finalScale.x;
                             break;
                         case TextAlign.Right:
-                            curX = halfWidthScaled * 2.0f - lineWidths[curLine] * scale_.x;
+                            curX = halfWidthScaled * 2.0f - lineWidths[curLine] * finalScale.x;
                             break;
                         }
-                        curY = curY + (fontInfo_.lineHeight + lineSpacing_) * scale_.y;
+                        curY = curY + (fontInfo_.lineHeight + lineSpacing_) * finalScale.y;
                     }
                     continue;
                 }
@@ -905,8 +908,8 @@ public class exSpriteFont : exSpriteBase {
                             int j = r * 2 + c;
 
                             // calculate the base pos
-                            float x = curX - halfWidthScaled + c * charInfo.width * scale_.x + charInfo.xoffset * scale_.x;
-                            float y = -curY + halfHeightScaled - r * charInfo.height * scale_.y - charInfo.yoffset * scale_.y;
+                            float x = curX - halfWidthScaled + c * charInfo.width * finalScale.x + charInfo.xoffset * finalScale.x;
+                            float y = -curY + halfHeightScaled - r * charInfo.height * finalScale.y - charInfo.yoffset * finalScale.y;
 
                             // calculate the pos affect by anchor
                             x -= offsetX;
@@ -918,29 +921,14 @@ public class exSpriteFont : exSpriteBase {
 
                             // build vertices
                             vertices[vert_id+j] = new Vector3( x, y, 0.0f );
-
-                            // DELME { 
-                            // // build vertices
-                            // switch ( plane ) {
-                            // case Plane.XY:
-                            //     vertices[vert_id+j] = new Vector3( x, y, 0.0f );
-                            //     break;
-                            // case Plane.XZ:
-                            //     vertices[vert_id+j] = new Vector3( x, 0.0f, y );
-                            //     break;
-                            // case Plane.ZY:
-                            //     vertices[vert_id+j] = new Vector3( 0.0f, y, x );
-                            //     break;
-                            // }
-                            // } DELME end 
                         }
                     }
 
                     //
-                    curX = curX + (charInfo.xadvance + tracking_) * scale_.x;
+                    curX = curX + (charInfo.xadvance + tracking_) * finalScale.x;
                     if ( useKerning_ ) {
                         if ( i < text_.Length - 1 ) {
-                            curX += kernings[i] * scale_.x;
+                            curX += kernings[i] * finalScale.x;
                         }
                     }
                 }

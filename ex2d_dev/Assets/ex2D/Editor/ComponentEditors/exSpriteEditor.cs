@@ -231,7 +231,7 @@ public class exSpriteEditor : exSpriteBaseEditor {
         // custom size
         // ======================================================== 
 
-        GUI.enabled = !inAnimMode && !hasPixelPerfectComponent;
+        GUI.enabled = !inAnimMode;
         editSprite.customSize = EditorGUILayout.Toggle( "Custom Size", editSprite.customSize );
         GUI.enabled = true;
 

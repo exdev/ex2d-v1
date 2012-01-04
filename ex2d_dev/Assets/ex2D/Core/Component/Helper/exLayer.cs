@@ -328,4 +328,23 @@ public class exLayer : MonoBehaviour {
         //
         parent_ = _parent;
     }
+
+    // ------------------------------------------------------------------ 
+    // Desc: manually add the layer to layerMng's dirty layer list, useful when rotate the sprite by transform.rotation
+    // ------------------------------------------------------------------ 
+
+    public void Dirty () {
+        exLayer lastLayer = this;
+        exLayer parentLayer = parent_;
+
+        while ( parentLayer != null ) {
+            lastLayer = parentLayer;
+            parentLayer = lastLayer.parent;
+        }
+
+        exLayerMng layerMng = lastLayer as exLayerMng;
+        if ( layerMng ) {
+            layerMng.AddDirtyLayer(this);
+        }
+    }
 }
