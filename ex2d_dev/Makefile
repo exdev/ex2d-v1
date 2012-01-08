@@ -66,7 +66,7 @@ all: |ex2d
 rebuild_all: |clean_all all
 
 # defines
-RUNTIME_DEFINE = -d:$(UNITY_VER) -d:UNITY_IPHONE
+RUNTIME_DEFINE = -d:$(UNITY_VER) -d:UNITY_IPHONE -d:UNITY_FLASH
 EDITOR_DEFINE = -d:$(UNITY_VER) -d:UNITY_EDITOR 
 
 # /////////////////////////////////////////////////////////////////////////////
