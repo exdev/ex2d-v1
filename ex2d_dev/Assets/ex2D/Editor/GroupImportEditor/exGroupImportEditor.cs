@@ -132,7 +132,11 @@ class exGroupImportEditor : EditorWindow {
                     importer.isReadable              = firstImporter.isReadable;
                     importer.mipmapEnabled           = firstImporter.mipmapEnabled;
                     importer.borderMipmap            = firstImporter.borderMipmap;
+#if UNITY_3_4
                     importer.correctGamma            = firstImporter.correctGamma;
+#else
+                    importer.generateMipsInLinearSpace = firstImporter.generateMipsInLinearSpace;
+#endif
                     importer.mipmapFilter            = firstImporter.mipmapFilter;
                     importer.fadeout                 = firstImporter.fadeout;
                     importer.mipmapFadeDistanceStart = firstImporter.mipmapFadeDistanceStart;

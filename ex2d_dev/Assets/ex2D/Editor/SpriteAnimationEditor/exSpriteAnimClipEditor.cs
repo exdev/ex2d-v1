@@ -397,9 +397,7 @@ partial class exSpriteAnimClipEditor : EditorWindow {
             Object newClip = EditorGUILayout.ObjectField( "Sprite Animation"
                                                           , curEdit
                                                           , typeof(exSpriteAnimClip)
-#if !UNITY_3_0 && !UNITY_3_1 && !UNITY_3_3
                                                           , false
-#endif
                                                           , GUILayout.Width(300) 
                                                         );
             if ( newClip != curEdit )
@@ -1034,7 +1032,7 @@ partial class exSpriteAnimClipEditor : EditorWindow {
                 minSeconds = frameInfo.length;
             }
         }
-        int gcd = exMathHelper.GetGCD(frames);
+        int gcd = exMathHelper.GetGCD( new List<int>(frames) );
 
         // get delta
         float delta = _newLength - total;

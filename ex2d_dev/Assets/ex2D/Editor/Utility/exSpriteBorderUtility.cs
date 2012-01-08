@@ -50,7 +50,11 @@ public static class exSpriteBorderUtility {
     // ------------------------------------------------------------------ 
 
     public static void Build ( this exSpriteBorder _spriteBorder, Texture2D _texture = null ) {
+#if UNITY_3_4
         bool isPrefab = (EditorUtility.GetPrefabType(_spriteBorder) == PrefabType.Prefab); 
+#else
+        bool isPrefab = (PrefabUtility.GetPrefabType(_spriteBorder) == PrefabType.Prefab); 
+#endif
         EditorUtility.SetDirty (_spriteBorder);
 
         //

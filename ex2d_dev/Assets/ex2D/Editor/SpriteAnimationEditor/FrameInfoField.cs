@@ -426,9 +426,7 @@ partial class exSpriteAnimClipEditor {
                 EditorGUILayout.ObjectField( "Frame["+i+"]"
                                              , tex
                                              , typeof(Object)
-#if !UNITY_3_0 && !UNITY_3_1 && !UNITY_3_3
                                              , false 
-#endif
                                              , GUILayout.Width(300) );
                 GUI.enabled = true; 
 

@@ -58,9 +58,7 @@ public class exDebugHelperEditor : Editor {
         curEdit.txtPrint = (exSpriteFont)EditorGUILayout.ObjectField( "Text Print"
                                                                       , curEdit.txtPrint
                                                                       , typeof(exSpriteFont)
-#if !UNITY_3_0 && !UNITY_3_1 && !UNITY_3_3
                                                                       , false 
-#endif
                                                                     );
 
         // ======================================================== 
@@ -70,9 +68,7 @@ public class exDebugHelperEditor : Editor {
         curEdit.txtFPS = (exSpriteFont)EditorGUILayout.ObjectField( "Text FPS"
                                                                     , curEdit.txtFPS
                                                                     , typeof(exSpriteFont)
-#if !UNITY_3_0 && !UNITY_3_1 && !UNITY_3_3
                                                                     , false 
-#endif
                                                                   );
 
         // ======================================================== 
@@ -82,9 +78,7 @@ public class exDebugHelperEditor : Editor {
         curEdit.txtLog = (exSpriteFont)EditorGUILayout.ObjectField( "Text Log"
                                                                     , curEdit.txtLog
                                                                     , typeof(exSpriteFont)
-#if !UNITY_3_0 && !UNITY_3_1 && !UNITY_3_3
                                                                     , false 
-#endif
                                                                   );
 
         curEdit.showFps = EditorGUILayout.Toggle( "Show Fps", curEdit.showFps );

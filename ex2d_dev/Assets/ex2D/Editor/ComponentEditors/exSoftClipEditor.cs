@@ -104,9 +104,7 @@ public class exSoftClipEditor : exPlaneEditor {
                 EditorGUILayout.ObjectField ( p.name
                                             , p
                                             , typeof(exPlane)
-#if !UNITY_3_0 && !UNITY_3_1 && !UNITY_3_3
                                             , true
-#endif
                                             );
             }
         }

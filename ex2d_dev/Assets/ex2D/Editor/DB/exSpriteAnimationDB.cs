@@ -71,7 +71,7 @@ public class exSpriteAnimationDB : ScriptableObject {
     static int version = 1;
     static bool needSync = false;
     static exSpriteAnimationDB db;
-    public static string dbPath = "Assets/.ex2D_SpriteAnimationDB.asset"; ///< the fullpath of the sprite animation clip db we use
+    public static string dbPath = "Assets/_ex2D_SpriteAnimationDB.asset"; ///< the fullpath of the sprite animation clip db we use
 
     // ------------------------------------------------------------------ 
     /// force sync the sprite animation db

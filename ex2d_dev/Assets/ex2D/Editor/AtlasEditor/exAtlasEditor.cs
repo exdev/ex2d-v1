@@ -283,9 +283,7 @@ partial class exAtlasEditor : EditorWindow {
         Object newAtlasInfo = EditorGUILayout.ObjectField( "Atlas Info"
                                                            , curEdit
                                                            , typeof(exAtlasInfo)
-#if !UNITY_3_0 && !UNITY_3_1 && !UNITY_3_3
                                                            , false 
-#endif
                                                            , GUILayout.Width(300)
                                                          );
         if ( newAtlasInfo != curEdit ) 
@@ -446,9 +444,7 @@ partial class exAtlasEditor : EditorWindow {
                         = (Texture2D)EditorGUILayout.ObjectField( "Texture"
                                                                   , curEdit.texture
                                                                   , typeof(Texture2D)
-#if !UNITY_3_0 && !UNITY_3_1 && !UNITY_3_3
                                                                   , false
-#endif
                                                                   , GUILayout.Width(100) 
                                                                   , GUILayout.Height(100) 
                                                                 );
@@ -504,9 +500,7 @@ partial class exAtlasEditor : EditorWindow {
                         = (Material)EditorGUILayout.ObjectField( "Material" 
                                                                  , curEdit.material
                                                                  , typeof(Material)
-#if !UNITY_3_0 && !UNITY_3_1 && !UNITY_3_3
                                                                  , false 
-#endif
                                                                );
                 }
                 else {
@@ -532,9 +526,7 @@ partial class exAtlasEditor : EditorWindow {
                         = (exAtlas)EditorGUILayout.ObjectField( "Atlas"
                                                               , curEdit.atlas
                                                               , typeof(exAtlas)
-#if !UNITY_3_0 && !UNITY_3_1 && !UNITY_3_3
                                                               , false 
-#endif
                                                             );
                 }
                 else {
@@ -582,9 +574,7 @@ partial class exAtlasEditor : EditorWindow {
                         exBitmapFont bmfont = curEdit.bitmapFonts[i];
                         EditorGUILayout.ObjectField( bmfont 
                                                      , typeof(exBitmapFont) 
-#if !UNITY_3_0 && !UNITY_3_1 && !UNITY_3_3
                                                      , false 
-#endif
                                                    );
                         if ( GUILayout.Button("Delete", GUILayout.MaxWidth(80) ) ) {
                             curEdit.RemoveBitmapFont(bmfont);

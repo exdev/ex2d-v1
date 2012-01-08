@@ -5,12 +5,15 @@
 // Description  : 
 // ======================================================================================
 
+#if !UNITY_FLASH
+
 ///////////////////////////////////////////////////////////////////////////////
 // usings
 ///////////////////////////////////////////////////////////////////////////////
 
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 ///////////////////////////////////////////////////////////////////////////////
 // class exPool
@@ -20,7 +23,7 @@ using System.Collections;
 ///////////////////////////////////////////////////////////////////////////////
 
 [System.Serializable]
-public class exPool<T> {
+public class exPool<T> where T : MonoBehaviour {
 
     public int size;
     public GameObject prefab;
@@ -46,8 +49,7 @@ public class exPool<T> {
         if ( prefab != null ) {
             for ( int i = 0; i < size; ++i ) {
                 GameObject obj = GameObject.Instantiate(prefab, Vector3.zero, Quaternion.identity) as GameObject;
-                objects[i] = (T)(object)obj.GetComponent(typeof(T));
-                (objects[i] as MonoBehaviour).enabled = false;
+                objects[i] = obj.GetComponent<T>();
             }
         }
     }
@@ -60,13 +62,12 @@ public class exPool<T> {
         if ( idx < 0 )
             Debug.LogError ("Error: the pool do not have enough free item.");
 
-        MonoBehaviour result = objects[idx] as MonoBehaviour;
+        T result = objects[idx];
         --idx; 
 
         result.transform.position = _pos;
         result.transform.rotation = _rot;
-        result.enabled = true;
-        return (T)(object)result;
+        return result;
     }
 
     // ------------------------------------------------------------------ 
@@ -149,3 +150,5 @@ public class exFastPool {
 
     public GameObject[] GameObjects () { return goList; }
 }
+
+#endif

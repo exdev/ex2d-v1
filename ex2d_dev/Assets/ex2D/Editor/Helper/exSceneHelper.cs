@@ -159,7 +159,11 @@ public static class exSceneHelper {
                     //
                     if ( needRebuild ) {
                         exSpriteEditor.UpdateAtlas( sp, elInfo );
+#if UNITY_3_4
                         bool isPrefab = (EditorUtility.GetPrefabType(spBase) == PrefabType.Prefab); 
+#else
+                        bool isPrefab = (PrefabUtility.GetPrefabType(spBase) == PrefabType.Prefab); 
+#endif
                         if ( isPrefab == false ) {
                             Texture2D texture = null;
                             if ( sp.index == -1 ) {
@@ -240,7 +244,11 @@ public static class exSceneHelper {
                         //
                         if ( needRebuild ) {
                             exSpriteBorderEditor.UpdateAtlas( spBorder, elInfo );
+#if UNITY_3_4
                             bool isPrefab = (EditorUtility.GetPrefabType(spBase) == PrefabType.Prefab); 
+#else
+                            bool isPrefab = (PrefabUtility.GetPrefabType(spBase) == PrefabType.Prefab); 
+#endif
                             if ( isPrefab == false ) {
                                 Texture2D texture = null;
                                 if ( spBorder.index == -1 ) {
@@ -303,7 +311,11 @@ public static class exSceneHelper {
                     if ( needRebuild ) {
                         exAtlasDB.ElementInfo elInfo = exAtlasDB.GetElementInfo(spBorder.guiBorder.textureGUID);
                         exSpriteBorderEditor.UpdateAtlas( spBorder, elInfo );
+#if UNITY_3_4
                         bool isPrefab = (EditorUtility.GetPrefabType(spBase) == PrefabType.Prefab); 
+#else
+                        bool isPrefab = (PrefabUtility.GetPrefabType(spBase) == PrefabType.Prefab); 
+#endif
                         if ( isPrefab == false ) {
                             Texture2D texture = null;
                             if ( spBorder.useAtlas == false ) {

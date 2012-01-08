@@ -402,7 +402,17 @@ public class exSpriteAnimation : MonoBehaviour {
     public exSpriteAnimClip.FrameInfo GetCurFrameInfo () {
         if ( curAnimation != null ) {
             float wrappedTime = curAnimation.clip.WrapSeconds(curAnimation.time, curAnimation.wrapMode);
+#if UNITY_FLASH
+            int index = curAnimation.frameTimes.Count - 1;
+            for ( int i = 0; i < curAnimation.frameTimes.Count; ++i ) {
+                if ( curAnimation.frameTimes[i] > wrappedTime ) {
+                    index = i-1;
+                    break;
+                }
+            }
+#else
             int index = curAnimation.frameTimes.BinarySearch(wrappedTime);
+#endif
             if ( index < 0 ) {
                 index = ~index;
             }
@@ -421,7 +431,17 @@ public class exSpriteAnimation : MonoBehaviour {
         int index = -1;
         if ( curAnimation != null ) {
             float wrappedTime = curAnimation.clip.WrapSeconds(curAnimation.time, curAnimation.wrapMode);
+#if UNITY_FLASH
+            index = curAnimation.frameTimes.Count - 1;
+            for ( int i = 0; i < curAnimation.frameTimes.Count; ++i ) {
+                if ( curAnimation.frameTimes[i] > wrappedTime ) {
+                    index = i-1;
+                    break;
+                }
+            }
+#else
             index = curAnimation.frameTimes.BinarySearch(wrappedTime);
+#endif
         }
         return index;
     }

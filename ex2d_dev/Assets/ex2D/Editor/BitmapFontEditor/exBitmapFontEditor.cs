@@ -185,9 +185,7 @@ partial class exBitmapFontEditor : EditorWindow {
         Object newFontInfo = EditorGUILayout.ObjectField( "Font Info"
                                                           , curFontInfo
                                                           , typeof(Object)
-#if !UNITY_3_0 && !UNITY_3_1 && !UNITY_3_3
                                                           , false
-#endif
                                                           , GUILayout.Width(300) 
                                                         );
         if ( newFontInfo != curFontInfo ) {
@@ -204,9 +202,7 @@ partial class exBitmapFontEditor : EditorWindow {
             EditorGUILayout.ObjectField( pi.texture.name
                                          , pi.texture
                                          , typeof(Texture2D)
-#if !UNITY_3_0 && !UNITY_3_1 && !UNITY_3_3
                                          , false
-#endif
                                          , GUILayout.Width(50)
                                          , GUILayout.Height(50) 
                                        );

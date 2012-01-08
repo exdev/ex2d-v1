@@ -149,9 +149,7 @@ partial class exGUIBorderEditor : EditorWindow {
             Object newBorder = EditorGUILayout.ObjectField( "GUI Border"
                                                             , curEdit 
                                                             , typeof(exGUIBorder) 
-#if !UNITY_3_0 && !UNITY_3_1 && !UNITY_3_3
                                                             , false
-#endif
                                                             , GUILayout.Width(300)
                                                           );
             if ( newBorder != curEdit )
@@ -165,9 +163,7 @@ partial class exGUIBorderEditor : EditorWindow {
             GUILayout.Space(15);
                 Texture2D newTexture = (Texture2D)EditorGUILayout.ObjectField( editTexture
                                                                                , typeof(Texture2D)
-#if !UNITY_3_0 && !UNITY_3_1 && !UNITY_3_3
                                                                                , false
-#endif
                                                                                , GUILayout.Height(50)
                                                                                , GUILayout.Width(50)
                                                                              );

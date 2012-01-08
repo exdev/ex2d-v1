@@ -99,9 +99,7 @@ public class exSpriteEditor : exSpriteBaseEditor {
             EditorGUIUtility.LookLikeControls ();
             Texture2D newTexture = (Texture2D)EditorGUILayout.ObjectField( editTexture
                                                                            , typeof(Texture2D)
-#if !UNITY_3_0 && !UNITY_3_1 && !UNITY_3_3
                                                                            , false
-#endif
                                                                            , GUILayout.Width(100)
                                                                            , GUILayout.Height(100) 
                                                                          );
@@ -209,9 +207,7 @@ public class exSpriteEditor : exSpriteBaseEditor {
         EditorGUILayout.ObjectField( "Atlas"
                                      , editSprite.atlas
                                      , typeof(exAtlas)
-#if !UNITY_3_0 && !UNITY_3_1 && !UNITY_3_3
                                      , false 
-#endif
                                    );
         GUI.enabled = true;
 

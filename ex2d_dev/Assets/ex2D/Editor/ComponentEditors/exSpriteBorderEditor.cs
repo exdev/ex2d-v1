@@ -97,9 +97,7 @@ public class exSpriteBorderEditor : exSpriteBaseEditor {
             exGUIBorder newGUIBorder = (exGUIBorder)EditorGUILayout.ObjectField( "GUI Border"
                                                                                  , editSpriteBorder.guiBorder
                                                                                  , typeof(exGUIBorder)
-#if !UNITY_3_0 && !UNITY_3_1 && !UNITY_3_3
                                                                                  , false
-#endif
                                                                                );
 
             if ( newGUIBorder != editSpriteBorder.guiBorder ) {
@@ -221,9 +219,7 @@ public class exSpriteBorderEditor : exSpriteBaseEditor {
         EditorGUILayout.ObjectField( "Atlas"
                                      , editSpriteBorder.atlas
                                      , typeof(exAtlas)
-#if !UNITY_3_0 && !UNITY_3_1 && !UNITY_3_3
                                      , false 
-#endif
                                    );
         GUI.enabled = true;
 

@@ -29,7 +29,7 @@ public class RaycastSorter : IComparer {
         RaycastHit raycastHitA = (RaycastHit)_a;
         RaycastHit raycastHitB = (RaycastHit)_b;
 
-        return raycastHitA.distance.CompareTo(raycastHitB.distance);
+        return (int)Mathf.Sign(raycastHitA.distance - raycastHitB.distance);
     }
 }
 

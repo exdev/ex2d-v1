@@ -68,9 +68,7 @@ public class exSpriteAnimationEditor : Editor {
         editSpAnim.defaultAnimation = (exSpriteAnimClip)EditorGUILayout.ObjectField( "Default Animation"
                                                                                    , editSpAnim.defaultAnimation
                                                                                    , typeof(exSpriteAnimClip)
-#if !UNITY_3_0 && !UNITY_3_1 && !UNITY_3_3
                                                                                    , false 
-#endif
                                                                                  );
         if ( GUILayout.Button("Edit...", GUILayout.Width(40), GUILayout.Height(15) ) ) {
             exSpriteAnimClipEditor editor = exSpriteAnimClipEditor.NewWindow();
@@ -127,9 +125,7 @@ public class exSpriteAnimationEditor : Editor {
                     (exSpriteAnimClip)EditorGUILayout.ObjectField( "[" + i + "]"
                                                                  , editSpAnim.animations[i]
                                                                  , typeof(exSpriteAnimClip)
-#if !UNITY_3_0 && !UNITY_3_1 && !UNITY_3_3
                                                                  , false 
-#endif
                                                                );
                 if ( GUILayout.Button("-", GUILayout.Width(15), GUILayout.Height(15) ) ) {
                     idxRemoved = i;

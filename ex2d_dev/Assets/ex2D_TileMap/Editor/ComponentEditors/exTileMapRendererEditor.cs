@@ -61,9 +61,7 @@ partial class exTileMapRendererEditor : exPlaneEditor {
         exTileMap newTileMap = (exTileMap)EditorGUILayout.ObjectField( "Tile Map"
                                                                        , editTileMap.tileMap
                                                                        , typeof(exTileMap)
-#if !UNITY_3_0 && !UNITY_3_1 && !UNITY_3_3
                                                                        , false
-#endif
                                                                      );
         if ( newTileMap != editTileMap.tileMap ) {
             editTileMap.CreateTileMap(newTileMap);

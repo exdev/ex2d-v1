@@ -62,9 +62,7 @@ class exBitmapFontWizard : ScriptableWizard {
             fontInfo = EditorGUILayout.ObjectField( "Font Info"
                                                     , isFontInfo ? Selection.activeObject : null 
                                                     , typeof(Object) 
-#if !UNITY_3_0 && !UNITY_3_1 && !UNITY_3_3
                                                     , false 
-#endif
                                                   );
             GUI.enabled = true;
 
