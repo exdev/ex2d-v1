@@ -16,7 +16,7 @@ UNITY_PATH = /Applications/Unity/Unity.app/Contents/Frameworks
 COMPILER = $(UNITY_PATH)/Mono/bin/gmcs
 UNITY_ENGINE_DLL = $(UNITY_PATH)/Managed/UnityEngine.dll
 UNITY_EDITOR_DLL = $(UNITY_PATH)/Managed/UnityEditor.dll
-UNITY_VER = UNITY_3_4 
+UNITY_VER = UNITY_3_5 
 
 # Utilities.
 MKDIR = mkdir -p
@@ -66,8 +66,8 @@ all: |ex2d
 rebuild_all: |clean_all all
 
 # defines
-RUNTIME_DEFINE = -d:UNITY_3_4 -d:UNITY_IPHONE
-EDITOR_DEFINE = -d:UNITY_EDITOR -d:UNITY_3_4
+RUNTIME_DEFINE = -d:$(UNITY_VER) -d:UNITY_IPHONE
+EDITOR_DEFINE = -d:$(UNITY_VER) -d:UNITY_EDITOR 
 
 # /////////////////////////////////////////////////////////////////////////////
 # ex2D runtime target
