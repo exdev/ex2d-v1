@@ -121,7 +121,7 @@ public class exPlaneEditor : Editor {
 
         GUI.enabled = !inAnimMode;
         EditorGUIUtility.LookLikeControls ();
-		Transform2D newTrans2D = (Transform2D)EditorGUILayout.EnumPopup( "Transform 2D", trans2d, GUILayout.Width(165) );
+		Transform2D newTrans2D = (Transform2D)EditorGUILayout.EnumPopup( "Transform 2D", trans2d, GUILayout.Width(200), GUILayout.ExpandWidth(false) );
         EditorGUIUtility.LookLikeInspector ();
         GUI.enabled = true;
 
@@ -190,7 +190,7 @@ public class exPlaneEditor : Editor {
                                                                               , isPrefabCamera ? editPlane.renderCamera : null 
                                                                               , typeof(Camera) 
                                                                               , false 
-                                                                              , GUILayout.Width(250) );
+                                                                              , GUILayout.Width(300) );
                 labelStyle.fontStyle = FontStyle.Bold;
                 labelStyle.normal.textColor = Color.yellow;
                 GUILayout.Label( "(Prefab Only)", labelStyle );
@@ -202,7 +202,7 @@ public class exPlaneEditor : Editor {
                                                                           , editPlane.renderCamera 
                                                                           , typeof(Camera) 
                                                                           , true 
-                                                                          , GUILayout.Width(250) );
+                                                                          , GUILayout.Width(300) );
         }
         EditorGUIUtility.LookLikeInspector ();
 

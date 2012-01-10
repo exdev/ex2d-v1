@@ -77,14 +77,13 @@ public class exSpriteBaseEditor : exPlaneEditor {
         EditorGUIUtility.LookLikeInspector ();
         EditorGUI.indentLevel = 1;
 
-        GUILayout.BeginHorizontal();
             // ======================================================== 
             // Collision Type 
             // ======================================================== 
 
             GUI.enabled = !inAnimMode;
             EditorGUIUtility.LookLikeControls ();
-            CollisionType newCollisionType = (CollisionType)EditorGUILayout.EnumPopup( "Collision Type", collisionType, GUILayout.Width(165) );
+            CollisionType newCollisionType = (CollisionType)EditorGUILayout.EnumPopup( "Collision Type", collisionType, GUILayout.Width(200) );
             EditorGUIUtility.LookLikeInspector ();
             GUI.enabled = true;
 
@@ -108,11 +107,13 @@ public class exSpriteBaseEditor : exPlaneEditor {
                     editSpriteBase.collisionHelper.UpdateCollider();
             }
 
+        GUILayout.BeginHorizontal();
+
             // ======================================================== 
             // use collision helper
             // ======================================================== 
 
-            GUILayout.Space(5);
+            GUILayout.Space(15);
             GUI.enabled = !inAnimMode;
             exCollisionHelper compCollisionHelper = editSpriteBase.collisionHelper;
             bool hasCollisionHelperComp = compCollisionHelper != null; 

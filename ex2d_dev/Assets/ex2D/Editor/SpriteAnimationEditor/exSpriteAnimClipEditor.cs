@@ -288,7 +288,7 @@ partial class exSpriteAnimClipEditor : EditorWindow {
             GUILayout.Space(5);
             EditorGUILayout.SelectableLabel( curEdit.SnapToFrames(curEdit.length) + " frames | "
                                              + curEdit.length.ToString("f3") + " secs",
-                                             GUILayout.Width(150), GUILayout.MaxHeight(18) );
+                                             GUILayout.MinWidth(150), GUILayout.MaxHeight(18) );
 
             // ======================================================== 
             // preview speed
@@ -298,7 +298,7 @@ partial class exSpriteAnimClipEditor : EditorWindow {
             curEdit.editorSpeed = EditorGUILayout.FloatField( "Preview Speed", 
                                                               curEdit.editorSpeed,
                                                               EditorStyles.toolbarTextField,
-                                                              GUILayout.Width(150) );
+                                                              GUILayout.MinWidth(200) );
 
             // ======================================================== 
             // preview length
@@ -306,7 +306,7 @@ partial class exSpriteAnimClipEditor : EditorWindow {
 
             GUILayout.Space(5);
             EditorGUILayout.SelectableLabel( (curEdit.length / curEdit.editorSpeed).ToString("f3") + " secs", 
-                                             GUILayout.Width(200), GUILayout.MaxHeight(18) );
+                                             GUILayout.MinWidth(80), GUILayout.MaxHeight(18) );
 
             GUILayout.FlexibleSpace();
 
@@ -340,7 +340,7 @@ partial class exSpriteAnimClipEditor : EditorWindow {
             curEdit.editorScale = GUILayout.HorizontalSlider ( curEdit.editorScale, 
                                                                0.01f, 
                                                                10.0f, 
-                                                               GUILayout.MaxWidth(150) );
+                                                               GUILayout.MinWidth(150) );
             GUILayout.Space(5);
             curEdit.editorScale = EditorGUILayout.FloatField( curEdit.editorScale,
                                                               EditorStyles.toolbarTextField,
