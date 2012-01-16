@@ -265,7 +265,6 @@ public class exLayerMng : exLayer {
             updateAll = true;
         }
         else {
-            Debug.Log("process dirty layer");
             dirtyLayers.Add (_layer);
             _layer.isDirty = true;
         }
