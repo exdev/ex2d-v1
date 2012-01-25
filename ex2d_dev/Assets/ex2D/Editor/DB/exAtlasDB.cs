@@ -163,6 +163,12 @@ public class exAtlasDB : ScriptableObject {
     // ------------------------------------------------------------------ 
 
     static void CreateDB () {
+        // first create db directory if not exists
+        string dbDir = Path.GetDirectoryName(dbPath);
+        if ( new DirectoryInfo(dbDir).Exists == false ) {
+            Directory.CreateDirectory (dbDir);
+        }
+
         // get atlas db, if not found, create one
         db = (exAtlasDB)AssetDatabase.LoadAssetAtPath( dbPath, typeof(exAtlasDB) );
         if ( db == null ) {

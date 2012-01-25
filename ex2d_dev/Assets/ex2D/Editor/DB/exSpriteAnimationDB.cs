@@ -162,6 +162,12 @@ public class exSpriteAnimationDB : ScriptableObject {
     // ------------------------------------------------------------------ 
 
     static void CreateDB () {
+        // first create db directory if not exists
+        string dbDir = Path.GetDirectoryName(dbPath);
+        if ( new DirectoryInfo(dbDir).Exists == false ) {
+            Directory.CreateDirectory (dbDir);
+        }
+
         // get sprite animation clip db, if not found, create one
         db = (exSpriteAnimationDB)AssetDatabase.LoadAssetAtPath( dbPath, typeof(exSpriteAnimationDB) );
         if ( db == null ) {
