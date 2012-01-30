@@ -109,7 +109,6 @@ $(EX2D_RUNTIME_TARGET):
 
 # get sources 
 EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/
-EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/About/
 EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/AtlasEditor/
 EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/BitmapFontEditor/
 EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/ComponentEditors/
@@ -119,6 +118,7 @@ EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/GroupImportEditor/
 EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/Helper/
 EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/LayerEditor/
 EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/Misc/
+EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/Misc/Wizards/
 EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/SpriteAnimationEditor/
 EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/Utility/
 EX2D_EDITOR_SOURCE = $(wildcard $(addsuffix *.cs,$(EX2D_EDITOR_SOURCE_DIRS)))
