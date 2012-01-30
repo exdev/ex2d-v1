@@ -44,13 +44,25 @@ class AboutWizard : ScriptableWizard {
 
         GUILayout.Space (10);
         GUILayout.BeginHorizontal();
-        GUILayout.Space (10);
-        GUILayout.Label("ex2D v1.2.3 (120118)");
+            GUILayout.Space (10);
+            GUILayout.Label("ex2D v1.2.3 (120130)");
+        GUILayout.EndHorizontal();
+
+        string support = "";
+#if UNITY_FLASH
+        support += "Flash ";
+#endif
+#if UNITY_IPHONE
+        support += "iPhone ";
+#endif
+        GUILayout.BeginHorizontal();
+            GUILayout.Space (10);
+            GUILayout.Label("Support Platform: " + support);
         GUILayout.EndHorizontal();
 
         GUILayout.BeginHorizontal();
-        GUILayout.Space (10);
-        GUILayout.Label("Develop by: exDev Studio (www.ex-dev.com)");
+            GUILayout.Space (10);
+            GUILayout.Label("Develop by: exDev Studio (www.ex-dev.com)");
         GUILayout.EndHorizontal();
     }
 }
