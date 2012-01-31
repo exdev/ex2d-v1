@@ -46,16 +46,15 @@ class PreferencesWizard : ScriptableWizard {
         // atlas DB 
         // ======================================================== 
 
-        string atlasDBKey = "AtlasDB_Path";
-        exAtlasDB.dbPath = EditorGUILayout.TextField ( "Atlas DB Path", EditorPrefs.GetString( atlasDBKey, exAtlasDB.dbPath ) );
-        EditorPrefs.GetString( atlasDBKey, exAtlasDB.dbPath );
+        exAtlasDB.dbPath = EditorGUILayout.TextField ( "Atlas DB Path", EditorPrefs.GetString( exAtlasDB.dbKey, exAtlasDB.dbPath ) );
+        EditorPrefs.SetString( exAtlasDB.dbKey, exAtlasDB.dbPath );
 
         // ======================================================== 
         // sprite animation DB 
         // ======================================================== 
 
-        string spanimDBKey = "SpriteAnimDB_Path";
-        exSpriteAnimationDB.dbPath = EditorGUILayout.TextField ( "SpriteAnimation DB Path", EditorPrefs.GetString( spanimDBKey, exSpriteAnimationDB.dbPath ) );
-        EditorPrefs.GetString( spanimDBKey, exSpriteAnimationDB.dbPath );
+        exSpriteAnimationDB.dbPath = EditorGUILayout.TextField ( "SpriteAnimation DB Path", 
+                                                                 EditorPrefs.GetString( exSpriteAnimationDB.dbKey, exSpriteAnimationDB.dbPath ) );
+        EditorPrefs.SetString( exSpriteAnimationDB.dbKey, exSpriteAnimationDB.dbPath );
     }
 }

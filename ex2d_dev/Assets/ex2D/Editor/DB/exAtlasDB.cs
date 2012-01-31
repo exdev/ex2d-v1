@@ -67,6 +67,8 @@ public class exAtlasDB : ScriptableObject {
     static int version = 2;
     static bool needSync = false;
     static exAtlasDB db;
+
+    public static string dbKey = "AtlasDB_Path"; ///< the db key for preferences
     public static string dbPath = "Assets/_ex2D_AtlasDB.asset"; ///< the fullpath of the atlas db we use 
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -106,6 +108,7 @@ public class exAtlasDB : ScriptableObject {
     // ------------------------------------------------------------------ 
 
     public static bool DBExists () {
+        dbPath = EditorPrefs.GetString( dbKey, dbPath );
         FileInfo fileInfo = new FileInfo(dbPath);
         return fileInfo.Exists;
     }
@@ -163,6 +166,8 @@ public class exAtlasDB : ScriptableObject {
     // ------------------------------------------------------------------ 
 
     static void CreateDB () {
+        dbPath = EditorPrefs.GetString( dbKey, dbPath );
+
         // first create db directory if not exists
         string dbDir = Path.GetDirectoryName(dbPath);
         if ( new DirectoryInfo(dbDir).Exists == false ) {

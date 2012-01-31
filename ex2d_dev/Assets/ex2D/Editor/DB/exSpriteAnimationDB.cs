@@ -71,6 +71,8 @@ public class exSpriteAnimationDB : ScriptableObject {
     static int version = 1;
     static bool needSync = false;
     static exSpriteAnimationDB db;
+
+    public static string dbKey = "SpriteAnimDB_Path"; ///< the db key for preferences
     public static string dbPath = "Assets/_ex2D_SpriteAnimationDB.asset"; ///< the fullpath of the sprite animation clip db we use
 
     // ------------------------------------------------------------------ 
@@ -106,6 +108,7 @@ public class exSpriteAnimationDB : ScriptableObject {
     // ------------------------------------------------------------------ 
 
     public static bool DBExists () {
+        dbPath = EditorPrefs.GetString( dbKey, dbPath );
         FileInfo fileInfo = new FileInfo(dbPath);
         return fileInfo.Exists;
     }
@@ -162,6 +165,8 @@ public class exSpriteAnimationDB : ScriptableObject {
     // ------------------------------------------------------------------ 
 
     static void CreateDB () {
+        dbPath = EditorPrefs.GetString( dbKey, dbPath );
+
         // first create db directory if not exists
         string dbDir = Path.GetDirectoryName(dbPath);
         if ( new DirectoryInfo(dbDir).Exists == false ) {
