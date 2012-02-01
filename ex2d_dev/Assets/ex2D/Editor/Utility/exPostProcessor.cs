@@ -285,7 +285,7 @@ class ex2D_SaveAssetsProcessor : AssetModificationProcessor {
         exSceneHelper.UpdateSpriteBorders (rebuildGuiBorders);
 
         // NOTE: without this you will got leaks message
-        EditorUtility.UnloadUnusedAssets();
+        // EditorUtility.UnloadUnusedAssets();
         ex.onSavingAssets = false;
     }
 }
