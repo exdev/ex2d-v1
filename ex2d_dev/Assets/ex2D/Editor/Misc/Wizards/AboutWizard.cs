@@ -23,7 +23,7 @@ class AboutWizard : ScriptableWizard {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    [MenuItem ("Window/ex2D/About")]
+    [MenuItem ("Window/ex2D/Misc/About")]
     public static void Create () {
         ScriptableWizard.DisplayWizard<AboutWizard>("About ex2D");
     }
@@ -45,7 +45,7 @@ class AboutWizard : ScriptableWizard {
         GUILayout.Space (10);
         GUILayout.BeginHorizontal();
             GUILayout.Space (10);
-            GUILayout.Label("ex2D v1.2.4 (120214)");
+            GUILayout.Label("ex2D v1.2.4 (120215)");
         GUILayout.EndHorizontal();
 
         string support = "";

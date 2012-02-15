@@ -23,7 +23,7 @@ class PreferencesWizard : ScriptableWizard {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    [MenuItem ("Window/ex2D/Preferences")]
+    [MenuItem ("Window/ex2D/Misc/Preferences")]
     public static void Create () {
         ScriptableWizard.DisplayWizard<PreferencesWizard>("ex2D Preferences");
     }

@@ -37,13 +37,15 @@ class exGroupImportEditor : EditorWindow {
     /// Open the group import editor window
     // ------------------------------------------------------------------ 
 
-    [MenuItem ("Window/ex2D/Group Import Editor")]
-    public static exGroupImportEditor NewWindow () {
-        exGroupImportEditor newWindow = EditorWindow.GetWindow<exGroupImportEditor>();
-        newWindow.wantsMouseMove = true;
-        newWindow.autoRepaintOnSceneChange = true;
-        return newWindow;
-    }
+    // DEPRECATED { 
+    // [MenuItem ("Window/ex2D/Group Import Editor")]
+    // public static exGroupImportEditor NewWindow () {
+    //     exGroupImportEditor newWindow = EditorWindow.GetWindow<exGroupImportEditor>();
+    //     newWindow.wantsMouseMove = true;
+    //     newWindow.autoRepaintOnSceneChange = true;
+    //     return newWindow;
+    // }
+    // } DEPRECATED end 
 
     // ------------------------------------------------------------------ 
     // Desc: 
