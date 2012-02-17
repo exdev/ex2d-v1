@@ -82,6 +82,7 @@ ios_build/
 *.err
 _log/
 *.vimentry
+*.vimentry.meta
 .vimfiles.*/
 quick_gen_project_*_autogen.bat
 quick_gen_project_*_autogen.sh
