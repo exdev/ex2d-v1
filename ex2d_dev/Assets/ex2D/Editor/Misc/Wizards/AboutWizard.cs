@@ -45,7 +45,7 @@ class AboutWizard : ScriptableWizard {
         GUILayout.Space (10);
         GUILayout.BeginHorizontal();
             GUILayout.Space (10);
-            GUILayout.Label("ex2D v1.2.4 (120226)");
+            GUILayout.Label("ex2D v1.2.4 (120227)");
         GUILayout.EndHorizontal();
 
         string support = "";
