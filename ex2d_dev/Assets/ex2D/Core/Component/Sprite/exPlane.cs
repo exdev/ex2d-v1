@@ -125,6 +125,7 @@ public class exPlane : MonoBehaviour {
             Camera newCamera = value;
             if ( newCamera != camera_ ) {
                 camera_ = newCamera;
+                inCommitList = false;
 
                 // update sprite manager
                 spriteMng_ = camera_.GetComponent<exSpriteMng>();
@@ -284,10 +285,11 @@ public class exPlane : MonoBehaviour {
             if ( camera_ == null )
                 return null;
 
-            if ( spriteMng_ == null ) {
+            if ( spriteMng_ == null || spriteMng_.camera != camera_ ) {
                 spriteMng_ = camera_.GetComponent<exSpriteMng>();
                 if ( spriteMng_ == null )
                     spriteMng_ = camera_.gameObject.AddComponent<exSpriteMng>();
+                inCommitList = false;
             }
             return spriteMng_;
         }
