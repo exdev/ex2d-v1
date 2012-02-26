@@ -130,6 +130,14 @@ public class exPlane : MonoBehaviour {
                 spriteMng_ = camera_.GetComponent<exSpriteMng>();
                 if ( spriteMng_ == null )
                     spriteMng_ = camera_.gameObject.AddComponent<exSpriteMng>();
+
+                // update pixel-perfect camera
+                exPixelPerfectCamera ppfCamera = camera_.GetComponent<exPixelPerfectCamera>();
+                if ( ppfCamera != null ) {
+                    exPixelPerfect ppf = GetComponent<exPixelPerfect>();
+                    if ( ppf != null )
+                        ppf.UpdatePixelPerfectCamera(ppfCamera);
+                }
             }
         }
     }
