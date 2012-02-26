@@ -62,7 +62,7 @@ public class exPixelPerfectCamera : MonoBehaviour {
         exPixelPerfect[] ppfs = GameObject.FindObjectsOfType ( typeof(exPixelPerfect) ) as exPixelPerfect[];
         foreach ( exPixelPerfect ppf in ppfs ) {
             exSpriteBase sprite = ppf.GetComponent<exSpriteBase>();
-            if ( sprite == null || sprite.renderCamera != this )
+            if ( sprite == null || sprite.renderCamera != camera )
                 continue;
 
             Vector3 toCamera = sprite.transform.position - transform.position;
@@ -120,9 +120,10 @@ public class exPixelPerfectCamera : MonoBehaviour {
             exPixelPerfect[] ppfs = GameObject.FindObjectsOfType ( typeof(exPixelPerfect) ) as exPixelPerfect[];
             foreach ( exPixelPerfect ppf in ppfs ) {
                 exSpriteBase sprite = ppf.GetComponent<exSpriteBase>();
-                if ( sprite == null || sprite.renderCamera != this )
+                if ( sprite == null || sprite.renderCamera != camera )
                     continue;
 
+                Debug.Log("sprite name = " + sprite.name);
                 Vector3 toCamera = sprite.transform.position - transform.position;
                 CalculatePixelPerfectScale ( sprite, toCamera.magnitude );
                 sprite.Commit();
