@@ -46,7 +46,7 @@ public class exSpriteAnimationEditor : Editor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-	override public void OnInspectorGUI () {
+	public override void OnInspectorGUI () {
         exSprite sprite = editSpAnim.GetComponent<exSprite>();
         bool checkDefaultSprite = (sprite != null) && string.IsNullOrEmpty(sprite.textureGUID);
 

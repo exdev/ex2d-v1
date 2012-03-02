@@ -141,7 +141,7 @@ public class exSpriteAnimClip : ScriptableObject {
     public bool editorNeedRebuild = false; ///< check if the sprite animation clip need rebuild
 
 #if !UNITY_FLASH
-    private EventInfoComparer eventInfoComparer = new EventInfoComparer();
+    EventInfoComparer eventInfoComparer = new EventInfoComparer();
 #endif
 
     ///////////////////////////////////////////////////////////////////////////////

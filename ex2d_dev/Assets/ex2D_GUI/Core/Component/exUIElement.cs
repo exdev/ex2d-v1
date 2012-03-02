@@ -68,7 +68,7 @@ public class exUIElement : exPlane {
     /// Awake functoin inherit from exPlane.
     // ------------------------------------------------------------------ 
 
-    override protected void Awake () {
+    protected new void Awake () {
         base.Awake();
         updateFlags |= UpdateFlags.Vertex;
         Commit();
@@ -78,7 +78,7 @@ public class exUIElement : exPlane {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    override public void Commit () {
+    public override void Commit () {
 
         if ( (updateFlags & UpdateFlags.Vertex) != 0 ) {
             //
@@ -180,7 +180,7 @@ public class exUIElement : exPlane {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    override protected void OnEnable () {
+    protected new void OnEnable () {
         base.OnEnable();
         foreach ( exUIElement el in children ) {
             el.enabled = true;
@@ -191,7 +191,7 @@ public class exUIElement : exPlane {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    override protected void OnDisable () {
+    protected new void OnDisable () {
         base.OnDisable();
         foreach ( exUIElement el in children ) {
             el.enabled = false;
@@ -202,14 +202,16 @@ public class exUIElement : exPlane {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    virtual public void Sync () {
+    public virtual void Sync () {
     }
 
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    void OnDestroy () {
+    protected new void OnDestroy () {
+        base.OnDestroy();
+
         if ( parent != null ) {
             parent.RemoveChild(this);
         }

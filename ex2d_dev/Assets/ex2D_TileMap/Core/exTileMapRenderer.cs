@@ -61,7 +61,7 @@ public class exTileMapRenderer : exPlane {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    override protected void Awake () {
+    protected new void Awake () {
         base.Awake();
 
         if ( tileMap_ != null ||
@@ -279,7 +279,7 @@ public class exTileMapRenderer : exPlane {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    override public void Commit () {
+    public override void Commit () {
         if ( meshFilter ) {
             if ( meshFilter_.sharedMesh != null ) {
                 UpdateMesh (meshFilter_.sharedMesh);

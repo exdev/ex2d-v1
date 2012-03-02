@@ -24,7 +24,7 @@ public class exPlaneBuilderEditor : Editor {
     // properties
     ///////////////////////////////////////////////////////////////////////////////
 
-    private bool isDirty = false; 
+    bool isDirty = false; 
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -177,7 +177,7 @@ public class exPlaneBuilderEditor : Editor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-	override public void OnInspectorGUI () {
+	public override void OnInspectorGUI () {
         exPlaneBuilder editTarget = target as exPlaneBuilder;
         EditorGUILayout.Space ();
 
@@ -303,7 +303,7 @@ public class exPlaneBuilderEditor : Editor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    private void ProcessEvent () {
+    void ProcessEvent () {
         // TODO:
     }
 }

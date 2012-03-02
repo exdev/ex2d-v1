@@ -35,7 +35,7 @@ public class exSoftClipEditor : exPlaneEditor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    override protected void OnEnable () {
+    protected new void OnEnable () {
         base.OnEnable();
         if ( target != curEdit ) {
             curEdit = target as exSoftClip;
@@ -46,7 +46,7 @@ public class exSoftClipEditor : exPlaneEditor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-	override public void OnInspectorGUI () {
+	public override void OnInspectorGUI () {
         base.OnInspectorGUI();
         GUILayout.Space(20);
 
@@ -252,7 +252,7 @@ public class exSoftClipEditor : exPlaneEditor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    override protected void AddAnimationHelper () {
+    protected override void AddAnimationHelper () {
         curEdit.gameObject.AddComponent<exSpriteBorderAnimHelper>();
     }
 

@@ -42,7 +42,7 @@ public class exSpriteBaseEditor : exPlaneEditor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    override protected void OnEnable () {
+    protected new void OnEnable () {
         base.OnEnable();
         if ( target != editSpriteBase ) {
             editSpriteBase = target as exSpriteBase;
@@ -65,7 +65,7 @@ public class exSpriteBaseEditor : exPlaneEditor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-	override public void OnInspectorGUI () {
+	public override void OnInspectorGUI () {
 
         // ======================================================== 
         // exPlane GUI 
@@ -234,7 +234,7 @@ public class exSpriteBaseEditor : exPlaneEditor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    override protected void AddAnimationHelper () {
+    protected override void AddAnimationHelper () {
         editSpriteBase.gameObject.AddComponent<exSpriteBaseAnimHelper>();
     }
 }

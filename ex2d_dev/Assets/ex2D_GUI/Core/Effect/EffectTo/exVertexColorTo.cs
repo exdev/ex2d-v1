@@ -25,7 +25,7 @@ public class exVertexColorTo : exEffectToColor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    protected override void Awake () {
+    protected new void Awake () {
         base.Awake();
         mesh = GetComponent<MeshFilter>().mesh;
     }

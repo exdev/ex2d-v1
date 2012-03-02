@@ -66,7 +66,7 @@ public class exUIButton : exUIElement {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    override public void Sync () {
+    public override void Sync () {
         base.Sync ();
 
         if ( border ) {

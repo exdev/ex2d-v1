@@ -34,7 +34,7 @@ public class exUIScrollViewEditor : exUIElementEditor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    override protected void OnEnable () {
+    protected new void OnEnable () {
         base.OnEnable();
         if ( target != editScrollView ) {
             editScrollView = target as exUIScrollView;
@@ -45,7 +45,7 @@ public class exUIScrollViewEditor : exUIElementEditor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-	override public void OnInspectorGUI () {
+	public override void OnInspectorGUI () {
 
         // ======================================================== 
         // Base GUI 
@@ -130,7 +130,7 @@ public class exUIScrollViewEditor : exUIElementEditor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    override protected void OnSceneGUI () {
+    protected override void OnSceneGUI () {
         base.OnSceneGUI();
 
         // ======================================================== 

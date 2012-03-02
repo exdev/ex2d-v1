@@ -34,7 +34,7 @@ public class exUIElementEditor : exPlaneEditor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    override protected void OnEnable () {
+    protected new void OnEnable () {
         base.OnEnable();
         if ( target != editElement ) {
             editElement = target as exUIElement;
@@ -45,7 +45,7 @@ public class exUIElementEditor : exPlaneEditor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-	override public void OnInspectorGUI () {
+	public override void OnInspectorGUI () {
 
         // ======================================================== 
         // Base GUI 
@@ -88,7 +88,7 @@ public class exUIElementEditor : exPlaneEditor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    virtual protected void OnSceneGUI () {
+    protected virtual void OnSceneGUI () {
 
         //
         Vector3[] vertices = new Vector3[4]; 

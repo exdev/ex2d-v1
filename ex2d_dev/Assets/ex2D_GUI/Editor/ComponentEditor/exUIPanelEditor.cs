@@ -34,7 +34,7 @@ public class exUIPanelEditor : exUIElementEditor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    override protected void OnEnable () {
+    protected new void OnEnable () {
         base.OnEnable();
         if ( target != editPanel ) {
             editPanel = target as exUIPanel;
@@ -45,7 +45,7 @@ public class exUIPanelEditor : exUIElementEditor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-	override public void OnInspectorGUI () {
+	public override void OnInspectorGUI () {
 
         // ======================================================== 
         // Base GUI 
@@ -92,7 +92,7 @@ public class exUIPanelEditor : exUIElementEditor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    override protected void OnSceneGUI () {
+    protected override void OnSceneGUI () {
         base.OnSceneGUI();
 
         // ======================================================== 

@@ -443,6 +443,9 @@ public class exSpriteAnimation : MonoBehaviour {
             }
 #else
             index = curAnimation.frameTimes.BinarySearch(wrappedTime);
+            if ( index < 0 ) {
+                index = ~index;
+            }
 #endif
         }
         return index;

@@ -106,7 +106,7 @@ public class exUIScrollView : exUIElement {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    override public void Sync () {
+    public override void Sync () {
         base.Sync();
 
         float startX = boundingRect.xMin;

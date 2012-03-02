@@ -46,7 +46,7 @@ public class exLayerMng : exLayer {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    protected override void Awake () {
+    protected new void Awake () {
         base.Awake();
     }
 

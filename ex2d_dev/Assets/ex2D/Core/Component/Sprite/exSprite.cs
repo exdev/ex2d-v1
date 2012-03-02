@@ -559,7 +559,7 @@ public class exSprite : exSpriteBase {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    override public void Commit () {
+    public override void Commit () {
         if ( meshFilter ) {
             if ( meshFilter_.sharedMesh != null ) {
                 UpdateMesh (meshFilter_.sharedMesh);
@@ -575,7 +575,7 @@ public class exSprite : exSpriteBase {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    override protected void OnEnable () {
+    protected new void OnEnable () {
         base.OnEnable();
 
         // NOTE: though we have ExecuteInEditMode, user can Add/Remove spanim in Editor
@@ -588,7 +588,7 @@ public class exSprite : exSpriteBase {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    override protected void OnDisable () {
+    protected new void OnDisable () {
         base.OnDisable();
 
         // NOTE: though we have ExecuteInEditMode, user can Add/Remove spanim in Editor
@@ -606,7 +606,7 @@ public class exSprite : exSpriteBase {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    override protected void Awake () {
+    protected new void Awake () {
 
 // DISABLE { 
 // #if UNITY_EDITOR

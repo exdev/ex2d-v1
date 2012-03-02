@@ -25,7 +25,7 @@ public class exEffectOp : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-	protected virtual void Awake() {
+	protected void Awake() {
         enabled = playAtStart ? true : false;
     }
 
