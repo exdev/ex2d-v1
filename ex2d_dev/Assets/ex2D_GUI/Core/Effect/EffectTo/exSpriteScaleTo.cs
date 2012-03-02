@@ -31,7 +31,7 @@ public class exSpriteScaleTo : exEffectOp {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-	protected override void Awake() {
+	protected new void Awake() {
         base.Awake();
         srcList = new Vector2[sprites.Length];
         destList = new Vector2[sprites.Length];

@@ -209,7 +209,9 @@ public class exUIElement : exPlane {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    void OnDestroy () {
+    protected new void OnDestroy () {
+        base.OnDestroy();
+
         if ( parent != null ) {
             parent.RemoveChild(this);
         }
