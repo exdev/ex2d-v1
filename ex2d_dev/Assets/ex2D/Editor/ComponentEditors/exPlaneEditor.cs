@@ -51,7 +51,7 @@ public class exPlaneEditor : Editor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    virtual protected void OnEnable () {
+    protected void OnEnable () {
         if ( target != editPlane ) {
             editPlane = target as exPlane;
 
@@ -77,7 +77,7 @@ public class exPlaneEditor : Editor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-	override public void OnInspectorGUI () {
+	public override void OnInspectorGUI () {
 
         exSprite editSprite = target as exSprite;
         inAnimMode = AnimationUtility.InAnimationMode();
@@ -264,7 +264,7 @@ public class exPlaneEditor : Editor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    virtual protected void AddAnimationHelper () {
+    protected virtual void AddAnimationHelper () {
         editPlane.gameObject.AddComponent<exAnimationHelper>();
     }
 }

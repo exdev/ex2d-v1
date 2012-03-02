@@ -27,7 +27,7 @@ partial class exTileMapRendererEditor : exPlaneEditor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    override protected void OnEnable () {
+    protected new void OnEnable () {
         base.OnEnable();
         if ( target != editTileMap ) {
             editTileMap = target as exTileMapRenderer;
@@ -39,7 +39,7 @@ partial class exTileMapRendererEditor : exPlaneEditor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-	override public void OnInspectorGUI () {
+	public override void OnInspectorGUI () {
 
         // ======================================================== 
         // exSprite Base GUI 

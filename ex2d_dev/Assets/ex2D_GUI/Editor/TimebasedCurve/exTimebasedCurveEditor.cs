@@ -27,7 +27,7 @@ public class exTimebasedCurveEditor : Editor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-	override public void OnInspectorGUI () {
+	public override void OnInspectorGUI () {
         //
         if ( target != curEditTarget ) {
             curEditTarget = target as exTimebasedCurveInfo;

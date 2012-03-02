@@ -24,7 +24,7 @@ public class exCubeEditor : Editor {
     // properties
     ///////////////////////////////////////////////////////////////////////////////
 
-    private bool isDirty = false; 
+    bool isDirty = false; 
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -211,7 +211,7 @@ public class exCubeEditor : Editor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-	override public void OnInspectorGUI () {
+	public override void OnInspectorGUI () {
         exCubeBuilder editTarget = target as exCubeBuilder;
         EditorGUILayout.Space ();
 
@@ -277,7 +277,7 @@ public class exCubeEditor : Editor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    private void ProcessEvent () {
+    void ProcessEvent () {
         // TODO:
     }
 

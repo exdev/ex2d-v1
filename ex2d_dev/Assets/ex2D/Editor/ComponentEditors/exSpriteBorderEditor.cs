@@ -58,7 +58,7 @@ public class exSpriteBorderEditor : exSpriteBaseEditor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    override protected void OnEnable () {
+    protected new void OnEnable () {
         base.OnEnable();
         if ( target != editSpriteBorder ) {
             editSpriteBorder = target as exSpriteBorder;
@@ -69,7 +69,7 @@ public class exSpriteBorderEditor : exSpriteBaseEditor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-	override public void OnInspectorGUI () {
+	public override void OnInspectorGUI () {
 
         // ======================================================== 
         // Base GUI 
@@ -415,7 +415,7 @@ public class exSpriteBorderEditor : exSpriteBaseEditor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    override protected void AddAnimationHelper () {
+    protected override void AddAnimationHelper () {
         editSpriteBorder.gameObject.AddComponent<exSpriteBorderAnimHelper>();
     }
 

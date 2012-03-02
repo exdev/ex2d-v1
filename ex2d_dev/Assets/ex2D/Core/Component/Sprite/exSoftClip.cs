@@ -112,10 +112,22 @@ public class exSoftClip : exPlane {
     /// Awake functoin inherit from exPlane.
     // ------------------------------------------------------------------ 
 
-    override protected void Awake () {
+    protected new void Awake () {
         base.Awake();
         updateFlags |= UpdateFlags.Vertex;
         Commit();
+
+        spriteMng.AddToSoftClipList(this);
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    protected new void OnDestroy () {
+        base.OnDestroy();
+
+        spriteMng.RemoveFromSoftClipList(this);
     }
 
     // ------------------------------------------------------------------ 
@@ -123,7 +135,7 @@ public class exSoftClip : exPlane {
     /// When enabled set to true, it will enable all the item in the planes
     // ------------------------------------------------------------------ 
 
-    override protected void OnEnable () {
+    protected new void OnEnable () {
         base.OnEnable();
 
         for ( int i = 0; i < planes.Count; ++i ) {
@@ -142,7 +154,7 @@ public class exSoftClip : exPlane {
     /// When enabled set to false, it will disable all the item in the planes
     // ------------------------------------------------------------------ 
 
-    override protected void OnDisable () {
+    protected new void OnDisable () {
         base.OnDisable();
     }
 
@@ -150,7 +162,7 @@ public class exSoftClip : exPlane {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    override public void Commit () {
+    public override void Commit () {
 
         if ( (updateFlags & UpdateFlags.Vertex) != 0 ) {
             //
@@ -200,14 +212,6 @@ public class exSoftClip : exPlane {
 
         //
         updateFlags = UpdateFlags.None;
-    }
-
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
-    void Update () {
-        spriteMng.AddToSoftClipList(this);
     }
 
     // ------------------------------------------------------------------ 

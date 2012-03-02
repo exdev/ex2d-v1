@@ -140,7 +140,7 @@ public class exSpriteAnimClip : ScriptableObject {
     public float editorSpeed = 1.0f; ///< the preview speed in sprite animation editor 
     public bool editorNeedRebuild = false; ///< check if the sprite animation clip need rebuild
 
-    private EventInfoComparer eventInfoComparer = new EventInfoComparer();
+    EventInfoComparer eventInfoComparer = new EventInfoComparer();
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions

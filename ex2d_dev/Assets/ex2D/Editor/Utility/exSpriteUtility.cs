@@ -105,7 +105,7 @@ public static class exSpriteUtility {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    static public void RecursivelyNormalizeScale ( this Transform _trans ) {
+    public static void RecursivelyNormalizeScale ( this Transform _trans ) {
         //
         foreach ( Transform child in _trans ) {
             child.RecursivelyNormalizeScale();

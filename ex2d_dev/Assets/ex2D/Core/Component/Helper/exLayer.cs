@@ -223,7 +223,7 @@ public class exLayer : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    protected virtual void Awake () {
+    protected void Awake () {
         // relink layers
         // NOTE: this happends when we clone a GameObject
 

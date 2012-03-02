@@ -308,7 +308,7 @@ public class exPlane : MonoBehaviour {
     /// you need to override this and call base.Awake() in your Awake block.
     // ------------------------------------------------------------------ 
 
-    virtual protected void Awake () {
+    protected void Awake () {
         //
         if ( camera_ == null )
             camera_ = Camera.main;
@@ -333,7 +333,7 @@ public class exPlane : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    void OnDestroy () {
+    protected void OnDestroy () {
         if ( meshFilter ) {
             DestroyImmediate( meshFilter.sharedMesh, true );
         }
@@ -348,7 +348,7 @@ public class exPlane : MonoBehaviour {
     /// you need to override this and call base.OnEnable() in your OnEnable block.
     // ------------------------------------------------------------------ 
 
-    virtual protected void OnEnable () {
+    protected void OnEnable () {
         if ( renderer != null )
             renderer.enabled = true;
     }
@@ -362,7 +362,7 @@ public class exPlane : MonoBehaviour {
     /// you need to override this and call base.OnDisable() in your OnDisable block.
     // ------------------------------------------------------------------ 
 
-    virtual protected void OnDisable () {
+    protected void OnDisable () {
         if ( renderer != null )
             renderer.enabled = false;
     }
@@ -385,7 +385,7 @@ public class exPlane : MonoBehaviour {
     /// It will be invoked when updateFlags is not UpdateFlags.None
     // ------------------------------------------------------------------ 
 
-    virtual public void Commit () {
+    public virtual void Commit () {
         // Debug.LogWarning ("You should not directly call this function. please override it!");
     }
 

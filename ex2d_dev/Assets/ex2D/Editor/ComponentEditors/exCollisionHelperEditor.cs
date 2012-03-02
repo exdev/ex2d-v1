@@ -56,7 +56,7 @@ public class exCollisionHelperEditor : Editor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-	override public void OnInspectorGUI () {
+	public override void OnInspectorGUI () {
         bool inAnimMode = AnimationUtility.InAnimationMode();
 
         EditorGUIUtility.LookLikeInspector ();

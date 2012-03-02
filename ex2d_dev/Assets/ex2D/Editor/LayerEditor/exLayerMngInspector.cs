@@ -26,7 +26,7 @@ class exLayerMngInspector : Editor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-	override public void OnInspectorGUI () {
+	public override void OnInspectorGUI () {
         // DrawDefaultInspector(); 
         GUILayout.BeginHorizontal();
         GUILayout.FlexibleSpace();

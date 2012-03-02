@@ -45,7 +45,7 @@ public class exPixelPerfectEditor : Editor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-	override public void OnInspectorGUI () {
+	public override void OnInspectorGUI () {
 
         EditorGUIUtility.LookLikeInspector ();
         EditorGUILayout.Space ();
