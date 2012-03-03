@@ -127,7 +127,9 @@ public class exSoftClip : exPlane {
     protected new void OnDestroy () {
         base.OnDestroy();
 
-        spriteMng.RemoveFromSoftClipList(this);
+        if ( spriteMng != null ) {
+            spriteMng_.RemoveFromSoftClipList(this);
+        }
     }
 
     // ------------------------------------------------------------------ 
