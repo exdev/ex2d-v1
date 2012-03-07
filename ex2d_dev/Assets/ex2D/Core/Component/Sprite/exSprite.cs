@@ -692,7 +692,7 @@ public class exSprite : exSpriteBase {
     /// Set a new picture in an atlas to this sprite 
     // ------------------------------------------------------------------ 
 
-    public void SetSprite ( exAtlas _atlas, int _index ) {
+    public void SetSprite ( exAtlas _atlas, int _index, bool _changeDefaultAnimSprite = false ) {
         bool checkVertex = false;
         bool createMesh = false;
 
@@ -767,6 +767,11 @@ public class exSprite : exSpriteBase {
             if ( meshCollider && meshCollider.sharedMesh == null ) {
                 this.UpdateColliderSize(0.2f);
             }
+        }
+
+        //
+        if ( _changeDefaultAnimSprite && spanim ) {
+            spanim.UpdateDefaultSprite ( _atlas, _index );
         }
     }
 

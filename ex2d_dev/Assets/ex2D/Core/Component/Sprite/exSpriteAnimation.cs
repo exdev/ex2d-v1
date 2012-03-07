@@ -231,6 +231,15 @@ public class exSpriteAnimation : MonoBehaviour {
         sprite.SetSprite( defaultAtlas, defaultIndex );
     }
 
+    // ------------------------------------------------------------------ 
+    /// update the default sprite if we dynamically change it in the game
+    // ------------------------------------------------------------------ 
+
+    public void UpdateDefaultSprite ( exAtlas _atlas, int _index ) {
+        defaultAtlas = _atlas;
+        defaultIndex = _index;
+    }
+
     // NOTE: the reason I design to Play instead of using default parameter is because in 
     // Unity Animation Editor, it can send message to function that only have one parameter.
 
