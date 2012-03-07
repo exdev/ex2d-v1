@@ -270,7 +270,9 @@ public static class exEditorHelper {
     /// material at Material/ and give it the same name as texture and return it.
     // ------------------------------------------------------------------ 
 
-    public static Material GetDefaultMaterial ( Texture2D _texture ) {
+    public static Material GetDefaultMaterial ( Texture2D _texture, 
+                                                string _shaderName = "ex2D/Alpha Blended" ) 
+    {
         if ( _texture == null )
             return null;
 
@@ -299,7 +301,7 @@ public static class exEditorHelper {
                 AssetDatabase.CreateFolder ( texturePath, "Materials" );
 
             // create temp materal
-            newMaterial = new Material( Shader.Find("ex2D/Alpha Blended") );
+            newMaterial = new Material( Shader.Find(_shaderName) );
             newMaterial.mainTexture = _texture;
 
             AssetDatabase.CreateAsset(newMaterial, materialPath);
