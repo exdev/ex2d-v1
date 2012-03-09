@@ -273,7 +273,7 @@ public class exSpriteAnimation : MonoBehaviour {
             if ( _index == 0 )
                 curAnimation.time = 0.0f;
             else if ( _index > 0 && _index < curAnimation.frameTimes.Count )
-                curAnimation.time = curAnimation.frameTimes[_index];
+                curAnimation.time = curAnimation.frameTimes[_index-1];
             playing = true;
             if ( curAnimation.speed >= 0.0f )
                 lastEventInfoIndex = -1;
