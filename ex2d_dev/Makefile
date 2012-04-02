@@ -9,11 +9,16 @@
 #  general
 # /////////////////////////////////////////////////////////////////////////////
 
-# settings
+# settings (windows)
+# UNITY_PATH = $(subst \,/,$(PROGRAMFILES))/Unity/Editor/Data
+# settings (mac)
 UNITY_PATH = /Applications/Unity/Unity.app/Contents/Frameworks
 
-# unit essential
+# unit essential (windows)
+# COMPILER = $(UNITY_PATH)/Mono/bin/gmcs.bat
+# unit essential (mac)
 COMPILER = $(UNITY_PATH)/Mono/bin/gmcs
+
 UNITY_ENGINE_DLL = $(UNITY_PATH)/Managed/UnityEngine.dll
 UNITY_EDITOR_DLL = $(UNITY_PATH)/Managed/UnityEditor.dll
 UNITY_VER = UNITY_3_5 
