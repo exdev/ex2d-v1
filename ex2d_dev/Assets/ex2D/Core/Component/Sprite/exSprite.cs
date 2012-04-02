@@ -689,6 +689,7 @@ public class exSprite : exSpriteBase {
     // ------------------------------------------------------------------ 
     /// \param _atlas the new atlas
     /// \param _index the index of the element in the new atlas
+    /// \param _changeDefaultAnimSprite if this is true, the default animation sprite will be changed so when we use stopAction = defaultSprite it will change to this new one 
     /// Set a new picture in an atlas to this sprite 
     // ------------------------------------------------------------------ 
 
@@ -758,14 +759,16 @@ public class exSprite : exSpriteBase {
 
         //
         if ( createMesh ) {
-            // create mesh ( in editor, this can duplicate mesh to prevent shared mesh for sprite)
-            meshFilter_.mesh = new Mesh();
-            updateFlags = UpdateFlags.Vertex | UpdateFlags.UV | UpdateFlags.Color | UpdateFlags.Index;
+            if ( meshFilter ) {
+                // create mesh ( in editor, this can duplicate mesh to prevent shared mesh for sprite)
+                meshFilter_.mesh = new Mesh();
+                updateFlags = UpdateFlags.Vertex | UpdateFlags.UV | UpdateFlags.Color | UpdateFlags.Index;
 
-            // check if update mesh collider
-            MeshCollider meshCollider = collider as MeshCollider;  
-            if ( meshCollider && meshCollider.sharedMesh == null ) {
-                this.UpdateColliderSize(0.2f);
+                // check if update mesh collider
+                MeshCollider meshCollider = collider as MeshCollider;  
+                if ( meshCollider && meshCollider.sharedMesh == null ) {
+                    this.UpdateColliderSize(0.2f);
+                }
             }
         }
 

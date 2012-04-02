@@ -262,6 +262,7 @@ public static class exEditorHelper {
 
     // ------------------------------------------------------------------ 
     /// \param _texture the material for this texture
+    /// \param _shaderName the name of the shader been applied in this material
     /// \return the result material
     /// Get default material from the in texture. This function will try to
     /// find a texture material in the same directory with the same name. If

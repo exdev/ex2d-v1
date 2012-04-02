@@ -267,13 +267,13 @@ public class exLayer : MonoBehaviour {
 
     public void InsertAt ( int _index, exLayer _layer ) {
         if ( _layer.parent == this ) {
-            int index = children_.IndexOf (_layer);
-            if ( index > _index ) {
+            int curIndex = children_.IndexOf (_layer);
+            if ( curIndex > _index ) {
                 _layer.parent = null;
                 children_.Insert ( _index, _layer );
                 _layer.parent_ = this;
             }
-            else {
+            else if ( curIndex < _index ) {
                 children_.Insert ( _index, _layer );
                 _layer.parent = null;
                 _layer.parent_ = this;
