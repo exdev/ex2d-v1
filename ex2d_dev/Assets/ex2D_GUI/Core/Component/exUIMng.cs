@@ -498,7 +498,7 @@ public class exUIMng : MonoBehaviour {
             RaycastHit hit = hits[i];
             GameObject go = hit.collider.gameObject;
             exUIElement el = go.GetComponent<exUIElement>();
-            if ( el && el.enabled ) {
+            if ( el && el.isActive ) {
                 elements.Add(el);
             }
         }

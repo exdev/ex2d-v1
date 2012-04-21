@@ -60,6 +60,24 @@ public class exUIElement : exPlane {
         }
     }
 
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public bool isActive {
+        get {
+            if ( enabled == false )
+                return false;
+            exUIElement p = parent;
+            while ( p != null ) {
+                if ( p.enabled == false )
+                    return false;
+                p = p.parent;
+            }
+            return true;
+        }
+    }
+
     ///////////////////////////////////////////////////////////////////////////////
     // static functions
     ///////////////////////////////////////////////////////////////////////////////
@@ -173,28 +191,6 @@ public class exUIElement : exPlane {
             collisionHelper.autoLength = false;
             collisionHelper.length = 0.2f;
             collisionHelper.UpdateCollider();
-        }
-    }
-
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
-    protected new void OnEnable () {
-        base.OnEnable();
-        foreach ( exUIElement el in children ) {
-            el.enabled = true;
-        }
-    }
-
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
-    protected new void OnDisable () {
-        base.OnDisable();
-        foreach ( exUIElement el in children ) {
-            el.enabled = false;
         }
     }
 
