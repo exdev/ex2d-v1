@@ -454,6 +454,9 @@ public class exUIScrollView : exUIElement {
 
     // ------------------------------------------------------------------ 
     // Desc: 
+    public static float ExpoOut ( float _t ) {
+        return (_t==1.0f) ? 1.0f : 1.001f * (-Mathf.Pow(2.0f, -10 * _t) + 1);
+    }
     // ------------------------------------------------------------------ 
 
     void RelocateContent () {
@@ -462,8 +465,8 @@ public class exUIScrollView : exUIElement {
         float maxOffsetX = Mathf.Max(contentWidth - boundingRect.width, 0.0f);
         float maxOffsetY = Mathf.Max(contentHeight - boundingRect.height, 0.0f);
 
-        contentOffset = new Vector2 ( Mathf.Lerp ( startPos.x, destPos.x, exEase.ExpoOut(ratio) ),
-                                      Mathf.Lerp ( startPos.y, destPos.y, exEase.ExpoOut(ratio) ) );
+        contentOffset = new Vector2 ( Mathf.Lerp ( startPos.x, destPos.x, ExpoOut(ratio) ),
+                                      Mathf.Lerp ( startPos.y, destPos.y, ExpoOut(ratio) ) );
 
         //
         float bounceX = 0.0f;
