@@ -371,7 +371,7 @@ public class exSpriteAnimation : MonoBehaviour {
         if ( string.IsNullOrEmpty(_name) )
             return playing;
         else
-            return ( playing && curAnimation.name == _name );
+            return ( playing && curAnimation != null && curAnimation.name == _name );
     }
 
     // ------------------------------------------------------------------ 
@@ -385,7 +385,7 @@ public class exSpriteAnimation : MonoBehaviour {
         if ( string.IsNullOrEmpty(_name) )
             return (enabled == false);
         else
-            return (enabled == false && curAnimation.name == _name);
+            return (enabled == false && curAnimation != null && curAnimation.name == _name);
     }
 
     // ------------------------------------------------------------------ 
