@@ -55,7 +55,7 @@ public class exSpriteEditor : exSpriteBaseEditor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    override protected void OnEnable () {
+    protected new void OnEnable () {
         base.OnEnable();
         if ( target != editSprite ) {
             editSprite = target as exSprite;
@@ -66,7 +66,7 @@ public class exSpriteEditor : exSpriteBaseEditor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-	override public void OnInspectorGUI () {
+	public override void OnInspectorGUI () {
 
         // ======================================================== 
         // Base GUI 
@@ -99,9 +99,7 @@ public class exSpriteEditor : exSpriteBaseEditor {
             EditorGUIUtility.LookLikeControls ();
             Texture2D newTexture = (Texture2D)EditorGUILayout.ObjectField( editTexture
                                                                            , typeof(Texture2D)
-#if !UNITY_3_0 && !UNITY_3_1 && !UNITY_3_3
                                                                            , false
-#endif
                                                                            , GUILayout.Width(100)
                                                                            , GUILayout.Height(100) 
                                                                          );
@@ -209,9 +207,7 @@ public class exSpriteEditor : exSpriteBaseEditor {
         EditorGUILayout.ObjectField( "Atlas"
                                      , editSprite.atlas
                                      , typeof(exAtlas)
-#if !UNITY_3_0 && !UNITY_3_1 && !UNITY_3_3
                                      , false 
-#endif
                                    );
         GUI.enabled = true;
 
@@ -231,7 +227,7 @@ public class exSpriteEditor : exSpriteBaseEditor {
         // custom size
         // ======================================================== 
 
-        GUI.enabled = !inAnimMode && !hasPixelPerfectComponent;
+        GUI.enabled = !inAnimMode;
         editSprite.customSize = EditorGUILayout.Toggle( "Custom Size", editSprite.customSize );
         GUI.enabled = true;
 
@@ -337,7 +333,7 @@ public class exSpriteEditor : exSpriteBaseEditor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    override protected void AddAnimationHelper () {
+    protected override void AddAnimationHelper () {
         editSprite.gameObject.AddComponent<exSpriteAnimHelper>();
     }
 }

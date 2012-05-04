@@ -67,7 +67,9 @@ public class exAtlasDB : ScriptableObject {
     static int version = 2;
     static bool needSync = false;
     static exAtlasDB db;
-    public static string dbPath = "Assets/.ex2D_AtlasDB.asset"; ///< the fullpath of the atlas db we use 
+
+    public static string dbKey = "AtlasDB_Path"; ///< the db key for preferences
+    public static string dbPath = "Assets/_ex2D_AtlasDB.asset"; ///< the fullpath of the atlas db we use 
 
     ///////////////////////////////////////////////////////////////////////////////
     // static
@@ -106,6 +108,7 @@ public class exAtlasDB : ScriptableObject {
     // ------------------------------------------------------------------ 
 
     public static bool DBExists () {
+        dbPath = EditorPrefs.GetString( dbKey, dbPath );
         FileInfo fileInfo = new FileInfo(dbPath);
         return fileInfo.Exists;
     }
@@ -119,10 +122,16 @@ public class exAtlasDB : ScriptableObject {
         db.elementInfos.Clear();
         db.texGUIDToElementInfo.Clear();
 
-        EditorUtility.DisplayProgressBar( "Syncing exAtlasDB...", "Syncing...", 0.5f );    
-        SyncDirectory ("Assets");
-        EditorUtility.UnloadUnusedAssetsIgnoreManagedReferences();
-        EditorUtility.ClearProgressBar();    
+        try {
+            EditorUtility.DisplayProgressBar( "Syncing exAtlasDB...", "Syncing...", 0.5f );    
+            SyncDirectory ("Assets");
+            EditorUtility.UnloadUnusedAssetsIgnoreManagedReferences();
+            EditorUtility.ClearProgressBar();    
+        }
+        catch ( System.Exception ) {
+            EditorUtility.ClearProgressBar();    
+            throw;
+        }
 
         EditorUtility.SetDirty(db);
     }
@@ -157,6 +166,14 @@ public class exAtlasDB : ScriptableObject {
     // ------------------------------------------------------------------ 
 
     static void CreateDB () {
+        dbPath = EditorPrefs.GetString( dbKey, dbPath );
+
+        // first create db directory if not exists
+        string dbDir = Path.GetDirectoryName(dbPath);
+        if ( new DirectoryInfo(dbDir).Exists == false ) {
+            Directory.CreateDirectory (dbDir);
+        }
+
         // get atlas db, if not found, create one
         db = (exAtlasDB)AssetDatabase.LoadAssetAtPath( dbPath, typeof(exAtlasDB) );
         if ( db == null ) {

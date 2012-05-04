@@ -19,7 +19,7 @@ using System.IO;
 ///////////////////////////////////////////////////////////////////////////////
 
 [CustomEditor(typeof(exSoftClip))]
-class exSoftClipEditor : exPlaneEditor {
+public class exSoftClipEditor : exPlaneEditor {
 
     ///////////////////////////////////////////////////////////////////////////////
     // properties
@@ -35,7 +35,7 @@ class exSoftClipEditor : exPlaneEditor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    override protected void OnEnable () {
+    protected new void OnEnable () {
         base.OnEnable();
         if ( target != curEdit ) {
             curEdit = target as exSoftClip;
@@ -46,7 +46,7 @@ class exSoftClipEditor : exPlaneEditor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-	override public void OnInspectorGUI () {
+	public override void OnInspectorGUI () {
         base.OnInspectorGUI();
         GUILayout.Space(20);
 
@@ -104,9 +104,7 @@ class exSoftClipEditor : exPlaneEditor {
                 EditorGUILayout.ObjectField ( p.name
                                             , p
                                             , typeof(exPlane)
-#if !UNITY_3_0 && !UNITY_3_1 && !UNITY_3_3
                                             , true
-#endif
                                             );
             }
         }
@@ -254,7 +252,7 @@ class exSoftClipEditor : exPlaneEditor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    override protected void AddAnimationHelper () {
+    protected override void AddAnimationHelper () {
         curEdit.gameObject.AddComponent<exSpriteBorderAnimHelper>();
     }
 

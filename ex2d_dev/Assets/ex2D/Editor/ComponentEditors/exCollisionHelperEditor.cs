@@ -18,7 +18,7 @@ using System.Collections;
 ///////////////////////////////////////////////////////////////////////////////
 
 [CustomEditor(typeof(exCollisionHelper))]
-class exCollisionHelperEditor : Editor {
+public class exCollisionHelperEditor : Editor {
 
     ///////////////////////////////////////////////////////////////////////////////
     // properties
@@ -56,7 +56,7 @@ class exCollisionHelperEditor : Editor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-	override public void OnInspectorGUI () {
+	public override void OnInspectorGUI () {
         bool inAnimMode = AnimationUtility.InAnimationMode();
 
         EditorGUIUtility.LookLikeInspector ();

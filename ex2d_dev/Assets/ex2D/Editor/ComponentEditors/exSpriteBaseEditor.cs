@@ -32,7 +32,6 @@ public class exSpriteBaseEditor : exPlaneEditor {
     ///////////////////////////////////////////////////////////////////////////////
 
     private exSpriteBase editSpriteBase;
-    protected bool hasPixelPerfectComponent = false;
     protected CollisionType collisionType = CollisionType.None;
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -43,7 +42,7 @@ public class exSpriteBaseEditor : exPlaneEditor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    override protected void OnEnable () {
+    protected new void OnEnable () {
         base.OnEnable();
         if ( target != editSpriteBase ) {
             editSpriteBase = target as exSpriteBase;
@@ -66,7 +65,7 @@ public class exSpriteBaseEditor : exPlaneEditor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-	override public void OnInspectorGUI () {
+	public override void OnInspectorGUI () {
 
         // ======================================================== 
         // exPlane GUI 
@@ -78,14 +77,13 @@ public class exSpriteBaseEditor : exPlaneEditor {
         EditorGUIUtility.LookLikeInspector ();
         EditorGUI.indentLevel = 1;
 
-        GUILayout.BeginHorizontal();
             // ======================================================== 
             // Collision Type 
             // ======================================================== 
 
             GUI.enabled = !inAnimMode;
             EditorGUIUtility.LookLikeControls ();
-            CollisionType newCollisionType = (CollisionType)EditorGUILayout.EnumPopup( "Collision Type", collisionType, GUILayout.Width(165) );
+            CollisionType newCollisionType = (CollisionType)EditorGUILayout.EnumPopup( "Collision Type", collisionType, GUILayout.Width(200) );
             EditorGUIUtility.LookLikeInspector ();
             GUI.enabled = true;
 
@@ -109,11 +107,13 @@ public class exSpriteBaseEditor : exPlaneEditor {
                     editSpriteBase.collisionHelper.UpdateCollider();
             }
 
+        GUILayout.BeginHorizontal();
+
             // ======================================================== 
             // use collision helper
             // ======================================================== 
 
-            GUILayout.Space(5);
+            GUILayout.Space(15);
             GUI.enabled = !inAnimMode;
             exCollisionHelper compCollisionHelper = editSpriteBase.collisionHelper;
             bool hasCollisionHelperComp = compCollisionHelper != null; 
@@ -151,7 +151,7 @@ public class exSpriteBaseEditor : exPlaneEditor {
         GUILayout.Space(15);
             GUI.enabled = !inAnimMode;
             exPixelPerfect compPixelPerfect = editSpriteBase.GetComponent<exPixelPerfect>();
-            hasPixelPerfectComponent = compPixelPerfect != null; 
+            bool hasPixelPerfectComponent = compPixelPerfect != null; 
             bool usePixelPerfect = GUILayout.Toggle ( hasPixelPerfectComponent, "Use Pixel Perfect" ); 
             if ( usePixelPerfect != hasPixelPerfectComponent ) {
                 if ( usePixelPerfect )
@@ -167,11 +167,9 @@ public class exSpriteBaseEditor : exPlaneEditor {
         // scale 
         // ======================================================== 
 
-        GUI.enabled = !hasPixelPerfectComponent;
         EditorGUIUtility.LookLikeControls ();
         editSpriteBase.scale = EditorGUILayout.Vector2Field ( "Scale", editSpriteBase.scale );
         EditorGUIUtility.LookLikeInspector ();
-        GUI.enabled = true;
 
         // ======================================================== 
         // HFlip, VFlip, Reset to Pixel Perfect
@@ -236,7 +234,7 @@ public class exSpriteBaseEditor : exPlaneEditor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    override protected void AddAnimationHelper () {
+    protected override void AddAnimationHelper () {
         editSpriteBase.gameObject.AddComponent<exSpriteBaseAnimHelper>();
     }
 }

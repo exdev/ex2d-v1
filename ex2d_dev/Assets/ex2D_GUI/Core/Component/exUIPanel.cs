@@ -44,7 +44,7 @@ public class exUIPanel : exUIElement {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    override public void Sync () {
+    public override void Sync () {
         base.Sync ();
 
         if ( background ) {

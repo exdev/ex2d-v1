@@ -19,7 +19,7 @@ using System.IO;
 ///////////////////////////////////////////////////////////////////////////////
 
 [CustomEditor(typeof(exViewportPosition))]
-class exViewportPositionEditor : Editor {
+public class exViewportPositionEditor : Editor {
 
     ///////////////////////////////////////////////////////////////////////////////
     // properties
@@ -45,7 +45,7 @@ class exViewportPositionEditor : Editor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-	override public void OnInspectorGUI () {
+	public override void OnInspectorGUI () {
 
         EditorGUIUtility.LookLikeInspector ();
         EditorGUILayout.Space ();

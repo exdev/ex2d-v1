@@ -19,7 +19,7 @@ using System.IO;
 ///////////////////////////////////////////////////////////////////////////////
 
 [CustomEditor(typeof(exSpriteAnimation))]
-class exSpriteAnimationEditor : Editor {
+public class exSpriteAnimationEditor : Editor {
 
     ///////////////////////////////////////////////////////////////////////////////
     // properties
@@ -46,7 +46,7 @@ class exSpriteAnimationEditor : Editor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-	override public void OnInspectorGUI () {
+	public override void OnInspectorGUI () {
         exSprite sprite = editSpAnim.GetComponent<exSprite>();
         bool checkDefaultSprite = (sprite != null) && string.IsNullOrEmpty(sprite.textureGUID);
 
@@ -68,9 +68,7 @@ class exSpriteAnimationEditor : Editor {
         editSpAnim.defaultAnimation = (exSpriteAnimClip)EditorGUILayout.ObjectField( "Default Animation"
                                                                                    , editSpAnim.defaultAnimation
                                                                                    , typeof(exSpriteAnimClip)
-#if !UNITY_3_0 && !UNITY_3_1 && !UNITY_3_3
                                                                                    , false 
-#endif
                                                                                  );
         if ( GUILayout.Button("Edit...", GUILayout.Width(40), GUILayout.Height(15) ) ) {
             exSpriteAnimClipEditor editor = exSpriteAnimClipEditor.NewWindow();
@@ -127,9 +125,7 @@ class exSpriteAnimationEditor : Editor {
                     (exSpriteAnimClip)EditorGUILayout.ObjectField( "[" + i + "]"
                                                                  , editSpAnim.animations[i]
                                                                  , typeof(exSpriteAnimClip)
-#if !UNITY_3_0 && !UNITY_3_1 && !UNITY_3_3
                                                                  , false 
-#endif
                                                                );
                 if ( GUILayout.Button("-", GUILayout.Width(15), GUILayout.Height(15) ) ) {
                     idxRemoved = i;

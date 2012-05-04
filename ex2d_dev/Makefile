@@ -9,14 +9,19 @@
 #  general
 # /////////////////////////////////////////////////////////////////////////////
 
-# settings
+# settings (windows)
+# UNITY_PATH = $(subst \,/,$(PROGRAMFILES))/Unity/Editor/Data
+# settings (mac)
 UNITY_PATH = /Applications/Unity/Unity.app/Contents/Frameworks
 
-# unit essential
+# unit essential (windows)
+# COMPILER = $(UNITY_PATH)/Mono/bin/gmcs.bat
+# unit essential (mac)
 COMPILER = $(UNITY_PATH)/Mono/bin/gmcs
+
 UNITY_ENGINE_DLL = $(UNITY_PATH)/Managed/UnityEngine.dll
 UNITY_EDITOR_DLL = $(UNITY_PATH)/Managed/UnityEditor.dll
-UNITY_VER = UNITY_3_4 
+UNITY_VER = UNITY_3_5 
 
 # Utilities.
 MKDIR = mkdir -p
@@ -66,8 +71,10 @@ all: |ex2d
 rebuild_all: |clean_all all
 
 # defines
-RUNTIME_DEFINE = -d:UNITY_3_4 -d:UNITY_IPHONE
-EDITOR_DEFINE = -d:UNITY_EDITOR -d:UNITY_3_4
+PLATFORM_DEFINE = -d:UNITY_IPHONE
+#  PLATFORM_DEFINE = -d:UNITY_IPHONE -d:UNITY_FLASH
+RUNTIME_DEFINE = -d:$(UNITY_VER) $(PLATFORM_DEFINE)
+EDITOR_DEFINE = -d:$(UNITY_VER) -d:UNITY_EDITOR $(PLATFORM_DEFINE) 
 
 # /////////////////////////////////////////////////////////////////////////////
 # ex2D runtime target
@@ -108,7 +115,6 @@ $(EX2D_RUNTIME_TARGET):
 
 # get sources 
 EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/
-EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/About/
 EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/AtlasEditor/
 EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/BitmapFontEditor/
 EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/ComponentEditors/
@@ -118,6 +124,7 @@ EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/GroupImportEditor/
 EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/Helper/
 EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/LayerEditor/
 EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/Misc/
+EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/Misc/Wizards/
 EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/SpriteAnimationEditor/
 EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/Utility/
 EX2D_EDITOR_SOURCE = $(wildcard $(addsuffix *.cs,$(EX2D_EDITOR_SOURCE_DIRS)))
@@ -196,12 +203,7 @@ $(EX2D_TILEMAP_EDITOR_TARGET):
 # /////////////////////////////////////////////////////////////////////////////
 
 # get sources 
-EX2D_GUI_RUNTIME_SOURCE_DIRS += Assets/ex2D_GUI/Core/Asset/
 EX2D_GUI_RUNTIME_SOURCE_DIRS += Assets/ex2D_GUI/Core/Component/
-EX2D_GUI_RUNTIME_SOURCE_DIRS += Assets/ex2D_GUI/Core/Effect/
-EX2D_GUI_RUNTIME_SOURCE_DIRS += Assets/ex2D_GUI/Core/Effect/EffectFrom/
-EX2D_GUI_RUNTIME_SOURCE_DIRS += Assets/ex2D_GUI/Core/Effect/EffectTo/
-EX2D_GUI_RUNTIME_SOURCE_DIRS += Assets/ex2D_GUI/Core/Helper/
 EX2D_GUI_RUNTIME_SOURCE = $(wildcard $(addsuffix *.cs,$(EX2D_GUI_RUNTIME_SOURCE_DIRS)))
 
 # deubg argument
@@ -225,7 +227,6 @@ $(EX2D_GUI_RUNTIME_TARGET):
 # get sources 
 EX2D_GUI_EDITOR_SOURCE_DIRS += Assets/ex2D_GUI/Editor/
 EX2D_GUI_EDITOR_SOURCE_DIRS += Assets/ex2D_GUI/Editor/ComponentEditor/
-EX2D_GUI_EDITOR_SOURCE_DIRS += Assets/ex2D_GUI/Editor/TimebasedCurve/
 EX2D_GUI_EDITOR_SOURCE_DIRS += Assets/ex2D_GUI/Editor/Utility/
 EX2D_GUI_EDITOR_SOURCE = $(wildcard $(addsuffix *.cs,$(EX2D_GUI_EDITOR_SOURCE_DIRS)))
 

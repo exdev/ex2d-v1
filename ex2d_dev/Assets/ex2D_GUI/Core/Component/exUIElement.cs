@@ -60,6 +60,24 @@ public class exUIElement : exPlane {
         }
     }
 
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public bool isActive {
+        get {
+            if ( enabled == false )
+                return false;
+            exUIElement p = parent;
+            while ( p != null ) {
+                if ( p.enabled == false )
+                    return false;
+                p = p.parent;
+            }
+            return true;
+        }
+    }
+
     ///////////////////////////////////////////////////////////////////////////////
     // static functions
     ///////////////////////////////////////////////////////////////////////////////
@@ -68,7 +86,7 @@ public class exUIElement : exPlane {
     /// Awake functoin inherit from exPlane.
     // ------------------------------------------------------------------ 
 
-    override protected void Awake () {
+    protected new void Awake () {
         base.Awake();
         updateFlags |= UpdateFlags.Vertex;
         Commit();
@@ -78,7 +96,7 @@ public class exUIElement : exPlane {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    override public void Commit () {
+    public override void Commit () {
 
         if ( (updateFlags & UpdateFlags.Vertex) != 0 ) {
             //
@@ -180,36 +198,16 @@ public class exUIElement : exPlane {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    override protected void OnEnable () {
-        base.OnEnable();
-        foreach ( exUIElement el in children ) {
-            el.enabled = true;
-        }
+    public virtual void Sync () {
     }
 
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    override protected void OnDisable () {
-        base.OnDisable();
-        foreach ( exUIElement el in children ) {
-            el.enabled = false;
-        }
-    }
+    protected new void OnDestroy () {
+        base.OnDestroy();
 
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
-    virtual public void Sync () {
-    }
-
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
-    void OnDestroy () {
         if ( parent != null ) {
             parent.RemoveChild(this);
         }

@@ -27,7 +27,7 @@ partial class exTileMapRendererEditor : exPlaneEditor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    override protected void OnEnable () {
+    protected new void OnEnable () {
         base.OnEnable();
         if ( target != editTileMap ) {
             editTileMap = target as exTileMapRenderer;
@@ -39,7 +39,7 @@ partial class exTileMapRendererEditor : exPlaneEditor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-	override public void OnInspectorGUI () {
+	public override void OnInspectorGUI () {
 
         // ======================================================== 
         // exSprite Base GUI 
@@ -61,9 +61,7 @@ partial class exTileMapRendererEditor : exPlaneEditor {
         exTileMap newTileMap = (exTileMap)EditorGUILayout.ObjectField( "Tile Map"
                                                                        , editTileMap.tileMap
                                                                        , typeof(exTileMap)
-#if !UNITY_3_0 && !UNITY_3_1 && !UNITY_3_3
                                                                        , false
-#endif
                                                                      );
         if ( newTileMap != editTileMap.tileMap ) {
             editTileMap.CreateTileMap(newTileMap);

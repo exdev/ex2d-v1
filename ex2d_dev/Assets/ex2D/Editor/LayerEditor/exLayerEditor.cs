@@ -180,7 +180,7 @@ public class exLayerEditor : EditorWindow {
             exLayerMng layerMng = curLayer as exLayerMng;
             GUI.enabled = (layerMng != null);
             if ( GUILayout.Button( "Update", EditorStyles.toolbarButton ) ) {
-                layerMng.UpdateLayer();
+                layerMng.AddDirtyLayer(layerMng);
                 EditorUtility.SetDirty(layerMng);
             }
             GUI.enabled = true;
@@ -265,72 +265,78 @@ public class exLayerEditor : EditorWindow {
         }
         else if ( e.type == EventType.DragPerform ) {
             DragAndDrop.AcceptDrag();
-            EditorUtility.DisplayProgressBar( "Add new layer items", "Add new layer itmes...", 0.5f  );    
-
-            //
-            Object oldSelActiveObject = null;
-            List<Object> oldSelObjects = new List<Object>();
-            foreach ( Object o in Selection.objects ) {
-                oldSelObjects.Add(o);
-            }
-            oldSelActiveObject = Selection.activeObject;
-
-            //
-            List<exLayer> addedLayers = new List<exLayer>(); 
-            List<exLayer> newLayers = new List<exLayer>(); 
-            foreach ( Object o in DragAndDrop.objectReferences ) {
-                // never add self, it cause dead loop
-                if ( o == curEditGO )
-                    continue;
+            try {
+                EditorUtility.DisplayProgressBar( "Add new layer items", "Add new layer itmes...", 0.5f  );    
 
                 //
-                Selection.activeObject = o;
-                Object[] objects = Selection.GetFiltered( typeof(GameObject), SelectionMode.Deep);
-                foreach ( Object obj in objects ) {
-                    if ( obj ) {
-                        GameObject go = obj as GameObject;
-                        exLayer layer = go.GetComponent<exLayer>();
-                        if ( layer == null ) {
-                            layer = go.AddComponent<exLayer>();
-                            newLayers.Add(layer);
-                        }
-                        if ( addedLayers.IndexOf(layer) == -1 ) {
-                            addedLayers.Add(layer);
+                Object oldSelActiveObject = null;
+                List<Object> oldSelObjects = new List<Object>();
+                foreach ( Object o in Selection.objects ) {
+                    oldSelObjects.Add(o);
+                }
+                oldSelActiveObject = Selection.activeObject;
+
+                //
+                List<exLayer> addedLayers = new List<exLayer>(); 
+                List<exLayer> newLayers = new List<exLayer>(); 
+                foreach ( Object o in DragAndDrop.objectReferences ) {
+                    // never add self, it cause dead loop
+                    if ( o == curEditGO )
+                        continue;
+
+                    //
+                    Selection.activeObject = o;
+                    Object[] objects = Selection.GetFiltered( typeof(GameObject), SelectionMode.Deep);
+                    foreach ( Object obj in objects ) {
+                        if ( obj ) {
+                            GameObject go = obj as GameObject;
+                            exLayer layer = go.GetComponent<exLayer>();
+                            if ( layer == null ) {
+                                layer = go.AddComponent<exLayer>();
+                                newLayers.Add(layer);
+                            }
+                            if ( addedLayers.IndexOf(layer) == -1 ) {
+                                addedLayers.Add(layer);
+                            }
                         }
                     }
                 }
-            }
 
-            // sync new layer's parent
-            foreach ( exLayer layer in newLayers ) {
-                Transform parent = layer.transform.parent;
-                while ( parent != null ) {
-                    exLayer parentLayer = parent.GetComponent<exLayer>();
-                    if ( parentLayer ) {
-                        layer.parent = parentLayer;
-                        break;
+                // sync new layer's parent
+                foreach ( exLayer layer in newLayers ) {
+                    Transform parent = layer.transform.parent;
+                    while ( parent != null ) {
+                        exLayer parentLayer = parent.GetComponent<exLayer>();
+                        if ( parentLayer ) {
+                            layer.parent = parentLayer;
+                            break;
+                        }
+                        parent = parent.parent;
                     }
-                    parent = parent.parent;
                 }
-            }
 
-            //
-            List<exLayer> parentOfNewLayers = new List<exLayer>(); 
-            foreach ( exLayer li in addedLayers ) {
-                if ( addedLayers.IndexOf(li.parent) == -1 ) {
-                    parentOfNewLayers.Add(li);
+                //
+                List<exLayer> parentOfNewLayers = new List<exLayer>(); 
+                foreach ( exLayer li in addedLayers ) {
+                    if ( addedLayers.IndexOf(li.parent) == -1 ) {
+                        parentOfNewLayers.Add(li);
+                    }
                 }
-            }
-            foreach ( exLayer li in parentOfNewLayers ) {
-                li.ForceSetParent(curLayer);
-                EditorUtility.SetDirty(li);
-            }
-            EditorUtility.SetDirty(curLayer);
+                foreach ( exLayer li in parentOfNewLayers ) {
+                    li.ForceSetParent(curLayer);
+                    EditorUtility.SetDirty(li);
+                }
+                EditorUtility.SetDirty(curLayer);
 
-            //
-            Selection.objects = oldSelObjects.ToArray();
-            Selection.activeObject = oldSelActiveObject;
-            EditorUtility.ClearProgressBar();
+                //
+                Selection.objects = oldSelObjects.ToArray();
+                Selection.activeObject = oldSelActiveObject;
+                EditorUtility.ClearProgressBar();
+            }
+            catch ( System.Exception ) {
+                EditorUtility.ClearProgressBar();
+                throw;
+            }
 
             Repaint();
         }
@@ -346,10 +352,12 @@ public class exLayerEditor : EditorWindow {
         //
         layers.Clear();
         Rect layerFieldRect = new Rect ( _x, _y, position.width - 2.0f * _x, layerFieldHeight );
-        float totalLayerHeight = LayerField ( layerFieldRect, 0, _layer ); 
 
-        //
-        GUILayoutUtility.GetRect ( layerFieldRect.width, totalLayerHeight );
+        // DISABLE { 
+        // float totalLayerHeight = LayerField ( layerFieldRect, 0, _layer ); 
+        // GUILayoutUtility.GetRect ( layerFieldRect.width, totalLayerHeight );
+        LayerField ( layerFieldRect, 0, _layer ); 
+        // } DISABLE end 
 
         // ======================================================== 
         // process drag 
@@ -569,20 +577,57 @@ public class exLayerEditor : EditorWindow {
         // draw field 
         // ======================================================== 
 
+        // draw rect
         exEditorHelper.DrawRect( _rect, 
                                  selected ? new Color( 0.0f, 0.4f, 0.8f, 1.0f ) : new Color( 0.25f, 0.25f, 0.25f, 1.0f ), 
                                  new Color( 0.0f, 0.0f, 0.0f, 1.0f ) );
         float curX = _rect.x;
         float curY = _rect.y;
 
-        curX += _indentLevel * 15.0f + 10.0f;
-        if ( _layer.children.Count > 0 ) {
-            _layer.foldout = EditorGUI.Foldout ( new Rect ( curX, curY + 2, 10, _rect.height-2 ), _layer.foldout, "" );
-        }
-        curX += 15;
-        _layer.indentLevel = _indentLevel;
 
-        GUI.Label ( new Rect ( curX, curY + 1, _rect.width - curX, _rect.height ), _layer.name );
+        GUI.BeginGroup( _rect );
+            // draw foldout
+            curX += _indentLevel * 15.0f + 10.0f;
+            if ( _layer.children.Count > 0 ) {
+                _layer.foldout = EditorGUI.Foldout ( new Rect ( curX, 2, 10, _rect.height-2 ), _layer.foldout, "" );
+            }
+            curX += 15;
+            _layer.indentLevel = _indentLevel;
+
+            // draw label
+            GUI.Label ( new Rect ( curX, 1, _rect.width - curX, _rect.height - 2 ), _layer.name );
+
+            // draw enum
+            EditorGUIUtility.LookLikeInspector ();
+            Color oldColor = GUI.contentColor;
+            Color oldBGColor = GUI.backgroundColor;
+                switch ( _layer.type ) {
+                case exLayer.Type.Dynamic: 
+                    GUI.backgroundColor = Color.green; 
+                    GUI.contentColor = Color.green; 
+                    break;
+                case exLayer.Type.Abstract: 
+                    GUI.backgroundColor = Color.yellow; 
+                    GUI.contentColor = Color.yellow; 
+                    break;
+                }
+                _layer.type = (exLayer.Type)EditorGUI.EnumPopup ( new Rect ( _rect.width - 60.0f * 2.0f - 20.0f, 2, 70.0f, _rect.height - 4 ), _layer.type );
+            GUI.backgroundColor = oldBGColor;
+            GUI.contentColor = oldColor;
+            EditorGUIUtility.LookLikeControls ();
+
+            // draw range
+            if (_layer.type == exLayer.Type.Dynamic) {
+                _layer.range = EditorGUI.IntField ( new Rect ( _rect.width - 60.0f * 1.0f - 5.0f, 2, 60.0f, _rect.height - 4 ), _layer.range );
+            }
+        GUI.EndGroup();
+
+        //
+        if ( GUI.changed ) {
+            EditorUtility.SetDirty(_layer);
+        }
+
+        //
         layers.Add(_layer);
 
         // ======================================================== 
@@ -646,6 +691,8 @@ public class exLayerEditor : EditorWindow {
                 Repaint();
             }
         }
+
+        GUILayoutUtility.GetRect ( _rect.width, _rect.height );
 
         // ======================================================== 
         // draw the child

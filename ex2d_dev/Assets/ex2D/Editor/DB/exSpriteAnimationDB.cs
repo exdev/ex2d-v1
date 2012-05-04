@@ -71,7 +71,9 @@ public class exSpriteAnimationDB : ScriptableObject {
     static int version = 1;
     static bool needSync = false;
     static exSpriteAnimationDB db;
-    public static string dbPath = "Assets/.ex2D_SpriteAnimationDB.asset"; ///< the fullpath of the sprite animation clip db we use
+
+    public static string dbKey = "SpriteAnimDB_Path"; ///< the db key for preferences
+    public static string dbPath = "Assets/_ex2D_SpriteAnimationDB.asset"; ///< the fullpath of the sprite animation clip db we use
 
     // ------------------------------------------------------------------ 
     /// force sync the sprite animation db
@@ -106,6 +108,7 @@ public class exSpriteAnimationDB : ScriptableObject {
     // ------------------------------------------------------------------ 
 
     public static bool DBExists () {
+        dbPath = EditorPrefs.GetString( dbKey, dbPath );
         FileInfo fileInfo = new FileInfo(dbPath);
         return fileInfo.Exists;
     }
@@ -119,10 +122,16 @@ public class exSpriteAnimationDB : ScriptableObject {
         db.guidInfos.Clear();
         db.texGuidToAnimClipGUIDs.Clear();
 
-        EditorUtility.DisplayProgressBar( "Syncing exSpriteAnimationDB...", "Syncing...", 0.5f );    
-        SyncDirectory ("Assets");
-        EditorUtility.UnloadUnusedAssetsIgnoreManagedReferences();
-        EditorUtility.ClearProgressBar();    
+        try {
+            EditorUtility.DisplayProgressBar( "Syncing exSpriteAnimationDB...", "Syncing...", 0.5f );    
+            SyncDirectory ("Assets");
+            EditorUtility.UnloadUnusedAssetsIgnoreManagedReferences();
+            EditorUtility.ClearProgressBar();    
+        }
+        catch ( System.Exception ) {
+            EditorUtility.ClearProgressBar();    
+            throw;
+        }
 
         EditorUtility.SetDirty(db);
     }
@@ -156,6 +165,14 @@ public class exSpriteAnimationDB : ScriptableObject {
     // ------------------------------------------------------------------ 
 
     static void CreateDB () {
+        dbPath = EditorPrefs.GetString( dbKey, dbPath );
+
+        // first create db directory if not exists
+        string dbDir = Path.GetDirectoryName(dbPath);
+        if ( new DirectoryInfo(dbDir).Exists == false ) {
+            Directory.CreateDirectory (dbDir);
+        }
+
         // get sprite animation clip db, if not found, create one
         db = (exSpriteAnimationDB)AssetDatabase.LoadAssetAtPath( dbPath, typeof(exSpriteAnimationDB) );
         if ( db == null ) {

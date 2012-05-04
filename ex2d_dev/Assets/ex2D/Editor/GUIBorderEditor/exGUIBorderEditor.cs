@@ -149,9 +149,7 @@ partial class exGUIBorderEditor : EditorWindow {
             Object newBorder = EditorGUILayout.ObjectField( "GUI Border"
                                                             , curEdit 
                                                             , typeof(exGUIBorder) 
-#if !UNITY_3_0 && !UNITY_3_1 && !UNITY_3_3
                                                             , false
-#endif
                                                             , GUILayout.Width(300)
                                                           );
             if ( newBorder != curEdit )
@@ -165,9 +163,7 @@ partial class exGUIBorderEditor : EditorWindow {
             GUILayout.Space(15);
                 Texture2D newTexture = (Texture2D)EditorGUILayout.ObjectField( editTexture
                                                                                , typeof(Texture2D)
-#if !UNITY_3_0 && !UNITY_3_1 && !UNITY_3_3
                                                                                , false
-#endif
                                                                                , GUILayout.Height(50)
                                                                                , GUILayout.Width(50)
                                                                              );
@@ -202,7 +198,7 @@ partial class exGUIBorderEditor : EditorWindow {
             GUI.enabled = editTexture != null;
             EditorGUIUtility.LookLikeControls ();
             GUILayout.BeginHorizontal();
-                int newLeft = EditorGUILayout.IntField ( "Left", curEdit.border.left, GUILayout.Width(150) ); // left
+                int newLeft = EditorGUILayout.IntField ( "Left", curEdit.border.left, GUILayout.Width(200) ); // left
                 if ( editTexture ) {
                     newLeft = Mathf.Clamp( newLeft, 0, editTexture.width - curEdit.border.right );
                     if ( newLeft != curEdit.border.left ) {
@@ -212,7 +208,7 @@ partial class exGUIBorderEditor : EditorWindow {
                     
                 }
 
-                int newRight = EditorGUILayout.IntField ( "Right", curEdit.border.right, GUILayout.Width(150) ); // right
+                int newRight = EditorGUILayout.IntField ( "Right", curEdit.border.right, GUILayout.Width(200) ); // right
                 if ( editTexture ) {
                     newRight = Mathf.Clamp( newRight, 0, editTexture.width - curEdit.border.left );
                     if ( newRight != curEdit.border.right ) {
@@ -225,7 +221,7 @@ partial class exGUIBorderEditor : EditorWindow {
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
-                int newTop = EditorGUILayout.IntField ( "Top", curEdit.border.top, GUILayout.Width(150) ); // top
+                int newTop = EditorGUILayout.IntField ( "Top", curEdit.border.top, GUILayout.Width(200) ); // top
                 if ( editTexture ) {
                      newTop = Mathf.Clamp( newTop, 0, editTexture.height - curEdit.border.bottom );
                      if ( newTop != curEdit.border.top ) {
@@ -235,7 +231,7 @@ partial class exGUIBorderEditor : EditorWindow {
                      
                 }
 
-                int newBottom = EditorGUILayout.IntField ( "Bottom", curEdit.border.bottom, GUILayout.Width(150) ); // bottom
+                int newBottom = EditorGUILayout.IntField ( "Bottom", curEdit.border.bottom, GUILayout.Width(200) ); // bottom
                 if ( editTexture ) {
                     newBottom = Mathf.Clamp( newBottom, 0, editTexture.height - curEdit.border.top );
                     if ( newBottom != curEdit.border.bottom ) {
@@ -249,10 +245,12 @@ partial class exGUIBorderEditor : EditorWindow {
             EditorGUIUtility.LookLikeInspector ();
             GUI.enabled = true;
 
-            EditorGUILayout.LabelField ( "Center", editTexture ? 
-                                         (editTexture.width - curEdit.border.horizontal) + " x " + (editTexture.height - curEdit.border.vertical)
-                                         : "0 x 0", 
-                                         GUILayout.Width(200) );
+            GUILayout.BeginHorizontal();
+            GUILayout.Space(15);
+            GUILayout.Label ( "Center = " + (editTexture ? 
+                              (editTexture.width - curEdit.border.horizontal) + " x " + (editTexture.height - curEdit.border.vertical)
+                              : "0 x 0") );
+            GUILayout.EndHorizontal();
 
             // ======================================================== 
             // save button
@@ -288,7 +286,8 @@ partial class exGUIBorderEditor : EditorWindow {
                 // toolbar 
                 // ======================================================== 
 
-                GUILayout.BeginHorizontal ( EditorStyles.toolbar, GUILayout.MaxWidth(position.width - 350) );
+                // GUILayout.BeginHorizontal ( EditorStyles.toolbar, GUILayout.MaxWidth(position.width - 350) );
+                GUILayout.BeginHorizontal ( EditorStyles.toolbar );
 
                     // ======================================================== 
                     // Show Grid 
@@ -302,8 +301,8 @@ partial class exGUIBorderEditor : EditorWindow {
 
                     EditorGUIUtility.LookLikeControls ();
                     GUILayout.BeginHorizontal();
-                        previewWidth = Mathf.Max ( curEdit.border.horizontal, EditorGUILayout.IntField ( "Width", previewWidth, EditorStyles.toolbarTextField ) ); // preview width
-                        previewHeight = Mathf.Max ( curEdit.border.vertical, EditorGUILayout.IntField ( "Height", previewHeight, EditorStyles.toolbarTextField ) ); // preview height
+                        previewWidth = Mathf.Max ( curEdit.border.horizontal, EditorGUILayout.IntField ( "Width", previewWidth, EditorStyles.toolbarTextField, GUILayout.Width(200) ) ); // preview width
+                        previewHeight = Mathf.Max ( curEdit.border.vertical, EditorGUILayout.IntField ( "Height", previewHeight, EditorStyles.toolbarTextField, GUILayout.Width(200) ) ); // preview height
                     GUILayout.EndHorizontal();
                     EditorGUIUtility.LookLikeInspector ();
 

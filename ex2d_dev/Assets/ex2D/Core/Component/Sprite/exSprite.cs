@@ -300,10 +300,12 @@ public class exSprite : exSpriteBase {
         // ======================================================== 
 
         if ( (updateFlags & UpdateFlags.Vertex) != 0 ) {
+            Vector2 finalScale = new Vector2 ( scale_.x * ppfScale_.x,
+                                               scale_.y * ppfScale_.y );
 
             // init
-            float halfWidthScaled = width_ * scale_.x * 0.5f;
-            float halfHeightScaled = height_ * scale_.y * 0.5f;
+            float halfWidthScaled = width_ * finalScale.x * 0.5f;
+            float halfHeightScaled = height_ * finalScale.y * 0.5f;
             float offsetX = 0.0f;
             float offsetY = 0.0f;
 
@@ -318,18 +320,18 @@ public class exSprite : exSpriteBase {
                 Rect trimRect = new Rect ( 0, 0, 1, 1 );
 
                 if ( el != null ) {
-                    originalWidth   = el.originalWidth * scale_.x;
-                    originalHeight  = el.originalHeight * scale_.y;
-                    trimRect        = new Rect( el.trimRect.x * scale_.x, 
-                                                el.trimRect.y * scale_.y, 
-                                                el.trimRect.width * scale_.x, 
-                                                el.trimRect.height * scale_.y );
+                    originalWidth   = el.originalWidth * finalScale.x;
+                    originalHeight  = el.originalHeight * finalScale.y;
+                    trimRect        = new Rect( el.trimRect.x * finalScale.x, 
+                                                el.trimRect.y * finalScale.y, 
+                                                el.trimRect.width * finalScale.x, 
+                                                el.trimRect.height * finalScale.y );
                 }
                 else {
                     if ( renderer.sharedMaterial != null ) {
                         Texture texture = renderer.sharedMaterial.mainTexture;
-                        originalWidth   = texture.width * scale_.x;
-                        originalHeight  = texture.height * scale_.y;
+                        originalWidth   = texture.width * finalScale.x;
+                        originalHeight  = texture.height * finalScale.y;
                         trimRect = new Rect ( trimUV.x * originalWidth,
                                               (1.0f - trimUV.height - trimUV.y ) * originalHeight,
                                               trimUV.width * originalWidth, 
@@ -413,10 +415,10 @@ public class exSprite : exSpriteBase {
             offsetY += offset_.y;
 
             //
-            float xMinClip = scale_.x * width_  * ( -0.5f + clipLeft   );
-            float xMaxClip = scale_.x * width_  * (  0.5f - clipRight  );
-            float yMinClip = scale_.y * height_ * ( -0.5f + clipTop    );
-            float yMaxClip = scale_.y * height_ * (  0.5f - clipBottom );
+            float xMinClip = finalScale.x * width_  * ( -0.5f + clipLeft   );
+            float xMaxClip = finalScale.x * width_  * (  0.5f - clipRight  );
+            float yMinClip = finalScale.y * height_ * ( -0.5f + clipTop    );
+            float yMaxClip = finalScale.y * height_ * (  0.5f - clipBottom );
 
             // build vertices & normals
             for ( int r = 0; r < 2; ++r ) {
@@ -424,7 +426,7 @@ public class exSprite : exSpriteBase {
                     int i = r * 2 + c;
                     float x, y;
                     CalculateVertex( out x, out y,
-                                     width_ * scale_.x, height_ * scale_.y,
+                                     width_ * finalScale.x, height_ * finalScale.y,
                                      c, r, 
                                      xMinClip, xMaxClip, yMinClip, yMaxClip, 
                                      offsetX, offsetY );
@@ -432,56 +434,6 @@ public class exSprite : exSpriteBase {
                     normals[i] = new Vector3( 0.0f, 0.0f, -1.0f ); // TEMP
                 }
             }
-
-            // DELME { 
-            // switch ( plane ) {
-            // case Plane.XY:
-            //     for ( int r = 0; r < 2; ++r ) {
-            //         for ( int c = 0; c < 2; ++c ) {
-            //             int i = r * 2 + c;
-            //             float x, y;
-            //             CalculateVertex( out x, out y,
-            //                              width_ * scale_.x, height_ * scale_.y,
-            //                              c, r, 
-            //                              xMinClip, xMaxClip, yMinClip, yMaxClip, 
-            //                              offsetX, offsetY );
-            //             vertices[i] = new Vector3( x, y, 0.0f );
-            //             normals[i] = new Vector3( 0.0f, 0.0f, -1.0f ); // TEMP
-            //         }
-            //     }
-            //     break;
-            // case Plane.XZ:
-            //     for ( int r = 0; r < 2; ++r ) {
-            //         for ( int c = 0; c < 2; ++c ) {
-            //             int i = r * 2 + c;
-            //             float x, y;
-            //             CalculateVertex( out x, out y,
-            //                              width_ * scale_.x, height_ * scale_.y,
-            //                              c, r, 
-            //                              xMinClip, xMaxClip, yMinClip, yMaxClip, 
-            //                              offsetX, offsetY );
-            //             vertices[i] = new Vector3( x, 0.0f, y );
-            //             normals[i] = new Vector3( 0.0f, 0.0f, -1.0f ); // TEMP
-            //         }
-            //     }
-            //     break;
-            // case Plane.ZY:
-            //     for ( int r = 0; r < 2; ++r ) {
-            //         for ( int c = 0; c < 2; ++c ) {
-            //             int i = r * 2 + c;
-            //             float x, y;
-            //             CalculateVertex( out x, out y,
-            //                              width_ * scale_.x, height_ * scale_.y,
-            //                              c, r, 
-            //                              xMinClip, xMaxClip, yMinClip, yMaxClip, 
-            //                              offsetX, offsetY );
-            //             vertices[i] = new Vector3( 0.0f, y, x );
-            //             normals[i] = new Vector3( 0.0f, 0.0f, -1.0f ); // TEMP
-            //         }
-            //     }
-            //     break;
-            // }
-            // } DELME end 
 
             _mesh.vertices = vertices;
             _mesh.normals = normals; // TEMP
@@ -607,7 +559,7 @@ public class exSprite : exSpriteBase {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    override public void Commit () {
+    public override void Commit () {
         if ( meshFilter ) {
             if ( meshFilter_.sharedMesh != null ) {
                 UpdateMesh (meshFilter_.sharedMesh);
@@ -623,7 +575,7 @@ public class exSprite : exSpriteBase {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    override protected void OnEnable () {
+    protected new void OnEnable () {
         base.OnEnable();
 
         // NOTE: though we have ExecuteInEditMode, user can Add/Remove spanim in Editor
@@ -636,23 +588,25 @@ public class exSprite : exSpriteBase {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    override protected void OnDisable () {
+    protected new void OnDisable () {
         base.OnDisable();
 
         // NOTE: though we have ExecuteInEditMode, user can Add/Remove spanim in Editor
         if ( spanim == null ) {
             spanim = GetComponent<exSpriteAnimation>(); 
         }
-        if ( spanim ) {
-            spanim.Stop();
-        }
+        // DISABLE { 
+        // if ( spanim ) {
+        //     spanim.Stop();
+        // }
+        // } DISABLE end 
     }
 
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    override protected void Awake () {
+    protected new void Awake () {
 
 // DISABLE { 
 // #if UNITY_EDITOR
@@ -735,10 +689,11 @@ public class exSprite : exSpriteBase {
     // ------------------------------------------------------------------ 
     /// \param _atlas the new atlas
     /// \param _index the index of the element in the new atlas
+    /// \param _changeDefaultAnimSprite if this is true, the default animation sprite will be changed so when we use stopAction = defaultSprite it will change to this new one 
     /// Set a new picture in an atlas to this sprite 
     // ------------------------------------------------------------------ 
 
-    public void SetSprite ( exAtlas _atlas, int _index ) {
+    public void SetSprite ( exAtlas _atlas, int _index, bool _changeDefaultAnimSprite = false ) {
         bool checkVertex = false;
         bool createMesh = false;
 
@@ -804,15 +759,22 @@ public class exSprite : exSpriteBase {
 
         //
         if ( createMesh ) {
-            // create mesh ( in editor, this can duplicate mesh to prevent shared mesh for sprite)
-            meshFilter_.mesh = new Mesh();
-            updateFlags = UpdateFlags.Vertex | UpdateFlags.UV | UpdateFlags.Color | UpdateFlags.Index;
+            if ( meshFilter ) {
+                // create mesh ( in editor, this can duplicate mesh to prevent shared mesh for sprite)
+                meshFilter_.mesh = new Mesh();
+                updateFlags = UpdateFlags.Vertex | UpdateFlags.UV | UpdateFlags.Color | UpdateFlags.Index;
 
-            // check if update mesh collider
-            MeshCollider meshCollider = collider as MeshCollider;  
-            if ( meshCollider && meshCollider.sharedMesh == null ) {
-                this.UpdateColliderSize(0.2f);
+                // check if update mesh collider
+                MeshCollider meshCollider = collider as MeshCollider;  
+                if ( meshCollider && meshCollider.sharedMesh == null ) {
+                    this.UpdateColliderSize(0.2f);
+                }
             }
+        }
+
+        //
+        if ( _changeDefaultAnimSprite && spanim ) {
+            spanim.UpdateDefaultSprite ( _atlas, _index );
         }
     }
 
@@ -820,11 +782,11 @@ public class exSprite : exSpriteBase {
     /// horizontal flip the sprite
     // ------------------------------------------------------------------ 
 
-    public void HFlip () { scale_.x = -scale_.x; }
+    public void HFlip () { scale_.x = -scale_.x; updateFlags |= UpdateFlags.Vertex; }
 
     // ------------------------------------------------------------------ 
     /// vertical flip the sprite
     // ------------------------------------------------------------------ 
 
-    public void VFlip () { scale_.y = -scale_.y; }
+    public void VFlip () { scale_.y = -scale_.y; updateFlags |= UpdateFlags.Vertex; }
 }

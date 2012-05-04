@@ -41,13 +41,12 @@ public class exSpriteAnimState {
     [System.NonSerialized] public List<float> frameTimes; ///< the list of the start time in seconds of each frame in the exSpriteAnimClip
 
     // ------------------------------------------------------------------ 
-    /// \param _animClip the referenced animation clip
-    /// Constructor of exSpriteAnimState, it will copy the settings from _animClip. 
+    // Desc: 
     // ------------------------------------------------------------------ 
 
-    public exSpriteAnimState ( exSpriteAnimClip _animClip ) {
+    void Init ( string _name, exSpriteAnimClip _animClip ) {
         clip = _animClip;
-        name = _animClip.name;
+        name = _name;
         wrapMode = _animClip.wrapMode;
         stopAction = _animClip.stopAction;
         length = _animClip.length;
@@ -59,6 +58,25 @@ public class exSpriteAnimState {
             tmp += fi.length;
             frameTimes.Add(tmp);
         }
+    }
+
+    // ------------------------------------------------------------------ 
+    /// \param _animClip the referenced animation clip
+    /// Constructor of exSpriteAnimState, it will copy the settings from _animClip. 
+    // ------------------------------------------------------------------ 
+
+    public exSpriteAnimState ( exSpriteAnimClip _animClip ) {
+        Init ( _animClip.name, _animClip );
+    }
+
+    // ------------------------------------------------------------------ 
+    /// \param _name the name of the animation state
+    /// \param _animClip the referenced animation clip
+    /// Constructor of exSpriteAnimState, it will copy the settings from _animClip. 
+    // ------------------------------------------------------------------ 
+
+    public exSpriteAnimState ( string _name, exSpriteAnimClip _animClip ) {
+        Init ( _name, _animClip );
     }
 }
 
@@ -102,7 +120,6 @@ public class exSpriteAnimation : MonoBehaviour {
     private exSpriteAnimState curAnimation;
     private exSprite sprite;
     private bool playing = false;
-    private bool paused = false;
     private exAtlas defaultAtlas;
     private int defaultIndex;
     private int lastEventInfoIndex = -1;
@@ -159,7 +176,7 @@ public class exSpriteAnimation : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     void Update () {
-        if ( !paused && playing && (curAnimation != null) ) {
+        if ( playing && (curAnimation != null) ) {
             // advance the time and check if we trigger any animation events
             float delta = Time.deltaTime * curAnimation.speed;
             float curTime = curAnimation.time;
@@ -214,6 +231,15 @@ public class exSpriteAnimation : MonoBehaviour {
         sprite.SetSprite( defaultAtlas, defaultIndex );
     }
 
+    // ------------------------------------------------------------------ 
+    /// update the default sprite if we dynamically change it in the game
+    // ------------------------------------------------------------------ 
+
+    public void UpdateDefaultSprite ( exAtlas _atlas, int _index ) {
+        defaultAtlas = _atlas;
+        defaultIndex = _index;
+    }
+
     // NOTE: the reason I design to Play instead of using default parameter is because in 
     // Unity Animation Editor, it can send message to function that only have one parameter.
 
@@ -247,9 +273,8 @@ public class exSpriteAnimation : MonoBehaviour {
             if ( _index == 0 )
                 curAnimation.time = 0.0f;
             else if ( _index > 0 && _index < curAnimation.frameTimes.Count )
-                curAnimation.time = curAnimation.frameTimes[_index];
+                curAnimation.time = curAnimation.frameTimes[_index-1];
             playing = true;
-            paused = false;
             if ( curAnimation.speed >= 0.0f )
                 lastEventInfoIndex = -1;
             else
@@ -294,7 +319,6 @@ public class exSpriteAnimation : MonoBehaviour {
             curAnimation.time = 0.0f;
             curAnimation = null;
             playing = false;
-            paused = false;
 
             //
             switch ( stopAction ) {
@@ -318,12 +342,12 @@ public class exSpriteAnimation : MonoBehaviour {
         enabled = false;
     }
 
+    // DELME { 
     // ------------------------------------------------------------------ 
     /// Pause the playing animation
     // ------------------------------------------------------------------ 
 
     public void Pause () {
-        paused = true;
         enabled = false;
     }
 
@@ -332,9 +356,9 @@ public class exSpriteAnimation : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     public void Resume () {
-        paused = false;
         enabled = true;
     }
+    // } DELME end 
 
     // ------------------------------------------------------------------ 
     /// \param _name the name of the animation
@@ -347,7 +371,7 @@ public class exSpriteAnimation : MonoBehaviour {
         if ( string.IsNullOrEmpty(_name) )
             return playing;
         else
-            return ( playing && curAnimation.name == _name );
+            return ( playing && curAnimation != null && curAnimation.name == _name );
     }
 
     // ------------------------------------------------------------------ 
@@ -359,9 +383,9 @@ public class exSpriteAnimation : MonoBehaviour {
 
     public bool IsPaused ( string _name = "" ) {
         if ( string.IsNullOrEmpty(_name) )
-            return paused;
+            return (enabled == false);
         else
-            return (paused && curAnimation.name == _name);
+            return (enabled == false && curAnimation != null && curAnimation.name == _name);
     }
 
     // ------------------------------------------------------------------ 
@@ -378,7 +402,9 @@ public class exSpriteAnimation : MonoBehaviour {
         //     return null;
         // }
         // } DISABLE end 
-        return nameToState[_name];
+        if ( nameToState.ContainsKey(_name) )
+            return nameToState[_name];
+        return null;
     }
 
     // ------------------------------------------------------------------ 
@@ -405,7 +431,17 @@ public class exSpriteAnimation : MonoBehaviour {
     public exSpriteAnimClip.FrameInfo GetCurFrameInfo () {
         if ( curAnimation != null ) {
             float wrappedTime = curAnimation.clip.WrapSeconds(curAnimation.time, curAnimation.wrapMode);
+#if UNITY_FLASH
+            int index = curAnimation.frameTimes.Count - 1;
+            for ( int i = 0; i < curAnimation.frameTimes.Count; ++i ) {
+                if ( curAnimation.frameTimes[i] > wrappedTime ) {
+                    index = i;
+                    break;
+                }
+            }
+#else
             int index = curAnimation.frameTimes.BinarySearch(wrappedTime);
+#endif
             if ( index < 0 ) {
                 index = ~index;
             }
@@ -424,7 +460,20 @@ public class exSpriteAnimation : MonoBehaviour {
         int index = -1;
         if ( curAnimation != null ) {
             float wrappedTime = curAnimation.clip.WrapSeconds(curAnimation.time, curAnimation.wrapMode);
+#if UNITY_FLASH
+            index = curAnimation.frameTimes.Count - 1;
+            for ( int i = 0; i < curAnimation.frameTimes.Count; ++i ) {
+                if ( curAnimation.frameTimes[i] > wrappedTime ) {
+                    index = i;
+                    break;
+                }
+            }
+#else
             index = curAnimation.frameTimes.BinarySearch(wrappedTime);
+            if ( index < 0 ) {
+                index = ~index;
+            }
+#endif
         }
         return index;
     }
@@ -436,19 +485,41 @@ public class exSpriteAnimation : MonoBehaviour {
     /// it to the lookup table by the name of the clip
     /// 
     /// \note if the animation already in the exSpriteAnimation.animations, 
-    /// it will do nothing
+    /// it will override the old clip and return a new animation state.
     // ------------------------------------------------------------------ 
 
     public exSpriteAnimState AddAnimation ( exSpriteAnimClip _animClip ) {
+        return AddAnimation ( _animClip.name, _animClip );
+    }
+
+    // ------------------------------------------------------------------ 
+    /// \param _name the name of animation state you want to add
+    /// \param _animClip the sprite animation clip wants to add
+    /// \return the instantiate animation state of the added _animClip 
+    /// Add a sprite animation clip, create a new animation state and saves 
+    /// it to the lookup table by the name of the clip
+    /// 
+    /// \note if the animation already in the exSpriteAnimation.animations, 
+    /// it will override the old clip and return a new animation state.
+    // ------------------------------------------------------------------ 
+
+    public exSpriteAnimState AddAnimation ( string _name, exSpriteAnimClip _animClip ) {
+        exSpriteAnimState state = null;
+
         // if we already have the animation, just return the animation state
         if ( animations.IndexOf(_animClip) != -1 ) {
-            return nameToState[_animClip.name];
+            state = nameToState[_name];
+            if ( state.clip != _animClip ) {
+                state = new exSpriteAnimState( _name, _animClip );
+                nameToState[_name] = state;
+            }
+            return state;
         }
 
         //
         animations.Add (_animClip);
-        exSpriteAnimState state = new exSpriteAnimState(_animClip);
-        nameToState[state.name] = state;
+        state = new exSpriteAnimState( _name, _animClip );
+        nameToState[_name] = state;
         return state;
     }
 

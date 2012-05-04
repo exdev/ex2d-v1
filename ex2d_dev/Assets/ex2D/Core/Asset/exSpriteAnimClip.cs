@@ -140,7 +140,9 @@ public class exSpriteAnimClip : ScriptableObject {
     public float editorSpeed = 1.0f; ///< the preview speed in sprite animation editor 
     public bool editorNeedRebuild = false; ///< check if the sprite animation clip need rebuild
 
-    private EventInfoComparer eventInfoComparer = new EventInfoComparer();
+#if !UNITY_FLASH
+    EventInfoComparer eventInfoComparer = new EventInfoComparer();
+#endif
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -153,7 +155,17 @@ public class exSpriteAnimClip : ScriptableObject {
 
     public void AddEvent ( EventInfo _e ) {
         //
+#if UNITY_FLASH
+        int index = eventInfos.Count-1;
+        for ( int i = 0; i < eventInfos.Count; ++i ) {
+            if ( eventInfos[i].time > _e.time ) {
+                index = i;
+                break;
+            }
+        }
+#else
         int index = eventInfos.BinarySearch( _e, eventInfoComparer );
+#endif
         if ( index < 0 ) {
             index = ~index;
         }

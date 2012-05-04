@@ -31,7 +31,7 @@ public class exPixelPerfect : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     [System.NonSerialized] public exSpriteBase sprite;
-    [System.NonSerialized] public float depthToCamera = 0.0f;
+    [System.NonSerialized] public Vector3 toCamera;
 
     // ------------------------------------------------------------------ 
     // Desc: 
@@ -49,25 +49,19 @@ public class exPixelPerfect : MonoBehaviour {
 
     void Awake () {
         sprite = GetComponent<exSpriteBase>();
-        depthToCamera = transform.position.z - sprite.renderCamera.transform.position.z;
+    }
 
-        // DELME { 
-        // //
-        // if ( sprite.renderCamera.orthographic == false ) {
-        //     switch ( sprite.plane ) {
-        //     case exPlane.Plane.XY: depthToCamera = transform.position.z - sprite.renderCamera.transform.position.z; break;
-        //     case exPlane.Plane.XZ: depthToCamera = transform.position.y - sprite.renderCamera.transform.position.y; break;
-        //     case exPlane.Plane.ZY: depthToCamera = transform.position.x - sprite.renderCamera.transform.position.x; break;
-        //     }
-        // }
-        // } DELME end 
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
 
-        //
+    void Start () {
         ppfCamera = sprite.renderCamera.GetComponent<exPixelPerfectCamera>();
         if ( ppfCamera == null ) {
             ppfCamera = sprite.renderCamera.gameObject.AddComponent<exPixelPerfectCamera>();
         }
-        ppfCamera.MakePixelPerfect(sprite,depthToCamera);
+
+        UpdatePixelPerfectCamera (ppfCamera);
     }
 
     // ------------------------------------------------------------------ 
@@ -82,23 +76,38 @@ public class exPixelPerfect : MonoBehaviour {
 
     // ------------------------------------------------------------------ 
     // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void OnDestroy () {
+        if ( sprite != null )
+            sprite.ppfScale = Vector2.one; 
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void UpdatePixelPerfectCamera ( exPixelPerfectCamera _ppfCamera ) {
+        ppfCamera = _ppfCamera;
+        if ( sprite.renderCamera.orthographic == false ) {
+            toCamera = transform.position - sprite.renderCamera.transform.position;
+        }
+
+        //
+        ppfCamera.CalculatePixelPerfectScale ( sprite, toCamera.magnitude );
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
     // NOTE: if in LateUpdate, it may not go into sprite.Commit while changes
     // ------------------------------------------------------------------ 
 
     void Update () {
-        if ( sprite.renderCamera.orthographic == false ) {
-            float depth = transform.position.z - sprite.renderCamera.transform.position.z;
+        if ( sprite != null && sprite.renderCamera.orthographic == false ) {
+            Vector3 newToCamera = transform.position - sprite.renderCamera.transform.position;
 
-            // DELME { 
-            // switch ( sprite.plane ) {
-            // case exPlane.Plane.XY: depth = transform.position.z - sprite.renderCamera.transform.position.z; break;
-            // case exPlane.Plane.XZ: depth = transform.position.y - sprite.renderCamera.transform.position.y; break;
-            // case exPlane.Plane.ZY: depth = transform.position.x - sprite.renderCamera.transform.position.x; break;
-            // }
-            // } DELME end 
-
-            if ( depth != depthToCamera ) {
-                depthToCamera = depth;
+            if ( newToCamera.sqrMagnitude != toCamera.sqrMagnitude ) {
+                toCamera = newToCamera;
 
                 //
                 if ( ppfCamera == null || ppfCamera.camera != sprite.renderCamera ) {
@@ -107,7 +116,7 @@ public class exPixelPerfect : MonoBehaviour {
                         ppfCamera = sprite.renderCamera.gameObject.AddComponent<exPixelPerfectCamera>();
                     }
                 }
-                ppfCamera.MakePixelPerfect(sprite,depthToCamera);
+                ppfCamera.CalculatePixelPerfectScale ( sprite, toCamera.magnitude );
             }
         }
     }

@@ -51,7 +51,7 @@ public class exPlaneEditor : Editor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    virtual protected void OnEnable () {
+    protected void OnEnable () {
         if ( target != editPlane ) {
             editPlane = target as exPlane;
 
@@ -77,11 +77,16 @@ public class exPlaneEditor : Editor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-	override public void OnInspectorGUI () {
+	public override void OnInspectorGUI () {
 
         exSprite editSprite = target as exSprite;
         inAnimMode = AnimationUtility.InAnimationMode();
+
+#if UNITY_3_4
         isPrefab = (EditorUtility.GetPrefabType(target) == PrefabType.Prefab); 
+#else
+        isPrefab = (PrefabUtility.GetPrefabType(target) == PrefabType.Prefab); 
+#endif
 
         // TEMP: not sure this is good { 
         Event e = Event.current;
@@ -116,7 +121,7 @@ public class exPlaneEditor : Editor {
 
         GUI.enabled = !inAnimMode;
         EditorGUIUtility.LookLikeControls ();
-		Transform2D newTrans2D = (Transform2D)EditorGUILayout.EnumPopup( "Transform 2D", trans2d, GUILayout.Width(165) );
+		Transform2D newTrans2D = (Transform2D)EditorGUILayout.EnumPopup( "Transform 2D", trans2d, GUILayout.Width(200), GUILayout.ExpandWidth(false) );
         EditorGUIUtility.LookLikeInspector ();
         GUI.enabled = true;
 
@@ -176,14 +181,19 @@ public class exPlaneEditor : Editor {
         EditorGUIUtility.LookLikeControls ();
         if ( isPrefab ) {
             GUILayout.BeginHorizontal();
-                bool isPrefabCamera = (EditorUtility.GetPrefabType(editPlane.renderCamera) == PrefabType.Prefab);
+                bool isPrefabCamera = false;
+                if ( editPlane.renderCamera != null ) {
+#if UNITY_3_4
+                    isPrefabCamera = (EditorUtility.GetPrefabType(editPlane.renderCamera) == PrefabType.Prefab);
+#else
+                    isPrefabCamera = (PrefabUtility.GetPrefabType(editPlane.renderCamera) == PrefabType.Prefab);
+#endif
+                }
                 editPlane.renderCamera = (Camera)EditorGUILayout.ObjectField( "Camera"
                                                                               , isPrefabCamera ? editPlane.renderCamera : null 
                                                                               , typeof(Camera) 
-#if !UNITY_3_0 && !UNITY_3_1 && !UNITY_3_3
                                                                               , false 
-#endif
-                                                                              , GUILayout.Width(250) );
+                                                                              , GUILayout.Width(300) );
                 labelStyle.fontStyle = FontStyle.Bold;
                 labelStyle.normal.textColor = Color.yellow;
                 GUILayout.Label( "(Prefab Only)", labelStyle );
@@ -194,10 +204,8 @@ public class exPlaneEditor : Editor {
             editPlane.renderCamera = (Camera)EditorGUILayout.ObjectField( "Camera"
                                                                           , editPlane.renderCamera 
                                                                           , typeof(Camera) 
-#if !UNITY_3_0 && !UNITY_3_1 && !UNITY_3_3
                                                                           , true 
-#endif
-                                                                          , GUILayout.Width(250) );
+                                                                          , GUILayout.Width(300) );
         }
         EditorGUIUtility.LookLikeInspector ();
 
@@ -259,7 +267,7 @@ public class exPlaneEditor : Editor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    virtual protected void AddAnimationHelper () {
+    protected virtual void AddAnimationHelper () {
         editPlane.gameObject.AddComponent<exAnimationHelper>();
     }
 }

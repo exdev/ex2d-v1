@@ -19,7 +19,7 @@ using System.IO;
 ///////////////////////////////////////////////////////////////////////////////
 
 [CustomEditor(typeof(exPixelPerfect))]
-class exPixelPerfectEditor : Editor {
+public class exPixelPerfectEditor : Editor {
 
     ///////////////////////////////////////////////////////////////////////////////
     // properties
@@ -45,7 +45,7 @@ class exPixelPerfectEditor : Editor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-	override public void OnInspectorGUI () {
+	public override void OnInspectorGUI () {
 
         EditorGUIUtility.LookLikeInspector ();
         EditorGUILayout.Space ();

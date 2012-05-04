@@ -23,12 +23,43 @@ using System.Collections.Generic;
 public class exSpriteMng : MonoBehaviour {
 
     List<exPlane> sprites = new List<exPlane>();
+    List<exSoftClip> softClips = new List<exSoftClip>();
     
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
 
     void OnPreRender () {
+
+        // ======================================================== 
+        // pre-softclip 
+        // ======================================================== 
+
+        foreach ( exPlane sp in sprites ) {
+            // NOTE: it is possible the sprite has been destroyed first
+            if ( sp != null ) { 
+                if ( sp.updateFlags != exPlane.UpdateFlags.None ) {
+                    sp.Commit();
+                    sp.updateFlags = exPlane.UpdateFlags.None;
+                }
+                sp.inCommitList = false;
+            }
+        }
+        sprites.Clear();
+
+        // ======================================================== 
+        // process softclip items after sprites' boundingRect changes 
+        // ======================================================== 
+
+        foreach ( exSoftClip sp in softClips ) {
+            if ( sp.enabled )
+                sp.UpdateClipInfo();
+        }
+
+        // ======================================================== 
+        // post-softclip 
+        // ======================================================== 
+
         foreach ( exPlane sp in sprites ) {
             // NOTE: it is possible the sprite has been destroyed first
             if ( sp != null ) { 
@@ -51,5 +82,22 @@ public class exSpriteMng : MonoBehaviour {
             sprites.Add (_plane); 
             _plane.inCommitList = true;
         }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void AddToSoftClipList ( exSoftClip _softClip ) {
+        if ( softClips.IndexOf(_softClip) == -1 )
+            softClips.Add (_softClip);
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void RemoveFromSoftClipList ( exSoftClip _softClip ) {
+        softClips.Remove (_softClip);
     }
 }

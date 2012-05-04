@@ -66,7 +66,7 @@ public class exUIButton : exUIElement {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    override public void Sync () {
+    public override void Sync () {
         base.Sync ();
 
         if ( border ) {
@@ -137,7 +137,7 @@ public class exUIButton : exUIElement {
                  _e.buttons == exUIEvent.PointerButtonFlags.Touch ) {
                 exUIMng.instance.activeElement = null;
                 if ( isPressing ) {
-                    StartCoroutine ( DelayButtonRelease(0.5f) );
+                    StartCoroutine ( DelayButtonRelease(0.0f) );
                 }
             }
             return true;

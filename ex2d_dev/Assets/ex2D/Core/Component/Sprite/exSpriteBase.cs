@@ -59,6 +59,21 @@ public class exSpriteBase : exPlane {
         }
     }
 
+    // ------------------------------------------------------------------ 
+    protected Vector2 ppfScale_ = Vector2.one;
+    /// the pixel-perfect scale of the sprite
+    // ------------------------------------------------------------------ 
+
+    public Vector2 ppfScale {
+        get { return ppfScale_; }
+        set { 
+            if ( ppfScale_ != value ) {
+                ppfScale_ = value;
+                updateFlags |= UpdateFlags.Vertex;
+            }
+        }
+    }
+
     ///////////////////////////////////////////////////////////////////////////////
     // functions
     ///////////////////////////////////////////////////////////////////////////////
@@ -67,7 +82,7 @@ public class exSpriteBase : exPlane {
     /// OnEnable functoin inherit from exPlane
     // ------------------------------------------------------------------ 
 
-    override protected void OnEnable () {
+    protected new void OnEnable () {
         base.OnEnable();
         exPixelPerfect ppf = GetComponent<exPixelPerfect>();
         if ( ppf ) {
@@ -79,7 +94,7 @@ public class exSpriteBase : exPlane {
     /// OnDisable functoin inherit from exPlane
     // ------------------------------------------------------------------ 
 
-    override protected void OnDisable () {
+    protected new void OnDisable () {
         base.OnDisable();
         exPixelPerfect ppf = GetComponent<exPixelPerfect>();
         if ( ppf ) {

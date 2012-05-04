@@ -50,7 +50,11 @@ public static class exSpriteUtility {
     // ------------------------------------------------------------------ 
 
     public static void Build ( this exSprite _sprite, Texture2D _texture = null ) {
+#if UNITY_3_4
         bool isPrefab = (EditorUtility.GetPrefabType(_sprite) == PrefabType.Prefab); 
+#else
+        bool isPrefab = (PrefabUtility.GetPrefabType(_sprite) == PrefabType.Prefab); 
+#endif
         EditorUtility.SetDirty (_sprite);
 
         //
@@ -101,7 +105,7 @@ public static class exSpriteUtility {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    static public void RecursivelyNormalizeScale ( this Transform _trans ) {
+    public static void RecursivelyNormalizeScale ( this Transform _trans ) {
         //
         foreach ( Transform child in _trans ) {
             child.RecursivelyNormalizeScale();

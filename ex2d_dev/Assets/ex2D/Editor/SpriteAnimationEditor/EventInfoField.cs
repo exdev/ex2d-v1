@@ -213,9 +213,7 @@ partial class exSpriteAnimClipEditor {
                 ei.objectParam = EditorGUILayout.ObjectField ( "Parameter"
                                                                , ei.objectParam
                                                                , typeof(Object)
-#if !UNITY_3_0 && !UNITY_3_1 && !UNITY_3_3
                                                                , true
-#endif
                                                                , GUILayout.Width(200) 
                                                              );
                 break;

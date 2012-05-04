@@ -151,9 +151,7 @@ partial class exTileMapEditor : EditorWindow {
                     (exTileSheet)EditorGUILayout.ObjectField( "Tile Sheet"
                                                                , curEdit.tileSheet
                                                                , typeof(exTileSheet)
-#if !UNITY_3_0 && !UNITY_3_1 && !UNITY_3_3
                                                                , false
-#endif
                                                              );
                 if ( newTileSheet != curEdit.tileSheet ) {
                     curEdit.tileSheet = newTileSheet;
@@ -193,9 +191,7 @@ partial class exTileMapEditor : EditorWindow {
             EditorGUILayout.ObjectField( "Tile Map"
                                          , curEdit
                                          , typeof(exTileMap)
-#if !UNITY_3_0 && !UNITY_3_1 && !UNITY_3_3
                                          , false
-#endif
                                        );
             GUI.enabled = true;
 

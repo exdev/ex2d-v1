@@ -56,19 +56,24 @@ public static class exBitmapFontUtility {
     // ------------------------------------------------------------------ 
 
     public static void Build ( this exBitmapFont _bitmapFont, Object _fontInfo ) {
-
-        EditorUtility.DisplayProgressBar( "Building BitmapFont...",
-                                          "Build BitmapFont " + _bitmapFont.name, 
-                                          0.0f );    
-        // 
-        _bitmapFont.pageInfos.Clear();
-        _bitmapFont.charInfos.Clear();
-        _bitmapFont.kernings.Clear();
-        // TODO { 
-        // _bitmapFont.fontInfoGUIDs.Clear();
-        // } TODO end 
-        ParseFontInfo ( _bitmapFont, _fontInfo ); 
-        EditorUtility.ClearProgressBar();    
+        try {
+            EditorUtility.DisplayProgressBar( "Building BitmapFont...",
+                                              "Build BitmapFont " + _bitmapFont.name, 
+                                              0.0f );    
+            // 
+            _bitmapFont.pageInfos.Clear();
+            _bitmapFont.charInfos.Clear();
+            _bitmapFont.kernings.Clear();
+            // TODO { 
+            // _bitmapFont.fontInfoGUIDs.Clear();
+            // } TODO end 
+            ParseFontInfo ( _bitmapFont, _fontInfo ); 
+            EditorUtility.ClearProgressBar();    
+        }
+        catch ( System.Exception ) {
+            EditorUtility.ClearProgressBar();    
+            throw;
+        }
 
         //
         _bitmapFont.editorNeedRebuild = false;

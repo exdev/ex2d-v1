@@ -288,7 +288,7 @@ partial class exSpriteAnimClipEditor : EditorWindow {
             GUILayout.Space(5);
             EditorGUILayout.SelectableLabel( curEdit.SnapToFrames(curEdit.length) + " frames | "
                                              + curEdit.length.ToString("f3") + " secs",
-                                             GUILayout.Width(150), GUILayout.MaxHeight(18) );
+                                             GUILayout.MinWidth(150), GUILayout.MaxHeight(18) );
 
             // ======================================================== 
             // preview speed
@@ -298,7 +298,7 @@ partial class exSpriteAnimClipEditor : EditorWindow {
             curEdit.editorSpeed = EditorGUILayout.FloatField( "Preview Speed", 
                                                               curEdit.editorSpeed,
                                                               EditorStyles.toolbarTextField,
-                                                              GUILayout.Width(150) );
+                                                              GUILayout.MinWidth(200) );
 
             // ======================================================== 
             // preview length
@@ -306,7 +306,7 @@ partial class exSpriteAnimClipEditor : EditorWindow {
 
             GUILayout.Space(5);
             EditorGUILayout.SelectableLabel( (curEdit.length / curEdit.editorSpeed).ToString("f3") + " secs", 
-                                             GUILayout.Width(200), GUILayout.MaxHeight(18) );
+                                             GUILayout.MinWidth(80), GUILayout.MaxHeight(18) );
 
             GUILayout.FlexibleSpace();
 
@@ -340,7 +340,7 @@ partial class exSpriteAnimClipEditor : EditorWindow {
             curEdit.editorScale = GUILayout.HorizontalSlider ( curEdit.editorScale, 
                                                                0.01f, 
                                                                10.0f, 
-                                                               GUILayout.MaxWidth(150) );
+                                                               GUILayout.MinWidth(150) );
             GUILayout.Space(5);
             curEdit.editorScale = EditorGUILayout.FloatField( curEdit.editorScale,
                                                               EditorStyles.toolbarTextField,
@@ -397,9 +397,7 @@ partial class exSpriteAnimClipEditor : EditorWindow {
             Object newClip = EditorGUILayout.ObjectField( "Sprite Animation"
                                                           , curEdit
                                                           , typeof(exSpriteAnimClip)
-#if !UNITY_3_0 && !UNITY_3_1 && !UNITY_3_3
                                                           , false
-#endif
                                                           , GUILayout.Width(300) 
                                                         );
             if ( newClip != curEdit )
@@ -1034,7 +1032,7 @@ partial class exSpriteAnimClipEditor : EditorWindow {
                 minSeconds = frameInfo.length;
             }
         }
-        int gcd = exMathHelper.GetGCD(frames);
+        int gcd = exMathHelper.GetGCD( new List<int>(frames) );
 
         // get delta
         float delta = _newLength - total;

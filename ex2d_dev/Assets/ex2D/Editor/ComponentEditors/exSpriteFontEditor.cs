@@ -19,7 +19,7 @@ using System.IO;
 ///////////////////////////////////////////////////////////////////////////////
 
 [CustomEditor(typeof(exSpriteFont))]
-class exSpriteFontEditor : exSpriteBaseEditor {
+public class exSpriteFontEditor : exSpriteBaseEditor {
 
     private static string[] textAlignStrings = new string[] { "Left", "Center", "Right" };
 
@@ -38,7 +38,7 @@ class exSpriteFontEditor : exSpriteBaseEditor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    override protected void OnEnable () {
+    protected new void OnEnable () {
         base.OnEnable();
         if ( target != editSpriteFont ) {
             editSpriteFont = target as exSpriteFont;
@@ -53,7 +53,7 @@ class exSpriteFontEditor : exSpriteBaseEditor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-	override public void OnInspectorGUI () {
+	public override void OnInspectorGUI () {
 
         // ======================================================== 
         // Base GUI 
@@ -144,9 +144,7 @@ class exSpriteFontEditor : exSpriteBaseEditor {
         editSpriteFont.fontInfo = (exBitmapFont)EditorGUILayout.ObjectField( "Font Info"
                                                                            , editSpriteFont.fontInfo
                                                                            , typeof(exBitmapFont)
-#if !UNITY_3_0 && !UNITY_3_1 && !UNITY_3_3
                                                                            , false 
-#endif
                                                                          );
         if ( GUILayout.Button("Edit...", GUILayout.Width(40), GUILayout.Height(15) ) ) {
             exBitmapFontEditor editor = exBitmapFontEditor.NewWindow();
@@ -340,7 +338,7 @@ class exSpriteFontEditor : exSpriteBaseEditor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    override protected void AddAnimationHelper () {
+    protected override void AddAnimationHelper () {
         editSpriteFont.gameObject.AddComponent<exSpriteFontAnimHelper>();
     }
 }

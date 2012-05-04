@@ -48,7 +48,11 @@ public static class exSpriteFontUtility {
     // ------------------------------------------------------------------ 
 
     public static void Build ( this exSpriteFont _spriteFont ) {
+#if UNITY_3_4
         bool isPrefab = (EditorUtility.GetPrefabType(_spriteFont) == PrefabType.Prefab); 
+#else
+        bool isPrefab = (PrefabUtility.GetPrefabType(_spriteFont) == PrefabType.Prefab); 
+#endif
 
         // when build, alway set dirty
         EditorUtility.SetDirty (_spriteFont);

@@ -19,7 +19,7 @@ using System.IO;
 ///////////////////////////////////////////////////////////////////////////////
 
 [CustomEditor(typeof(exSpriteBorder))]
-class exSpriteBorderEditor : exSpriteBaseEditor {
+public class exSpriteBorderEditor : exSpriteBaseEditor {
 
     ///////////////////////////////////////////////////////////////////////////////
     // properties
@@ -58,7 +58,7 @@ class exSpriteBorderEditor : exSpriteBaseEditor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    override protected void OnEnable () {
+    protected new void OnEnable () {
         base.OnEnable();
         if ( target != editSpriteBorder ) {
             editSpriteBorder = target as exSpriteBorder;
@@ -69,7 +69,7 @@ class exSpriteBorderEditor : exSpriteBaseEditor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-	override public void OnInspectorGUI () {
+	public override void OnInspectorGUI () {
 
         // ======================================================== 
         // Base GUI 
@@ -97,9 +97,7 @@ class exSpriteBorderEditor : exSpriteBaseEditor {
             exGUIBorder newGUIBorder = (exGUIBorder)EditorGUILayout.ObjectField( "GUI Border"
                                                                                  , editSpriteBorder.guiBorder
                                                                                  , typeof(exGUIBorder)
-#if !UNITY_3_0 && !UNITY_3_1 && !UNITY_3_3
                                                                                  , false
-#endif
                                                                                );
 
             if ( newGUIBorder != editSpriteBorder.guiBorder ) {
@@ -221,9 +219,7 @@ class exSpriteBorderEditor : exSpriteBaseEditor {
         EditorGUILayout.ObjectField( "Atlas"
                                      , editSpriteBorder.atlas
                                      , typeof(exAtlas)
-#if !UNITY_3_0 && !UNITY_3_1 && !UNITY_3_3
                                      , false 
-#endif
                                    );
         GUI.enabled = true;
 
@@ -419,7 +415,7 @@ class exSpriteBorderEditor : exSpriteBaseEditor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    override protected void AddAnimationHelper () {
+    protected override void AddAnimationHelper () {
         editSpriteBorder.gameObject.AddComponent<exSpriteBorderAnimHelper>();
     }
 

@@ -163,7 +163,11 @@ class ex2D_PostProcessor : AssetPostprocessor {
 // 
 ///////////////////////////////////////////////////////////////////////////////
 
+#if UNITY_3_4
 class ex2D_SaveAssetsProcessor : SaveAssetsProcessor {
+#else
+class ex2D_SaveAssetsProcessor : AssetModificationProcessor {
+#endif
 
     // ------------------------------------------------------------------ 
     // Desc: 
@@ -281,7 +285,7 @@ class ex2D_SaveAssetsProcessor : SaveAssetsProcessor {
         exSceneHelper.UpdateSpriteBorders (rebuildGuiBorders);
 
         // NOTE: without this you will got leaks message
-        EditorUtility.UnloadUnusedAssets();
+        // EditorUtility.UnloadUnusedAssets();
         ex.onSavingAssets = false;
     }
 }
