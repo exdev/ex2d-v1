@@ -120,7 +120,6 @@ EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/BitmapFontEditor/
 EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/ComponentEditors/
 EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/DB/
 EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/GUIBorderEditor/
-EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/GroupImportEditor/
 EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/Helper/
 EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/LayerEditor/
 EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/Misc/

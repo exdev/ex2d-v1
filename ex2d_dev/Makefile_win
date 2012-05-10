@@ -16,7 +16,7 @@ UNITY_PATH = "c:/Program Files/Unity/Editor/Data"
 COMPILER = $(UNITY_PATH)/Mono/bin/gmcs
 UNITY_ENGINE_DLL = $(UNITY_PATH)/Managed/UnityEngine.dll
 UNITY_EDITOR_DLL = $(UNITY_PATH)/Managed/UnityEditor.dll
-UNITY_VER = UNITY_3_4
+UNITY_VER = UNITY_3_5
 
 # Utilities.
 MKDIR = mkdir -p
@@ -46,7 +46,7 @@ EX2D_GUI_EDITOR_TARGET = $(EX2D_GUI_TARGET_DIR)/Editor/ex2D.Editor.dll
 ex2d: $(EX2D_RUNTIME_TARGET) $(EX2D_EDITOR_TARGET)
 clean_ex2d: 
 	del /F ..\ex2d_submit\Assets\ex2D\Core\ex2D.Runtime.dll
-	del /F ..\ex2d_submit\Assets\ex2D\Core\ex2D.Editor.dll
+	del /F ..\ex2d_submit\Assets\ex2D\Editor\ex2D.Editor.dll
 rebuild_ex2d: |clean_ex2d ex2d 
 
 #  tilemap: $(EX2D_TILEMAP_RUNTIME_TARGET) $(EX2D_TILEMAP_EDITOR_TARGET)
@@ -113,7 +113,6 @@ EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/BitmapFontEditor/
 EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/ComponentEditors/
 EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/DB/
 EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/GUIBorderEditor/
-EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/GroupImportEditor/
 EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/Helper/
 EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/LayerEditor/
 EX2D_EDITOR_SOURCE_DIRS += Assets/ex2D/Editor/Misc/
