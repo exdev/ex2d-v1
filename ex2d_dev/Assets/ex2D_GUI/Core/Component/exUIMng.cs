@@ -162,7 +162,8 @@ public class exUIMng : MonoBehaviour {
 
         // recursively add ui-tree
         exUIElement[] elements = FindObjectsOfType(typeof(exUIElement)) as exUIElement[];
-        foreach ( exUIElement el in elements ) {
+        for ( int i = 0; i < elements.Length; ++i ) {
+            exUIElement el = elements[i];
             exUIElement parent_el = el.FindParent();
             if ( parent_el == null ) {
                 exUIElement.FindAndAddChild (el);
@@ -218,7 +219,8 @@ public class exUIMng : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     void DispatchEvents () {
-        foreach ( exUIEvent e in eventList ) {
+        for ( int i = 0; i < eventList.Count; ++i ) {
+            exUIEvent e = eventList[i];
             bool used = e.target.OnEvent(e);
             exUIElement uiParent = e.target;
             while ( used == false ) {
@@ -261,7 +263,8 @@ public class exUIMng : MonoBehaviour {
         //
         if ( touchID != -1 ) {
             bool found = false;
-            foreach ( Touch touch in Input.touches ) {
+            for ( int i = 0; i < Input.touches.Length; ++i ) {
+                Touch touch = Input.touches[i];
                 if ( touchID == touch.fingerId ) {
                     found = true;
                     if ( touch.phase == TouchPhase.Ended ||
@@ -287,7 +290,8 @@ public class exUIMng : MonoBehaviour {
             }
         }
         else {
-            foreach ( Touch touch in Input.touches ) {
+            for ( int i = 0; i < Input.touches.Length; ++i ) {
+                Touch touch = Input.touches[i];
                 if ( touch.phase == TouchPhase.Began ) {
                     hotElement = PickElement(touch.position);
                     if ( hotElement != null ) {

@@ -95,7 +95,8 @@ public class exTileMapRenderer : exPlane {
     public void UpdateMesh ( Mesh _mesh ) {
         int gridCount = 0;
         if ( updateFlags != UpdateFlags.None ) {
-            foreach ( int id in tileMap_.grids ) {
+            foreach ( int i = 0; i < tileMap_.grids.Length; ++i ) {
+                int id = tileMap_.grids[i]; 
                 if ( id != -1 ) {
                     ++gridCount;
                 }
