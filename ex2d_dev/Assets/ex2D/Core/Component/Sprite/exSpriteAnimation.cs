@@ -504,6 +504,7 @@ public class exSpriteAnimation : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     public exSpriteAnimState AddAnimation ( string _name, exSpriteAnimClip _animClip ) {
+        Init ();
         exSpriteAnimState state = null;
 
         // if we already have the animation, just return the animation state
