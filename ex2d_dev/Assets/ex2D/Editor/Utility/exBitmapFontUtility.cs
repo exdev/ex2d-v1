@@ -23,6 +23,8 @@ using System.IO;
 
 public static class exBitmapFontUtility {
 
+#if !(EX2D_EVALUATE)
+
     // ------------------------------------------------------------------ 
     /// \param _path the directory path to save the atlas
     /// \param _name the name of the atlas
@@ -223,5 +225,8 @@ public static class exBitmapFontUtility {
         }
         return "";
     }
+
+#endif // !(EX2D_EVALUATE)
+
 }
 

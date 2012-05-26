@@ -71,10 +71,11 @@ all: |ex2d
 rebuild_all: |clean_all all
 
 # defines
+#  EX2D_VER_DEFINE = -d:EX2D_EVALUATE
 PLATFORM_DEFINE = -d:UNITY_IPHONE
-#  PLATFORM_DEFINE = -d:UNITY_IPHONE -d:UNITY_FLASH
-RUNTIME_DEFINE = -d:$(UNITY_VER) $(PLATFORM_DEFINE)
-EDITOR_DEFINE = -d:$(UNITY_VER) -d:UNITY_EDITOR $(PLATFORM_DEFINE) 
+# PLATFORM_DEFINE = -d:UNITY_IPHONE -d:UNITY_FLASH
+RUNTIME_DEFINE = -d:$(UNITY_VER) $(PLATFORM_DEFINE) $(EX2D_VER_DEFINE)
+EDITOR_DEFINE = -d:$(UNITY_VER) -d:UNITY_EDITOR $(PLATFORM_DEFINE) $(EX2D_VER_DEFINE) 
 
 # /////////////////////////////////////////////////////////////////////////////
 # ex2D runtime target

@@ -23,6 +23,8 @@ using System.IO;
 
 public static class exSpriteFontUtility {
 
+#if !(EX2D_EVALUATE)
+
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
@@ -86,4 +88,7 @@ public static class exSpriteFontUtility {
             _spriteFont.collisionHelper.UpdateCollider ();
         }
     }
+
+#endif // !(EX2D_EVALUATE)
+
 }

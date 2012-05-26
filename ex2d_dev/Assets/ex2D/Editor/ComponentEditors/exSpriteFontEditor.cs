@@ -21,6 +21,8 @@ using System.IO;
 [CustomEditor(typeof(exSpriteFont))]
 public class exSpriteFontEditor : exSpriteBaseEditor {
 
+#if !(EX2D_EVALUATE)
+
     private static string[] textAlignStrings = new string[] { "Left", "Center", "Right" };
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -341,6 +343,18 @@ public class exSpriteFontEditor : exSpriteBaseEditor {
     protected override void AddAnimationHelper () {
         editSpriteFont.gameObject.AddComponent<exSpriteFontAnimHelper>();
     }
+
+#else // !(EX2D_EVALUATE)
+
+	public override void OnInspectorGUI () {
+        GUIStyle style = new GUIStyle();
+        style.fontStyle = FontStyle.Bold;
+        style.normal.textColor = Color.yellow;
+        GUILayout.Label( "Unavailable in Evaluate Version", style );
+	}
+
+#endif // !(EX2D_EVALUATE)
+
 }
 
 

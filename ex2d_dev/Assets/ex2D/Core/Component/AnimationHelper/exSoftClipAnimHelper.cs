@@ -68,5 +68,6 @@ public class exSoftClipAnimHelper : exSpriteBaseAnimHelper {
             softClip.updateFlags |= exPlane.UpdateFlags.Vertex;
         }
     }
+
 }
 

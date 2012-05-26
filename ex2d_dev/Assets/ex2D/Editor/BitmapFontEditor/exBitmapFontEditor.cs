@@ -23,6 +23,8 @@ using System.Collections.Generic;
 
 partial class exBitmapFontEditor : EditorWindow {
 
+#if !(EX2D_EVALUATE)
+
     ///////////////////////////////////////////////////////////////////////////////
     // private variables
     ///////////////////////////////////////////////////////////////////////////////
@@ -211,4 +213,7 @@ partial class exBitmapFontEditor : EditorWindow {
 
         EditorGUILayout.EndScrollView();
     }
+
+#endif // !(EX2D_EVALUATE)
+    
 }

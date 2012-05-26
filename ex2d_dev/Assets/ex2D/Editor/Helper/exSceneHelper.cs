@@ -175,6 +175,7 @@ public static class exSceneHelper {
                     }
                 }
 
+#if !(EX2D_EVALUATE)
                 // ======================================================== 
                 // exSpriteFont
                 // ======================================================== 
@@ -260,6 +261,7 @@ public static class exSceneHelper {
                         }
                     }
                 }
+#endif // !(EX2D_EVALUATE)
 
                 // DISABLE: it is too slow { 
                 // float progress = (float)i/(float)sprites.Length;
@@ -291,6 +293,7 @@ public static class exSceneHelper {
             for ( int i = 0; i < sprites.Length; ++i ) {
                 exSpriteBase spBase = sprites[i]; 
 
+#if !(EX2D_EVALUATE)
                 // ======================================================== 
                 // exSpriteBorder
                 // ======================================================== 
@@ -326,6 +329,8 @@ public static class exSceneHelper {
                         EditorUtility.SetDirty(spBorder);
                     }
                 }
+#endif // !(EX2D_EVALUATE)
+
             }
             EditorUtility.ClearProgressBar();    
         }

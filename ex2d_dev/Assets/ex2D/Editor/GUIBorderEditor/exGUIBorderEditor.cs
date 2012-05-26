@@ -23,6 +23,8 @@ using System.Collections.Generic;
 
 partial class exGUIBorderEditor : EditorWindow {
 
+#if !(EX2D_EVALUATE)
+
     ///////////////////////////////////////////////////////////////////////////////
     // private variables
     ///////////////////////////////////////////////////////////////////////////////
@@ -559,4 +561,7 @@ partial class exGUIBorderEditor : EditorWindow {
         }
 
     }
+
+#endif // !(EX2D_EVALUATE)
+
 }

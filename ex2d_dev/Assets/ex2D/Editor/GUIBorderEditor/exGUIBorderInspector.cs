@@ -22,6 +22,8 @@ using System.IO;
 [CustomEditor(typeof(exGUIBorder))]
 class exGUIBorderInspector : Editor {
 
+#if !(EX2D_EVALUATE)
+
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
@@ -38,4 +40,16 @@ class exGUIBorderInspector : Editor {
         GUILayout.Space(5);
         GUILayout.EndHorizontal();
     }
+
+#else // !(EX2D_EVALUATE)
+
+	public override void OnInspectorGUI () {
+        GUIStyle style = new GUIStyle();
+        style.fontStyle = FontStyle.Bold;
+        style.normal.textColor = Color.yellow;
+        GUILayout.Label( "Unavailable in Evaluate Version", style );
+    }
+
+#endif // !(EX2D_EVALUATE)
+
 }

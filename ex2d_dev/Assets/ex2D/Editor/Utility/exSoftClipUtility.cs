@@ -21,6 +21,8 @@ using System.IO;
 
 public static class exSoftClipUtility {
 
+#if !(EX2D_EVALUATE)
+
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
@@ -31,5 +33,7 @@ public static class exSoftClipUtility {
         go.AddComponent<exSoftClip>();
         Selection.activeObject = go;
     }
+
+#endif // !(EX2D_EVALUATE)
 
 }

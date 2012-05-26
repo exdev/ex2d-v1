@@ -830,6 +830,7 @@ public static class exEditorHelper {
                     sp.Build(texture);
                 }
 
+#if !(EX2D_EVALUATE)
                 // if sprite font
                 if ( spBase is exSpriteFont ) {
                     exSpriteFont spFont = spBase as exSpriteFont;
@@ -851,6 +852,7 @@ public static class exEditorHelper {
                     }
                     spBorder.Build(texture);
                 }
+#endif // EX2D_EVALUATE
             }
             EditorUtility.ClearProgressBar();    
         }

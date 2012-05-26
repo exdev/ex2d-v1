@@ -21,7 +21,9 @@ using System.IO;
 ///
 ///////////////////////////////////////////////////////////////////////////////
 
-public class exGUIBorderUtility {
+public static class exGUIBorderUtility {
+
+#if !(EX2D_EVALUATE)
 
     // ------------------------------------------------------------------ 
     // Desc: 
@@ -72,4 +74,7 @@ public class exGUIBorderUtility {
         Selection.activeObject = newGUIBorder;
         return newGUIBorder;
     }
+
+#endif // !(EX2D_EVALUATE)
+
 }

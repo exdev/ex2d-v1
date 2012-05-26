@@ -23,6 +23,8 @@ using System.IO;
 
 public static class exSpriteBorderUtility {
 
+#if !(EX2D_EVALUATE)
+
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
@@ -94,6 +96,8 @@ public static class exSpriteBorderUtility {
             _spriteBorder.collisionHelper.UpdateCollider ();
         }
     }
+
+#endif // !(EX2D_EVALUATE)
 
 }
 

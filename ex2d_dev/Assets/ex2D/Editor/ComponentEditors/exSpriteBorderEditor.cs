@@ -21,6 +21,8 @@ using System.IO;
 [CustomEditor(typeof(exSpriteBorder))]
 public class exSpriteBorderEditor : exSpriteBaseEditor {
 
+#if !(EX2D_EVALUATE)
+
     ///////////////////////////////////////////////////////////////////////////////
     // properties
     ///////////////////////////////////////////////////////////////////////////////
@@ -567,21 +569,17 @@ public class exSpriteBorderEditor : exSpriteBaseEditor {
 
     void GetDelatSize ( Vector3 _deltaVec, out float _dx, out float _dy ) {
         _dx = _deltaVec.x / editSpriteBorder.scale.x; _dy = _deltaVec.y / editSpriteBorder.scale.y;
-
-        // DELME { 
-        // switch ( editSpriteBorder.plane ) {
-        // case exPlane.Plane.XY:
-        //     _dx = _deltaVec.x / editSpriteBorder.scale.x; _dy = _deltaVec.y / editSpriteBorder.scale.y;
-        //     break;
-
-        // case exPlane.Plane.XZ:
-        //     _dx = _deltaVec.x / editSpriteBorder.scale.x; _dy = _deltaVec.z / editSpriteBorder.scale.y;
-        //     break;
-
-        // case exPlane.Plane.ZY:
-        //     _dx = _deltaVec.z / editSpriteBorder.scale.x; _dy = _deltaVec.y / editSpriteBorder.scale.y;
-        //     break;
-        // }
-        // } DELME end 
     }
+
+#else // !(EX2D_EVALUATE)
+
+	override public void OnInspectorGUI () {
+        GUIStyle style = new GUIStyle();
+        style.fontStyle = FontStyle.Bold;
+        style.normal.textColor = Color.yellow;
+        GUILayout.Label( "Unavailable in Evaluate Version", style );
+	}
+
+#endif // !(EX2D_EVALUATE)
+
 }

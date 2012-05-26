@@ -21,6 +21,8 @@ using System.IO;
 [CustomEditor(typeof(exSoftClip))]
 public class exSoftClipEditor : exPlaneEditor {
 
+#if !(EX2D_EVALUATE)
+
     ///////////////////////////////////////////////////////////////////////////////
     // properties
     ///////////////////////////////////////////////////////////////////////////////
@@ -404,21 +406,17 @@ public class exSoftClipEditor : exPlaneEditor {
 
     void GetDelatSize ( Vector3 _deltaVec, out float _dx, out float _dy ) {
         _dx = _deltaVec.x; _dy = _deltaVec.y;
-
-        // DELME { 
-        // switch ( curEdit.plane ) {
-        // case exPlane.Plane.XY:
-        //     _dx = _deltaVec.x; _dy = _deltaVec.y;
-        //     break;
-
-        // case exPlane.Plane.XZ:
-        //     _dx = _deltaVec.x; _dy = _deltaVec.z;
-        //     break;
-
-        // case exPlane.Plane.ZY:
-        //     _dx = _deltaVec.z; _dy = _deltaVec.y;
-        //     break;
-        // }
-        // } DELME end 
     }
+
+#else // !(EX2D_EVALUATE)
+
+	public override void OnInspectorGUI () {
+        GUIStyle style = new GUIStyle();
+        style.fontStyle = FontStyle.Bold;
+        style.normal.textColor = Color.yellow;
+        GUILayout.Label( "Unavailable in Evaluate Version", style );
+	}
+
+#endif // !(EX2D_EVALUATE)
+
 }

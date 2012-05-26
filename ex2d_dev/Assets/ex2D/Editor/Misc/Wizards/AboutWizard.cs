@@ -42,10 +42,14 @@ class AboutWizard : ScriptableWizard {
                          (Texture2D)AssetDatabase.LoadAssetAtPath( logoPath, typeof(Texture2D) ) );
         GUILayoutUtility.GetRect ( logoWidth, logoHeight );
 
+        string version = "ex2D v1.2.6 (120523)";
+#if EX2D_EVALUATE
+        version += " Evaluate";
+#endif
         GUILayout.Space (10);
         GUILayout.BeginHorizontal();
             GUILayout.Space (10);
-            GUILayout.Label("ex2D v1.2.6 (120523)");
+            GUILayout.Label(version);
         GUILayout.EndHorizontal();
 
         string support = "";

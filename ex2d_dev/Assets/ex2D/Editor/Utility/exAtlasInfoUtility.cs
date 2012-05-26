@@ -354,11 +354,12 @@ public static partial class exAtlasInfoUtility {
             // } TODO end 
         }
 
+#if EX2D_EVALUATE
         // ======================================================== 
         // Add water mark
         // ======================================================== 
 
-        // DISABLE: onlly open it in evaluate version { 
+        // NOTE: onlly open it in evaluate version { 
         // Make Water Make { 
         // Texture2D texWaterMark = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/ex2D/Editor/Resource/water_mark.png", typeof(Texture2D));
         // exTextureHelper.ImportTextureForAtlas(texWaterMark);
@@ -379,28 +380,29 @@ public static partial class exAtlasInfoUtility {
         // sw.Close();
         // } Make Water Make end 
 
-        // int wa_width = 392;
-        // int wa_height = 40;
-        // Color[] colors = new Color[wa_width*wa_height];
-        // for ( int r = 0; r < wa_height; ++r ) {
-        //     for ( int c = 0; c < wa_width; ++c ) {
-        //         colors[r*wa_width+c] = new Color ( waterMark[(r*wa_width+c)*4]/255.0f,
-        //                                            waterMark[(r*wa_width+c)*4+1]/255.0f, 
-        //                                            waterMark[(r*wa_width+c)*4+2]/255.0f, 
-        //                                            waterMark[(r*wa_width+c)*4+3]/255.0f );
-        //     }
-        // }
-        // Color[] colors_d = _tex.GetPixels();
-        // for ( int r = 0; r < wa_height; ++r ) {
-        //     for ( int c = 0; c < wa_width; ++c ) {
-        //         Color color_d = colors_d[r*_tex.width+c];
-        //         Color color = colors[r*wa_width+c];
-        //         // colors_d[r*_tex.width+(c+_tex.height-wa_height)] = 
-        //         colors_d[r*_tex.width+c] = color_d * ( 1.0f - color.a ) + color * color.a;
-        //     }
-        // }
-        // _tex.SetPixels( colors_d );
-        // } DISABLE end 
+        int wa_width = 392;
+        int wa_height = 40;
+        Color[] colors = new Color[wa_width*wa_height];
+        for ( int r = 0; r < wa_height; ++r ) {
+            for ( int c = 0; c < wa_width; ++c ) {
+                colors[r*wa_width+c] = new Color ( waterMark[(r*wa_width+c)*4]/255.0f,
+                                                   waterMark[(r*wa_width+c)*4+1]/255.0f, 
+                                                   waterMark[(r*wa_width+c)*4+2]/255.0f, 
+                                                   waterMark[(r*wa_width+c)*4+3]/255.0f );
+            }
+        }
+        Color[] colors_d = _tex.GetPixels();
+        for ( int r = 0; r < wa_height; ++r ) {
+            for ( int c = 0; c < wa_width; ++c ) {
+                Color color_d = colors_d[r*_tex.width+c];
+                Color color = colors[r*wa_width+c];
+                // colors_d[r*_tex.width+(c+_tex.height-wa_height)] = 
+                colors_d[r*_tex.width+c] = color_d * ( 1.0f - color.a ) + color * color.a;
+            }
+        }
+        _tex.SetPixels( colors_d );
+        // } NOTE end 
+#endif // EX2D_EVALUATE
 
         _tex.Apply(false);
     }

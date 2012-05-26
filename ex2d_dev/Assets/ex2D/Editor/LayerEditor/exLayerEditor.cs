@@ -22,6 +22,8 @@ using System.Collections.Generic;
 
 public class exLayerEditor : EditorWindow {
 
+#if !(EX2D_EVALUATE)
+
     static int layerFieldHeight = 20;
 
     protected class LayerForSort {
@@ -836,4 +838,7 @@ public class exLayerEditor : EditorWindow {
         if ( (_layer is exLayerMng) == false )
             GameObject.DestroyImmediate(_layer);
     } 
+
+#endif // !(EX2D_EVALUATE)
+
 }

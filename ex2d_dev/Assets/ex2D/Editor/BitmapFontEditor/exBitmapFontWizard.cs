@@ -19,6 +19,8 @@ using System.IO;
 
 class exBitmapFontWizard : ScriptableWizard {
 
+#if !(EX2D_EVALUATE)
+
     ///////////////////////////////////////////////////////////////////////////////
     // defines
     ///////////////////////////////////////////////////////////////////////////////
@@ -149,4 +151,5 @@ class exBitmapFontWizard : ScriptableWizard {
             throw;
         }
     }
+#endif // !(EX2D_EVALUATE)
 }
