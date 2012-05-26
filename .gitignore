@@ -49,4 +49,6 @@ _log/
 *.vimentry.meta
 .vimfiles.*/
 quick_gen_project_*_autogen.bat
+quick_gen_project_*_autogen.bat.meta
 quick_gen_project_*_autogen.sh
+quick_gen_project_*_autogen.sh.meta
