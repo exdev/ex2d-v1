@@ -124,6 +124,9 @@ public class exSpriteAnimation : MonoBehaviour {
     private int defaultIndex;
     private int lastEventInfoIndex = -1;
 
+    private float curWrappedTime = 0.0f;
+    private int curIndex = -1;
+
     ///////////////////////////////////////////////////////////////////////////////
     // functions
     ///////////////////////////////////////////////////////////////////////////////
@@ -183,6 +186,7 @@ public class exSpriteAnimation : MonoBehaviour {
 
             // advance the time
             curAnimation.time += delta;
+            Step (curAnimation);
 
             // save the last state
             float lastAnimTime = curAnimation.time;
@@ -221,6 +225,34 @@ public class exSpriteAnimation : MonoBehaviour {
                 }
             }
         }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void Step ( exSpriteAnimState _animState ) {
+        if ( _animState == null ) {
+            curWrappedTime = 0.0f;
+            curIndex = -1;
+            return;
+        }
+
+        curWrappedTime = _animState.clip.WrapSeconds(_animState.time, _animState.wrapMode);
+#if UNITY_FLASH
+        curIndex = _animState.frameTimes.Count - 1;
+        for ( int i = 0; i < _animState.frameTimes.Count; ++i ) {
+            if ( _animState.frameTimes[i] > curWrappedTime ) {
+                curIndex = i;
+                break;
+            }
+        }
+#else
+        curIndex = _animState.frameTimes.BinarySearch(curWrappedTime);
+        if ( curIndex < 0 ) {
+            curIndex = ~curIndex;
+        }
+#endif
     }
 
     // ------------------------------------------------------------------ 
@@ -430,23 +462,8 @@ public class exSpriteAnimation : MonoBehaviour {
 
     public exSpriteAnimClip.FrameInfo GetCurFrameInfo () {
         if ( curAnimation != null ) {
-            float wrappedTime = curAnimation.clip.WrapSeconds(curAnimation.time, curAnimation.wrapMode);
-#if UNITY_FLASH
-            int index = curAnimation.frameTimes.Count - 1;
-            for ( int i = 0; i < curAnimation.frameTimes.Count; ++i ) {
-                if ( curAnimation.frameTimes[i] > wrappedTime ) {
-                    index = i;
-                    break;
-                }
-            }
-#else
-            int index = curAnimation.frameTimes.BinarySearch(wrappedTime);
-#endif
-            if ( index < 0 ) {
-                index = ~index;
-            }
-            if ( index < curAnimation.clip.frameInfos.Count )
-                return curAnimation.clip.frameInfos[index];
+            if ( curIndex < curAnimation.clip.frameInfos.Count )
+                return curAnimation.clip.frameInfos[curIndex];
         }
         return null;
     }
@@ -457,25 +474,7 @@ public class exSpriteAnimation : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     public int GetCurFrameIndex () {
-        int index = -1;
-        if ( curAnimation != null ) {
-            float wrappedTime = curAnimation.clip.WrapSeconds(curAnimation.time, curAnimation.wrapMode);
-#if UNITY_FLASH
-            index = curAnimation.frameTimes.Count - 1;
-            for ( int i = 0; i < curAnimation.frameTimes.Count; ++i ) {
-                if ( curAnimation.frameTimes[i] > wrappedTime ) {
-                    index = i;
-                    break;
-                }
-            }
-#else
-            index = curAnimation.frameTimes.BinarySearch(wrappedTime);
-            if ( index < 0 ) {
-                index = ~index;
-            }
-#endif
-        }
-        return index;
+        return curIndex;
     }
 
     // ------------------------------------------------------------------ 
