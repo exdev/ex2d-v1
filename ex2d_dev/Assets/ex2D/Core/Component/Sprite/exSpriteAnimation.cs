@@ -300,9 +300,12 @@ public class exSpriteAnimation : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     public void Play ( string _name, int _frame ) {
-        float unitSeconds = 1.0f/curAnimation.clip.sampleRate;
-        float time = _frame * unitSeconds;
-        Play( _name, time );
+        curAnimation = GetAnimation(_name);
+        if ( curAnimation != null ) {
+            float unitSeconds = 1.0f/curAnimation.clip.sampleRate;
+            float time = _frame * unitSeconds;
+            Play ( curAnimation, time );
+        }
     }
 
     // ------------------------------------------------------------------ 
@@ -313,6 +316,17 @@ public class exSpriteAnimation : MonoBehaviour {
 
     public void Play ( string _name, float _time ) {
         curAnimation = GetAnimation(_name);
+        if ( curAnimation != null ) {
+            Play ( curAnimation, _time );
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void Play ( exSpriteAnimState _animState, float _time ) {
+        curAnimation = _animState;
         if ( curAnimation != null ) {
             curAnimation.time = _time;
             playing = true;
