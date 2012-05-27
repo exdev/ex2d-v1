@@ -564,6 +564,20 @@ partial class exAtlasEditor : EditorWindow {
                 GUILayout.EndHorizontal();
 
                 // ======================================================== 
+                // trim elements 
+                // ======================================================== 
+
+                bool newTrimElements = GUILayout.Toggle ( curEdit.trimElements, "Trimmed Elements" ); 
+                if ( newTrimElements != curEdit.trimElements ) {
+                    curEdit.trimElements = newTrimElements;
+                    foreach ( exAtlasInfo.Element el in curEdit.elements ) {
+                        curEdit.UpdateElement( el.texture, newTrimElements );
+                    }
+                    curEdit.needRebuild = true;
+                    GUI.changed = true;
+                }
+
+                // ======================================================== 
                 // bitmap fonts 
                 // ======================================================== 
 

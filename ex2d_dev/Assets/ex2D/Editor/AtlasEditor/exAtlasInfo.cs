@@ -125,6 +125,7 @@ public partial class exAtlasInfo : ScriptableObject {
     public Material material; ///< the default material we used
     public bool useBuildColor = false; ///< use buildColor as background color for transparent pixels
     public Color buildColor = new Color(1.0f, 1.0f, 1.0f, 0.0f); ///< the color of transparent pixels in atlas texture
+    public bool trimElements = false; ///< trim all element when importing
 
     // canvas settings
     public bool foldCanvas = true; ///< canvas fold option
@@ -566,7 +567,7 @@ public partial class exAtlasInfo : ScriptableObject {
                 Texture2D t = o as Texture2D;
                 exAtlasDB.ElementInfo elInfo = exAtlasDB.GetElementInfo(t);
                 if ( elInfo == null ) {
-                    AddElement( t, true );
+                    AddElement( t, trimElements );
                     dirty = true;
                 }
                 else {
