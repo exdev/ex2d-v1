@@ -295,24 +295,36 @@ public class exSpriteAnimation : MonoBehaviour {
 
     // ------------------------------------------------------------------ 
     /// \param _name the name of the animation to play
-    /// \param _index the frame index
+    /// \param _frame the frame count
+    /// Play the animation by _name, start from the _frame
+    // ------------------------------------------------------------------ 
+
+    public void Play ( string _name, int _frame ) {
+        float unitSeconds = 1.0f/curAnimation.clip.sampleRate;
+        float time = _frame * unitSeconds;
+        Play( _name, time );
+    }
+
+    // ------------------------------------------------------------------ 
+    /// \param _name the name of the animation to play
+    /// \param _time the tiem to play
     /// Play the animation by _name, start from the _index of frame  
     // ------------------------------------------------------------------ 
 
-    public void Play ( string _name, int _index ) {
+    public void Play ( string _name, float _time ) {
         curAnimation = GetAnimation(_name);
         if ( curAnimation != null ) {
-            if ( _index == 0 )
-                curAnimation.time = 0.0f;
-            else if ( _index > 0 && _index < curAnimation.frameTimes.Count )
-                curAnimation.time = curAnimation.frameTimes[_index-1];
+            curAnimation.time = _time;
             playing = true;
-            if ( curAnimation.speed >= 0.0f )
-                lastEventInfoIndex = -1;
-            else
-                lastEventInfoIndex = curAnimation.clip.eventInfos.Count;
+            if ( curAnimation.speed >= 0.0f ) {
+                lastEventInfoIndex = curAnimation.clip.GetForwardEventIndex(curAnimation.time);
+            }
+            else {
+                lastEventInfoIndex = curAnimation.clip.GetBackwardEventIndex(curAnimation.time);
+            }
 
-            exSpriteAnimClip.FrameInfo fi = curAnimation.clip.frameInfos[_index]; 
+            Step (curAnimation);
+            exSpriteAnimClip.FrameInfo fi = curAnimation.clip.frameInfos[curIndex]; 
             if ( fi != null )
                 sprite.SetSprite ( fi.atlas, fi.index );
             enabled = true;
