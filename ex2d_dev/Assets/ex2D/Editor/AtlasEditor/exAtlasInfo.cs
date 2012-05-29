@@ -314,6 +314,7 @@ public partial class exAtlasInfo : ScriptableObject {
         else {
             el.trimRect = new Rect( 0, 0, _tex.width, _tex.height );
         }
+        el.trim = _trim;
     }
 
     // ------------------------------------------------------------------ 
