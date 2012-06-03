@@ -110,6 +110,27 @@ public static class exSceneHelper {
     }
 
     // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    [MenuItem ("Assets/ex2D/Rebuild Sprites In Selected Scenes")]
+    public static void RebuildSpritesInSelectedScenes () {
+        string curEditScene = EditorApplication.currentScene;
+
+        Object[] objs = Selection.GetFiltered( typeof(Object), SelectionMode.DeepAssets);
+        foreach ( Object obj in objs ) {
+            string assetPath = AssetDatabase.GetAssetPath(obj);
+            if ( Path.GetExtension (assetPath) == ".unity" ) {
+                Debug.Log( "Rebuild sprite in " + Path.GetFileNameWithoutExtension (assetPath));
+                EditorApplication.OpenScene(assetPath);
+                RebuildSceneSprites ();
+                EditorApplication.SaveScene( EditorApplication.currentScene );
+            }
+        }
+        EditorApplication.OpenScene(curEditScene);
+    }
+
+    // ------------------------------------------------------------------ 
     /// \param _atlasInfoGUIDs the list of atlas info guid
     /// update sprites in current scene and in prefab by atlas info list
     // ------------------------------------------------------------------ 

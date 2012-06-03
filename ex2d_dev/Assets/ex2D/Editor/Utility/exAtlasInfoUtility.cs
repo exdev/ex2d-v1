@@ -27,7 +27,7 @@ public static partial class exAtlasInfoUtility {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    [MenuItem ("Assets/Select Atlas (ex2D)")]
+    [MenuItem ("Assets/ex2D/Select Atlas (ex2D)")]
     static void SelectAtlasByActiveTexture () {
         if ( Selection.activeObject is Texture2D ) {
             exAtlasDB.ElementInfo elInfo = exAtlasDB.GetElementInfo ( Selection.activeObject as Texture2D );
