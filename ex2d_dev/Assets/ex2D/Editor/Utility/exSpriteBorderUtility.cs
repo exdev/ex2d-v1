@@ -72,7 +72,7 @@ public static class exSpriteBorderUtility {
             _spriteBorder.renderer.sharedMaterial = _spriteBorder.atlas.material;
         }
         else if ( _texture != null ) {
-            _spriteBorder.renderer.sharedMaterial = exEditorHelper.GetDefaultMaterial(_texture);
+            _spriteBorder.renderer.sharedMaterial = exEditorHelper.GetDefaultMaterial(_texture, _texture.name);
         }
         EditorUtility.UnloadUnusedAssets();
 

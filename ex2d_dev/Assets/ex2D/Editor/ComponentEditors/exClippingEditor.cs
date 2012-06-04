@@ -117,7 +117,7 @@ public class exClippingEditor : exPlaneEditor {
         GUILayout.BeginHorizontal();
         GUILayout.Space(30);
             if ( GUILayout.Button("Update", GUILayout.Width(50), GUILayout.Height(20) ) ) {
-                curEdit.UpdateClipList();
+                curEdit.UpdateClipListInEditor();
                 GUI.changed = true;
             }
         GUILayout.EndHorizontal();

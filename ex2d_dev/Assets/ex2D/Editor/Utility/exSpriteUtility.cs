@@ -70,7 +70,7 @@ public static class exSpriteUtility {
             _sprite.renderer.sharedMaterial = _sprite.atlas.material;
         }
         else if ( _texture != null ) {
-            _sprite.renderer.sharedMaterial = exEditorHelper.GetDefaultMaterial(_texture);
+            _sprite.renderer.sharedMaterial = exEditorHelper.GetDefaultMaterial(_texture,_texture.name);
         }
         EditorUtility.UnloadUnusedAssets();
 

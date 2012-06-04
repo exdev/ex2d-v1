@@ -168,7 +168,7 @@ partial class exTileSheetEditor : EditorWindow {
                 // if we have texture but no material, try to find it
                 if ( curEdit.texture != null ) {
                     // assign it
-                    curEdit.material = exEditorHelper.GetDefaultMaterial(curEdit.texture);
+                    curEdit.material = exEditorHelper.GetDefaultMaterial(curEdit.texture, curEdit.texture.name);
                 }
                 // if we don't have texture, set material to null
                 else {

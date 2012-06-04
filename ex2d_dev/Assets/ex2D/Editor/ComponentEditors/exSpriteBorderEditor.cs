@@ -198,7 +198,7 @@ public class exSpriteBorderEditor : exSpriteBaseEditor {
             else {
                 editSpriteBorder.SetBorder( newGUIBorder, editAtlas, editIndex );
                 if ( editSpriteBorder.useAtlas == false ) {
-                    editSpriteBorder.renderer.sharedMaterial = exEditorHelper.GetDefaultMaterial(editTexture);
+                    editSpriteBorder.renderer.sharedMaterial = exEditorHelper.GetDefaultMaterial(editTexture, editTexture.name);
                     editSpriteBorder.updateFlags |= exPlane.UpdateFlags.UV;
                 }
             }

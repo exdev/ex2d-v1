@@ -99,6 +99,12 @@ public class exClipping : exPlane {
                     clipPlane.UpdateClipList ();
                     continue;
                 }
+                else {
+                    Renderer renderer = child.renderer;
+                    if ( renderer != null ) {
+                        renderer.material.shader = Shader.Find("ex2D/Alpha Blended (Clipping)");
+                    }
+                }
             }
             RecursivelyAddToClip (child);
         }
@@ -116,6 +122,9 @@ public class exClipping : exPlane {
         base.Awake();
         updateFlags |= UpdateFlags.Vertex;
         Commit();
+        CommitMaterialProperties();
+
+        spriteMng.AddToClippingList(this);
     }
 
     // ------------------------------------------------------------------ 
@@ -124,6 +133,10 @@ public class exClipping : exPlane {
 
     protected new void OnDestroy () {
         base.OnDestroy();
+
+        if ( spriteMng != null ) {
+            spriteMng_.RemoveFromClippingList(this);
+        }
     }
 
     // ------------------------------------------------------------------ 
@@ -159,107 +172,78 @@ public class exClipping : exPlane {
     // ------------------------------------------------------------------ 
 
     public override void Commit () {
-        // DELME { 
-        // if ( (updateFlags & UpdateFlags.Vertex) != 0 ) {
-        //     //
-        //     float halfWidth = width_ * 0.5f;
-        //     float halfHeight = height_ * 0.5f;
-        //     float offsetX = 0.0f;
-        //     float offsetY = 0.0f;
+        if ( (updateFlags & UpdateFlags.Vertex) != 0 ) {
+            //
+            float halfWidth = width_ * 0.5f;
+            float halfHeight = height_ * 0.5f;
+            float offsetX = 0.0f;
+            float offsetY = 0.0f;
 
-        //     //
-        //     switch ( anchor ) {
-        //     case Anchor.TopLeft     : offsetX = -halfWidth;   offsetY = -halfHeight;  break;
-        //     case Anchor.TopCenter   : offsetX = 0.0f;         offsetY = -halfHeight;  break;
-        //     case Anchor.TopRight    : offsetX = halfWidth;    offsetY = -halfHeight;  break;
+            //
+            switch ( anchor ) {
+            case Anchor.TopLeft     : offsetX = -halfWidth;   offsetY = -halfHeight;  break;
+            case Anchor.TopCenter   : offsetX = 0.0f;         offsetY = -halfHeight;  break;
+            case Anchor.TopRight    : offsetX = halfWidth;    offsetY = -halfHeight;  break;
 
-        //     case Anchor.MidLeft     : offsetX = -halfWidth;   offsetY = 0.0f;         break;
-        //     case Anchor.MidCenter   : offsetX = 0.0f;         offsetY = 0.0f;         break;
-        //     case Anchor.MidRight    : offsetX = halfWidth;    offsetY = 0.0f;         break;
+            case Anchor.MidLeft     : offsetX = -halfWidth;   offsetY = 0.0f;         break;
+            case Anchor.MidCenter   : offsetX = 0.0f;         offsetY = 0.0f;         break;
+            case Anchor.MidRight    : offsetX = halfWidth;    offsetY = 0.0f;         break;
 
-        //     case Anchor.BotLeft     : offsetX = -halfWidth;   offsetY = halfHeight;   break;
-        //     case Anchor.BotCenter   : offsetX = 0.0f;         offsetY = halfHeight;   break;
-        //     case Anchor.BotRight    : offsetX = halfWidth;    offsetY = halfHeight;   break;
+            case Anchor.BotLeft     : offsetX = -halfWidth;   offsetY = halfHeight;   break;
+            case Anchor.BotCenter   : offsetX = 0.0f;         offsetY = halfHeight;   break;
+            case Anchor.BotRight    : offsetX = halfWidth;    offsetY = halfHeight;   break;
 
-        //     default                 : offsetX = 0.0f;         offsetY = 0.0f;         break;
-        //     }
+            default                 : offsetX = 0.0f;         offsetY = 0.0f;         break;
+            }
 
-        //     //
-        //     boundingRect = new Rect( -offsetX - halfWidth, 
-        //                               offsetY - halfHeight,
-        //                               width_, 
-        //                               height_ );
+            //
+            boundingRect = new Rect( -offsetX - halfWidth, 
+                                      offsetY - halfHeight,
+                                      width_, 
+                                      height_ );
 
-        //     // do clip
-        //     if ( clipInfo_.clipped ) {
-        //         clippedRect = new Rect( boundingRect.x + clipInfo_.left * boundingRect.width, 
-        //                                 boundingRect.y + clipInfo_.top * boundingRect.height, 
-        //                                 (1.0f - clipInfo_.left - clipInfo_.right) * boundingRect.width,
-        //                                 (1.0f - clipInfo_.top - clipInfo_.bottom) * boundingRect.height
-        //                               ); 
-        //     }
-        //     else {
-        //         clippedRect = boundingRect;
-        //     }
+            // TODO: child clip { 
+            // // do clip
+            // if ( clipInfo_.clipped ) {
+            //     clippedRect = new Rect( boundingRect.x + clipInfo_.left * boundingRect.width, 
+            //                             boundingRect.y + clipInfo_.top * boundingRect.height, 
+            //                             (1.0f - clipInfo_.left - clipInfo_.right) * boundingRect.width,
+            //                             (1.0f - clipInfo_.top - clipInfo_.bottom) * boundingRect.height
+            //                           ); 
+            // }
+            // else {
+            //     clippedRect = boundingRect;
+            // }
+            // } TODO end 
+            clippedRect = boundingRect;
 
-        //     if ( collisionHelper ) 
-        //         collisionHelper.UpdateCollider();
-        // }
+            if ( collisionHelper ) 
+                collisionHelper.UpdateCollider();
+        }
 
-        // //
-        // updateFlags = UpdateFlags.None;
-        // } DELME end 
+        //
+        updateFlags = UpdateFlags.None;
     }
 
-    // DELME { 
-    // // ------------------------------------------------------------------ 
-    // // Desc: 
-    // // ------------------------------------------------------------------ 
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
 
-    // public void UpdateClipInfo () {
-    //     //
-    //     Rect a = clippedRect;
-    //     a.x += transform.position.x;
-    //     a.y += transform.position.y;
+    public void CommitMaterialProperties () {
+        Vector4 rect = new Vector4 ( clippedRect.center.x + transform.position.x, 
+                                     clippedRect.center.y + transform.position.y, 
+                                     clippedRect.width, 
+                                     clippedRect.height ); 
+        Matrix4x4 rot = Matrix4x4.TRS ( Vector3.zero, transform.rotation, Vector3.one );
+        rot = rot.inverse;
 
-    //     //
-    //     for ( int i = 0; i < planes.Count; ++i ) {
-    //         exPlane p = planes[i];
-    //         if ( p == null ) {
-    //             planes.RemoveAt(i);
-    //             --i;
-    //             continue;
-    //         }
-
-    //         exPlane.ClipInfo newClipInfo = new exPlane.ClipInfo(); 
-
-    //         //
-    //         Rect b = p.boundingRect;
-    //         b.x += p.transform.position.x;
-    //         b.y += p.transform.position.y;
-
-    //         //
-    //         if ( a.xMin > b.xMin ) {
-    //             newClipInfo.left = (a.xMin - b.xMin) / b.width;
-    //             newClipInfo.clipped = true;
-    //         }
-    //         if ( b.xMax > a.xMax ) {
-    //             newClipInfo.right = (b.xMax - a.xMax) / b.width;
-    //             newClipInfo.clipped = true;
-    //         }
-
-    //         if ( a.yMin > b.yMin ) {
-    //             newClipInfo.top = (a.yMin - b.yMin) / b.height;
-    //             newClipInfo.clipped = true;
-    //         }
-    //         if ( b.yMax > a.yMax ) {
-    //             newClipInfo.bottom = (b.yMax - a.yMax) / b.height;
-    //             newClipInfo.clipped = true;
-    //         }
-    //         p.clipInfo = newClipInfo;
-    //     }
-    // }
-    // } DELME end 
+        for ( int i = 0; i < planes.Count; ++i ) {
+            exPlane p = planes[i];
+            Renderer r = p.renderer;
+            r.sharedMaterial.SetVector ( "_ClipRect", rect );
+            r.sharedMaterial.SetMatrix ( "_ClipRotation", rot );
+        }
+    }
 
     // ------------------------------------------------------------------ 
     // Desc: 

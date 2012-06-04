@@ -272,6 +272,7 @@ public static class exEditorHelper {
     // ------------------------------------------------------------------ 
 
     public static Material GetDefaultMaterial ( Texture2D _texture, 
+                                                string _name,
                                                 string _shaderName = "ex2D/Alpha Blended" ) 
     {
         if ( _texture == null )
@@ -281,7 +282,8 @@ public static class exEditorHelper {
 
         // load material from "texture_path/Materials/texture_name.mat"
         string materialDirectory = Path.Combine( Path.GetDirectoryName(texturePath), "Materials" );
-        string materialPath = Path.Combine( materialDirectory, _texture.name 
+        string materialPath = Path.Combine( materialDirectory, 
+                                            _name 
                                             + "-" 
                                             + Path.GetExtension (texturePath).Substring(1) 
                                             + ".mat" );
@@ -290,7 +292,10 @@ public static class exEditorHelper {
         // if not found, load material from "texture_path/texture_name.mat"
         if ( newMaterial == null ) {
             newMaterial = (Material)AssetDatabase.LoadAssetAtPath( Path.Combine( Path.GetDirectoryName(texturePath), 
-                                                                                 Path.GetFileNameWithoutExtension(texturePath) + ".mat" ), 
+                                                                                 _name
+                                                                                 + "-" 
+                                                                                 + Path.GetExtension (texturePath).Substring(1) 
+                                                                                 + ".mat" ), 
                                                                    typeof(Material) );
         }
 

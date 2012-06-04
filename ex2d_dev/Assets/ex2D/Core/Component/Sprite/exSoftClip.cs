@@ -25,7 +25,7 @@ using System.Collections.Generic;
 ///////////////////////////////////////////////////////////////////////////////
 
 [ExecuteInEditMode]
-[AddComponentMenu("ex2D Sprite/Soft Clip")]
+// [AddComponentMenu("ex2D Sprite/Soft Clip")]
 public class exSoftClip : exPlane {
 
     // ------------------------------------------------------------------ 
@@ -117,7 +117,7 @@ public class exSoftClip : exPlane {
         updateFlags |= UpdateFlags.Vertex;
         Commit();
 
-        spriteMng.AddToSoftClipList(this);
+        // spriteMng.AddToSoftClipList(this);
     }
 
     // ------------------------------------------------------------------ 
@@ -127,9 +127,9 @@ public class exSoftClip : exPlane {
     protected new void OnDestroy () {
         base.OnDestroy();
 
-        if ( spriteMng != null ) {
-            spriteMng_.RemoveFromSoftClipList(this);
-        }
+        // if ( spriteMng != null ) {
+        //     spriteMng_.RemoveFromSoftClipList(this);
+        // }
     }
 
     // ------------------------------------------------------------------ 
@@ -196,17 +196,19 @@ public class exSoftClip : exPlane {
                                       width_, 
                                       height_ );
 
-            // do clip
-            if ( clipInfo_.clipped ) {
-                clippedRect = new Rect( boundingRect.x + clipInfo_.left * boundingRect.width, 
-                                        boundingRect.y + clipInfo_.top * boundingRect.height, 
-                                        (1.0f - clipInfo_.left - clipInfo_.right) * boundingRect.width,
-                                        (1.0f - clipInfo_.top - clipInfo_.bottom) * boundingRect.height
-                                      ); 
-            }
-            else {
-                clippedRect = boundingRect;
-            }
+            // DISABLE { 
+            // // do clip
+            // if ( clipInfo_.clipped ) {
+            //     clippedRect = new Rect( boundingRect.x + clipInfo_.left * boundingRect.width, 
+            //                             boundingRect.y + clipInfo_.top * boundingRect.height, 
+            //                             (1.0f - clipInfo_.left - clipInfo_.right) * boundingRect.width,
+            //                             (1.0f - clipInfo_.top - clipInfo_.bottom) * boundingRect.height
+            //                           ); 
+            // }
+            // else {
+            //     clippedRect = boundingRect;
+            // }
+            // } DISABLE end 
 
             if ( collisionHelper ) 
                 collisionHelper.UpdateCollider();
@@ -216,87 +218,89 @@ public class exSoftClip : exPlane {
         updateFlags = UpdateFlags.None;
     }
 
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
+    // DISABLE { 
+    // // ------------------------------------------------------------------ 
+    // // Desc: 
+    // // ------------------------------------------------------------------ 
 
-    public void UpdateClipInfo () {
-        //
-        Rect a = clippedRect;
-        a.x += transform.position.x;
-        a.y += transform.position.y;
+    // public void UpdateClipInfo () {
+    //     //
+    //     Rect a = clippedRect;
+    //     a.x += transform.position.x;
+    //     a.y += transform.position.y;
 
-        // DELME { 
-        // switch ( plane ) {
-        // case exSprite.Plane.XY:
-        //     a.x += transform.position.x;
-        //     a.y += transform.position.y;
-        //     break;
-        // case exSprite.Plane.XZ:
-        //     a.x += transform.position.x;
-        //     a.y += transform.position.z;
-        //     break;
-        // case exSprite.Plane.ZY:
-        //     a.x += transform.position.z;
-        //     a.y += transform.position.y;
-        //     break;
-        // }
-        // } DELME end 
+    //     // DELME { 
+    //     // switch ( plane ) {
+    //     // case exSprite.Plane.XY:
+    //     //     a.x += transform.position.x;
+    //     //     a.y += transform.position.y;
+    //     //     break;
+    //     // case exSprite.Plane.XZ:
+    //     //     a.x += transform.position.x;
+    //     //     a.y += transform.position.z;
+    //     //     break;
+    //     // case exSprite.Plane.ZY:
+    //     //     a.x += transform.position.z;
+    //     //     a.y += transform.position.y;
+    //     //     break;
+    //     // }
+    //     // } DELME end 
 
-        //
-        for ( int i = 0; i < planes.Count; ++i ) {
-            exPlane p = planes[i];
-            if ( p == null ) {
-                planes.RemoveAt(i);
-                --i;
-                continue;
-            }
+    //     //
+    //     for ( int i = 0; i < planes.Count; ++i ) {
+    //         exPlane p = planes[i];
+    //         if ( p == null ) {
+    //             planes.RemoveAt(i);
+    //             --i;
+    //             continue;
+    //         }
 
-            exPlane.ClipInfo newClipInfo = new exPlane.ClipInfo(); 
+    //         exPlane.ClipInfo newClipInfo = new exPlane.ClipInfo(); 
 
-            //
-            Rect b = p.boundingRect;
-            b.x += p.transform.position.x;
-            b.y += p.transform.position.y;
+    //         //
+    //         Rect b = p.boundingRect;
+    //         b.x += p.transform.position.x;
+    //         b.y += p.transform.position.y;
 
-            // DELME { 
-            // switch ( plane ) {
-            // case exSprite.Plane.XY:
-            //     b.x += p.transform.position.x;
-            //     b.y += p.transform.position.y;
-            //     break;
-            // case exSprite.Plane.XZ:
-            //     b.x += p.transform.position.x;
-            //     b.y += p.transform.position.z;
-            //     break;
-            // case exSprite.Plane.ZY:
-            //     b.x += p.transform.position.z;
-            //     b.y += p.transform.position.y;
-            //     break;
-            // }
-            // } DELME end 
+    //         // DELME { 
+    //         // switch ( plane ) {
+    //         // case exSprite.Plane.XY:
+    //         //     b.x += p.transform.position.x;
+    //         //     b.y += p.transform.position.y;
+    //         //     break;
+    //         // case exSprite.Plane.XZ:
+    //         //     b.x += p.transform.position.x;
+    //         //     b.y += p.transform.position.z;
+    //         //     break;
+    //         // case exSprite.Plane.ZY:
+    //         //     b.x += p.transform.position.z;
+    //         //     b.y += p.transform.position.y;
+    //         //     break;
+    //         // }
+    //         // } DELME end 
 
-            //
-            if ( a.xMin > b.xMin ) {
-                newClipInfo.left = (a.xMin - b.xMin) / b.width;
-                newClipInfo.clipped = true;
-            }
-            if ( b.xMax > a.xMax ) {
-                newClipInfo.right = (b.xMax - a.xMax) / b.width;
-                newClipInfo.clipped = true;
-            }
+    //         //
+    //         if ( a.xMin > b.xMin ) {
+    //             newClipInfo.left = (a.xMin - b.xMin) / b.width;
+    //             newClipInfo.clipped = true;
+    //         }
+    //         if ( b.xMax > a.xMax ) {
+    //             newClipInfo.right = (b.xMax - a.xMax) / b.width;
+    //             newClipInfo.clipped = true;
+    //         }
 
-            if ( a.yMin > b.yMin ) {
-                newClipInfo.top = (a.yMin - b.yMin) / b.height;
-                newClipInfo.clipped = true;
-            }
-            if ( b.yMax > a.yMax ) {
-                newClipInfo.bottom = (b.yMax - a.yMax) / b.height;
-                newClipInfo.clipped = true;
-            }
-            p.clipInfo = newClipInfo;
-        }
-    }
+    //         if ( a.yMin > b.yMin ) {
+    //             newClipInfo.top = (a.yMin - b.yMin) / b.height;
+    //             newClipInfo.clipped = true;
+    //         }
+    //         if ( b.yMax > a.yMax ) {
+    //             newClipInfo.bottom = (b.yMax - a.yMax) / b.height;
+    //             newClipInfo.clipped = true;
+    //         }
+    //         p.clipInfo = newClipInfo;
+    //     }
+    // }
+    // } DISABLE end 
 
     // ------------------------------------------------------------------ 
     // Desc: 

@@ -27,7 +27,7 @@ public static class exSoftClipUtility {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    [MenuItem ("GameObject/Create Other/ex2D/SoftClip Object")]
+    // [MenuItem ("GameObject/Create Other/ex2D/SoftClip Object")]
     static void CreateSoftClipObject () {
         GameObject go = new GameObject("SoftClipObject");
         go.AddComponent<exSoftClip>();
