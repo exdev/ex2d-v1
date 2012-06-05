@@ -18,6 +18,7 @@ using System.IO;
 // defines
 ///////////////////////////////////////////////////////////////////////////////
 
+[CanEditMultipleObjects]
 [CustomEditor(typeof(exSprite))]
 public class exSpriteEditor : exSpriteBaseEditor {
 

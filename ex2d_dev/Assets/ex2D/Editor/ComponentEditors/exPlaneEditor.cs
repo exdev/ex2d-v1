@@ -209,17 +209,6 @@ public class exPlaneEditor : Editor {
         }
         EditorGUIUtility.LookLikeInspector ();
 
-        // DELME { 
-        // // ======================================================== 
-        // // plane type
-        // // ======================================================== 
-
-        // GUI.enabled = !inAnimMode;
-        // EditorGUIUtility.LookLikeControls ();
-        // editPlane.plane = (exPlane.Plane)EditorGUILayout.EnumPopup( "Plane", editPlane.plane, GUILayout.Width(165) );
-        // EditorGUIUtility.LookLikeInspector ();
-        // } DELME end 
-
         // ======================================================== 
         // anchor
         // ======================================================== 

@@ -62,7 +62,8 @@ public class exClipping : exPlane {
     /// the list of the planes to clip
     // ------------------------------------------------------------------ 
 
-    public List<exPlane> planes = new List<exPlane>();
+    public List<exPlane> planes = new List<exPlane>(); // TODO: clipInfoList { plane, srcMaterial }
+    public Dictionary<Texture2D,Material> textureToClipMaterialTable = new Dictionary<Texture2D,Material>(); 
 
     // ------------------------------------------------------------------ 
     /// the clipped rect, if the clipping plane is a child of another soft-clip plane
@@ -230,18 +231,16 @@ public class exClipping : exPlane {
     // ------------------------------------------------------------------ 
 
     public void CommitMaterialProperties () {
-        Vector4 rect = new Vector4 ( clippedRect.center.x + transform.position.x, 
-                                     clippedRect.center.y + transform.position.y, 
+        Vector4 rect = new Vector4 ( clippedRect.center.x,
+                                     clippedRect.center.y,
                                      clippedRect.width, 
                                      clippedRect.height ); 
-        Matrix4x4 rot = Matrix4x4.TRS ( Vector3.zero, transform.rotation, Vector3.one );
-        rot = rot.inverse;
 
         for ( int i = 0; i < planes.Count; ++i ) {
             exPlane p = planes[i];
             Renderer r = p.renderer;
             r.sharedMaterial.SetVector ( "_ClipRect", rect );
-            r.sharedMaterial.SetMatrix ( "_ClipRotation", rot );
+            r.sharedMaterial.SetMatrix ( "_ClipMatrix", transform.worldToLocalMatrix );
         }
     }
 
@@ -251,41 +250,51 @@ public class exClipping : exPlane {
 
     void OnDrawGizmos () {
         //
-        Vector3 center_v3 = transform.position;
-        Vector3 size_v3 = Vector3.zero;
-        float halfWidth = width_ * 0.5f;
-        float halfHeight = height_ * 0.5f;
+        Vector3[] vertices = new Vector3[4]; 
+        Vector3[] corners = new Vector3[4];
+
+        float halfWidthScaled = width * 0.5f;
+        float halfHeightScaled = height * 0.5f;
         float offsetX = 0.0f;
         float offsetY = 0.0f;
 
         //
         switch ( anchor ) {
-        case Anchor.TopLeft     : offsetX = -halfWidth;   offsetY = -halfHeight;  break;
-        case Anchor.TopCenter   : offsetX = 0.0f;         offsetY = -halfHeight;  break;
-        case Anchor.TopRight    : offsetX = halfWidth;    offsetY = -halfHeight;  break;
+        case exPlane.Anchor.TopLeft     : offsetX = -halfWidthScaled;   offsetY = -halfHeightScaled;  break;
+        case exPlane.Anchor.TopCenter   : offsetX = 0.0f;               offsetY = -halfHeightScaled;  break;
+        case exPlane.Anchor.TopRight    : offsetX = halfWidthScaled;    offsetY = -halfHeightScaled;  break;
 
-        case Anchor.MidLeft     : offsetX = -halfWidth;   offsetY = 0.0f;         break;
-        case Anchor.MidCenter   : offsetX = 0.0f;         offsetY = 0.0f;         break;
-        case Anchor.MidRight    : offsetX = halfWidth;    offsetY = 0.0f;         break;
+        case exPlane.Anchor.MidLeft     : offsetX = -halfWidthScaled;   offsetY = 0.0f;               break;
+        case exPlane.Anchor.MidCenter   : offsetX = 0.0f;               offsetY = 0.0f;               break;
+        case exPlane.Anchor.MidRight    : offsetX = halfWidthScaled;    offsetY = 0.0f;               break;
 
-        case Anchor.BotLeft     : offsetX = -halfWidth;   offsetY = halfHeight;   break;
-        case Anchor.BotCenter   : offsetX = 0.0f;         offsetY = halfHeight;   break;
-        case Anchor.BotRight    : offsetX = halfWidth;    offsetY = halfHeight;   break;
+        case exPlane.Anchor.BotLeft     : offsetX = -halfWidthScaled;   offsetY = halfHeightScaled;   break;
+        case exPlane.Anchor.BotCenter   : offsetX = 0.0f;               offsetY = halfHeightScaled;   break;
+        case exPlane.Anchor.BotRight    : offsetX = halfWidthScaled;    offsetY = halfHeightScaled;   break;
 
-        default                 : offsetX = 0.0f;         offsetY = 0.0f;         break;
+        default                         : offsetX = 0.0f;               offsetY = 0.0f;               break;
         }
 
         //
-        float x = offset_.x - offsetX;
-        float y = offset_.y + offsetY;
+        vertices[0] = new Vector3 (-halfWidthScaled-offsetX,  halfHeightScaled+offsetY, 0.0f );
+        vertices[1] = new Vector3 ( halfWidthScaled-offsetX,  halfHeightScaled+offsetY, 0.0f );
+        vertices[2] = new Vector3 ( halfWidthScaled-offsetX, -halfHeightScaled+offsetY, 0.0f );
+        vertices[3] = new Vector3 (-halfWidthScaled-offsetX, -halfHeightScaled+offsetY, 0.0f );
 
-        center_v3 += new Vector3( x, y, 0.0f );
-        size_v3 = new Vector3 ( width_, height_, 0.0f );
+        // 0 -- 1
+        // |    |
+        // 3 -- 2
+
+        corners[0] = transform.localToWorldMatrix * new Vector4 ( vertices[0].x, vertices[0].y, vertices[0].z, 1.0f );
+        corners[1] = transform.localToWorldMatrix * new Vector4 ( vertices[1].x, vertices[1].y, vertices[1].z, 1.0f );
+        corners[2] = transform.localToWorldMatrix * new Vector4 ( vertices[2].x, vertices[2].y, vertices[2].z, 1.0f );
+        corners[3] = transform.localToWorldMatrix * new Vector4 ( vertices[3].x, vertices[3].y, vertices[3].z, 1.0f );
 
         Gizmos.color = Color.red;
-        Gizmos.DrawWireCube ( center_v3, size_v3 );
-        // Gizmos.color = new Color ( 1.0f, 1.0f, 0.0f, 0.0001f ); // this is very hack
-        // Gizmos.DrawCube ( center_v3, new Vector3 ( size.x, size.y, 0.0f ) );
+        Gizmos.DrawLine ( corners[0], corners[1] );
+        Gizmos.DrawLine ( corners[1], corners[2] );
+        Gizmos.DrawLine ( corners[2], corners[3] );
+        Gizmos.DrawLine ( corners[3], corners[0] );
     }
 }
 

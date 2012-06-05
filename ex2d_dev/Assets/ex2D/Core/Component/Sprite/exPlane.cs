@@ -63,50 +63,6 @@ public class exPlane : MonoBehaviour {
 		BotRight,    ///< the bottom-right of the plane
     }
 
-    // DISABLE { 
-    // // ------------------------------------------------------------------ 
-    // // Desc: 
-    // // ------------------------------------------------------------------ 
-
-    // [System.Serializable]
-    // public class ClipInfo {
-
-    //     public static bool operator == ( ClipInfo _a, ClipInfo _b ) { return _a.Equals(_b); }
-    //     public static bool operator != ( ClipInfo _a, ClipInfo _b ) { return !_a.Equals(_b); }
-
-    //     public bool clipped = false; 
-    //     public float top    = 0.0f; // percentage of clipped top
-    //     public float bottom = 0.0f; // percentage of clipped bottom
-    //     public float left   = 0.0f; // percentage of clipped left
-    //     public float right  = 0.0f; // percentage of clipped right
-
-    //     public override int GetHashCode() { 
-    //         return Mathf.FloorToInt(top * 10.0f) 
-    //             ^ Mathf.FloorToInt(bottom * 10.0f) 
-    //             ^ Mathf.FloorToInt(left * 10.0f) 
-    //             ^ Mathf.FloorToInt(right * 10.0f) 
-    //             ;
-    //     }
-    //     public override bool Equals ( object _obj ) {
-    //         if ( !(_obj is ClipInfo) )
-    //             return false;
-
-    //         return Equals((ClipInfo)_obj);
-    //     }
-    //     public bool Equals ( ClipInfo _other ) {
-    //         if ( clipped != _other.clipped ||
-    //              top != _other.top ||
-    //              bottom != _other.bottom ||
-    //              left != _other.left ||
-    //              right != _other.right )
-    //         {
-    //             return false;
-    //         }
-    //         return true;
-    //     }
-    // }
-    // } DISABLE end 
-
     ///////////////////////////////////////////////////////////////////////////////
     // properties
     ///////////////////////////////////////////////////////////////////////////////
