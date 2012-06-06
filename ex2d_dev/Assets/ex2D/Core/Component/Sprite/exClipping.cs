@@ -63,6 +63,7 @@ public class exClipping : exPlane {
     // ------------------------------------------------------------------ 
 
     public List<exPlane> planes = new List<exPlane>(); // TODO: clipInfoList { plane, srcMaterial }
+    public List<Material> clipMaterialList = new List<Material>();
     public Dictionary<Texture2D,Material> textureToClipMaterialTable = new Dictionary<Texture2D,Material>(); 
 
     // ------------------------------------------------------------------ 
@@ -121,11 +122,16 @@ public class exClipping : exPlane {
 
     protected new void Awake () {
         base.Awake();
+
+        spriteMng.AddToClippingList(this);
+        for ( int i = 0; i < clipMaterialList.Count; ++i ) {
+            Material mat = clipMaterialList[i];
+            textureToClipMaterialTable.Add( mat.mainTexture as Texture2D, mat );
+        }
+
         updateFlags |= UpdateFlags.Vertex;
         Commit();
         CommitMaterialProperties();
-
-        spriteMng.AddToClippingList(this);
     }
 
     // ------------------------------------------------------------------ 
@@ -138,6 +144,8 @@ public class exClipping : exPlane {
         if ( spriteMng != null ) {
             spriteMng_.RemoveFromClippingList(this);
         }
+
+        // TODO: restore all items in it.
     }
 
     // ------------------------------------------------------------------ 
@@ -148,15 +156,17 @@ public class exClipping : exPlane {
     protected new void OnEnable () {
         base.OnEnable();
 
-        for ( int i = 0; i < planes.Count; ++i ) {
-            exPlane p = planes[i];
-            if ( p == null ) {
-                planes.RemoveAt(i);
-                --i;
-                continue;
-            }
-            p.enabled = true;
-        }
+        // TODO: make all item clip { 
+        // for ( int i = 0; i < planes.Count; ++i ) {
+        //     exPlane p = planes[i];
+        //     if ( p == null ) {
+        //         planes.RemoveAt(i);
+        //         --i;
+        //         continue;
+        //     }
+        //     p.enabled = true;
+        // }
+        // } TODO end 
     }
 
     // ------------------------------------------------------------------ 
@@ -166,6 +176,8 @@ public class exClipping : exPlane {
 
     protected new void OnDisable () {
         base.OnDisable();
+
+        // TODO: make all item unclipped
     }
 
     // ------------------------------------------------------------------ 
@@ -230,17 +242,27 @@ public class exClipping : exPlane {
     // Desc: 
     // ------------------------------------------------------------------ 
 
+    public void AddClipMaterial ( Texture2D _texture, Material _mat ) {
+        if ( textureToClipMaterialTable.ContainsKey(_texture) == false ) {
+            textureToClipMaterialTable.Add( _texture, _mat );
+            clipMaterialList.Add(_mat);
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
     public void CommitMaterialProperties () {
         Vector4 rect = new Vector4 ( clippedRect.center.x,
                                      clippedRect.center.y,
                                      clippedRect.width, 
                                      clippedRect.height ); 
 
-        for ( int i = 0; i < planes.Count; ++i ) {
-            exPlane p = planes[i];
-            Renderer r = p.renderer;
-            r.sharedMaterial.SetVector ( "_ClipRect", rect );
-            r.sharedMaterial.SetMatrix ( "_ClipMatrix", transform.worldToLocalMatrix );
+        for ( int i = 0; i < clipMaterialList.Count; ++i ) {
+            Material mat = clipMaterialList[i];
+            mat.SetVector ( "_ClipRect", rect );
+            mat.SetMatrix ( "_ClipMatrix", transform.worldToLocalMatrix );
         }
     }
 

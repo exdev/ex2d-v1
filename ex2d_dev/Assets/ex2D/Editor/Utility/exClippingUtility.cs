@@ -64,10 +64,17 @@ public static class exClippingUtility {
                 else {
                     Renderer childRenderer = child.renderer;
                     if ( childRenderer != null ) {
-                        childRenderer.sharedMaterial = exEditorHelper.GetDefaultMaterial ( childRenderer.sharedMaterial.mainTexture as Texture2D,
-                                                                                           childRenderer.sharedMaterial.mainTexture.name 
-                                                                                           + "_clipping_" + _clipping.GetInstanceID(),
-                                                                                           "ex2D/Alpha Blended (Clipping)" );
+                        Texture2D texture = childRenderer.sharedMaterial.mainTexture as Texture2D;
+                        if ( _clipping.textureToClipMaterialTable.ContainsKey(texture) == false ) {
+                            childRenderer.sharedMaterial = exEditorHelper.GetDefaultMaterial ( texture, 
+                                                                                               texture.name 
+                                                                                               + "_clipping_" + _clipping.GetInstanceID(),
+                                                                                               "ex2D/Alpha Blended (Clipping)" );
+                            _clipping.AddClipMaterial ( texture, childRenderer.sharedMaterial );
+                        }
+                        else {
+                            childRenderer.sharedMaterial = _clipping.textureToClipMaterialTable[texture];
+                        }
                     }
                 }
             }
