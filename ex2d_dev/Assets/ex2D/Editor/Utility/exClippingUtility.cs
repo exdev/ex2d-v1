@@ -54,31 +54,46 @@ public static class exClippingUtility {
         foreach ( Transform child in _t ) {
             exPlane childPlane = child.GetComponent<exPlane>();
             if ( childPlane != null ) {
-                _clipping.planes.Add(childPlane);
+                AddToClipInEditor ( _clipping, childPlane );
+
                 exClipping clipPlane = childPlane as exClipping;
                 // if this is a clip plane, add child to it 
                 if ( clipPlane != null ) {
                     clipPlane.UpdateClipListInEditor ();
                     continue;
                 }
-                else {
-                    Renderer childRenderer = child.renderer;
-                    if ( childRenderer != null ) {
-                        Texture2D texture = childRenderer.sharedMaterial.mainTexture as Texture2D;
-                        if ( _clipping.textureToClipMaterialTable.ContainsKey(texture) == false ) {
-                            childRenderer.sharedMaterial = exEditorHelper.GetDefaultMaterial ( texture, 
-                                                                                               texture.name 
-                                                                                               + "_clipping_" + _clipping.GetInstanceID(),
-                                                                                               "ex2D/Alpha Blended (Clipping)" );
-                            _clipping.AddClipMaterial ( texture, childRenderer.sharedMaterial );
-                        }
-                        else {
-                            childRenderer.sharedMaterial = _clipping.textureToClipMaterialTable[texture];
-                        }
-                    }
-                }
             }
             _clipping.RecursivelyAddToClipInEditor (child);
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public static void AddToClipInEditor ( this exClipping _clipping, exPlane _plane ) {
+        // we already have this in clipping list
+        if ( _clipping.planes.IndexOf(_plane) != -1 )
+            return;
+
+        _clipping.planes.Add(_plane);
+        exClipping clipPlane = _plane as exClipping;
+        // if this is not a clip plane
+        if ( clipPlane == null ) {
+            Renderer r = _plane.renderer;
+            if ( r != null ) {
+                Texture2D texture = r.sharedMaterial.mainTexture as Texture2D;
+                if ( _clipping.textureToClipMaterialTable.ContainsKey(texture) == false ) {
+                    r.sharedMaterial = exEditorHelper.GetDefaultMaterial ( texture, 
+                                                                           texture.name 
+                                                                           + "_clipping_" + _clipping.GetInstanceID(),
+                                                                           "ex2D/Alpha Blended (Clipping)" );
+                    _clipping.AddClipMaterial ( texture, r.sharedMaterial );
+                }
+                else {
+                    r.sharedMaterial = _clipping.textureToClipMaterialTable[texture];
+                }
+            }
         }
     }
 

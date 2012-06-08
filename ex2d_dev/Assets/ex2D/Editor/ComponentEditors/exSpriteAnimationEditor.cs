@@ -88,10 +88,6 @@ public class exSpriteAnimationEditor : Editor {
 
         Rect lastRect = new Rect( 0, 0, 1, 1 );
         Rect dropRect = new Rect( 0, 0, 1, 1 );
-        lastRect = GUILayoutUtility.GetLastRect ();  
-        dropRect.x = lastRect.x;
-        dropRect.y = lastRect.yMax;
-        dropRect.width = lastRect.xMax;
 
         EditorGUI.indentLevel = 0;
         showAnimations = EditorGUILayout.Foldout(showAnimations, "Animations");
@@ -153,32 +149,42 @@ public class exSpriteAnimationEditor : Editor {
 
             EditorGUI.indentLevel = 1;
             EditorGUILayout.Space ();
-        }
 
-        // ======================================================== 
-        // drag and drop 
-        // ======================================================== 
+            lastRect = GUILayoutUtility.GetLastRect ();  
+            dropRect.x = lastRect.x + 30;
+            dropRect.y = lastRect.yMax;
+            dropRect.width = lastRect.xMax - 30 - 4;
+            dropRect.height = 20;
 
-        if ( dropRect.Contains(Event.current.mousePosition) ) {
-            if ( Event.current.type == EventType.DragUpdated ) {
-                // Show a copy icon on the drag
-                foreach ( Object o in DragAndDrop.objectReferences ) {
-                    if ( o is exSpriteAnimClip ) {
-                        DragAndDrop.visualMode = DragAndDropVisualMode.Copy;
-                        break;
+            exEditorHelper.DrawRect( dropRect, new Color( 0.2f, 0.2f, 0.2f, 1.0f ), new Color( 0.5f, 0.5f, 0.5f, 1.0f ) );
+            GUILayout.Space (20);
+
+            // ======================================================== 
+            // drag and drop 
+            // ======================================================== 
+
+            if ( dropRect.Contains(Event.current.mousePosition) ) {
+                if ( Event.current.type == EventType.DragUpdated ) {
+                    // Show a copy icon on the drag
+                    foreach ( Object o in DragAndDrop.objectReferences ) {
+                        if ( o is exSpriteAnimClip ) {
+                            DragAndDrop.visualMode = DragAndDropVisualMode.Copy;
+                            break;
+                        }
                     }
                 }
-            }
-            else if ( Event.current.type == EventType.DragPerform ) {
-                DragAndDrop.AcceptDrag();
-                foreach ( Object o in DragAndDrop.objectReferences ) {
-                    if ( o is exSpriteAnimClip ) {
-                        editSpAnim.animations.Add( o as exSpriteAnimClip );
+                else if ( Event.current.type == EventType.DragPerform ) {
+                    DragAndDrop.AcceptDrag();
+                    foreach ( Object o in DragAndDrop.objectReferences ) {
+                        if ( o is exSpriteAnimClip ) {
+                            editSpAnim.animations.Add( o as exSpriteAnimClip );
+                        }
                     }
+                    GUI.changed = true;
                 }
-                GUI.changed = true;
             }
         }
+        EditorGUILayout.Space ();
 
         // TODO: FIXME { 
         // ======================================================== 

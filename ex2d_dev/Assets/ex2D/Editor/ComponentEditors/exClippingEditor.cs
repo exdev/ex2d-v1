@@ -28,6 +28,7 @@ public class exClippingEditor : exPlaneEditor {
     ///////////////////////////////////////////////////////////////////////////////
 
     private exClipping curEdit;
+    private bool showClipList = true;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -83,44 +84,118 @@ public class exClippingEditor : exPlaneEditor {
         curEdit.height = EditorGUILayout.FloatField( "Height", curEdit.height );
         GUI.enabled = true;
 
+        // // ======================================================== 
+        // // clip objects 
+        // // ======================================================== 
+
+        // // label
+        // GUILayout.BeginHorizontal();
+        // GUILayout.Space(15);
+        //     GUILayout.Label( "Clip List" );
+        // GUILayout.EndHorizontal();
+
+        // // list
+        // EditorGUI.indentLevel = 2;
+        // GUI.enabled = false;
+        // for ( int i = 0; i < curEdit.planes.Count; ++i ) {
+        //     exPlane p = curEdit.planes[i];
+        //     if ( p == null ) {
+        //         curEdit.planes.RemoveAt(i);
+        //         --i;
+        //     }
+        //     else {
+        //         EditorGUILayout.ObjectField ( p.name
+        //                                     , p
+        //                                     , typeof(exPlane)
+        //                                     , true
+        //                                     );
+        //     }
+        // }
+        // GUI.enabled = true;
+        // EditorGUI.indentLevel = 1;
+
+        // // update button
+        // GUILayout.BeginHorizontal();
+        // GUILayout.Space(30);
+        //     if ( GUILayout.Button("Update", GUILayout.Width(50), GUILayout.Height(20) ) ) {
+        //         curEdit.UpdateClipListInEditor();
+        //         GUI.changed = true;
+        //     }
+        // GUILayout.EndHorizontal();
+
         // ======================================================== 
-        // clip objects 
+        // clip list
         // ======================================================== 
 
-        // label
-        GUILayout.BeginHorizontal();
-        GUILayout.Space(15);
-            GUILayout.Label( "Clip List" );
-        GUILayout.EndHorizontal();
+        Rect lastRect = new Rect( 0, 0, 1, 1 );
+        Rect dropRect = new Rect( 0, 0, 1, 1 );
 
-        // list
-        EditorGUI.indentLevel = 2;
-        GUI.enabled = false;
-        for ( int i = 0; i < curEdit.planes.Count; ++i ) {
-            exPlane p = curEdit.planes[i];
-            if ( p == null ) {
-                curEdit.planes.RemoveAt(i);
-                --i;
+        EditorGUI.indentLevel = 0;
+        showClipList = EditorGUILayout.Foldout(showClipList, "Clip Objects");
+        if ( showClipList ) {
+            EditorGUI.indentLevel = 2;
+            int idxRemoved = -1;
+            for ( int i = 0; i < curEdit.planes.Count; ++i ) {
+                GUILayout.BeginHorizontal();
+                curEdit.planes[i] = (exPlane)EditorGUILayout.ObjectField( "[" + i + "]"
+                                                                          , curEdit.planes[i]
+                                                                          , typeof(exPlane)
+                                                                          , false 
+                                                                        );
+                if ( GUILayout.Button("-", GUILayout.Width(15), GUILayout.Height(15) ) ) {
+                    idxRemoved = i;
+                }
+                GUILayout.EndHorizontal();
             }
-            else {
-                EditorGUILayout.ObjectField ( p.name
-                                            , p
-                                            , typeof(exPlane)
-                                            , true
-                                            );
+
+            // if we have item to remove
+            if ( idxRemoved != -1 ) {
+                // TODO: process remove
+                curEdit.planes.RemoveAt(idxRemoved);
+            }
+
+            EditorGUI.indentLevel = 1;
+            EditorGUILayout.Space ();
+
+            lastRect = GUILayoutUtility.GetLastRect ();  
+            dropRect.x = lastRect.x + 30;
+            dropRect.y = lastRect.yMax;
+            dropRect.width = lastRect.xMax - 30 - 4;
+            dropRect.height = 20;
+
+            exEditorHelper.DrawRect( dropRect, new Color( 0.2f, 0.2f, 0.2f, 1.0f ), new Color( 0.5f, 0.5f, 0.5f, 1.0f ) );
+            GUILayout.Space (20);
+
+            // ======================================================== 
+            // drag and drop 
+            // ======================================================== 
+
+            if ( dropRect.Contains(Event.current.mousePosition) ) {
+                if ( Event.current.type == EventType.DragUpdated ) {
+                    // Show a copy icon on the drag
+                    foreach ( Object o in DragAndDrop.objectReferences ) {
+                        if ( o is GameObject ) {
+                            if ( (o as GameObject).GetComponent<exPlane>() != null ) {
+                                DragAndDrop.visualMode = DragAndDropVisualMode.Copy;
+                                break;
+                            }
+                        }
+                    }
+                }
+                else if ( Event.current.type == EventType.DragPerform ) {
+                    DragAndDrop.AcceptDrag();
+                    foreach ( Object o in DragAndDrop.objectReferences ) {
+                        if ( o is GameObject ) {
+                            exPlane plane = (o as GameObject).GetComponent<exPlane>();
+                            if ( plane )
+                                curEdit.AddToClipInEditor(plane);
+                        }
+                    }
+                    GUI.changed = true;
+                }
             }
         }
-        GUI.enabled = true;
-        EditorGUI.indentLevel = 1;
-
-        // update button
-        GUILayout.BeginHorizontal();
-        GUILayout.Space(30);
-            if ( GUILayout.Button("Update", GUILayout.Width(50), GUILayout.Height(20) ) ) {
-                curEdit.UpdateClipListInEditor();
-                GUI.changed = true;
-            }
-        GUILayout.EndHorizontal();
+        EditorGUILayout.Space ();
 
         // ======================================================== 
         // if changes
