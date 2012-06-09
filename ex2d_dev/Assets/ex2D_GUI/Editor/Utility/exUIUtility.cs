@@ -85,7 +85,7 @@ public static class exUIUtility {
         //
         GameObject clipRectGO = new GameObject("ClipRect");
         clipRectGO.transform.parent = scrollViewGO.transform;
-        exSoftClip clipRect = clipRectGO.AddComponent<exSoftClip>();
+        exClipping clipRect = clipRectGO.AddComponent<exClipping>();
 
         //
         GameObject contentAnchor = new GameObject("ContentAnchor");

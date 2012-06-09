@@ -28,6 +28,16 @@ using System.Collections.Generic;
 [AddComponentMenu("ex2D Sprite/Clipping")]
 public class exClipping : exPlane {
 
+    [System.Serializable]
+    public class PlaneInfo {
+        public exPlane plane = null;
+        public Material material = null;
+    }  
+
+    ///////////////////////////////////////////////////////////////////////////////
+    //
+    ///////////////////////////////////////////////////////////////////////////////
+
     // ------------------------------------------------------------------ 
     [SerializeField] protected float width_ = 100.0f;
     /// the width of the soft-clip
@@ -59,10 +69,16 @@ public class exClipping : exPlane {
     }
 
     // ------------------------------------------------------------------ 
-    /// the list of the planes to clip
+    /// is dynamic clipping plane, the dynamic plane will update clip material list at runtime if you remove plane from clipping list 
     // ------------------------------------------------------------------ 
 
-    public List<exPlane> planes = new List<exPlane>(); // TODO: clipInfoList { plane, srcMaterial }
+    public bool isDyanmic = false;
+
+    // ------------------------------------------------------------------ 
+    /// the list of the planeInfoList to clip
+    // ------------------------------------------------------------------ 
+
+    public List<PlaneInfo> planeInfoList = new List<PlaneInfo>();
     public List<Material> clipMaterialList = new List<Material>();
     public Dictionary<Texture2D,Material> textureToClipMaterialTable = new Dictionary<Texture2D,Material>(); 
 
@@ -72,49 +88,197 @@ public class exClipping : exPlane {
 
     public Rect clippedRect { get; protected set; }
 
+
+    ///////////////////////////////////////////////////////////////////////////////
+    //
+    ///////////////////////////////////////////////////////////////////////////////
+
+    protected bool initied = false;
+
     ///////////////////////////////////////////////////////////////////////////////
     // functions
     ///////////////////////////////////////////////////////////////////////////////
-    
+
     // ------------------------------------------------------------------ 
-    /// update the list of planes to clip
+    // Desc: 
     // ------------------------------------------------------------------ 
 
-    public void UpdateClipList () {
-        planes.Clear();
-        if ( transform.childCount > 0 )
-            RecursivelyAddToClip (transform);
+    public bool HasPlaneInfo ( exPlane _plane ) {
+        for ( int i = 0; i < planeInfoList.Count; ++i ) {
+            if ( planeInfoList[i].plane == _plane )
+                return true;
+        }
+        return false;
     }
 
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    void RecursivelyAddToClip ( Transform _t ) {
-        foreach ( Transform child in _t ) {
-            exPlane plane = child.GetComponent<exPlane>();
-            if ( plane != null ) {
-                planes.Add(plane);
-                exClipping clipPlane = plane as exClipping;
-                // if this is a clip plane, add child to it 
-                if ( clipPlane != null ) {
-                    clipPlane.UpdateClipList ();
-                    continue;
+    protected void AddPlaneInfo ( exPlane _plane ) {
+        PlaneInfo planeInfo = new PlaneInfo();
+        planeInfo.plane = _plane;
+        planeInfo.material = _plane.renderer.sharedMaterial;
+        planeInfoList.Add(planeInfo);
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    protected void InsertPlaneInfo ( int _idx, exPlane _plane ) {
+        PlaneInfo planeInfo = new PlaneInfo();
+        planeInfo.plane = _plane;
+        planeInfo.material = _plane.renderer.sharedMaterial;
+        planeInfoList.Insert(_idx,planeInfo);
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    protected bool RemovePlaneInfo ( exPlane _plane ) {
+        for ( int i = 0; i < planeInfoList.Count; ++i ) {
+            PlaneInfo pi = planeInfoList[i];
+            if ( _plane ==  pi.plane ) {
+                _plane.renderer.sharedMaterial = pi.material;
+                planeInfoList.RemoveAt(i);
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    // ------------------------------------------------------------------ 
+    /// add plane to clipping list
+    // ------------------------------------------------------------------ 
+
+    public void AddPlane ( exPlane _plane ) {
+        // we already have this in clipping list
+        if ( HasPlaneInfo(_plane) )
+            return;
+
+        if ( _plane.clippingPlane != null ) {
+            _plane.clippingPlane.RemovePlane (_plane);
+        }
+        AddPlaneInfo(_plane);
+        _plane.clippingPlane = this;
+
+        // if we are in player or if we are running in editor
+        if ( Application.isPlaying ) {
+            Renderer r = _plane.renderer;
+            if ( r != null ) {
+                Texture2D texture = r.sharedMaterial.mainTexture as Texture2D;
+                if ( textureToClipMaterialTable.ContainsKey(texture) == false ) {
+                    r.material = new Material( Shader.Find("ex2D/Alpha Blended (Clipping)") );
+                    r.material.mainTexture = texture;
+                    AddClipMaterial ( texture, r.material );
                 }
                 else {
-                    Renderer renderer = child.renderer;
-                    if ( renderer != null ) {
-                        renderer.material.shader = Shader.Find("ex2D/Alpha Blended (Clipping)");
-                    }
+                    r.material = textureToClipMaterialTable[texture];
                 }
             }
-            RecursivelyAddToClip (child);
         }
     }
 
-    ///////////////////////////////////////////////////////////////////////////////
-    // functions
-    ///////////////////////////////////////////////////////////////////////////////
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void InsertPlane ( int _idx, exPlane _plane ) {
+        // we already have this in clipping list
+        if ( HasPlaneInfo(_plane) )
+            return;
+
+        if ( _plane.clippingPlane != null ) {
+            _plane.clippingPlane.RemovePlane (_plane);
+        }
+        InsertPlaneInfo(_idx,_plane);
+        _plane.clippingPlane = this;
+
+        // if we are in player or if we are running in editor
+        if ( Application.isPlaying ) {
+            exClipping clipPlane = _plane as exClipping;
+            // if this is not a clip plane
+            if ( clipPlane == null ) {
+                ApplyClipMaterial (_plane);
+            }
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    /// remove plane from clipping list
+    // ------------------------------------------------------------------ 
+
+    public bool RemovePlane ( exPlane _plane ) {
+        bool result = RemovePlaneInfo(_plane);
+        if ( result ) {
+            _plane.clippingPlane = null;
+
+            if ( isDyanmic || (Application.isPlaying == false ) )
+                CheckAndRemoveClipMaterial(_plane.renderer.sharedMaterial.mainTexture as Texture2D);
+        }
+        return result;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    protected void ApplyClipMaterial ( exPlane _plane ) {
+        Renderer r = _plane.renderer;
+        if ( r != null ) {
+            Texture2D texture = r.sharedMaterial.mainTexture as Texture2D;
+            if ( textureToClipMaterialTable.ContainsKey(texture) == false ) {
+                r.material = new Material( Shader.Find("ex2D/Alpha Blended (Clipping)") );
+                r.material.mainTexture = texture;
+                AddClipMaterial ( texture, r.material );
+            }
+            else {
+                r.material = textureToClipMaterialTable[texture];
+            }
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void CheckAndRemoveClipMaterial ( Texture2D _texture ) {
+        bool hasPlaneUseIt = false;
+        for ( int i = 0; i < planeInfoList.Count; ++i ) {
+            PlaneInfo pi = planeInfoList[i];
+            if ( pi.material.mainTexture == _texture ) {
+                hasPlaneUseIt = true;
+                break;
+            }
+        }
+        if ( hasPlaneUseIt == false ) {
+            Material clipMaterial = textureToClipMaterialTable[_texture];
+            textureToClipMaterialTable.Remove(_texture);
+            clipMaterialList.Remove(clipMaterial);
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    protected void Init () {
+        if ( initied == false ) {
+            initied = true;
+
+            spriteMng.AddToClippingList(this);
+            for ( int i = 0; i < clipMaterialList.Count; ++i ) {
+                Material mat = clipMaterialList[i];
+                textureToClipMaterialTable.Add( mat.mainTexture as Texture2D, mat );
+            }
+
+            updateFlags |= UpdateFlags.Vertex;
+            Commit();
+            CommitMaterialProperties();
+        }
+    }
 
     // ------------------------------------------------------------------ 
     /// Awake functoin inherit from exPlane.
@@ -122,16 +286,7 @@ public class exClipping : exPlane {
 
     protected new void Awake () {
         base.Awake();
-
-        spriteMng.AddToClippingList(this);
-        for ( int i = 0; i < clipMaterialList.Count; ++i ) {
-            Material mat = clipMaterialList[i];
-            textureToClipMaterialTable.Add( mat.mainTexture as Texture2D, mat );
-        }
-
-        updateFlags |= UpdateFlags.Vertex;
-        Commit();
-        CommitMaterialProperties();
+        Init ();
     }
 
     // ------------------------------------------------------------------ 
@@ -145,39 +300,46 @@ public class exClipping : exPlane {
             spriteMng_.RemoveFromClippingList(this);
         }
 
-        // TODO: restore all items in it.
+        // 
+        for ( int i = 0; i < planeInfoList.Count; ++i ) {
+            PlaneInfo pi = planeInfoList[i];
+            pi.plane.renderer.sharedMaterial = pi.material;
+        }
+        planeInfoList.Clear();
+        textureToClipMaterialTable.Clear();
+        clipMaterialList.Clear();
     }
 
     // ------------------------------------------------------------------ 
     /// OnEnable functoin inherit from exPlane.
-    /// When enabled set to true, it will enable all the item in the planes
+    /// When enabled set to true, it will enable all the item in the planeInfoList
     // ------------------------------------------------------------------ 
 
     protected new void OnEnable () {
         base.OnEnable();
+        Init ();
 
-        // TODO: make all item clip { 
-        // for ( int i = 0; i < planes.Count; ++i ) {
-        //     exPlane p = planes[i];
-        //     if ( p == null ) {
-        //         planes.RemoveAt(i);
-        //         --i;
-        //         continue;
-        //     }
-        //     p.enabled = true;
-        // }
-        // } TODO end 
+        // 
+        for ( int i = 0; i < planeInfoList.Count; ++i ) {
+            PlaneInfo pi = planeInfoList[i];
+            Texture2D texture = pi.plane.renderer.sharedMaterial.mainTexture as Texture2D;
+            pi.plane.renderer.material = textureToClipMaterialTable[texture];
+        }
     }
 
     // ------------------------------------------------------------------ 
     /// OnDisable functoin inherit from exPlane.
-    /// When enabled set to false, it will disable all the item in the planes
+    /// When enabled set to false, it will disable all the item in the planeInfoList
     // ------------------------------------------------------------------ 
 
     protected new void OnDisable () {
         base.OnDisable();
 
-        // TODO: make all item unclipped
+        // 
+        for ( int i = 0; i < planeInfoList.Count; ++i ) {
+            PlaneInfo pi = planeInfoList[i];
+            pi.plane.renderer.sharedMaterial = pi.material;
+        }
     }
 
     // ------------------------------------------------------------------ 
@@ -238,6 +400,90 @@ public class exClipping : exPlane {
         updateFlags = UpdateFlags.None;
     }
 
+    // TODO: for sub clip { 
+    // // ------------------------------------------------------------------ 
+    // // Desc: 
+    // // ------------------------------------------------------------------ 
+
+    // public void UpdateClipInfo () {
+    //     //
+    //     Rect a = clippedRect;
+    //     a.x += transform.position.x;
+    //     a.y += transform.position.y;
+
+    //     // DELME { 
+    //     // switch ( plane ) {
+    //     // case exSprite.Plane.XY:
+    //     //     a.x += transform.position.x;
+    //     //     a.y += transform.position.y;
+    //     //     break;
+    //     // case exSprite.Plane.XZ:
+    //     //     a.x += transform.position.x;
+    //     //     a.y += transform.position.z;
+    //     //     break;
+    //     // case exSprite.Plane.ZY:
+    //     //     a.x += transform.position.z;
+    //     //     a.y += transform.position.y;
+    //     //     break;
+    //     // }
+    //     // } DELME end 
+
+    //     //
+    //     for ( int i = 0; i < planes.Count; ++i ) {
+    //         exPlane p = planes[i];
+    //         if ( p == null ) {
+    //             planes.RemoveAt(i);
+    //             --i;
+    //             continue;
+    //         }
+
+    //         exPlane.ClipInfo newClipInfo = new exPlane.ClipInfo(); 
+
+    //         //
+    //         Rect b = p.boundingRect;
+    //         b.x += p.transform.position.x;
+    //         b.y += p.transform.position.y;
+
+    //         // DELME { 
+    //         // switch ( plane ) {
+    //         // case exSprite.Plane.XY:
+    //         //     b.x += p.transform.position.x;
+    //         //     b.y += p.transform.position.y;
+    //         //     break;
+    //         // case exSprite.Plane.XZ:
+    //         //     b.x += p.transform.position.x;
+    //         //     b.y += p.transform.position.z;
+    //         //     break;
+    //         // case exSprite.Plane.ZY:
+    //         //     b.x += p.transform.position.z;
+    //         //     b.y += p.transform.position.y;
+    //         //     break;
+    //         // }
+    //         // } DELME end 
+
+    //         //
+    //         if ( a.xMin > b.xMin ) {
+    //             newClipInfo.left = (a.xMin - b.xMin) / b.width;
+    //             newClipInfo.clipped = true;
+    //         }
+    //         if ( b.xMax > a.xMax ) {
+    //             newClipInfo.right = (b.xMax - a.xMax) / b.width;
+    //             newClipInfo.clipped = true;
+    //         }
+
+    //         if ( a.yMin > b.yMin ) {
+    //             newClipInfo.top = (a.yMin - b.yMin) / b.height;
+    //             newClipInfo.clipped = true;
+    //         }
+    //         if ( b.yMax > a.yMax ) {
+    //             newClipInfo.bottom = (b.yMax - a.yMax) / b.height;
+    //             newClipInfo.clipped = true;
+    //         }
+    //         p.clipInfo = newClipInfo;
+    //     }
+    // }
+    // } TODO end 
+
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
@@ -245,7 +491,8 @@ public class exClipping : exPlane {
     public void AddClipMaterial ( Texture2D _texture, Material _mat ) {
         if ( textureToClipMaterialTable.ContainsKey(_texture) == false ) {
             textureToClipMaterialTable.Add( _texture, _mat );
-            clipMaterialList.Add(_mat);
+            if ( clipMaterialList.IndexOf(_mat) == -1 )
+                clipMaterialList.Add(_mat);
         }
     }
 

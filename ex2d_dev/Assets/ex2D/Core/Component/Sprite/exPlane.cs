@@ -104,25 +104,6 @@ public class exPlane : MonoBehaviour {
         }
     }
 
-    // DELME { 
-    // // ------------------------------------------------------------------ 
-    // [SerializeField] protected Plane plane_ = Plane.XY;
-    // /// the 2D coordination (XY, XZ or ZY) used in this plane 
-    // // ------------------------------------------------------------------ 
-
-    // public Plane plane {
-    //     get { return plane_; }
-    //     set {
-    //         if ( plane_ != value ) {
-    //             plane_ = value;
-
-    //             //
-    //             updateFlags |= UpdateFlags.Vertex;
-    //         }
-    //     }
-    // }
-    // } DELME end 
-
     // ------------------------------------------------------------------ 
     [SerializeField] protected Anchor anchor_ = Anchor.MidCenter;
     /// the anchor position used in this plane
@@ -198,6 +179,12 @@ public class exPlane : MonoBehaviour {
         }
         get { return updateFlags_; }
     }
+
+    // ------------------------------------------------------------------ 
+    /// the clipping plane contains this
+    // ------------------------------------------------------------------ 
+
+    public exClipping clippingPlane = null;
 
     // ------------------------------------------------------------------ 
     /// The bounding rect of the plane
@@ -290,6 +277,10 @@ public class exPlane : MonoBehaviour {
         collisionHelper_ = GetComponent<exCollisionHelper>();
         if ( collisionHelper_ )
             collisionHelper_.plane = this;
+
+        //
+        if ( clippingPlane )
+            clippingPlane.AddPlane(this);
     }
 
     // ------------------------------------------------------------------ 

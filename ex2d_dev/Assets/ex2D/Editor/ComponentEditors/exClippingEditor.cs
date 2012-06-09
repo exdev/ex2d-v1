@@ -29,6 +29,7 @@ public class exClippingEditor : exPlaneEditor {
 
     private exClipping curEdit;
     private bool showClipList = true;
+    private bool showMaterialList = true;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -84,44 +85,31 @@ public class exClippingEditor : exPlaneEditor {
         curEdit.height = EditorGUILayout.FloatField( "Height", curEdit.height );
         GUI.enabled = true;
 
-        // // ======================================================== 
-        // // clip objects 
-        // // ======================================================== 
+        // ======================================================== 
+        // 
+        // ======================================================== 
 
-        // // label
-        // GUILayout.BeginHorizontal();
-        // GUILayout.Space(15);
-        //     GUILayout.Label( "Clip List" );
-        // GUILayout.EndHorizontal();
+        curEdit.isDyanmic = EditorGUILayout.Toggle( "Is Dyanmic", curEdit.isDyanmic );
 
-        // // list
-        // EditorGUI.indentLevel = 2;
-        // GUI.enabled = false;
-        // for ( int i = 0; i < curEdit.planes.Count; ++i ) {
-        //     exPlane p = curEdit.planes[i];
-        //     if ( p == null ) {
-        //         curEdit.planes.RemoveAt(i);
-        //         --i;
-        //     }
-        //     else {
-        //         EditorGUILayout.ObjectField ( p.name
-        //                                     , p
-        //                                     , typeof(exPlane)
-        //                                     , true
-        //                                     );
-        //     }
-        // }
-        // GUI.enabled = true;
-        // EditorGUI.indentLevel = 1;
+        // ======================================================== 
+        // clip material list 
+        // ======================================================== 
 
-        // // update button
-        // GUILayout.BeginHorizontal();
-        // GUILayout.Space(30);
-        //     if ( GUILayout.Button("Update", GUILayout.Width(50), GUILayout.Height(20) ) ) {
-        //         curEdit.UpdateClipListInEditor();
-        //         GUI.changed = true;
-        //     }
-        // GUILayout.EndHorizontal();
+        EditorGUI.indentLevel = 0;
+        showMaterialList = EditorGUILayout.Foldout(showMaterialList, "Clip Materials");
+        if ( showMaterialList ) {
+            EditorGUI.indentLevel = 2;
+            GUI.enabled = false;
+            for ( int i = 0; i < curEdit.clipMaterialList.Count; ++i ) {
+                Material clipMat = curEdit.clipMaterialList[i];
+                EditorGUILayout.ObjectField( "[" + i + "]"
+                                             , clipMat 
+                                             , typeof(Material)
+                                             , true 
+                                           );
+            }
+            GUI.enabled = true;
+        }
 
         // ======================================================== 
         // clip list
@@ -135,13 +123,21 @@ public class exClippingEditor : exPlaneEditor {
         if ( showClipList ) {
             EditorGUI.indentLevel = 2;
             int idxRemoved = -1;
-            for ( int i = 0; i < curEdit.planes.Count; ++i ) {
+            for ( int i = 0; i < curEdit.planeInfoList.Count; ++i ) {
                 GUILayout.BeginHorizontal();
-                curEdit.planes[i] = (exPlane)EditorGUILayout.ObjectField( "[" + i + "]"
-                                                                          , curEdit.planes[i]
-                                                                          , typeof(exPlane)
-                                                                          , false 
-                                                                        );
+                exPlane curPlane = curEdit.planeInfoList[i].plane;
+                exPlane newPlane = (exPlane)EditorGUILayout.ObjectField( "[" + i + "]"
+                                                                         , curPlane 
+                                                                         , typeof(exPlane)
+                                                                         , true 
+                                                                       );
+                if ( newPlane != curPlane &&
+                     curEdit.HasPlaneInfo(newPlane) == false ) 
+                {
+                    curEdit.RemovePlaneInEditor(curPlane);
+                    curEdit.InsertPlaneInEditor( i, newPlane );
+                }
+
                 if ( GUILayout.Button("-", GUILayout.Width(15), GUILayout.Height(15) ) ) {
                     idxRemoved = i;
                 }
@@ -150,8 +146,7 @@ public class exClippingEditor : exPlaneEditor {
 
             // if we have item to remove
             if ( idxRemoved != -1 ) {
-                // TODO: process remove
-                curEdit.planes.RemoveAt(idxRemoved);
+                curEdit.RemovePlaneInEditor(curEdit.planeInfoList[idxRemoved].plane);
             }
 
             EditorGUI.indentLevel = 1;
@@ -188,7 +183,7 @@ public class exClippingEditor : exPlaneEditor {
                         if ( o is GameObject ) {
                             exPlane plane = (o as GameObject).GetComponent<exPlane>();
                             if ( plane )
-                                curEdit.AddToClipInEditor(plane);
+                                curEdit.AddPlaneInEditor(plane);
                         }
                     }
                     GUI.changed = true;
@@ -304,7 +299,7 @@ public class exClippingEditor : exPlaneEditor {
     // ------------------------------------------------------------------ 
 
     protected override void AddAnimationHelper () {
-        curEdit.gameObject.AddComponent<exSpriteBorderAnimHelper>();
+        curEdit.gameObject.AddComponent<exClippingAnimHelper>();
     }
 
     // ------------------------------------------------------------------ 

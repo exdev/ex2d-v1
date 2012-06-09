@@ -956,7 +956,7 @@ public class exSpriteFont : exSpriteBase {
         base.Awake();
 
         if ( fontInfo_ != null && fontInfo_.pageInfos.Count == 1 ) {
-            renderer.sharedMaterial = fontInfo_.pageInfos[0].material;
+            // renderer.sharedMaterial = fontInfo_.pageInfos[0].material; // DELME???
 
             if ( meshFilter ) {
                 // create mesh ( in editor, this can duplicate mesh to prevent shared mesh for sprite)

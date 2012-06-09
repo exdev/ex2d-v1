@@ -34,36 +34,67 @@ public static class exClippingUtility {
         Selection.activeObject = go;
     }
 
+    // // ------------------------------------------------------------------ 
+    // /// \param _clipping the clipping plane
+    // /// update clip list in editor
+    // // ------------------------------------------------------------------ 
+
+    // public static void UpdateClipListInEditor ( this exClipping _clipping ) {
+    //     _clipping.planes.Clear();
+    //     if ( _clipping.transform.childCount > 0 )
+    //         _clipping.RecursivelyAddToClipInEditor (_clipping.transform);
+    // }
+
+    // // ------------------------------------------------------------------ 
+    // // Desc: 
+    // // ------------------------------------------------------------------ 
+
+    // static void RecursivelyAddToClipInEditor ( this exClipping _clipping, Transform _t ) {
+    //     foreach ( Transform child in _t ) {
+    //         exPlane childPlane = child.GetComponent<exPlane>();
+    //         if ( childPlane != null ) {
+    //             AddPlaneInEditor ( _clipping, childPlane );
+
+    //             exClipping clipPlane = childPlane as exClipping;
+    //             // if this is a clip plane, add child to it 
+    //             if ( clipPlane != null ) {
+    //                 clipPlane.UpdateClipListInEditor ();
+    //                 continue;
+    //             }
+    //         }
+    //         _clipping.RecursivelyAddToClipInEditor (child);
+    //     }
+    // }
+
     // ------------------------------------------------------------------ 
-    /// \param _sprite the sprite
-    /// \param _texture the raw texture used in the sprite
-    /// build the sprite by texture
+    /// \param _clipping the clipping plane
+    /// \param _plane the plane to add to clip
+    /// add plane to clipping list
     // ------------------------------------------------------------------ 
 
-    public static void UpdateClipListInEditor ( this exClipping _clipping ) {
-        _clipping.planes.Clear();
-        if ( _clipping.transform.childCount > 0 )
-            _clipping.RecursivelyAddToClipInEditor (_clipping.transform);
+    public static void InsertPlaneInEditor ( this exClipping _clipping, int _idx, exPlane _plane ) {
+        _clipping.InsertPlane (_idx, _plane);
+
+        exClipping clipPlane = _plane as exClipping;
+        // if this is not a clip plane
+        if ( clipPlane == null ) {
+            ApplyClipMaterialInEditor ( _clipping, _plane );
+        }
     }
 
     // ------------------------------------------------------------------ 
-    // Desc: 
+    /// \param _clipping the clipping plane
+    /// \param _plane the plane to add to clip
+    /// add plane to clipping list
     // ------------------------------------------------------------------ 
 
-    static void RecursivelyAddToClipInEditor ( this exClipping _clipping, Transform _t ) {
-        foreach ( Transform child in _t ) {
-            exPlane childPlane = child.GetComponent<exPlane>();
-            if ( childPlane != null ) {
-                AddToClipInEditor ( _clipping, childPlane );
+    public static void AddPlaneInEditor ( this exClipping _clipping, exPlane _plane ) {
+        _clipping.AddPlane (_plane);
 
-                exClipping clipPlane = childPlane as exClipping;
-                // if this is a clip plane, add child to it 
-                if ( clipPlane != null ) {
-                    clipPlane.UpdateClipListInEditor ();
-                    continue;
-                }
-            }
-            _clipping.RecursivelyAddToClipInEditor (child);
+        exClipping clipPlane = _plane as exClipping;
+        // if this is not a clip plane
+        if ( clipPlane == null ) {
+            ApplyClipMaterialInEditor ( _clipping, _plane );
         }
     }
 
@@ -71,28 +102,27 @@ public static class exClippingUtility {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public static void AddToClipInEditor ( this exClipping _clipping, exPlane _plane ) {
-        // we already have this in clipping list
-        if ( _clipping.planes.IndexOf(_plane) != -1 )
-            return;
+    public static void RemovePlaneInEditor ( this exClipping _clipping, exPlane _plane ) {
+        _clipping.RemovePlane (_plane);
+    }
 
-        _clipping.planes.Add(_plane);
-        exClipping clipPlane = _plane as exClipping;
-        // if this is not a clip plane
-        if ( clipPlane == null ) {
-            Renderer r = _plane.renderer;
-            if ( r != null ) {
-                Texture2D texture = r.sharedMaterial.mainTexture as Texture2D;
-                if ( _clipping.textureToClipMaterialTable.ContainsKey(texture) == false ) {
-                    r.sharedMaterial = exEditorHelper.GetDefaultMaterial ( texture, 
-                                                                           texture.name 
-                                                                           + "_clipping_" + _clipping.GetInstanceID(),
-                                                                           "ex2D/Alpha Blended (Clipping)" );
-                    _clipping.AddClipMaterial ( texture, r.sharedMaterial );
-                }
-                else {
-                    r.sharedMaterial = _clipping.textureToClipMaterialTable[texture];
-                }
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    static void ApplyClipMaterialInEditor ( this exClipping _clipping, exPlane _plane ) {
+        Renderer r = _plane.renderer;
+        if ( r != null ) {
+            Texture2D texture = r.sharedMaterial.mainTexture as Texture2D;
+            if ( _clipping.textureToClipMaterialTable.ContainsKey(texture) == false ) {
+                r.sharedMaterial = exEditorHelper.GetDefaultMaterial ( texture, 
+                                                                       texture.name 
+                                                                       + "-clipping-" + Mathf.Abs(_clipping.GetInstanceID()),
+                                                                       "ex2D/Alpha Blended (Clipping)" );
+                _clipping.AddClipMaterial ( texture, r.sharedMaterial );
+            }
+            else {
+                r.sharedMaterial = _clipping.textureToClipMaterialTable[texture];
             }
         }
     }

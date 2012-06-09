@@ -55,7 +55,7 @@ public class exUIScrollView : exUIElement {
     // properties
     ///////////////////////////////////////////////////////////////////////////////
 
-    public exSoftClip clipRect;
+    public exClipping clipRect;
     public exSpriteBorder horizontalBar;
     public exSpriteBorder horizontalSlider;
     public exSpriteBorder verticalBar;
