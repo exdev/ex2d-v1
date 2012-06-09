@@ -136,6 +136,10 @@ public class exSpriteAnimation : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     void Init () {
+        if ( nameToState == null ) {
+            initialized = false;
+        }
+
         if ( initialized == false ) {
             initialized = true;
 
@@ -159,10 +163,6 @@ public class exSpriteAnimation : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     void Awake () {
-        // DEBUG { 
-        // Debug.Log("exSpriteAnimation:Awake()");
-        // } DEBUG end 
-
         Init ();
 
         // NOTE: start will only trigger when the Component first run after enabled
@@ -454,12 +454,6 @@ public class exSpriteAnimation : MonoBehaviour {
 
     public exSpriteAnimState GetAnimation ( string _name ) {
         Init ();
-        // DISABLE { 
-        // if ( nameToState == null ) {
-        //     Debug.LogError ("The exSpriteAnimation is not Awake yet. Please put it before Default Time in Menu/Edit/Project Settings/Script Execution Order");
-        //     return null;
-        // }
-        // } DISABLE end 
         if ( nameToState.ContainsKey(_name) )
             return nameToState[_name];
         return null;

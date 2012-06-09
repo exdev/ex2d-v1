@@ -80,7 +80,7 @@ public class exClipping : exPlane {
 
     public List<PlaneInfo> planeInfoList = new List<PlaneInfo>();
     public List<Material> clipMaterialList = new List<Material>();
-    public Dictionary<Texture2D,Material> textureToClipMaterialTable = new Dictionary<Texture2D,Material>(); 
+    [System.NonSerialized] public Dictionary<Texture2D,Material> textureToClipMaterialTable = new Dictionary<Texture2D,Material>(); 
 
     // ------------------------------------------------------------------ 
     /// the clipped rect, if the clipping plane is a child of another soft-clip plane
@@ -93,11 +93,101 @@ public class exClipping : exPlane {
     //
     ///////////////////////////////////////////////////////////////////////////////
 
-    protected bool initied = false;
+    protected bool initialized = false;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
     ///////////////////////////////////////////////////////////////////////////////
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    protected void Init () {
+        if ( textureToClipMaterialTable.Count == 0 )
+            initialized = false;
+
+        if ( initialized == false ) {
+            initialized = true;
+
+            spriteMng.AddToClippingList(this);
+            for ( int i = 0; i < clipMaterialList.Count; ++i ) {
+                Material mat = clipMaterialList[i];
+                textureToClipMaterialTable.Add( mat.mainTexture as Texture2D, mat );
+            }
+
+            updateFlags |= UpdateFlags.Vertex;
+            Commit();
+            CommitMaterialProperties();
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    /// Awake functoin inherit from exPlane.
+    // ------------------------------------------------------------------ 
+
+    protected new void Awake () {
+        base.Awake();
+        Init ();
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    protected new void OnDestroy () {
+        base.OnDestroy();
+
+        if ( spriteMng != null ) {
+            spriteMng_.RemoveFromClippingList(this);
+        }
+
+        // 
+        for ( int i = 0; i < planeInfoList.Count; ++i ) {
+            PlaneInfo pi = planeInfoList[i];
+            if ( pi.plane )
+                pi.plane.renderer.sharedMaterial = pi.material;
+        }
+        planeInfoList.Clear();
+        textureToClipMaterialTable.Clear();
+        clipMaterialList.Clear();
+    }
+
+    // ------------------------------------------------------------------ 
+    /// OnEnable functoin inherit from exPlane.
+    /// When enabled set to true, it will enable all the item in the planeInfoList
+    // ------------------------------------------------------------------ 
+
+    protected new void OnEnable () {
+        base.OnEnable();
+        Init ();
+
+        // 
+        for ( int i = 0; i < planeInfoList.Count; ++i ) {
+            PlaneInfo pi = planeInfoList[i];
+            exPlane plane = pi.plane;
+            if ( plane ) {
+                Texture2D texture = plane.renderer.sharedMaterial.mainTexture as Texture2D;
+                plane.renderer.material = textureToClipMaterialTable[texture];
+            }
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    /// OnDisable functoin inherit from exPlane.
+    /// When enabled set to false, it will disable all the item in the planeInfoList
+    // ------------------------------------------------------------------ 
+
+    protected new void OnDisable () {
+        base.OnDisable();
+
+        // 
+        for ( int i = 0; i < planeInfoList.Count; ++i ) {
+            PlaneInfo pi = planeInfoList[i];
+            if ( pi.plane )
+                pi.plane.renderer.sharedMaterial = pi.material;
+        }
+    }
 
     // ------------------------------------------------------------------ 
     // Desc: 
@@ -257,88 +347,6 @@ public class exClipping : exPlane {
             Material clipMaterial = textureToClipMaterialTable[_texture];
             textureToClipMaterialTable.Remove(_texture);
             clipMaterialList.Remove(clipMaterial);
-        }
-    }
-
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
-    protected void Init () {
-        if ( initied == false ) {
-            initied = true;
-
-            spriteMng.AddToClippingList(this);
-            for ( int i = 0; i < clipMaterialList.Count; ++i ) {
-                Material mat = clipMaterialList[i];
-                textureToClipMaterialTable.Add( mat.mainTexture as Texture2D, mat );
-            }
-
-            updateFlags |= UpdateFlags.Vertex;
-            Commit();
-            CommitMaterialProperties();
-        }
-    }
-
-    // ------------------------------------------------------------------ 
-    /// Awake functoin inherit from exPlane.
-    // ------------------------------------------------------------------ 
-
-    protected new void Awake () {
-        base.Awake();
-        Init ();
-    }
-
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
-    protected new void OnDestroy () {
-        base.OnDestroy();
-
-        if ( spriteMng != null ) {
-            spriteMng_.RemoveFromClippingList(this);
-        }
-
-        // 
-        for ( int i = 0; i < planeInfoList.Count; ++i ) {
-            PlaneInfo pi = planeInfoList[i];
-            pi.plane.renderer.sharedMaterial = pi.material;
-        }
-        planeInfoList.Clear();
-        textureToClipMaterialTable.Clear();
-        clipMaterialList.Clear();
-    }
-
-    // ------------------------------------------------------------------ 
-    /// OnEnable functoin inherit from exPlane.
-    /// When enabled set to true, it will enable all the item in the planeInfoList
-    // ------------------------------------------------------------------ 
-
-    protected new void OnEnable () {
-        base.OnEnable();
-        Init ();
-
-        // 
-        for ( int i = 0; i < planeInfoList.Count; ++i ) {
-            PlaneInfo pi = planeInfoList[i];
-            Texture2D texture = pi.plane.renderer.sharedMaterial.mainTexture as Texture2D;
-            pi.plane.renderer.material = textureToClipMaterialTable[texture];
-        }
-    }
-
-    // ------------------------------------------------------------------ 
-    /// OnDisable functoin inherit from exPlane.
-    /// When enabled set to false, it will disable all the item in the planeInfoList
-    // ------------------------------------------------------------------ 
-
-    protected new void OnDisable () {
-        base.OnDisable();
-
-        // 
-        for ( int i = 0; i < planeInfoList.Count; ++i ) {
-            PlaneInfo pi = planeInfoList[i];
-            pi.plane.renderer.sharedMaterial = pi.material;
         }
     }
 
