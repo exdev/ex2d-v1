@@ -278,9 +278,10 @@ public class exPlane : MonoBehaviour {
         if ( collisionHelper_ )
             collisionHelper_.plane = this;
 
-        //
-        if ( clippingPlane )
-            clippingPlane.AddPlane(this);
+        // DISABLE: no reason to do this { 
+        // if ( clippingPlane )
+        //     clippingPlane.AddPlane(this);
+        // } DISABLE end 
     }
 
     // ------------------------------------------------------------------ 
@@ -290,6 +291,9 @@ public class exPlane : MonoBehaviour {
     protected void OnDestroy () {
         if ( meshFilter ) {
             DestroyImmediate( meshFilter.sharedMesh, true );
+        }
+        if ( clippingPlane ) {
+            clippingPlane.RemovePlane(this);
         }
     }
 
