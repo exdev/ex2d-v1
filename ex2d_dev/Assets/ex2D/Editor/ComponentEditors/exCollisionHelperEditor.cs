@@ -71,8 +71,8 @@ public class exCollisionHelperEditor : Editor {
 
         GUI.enabled = !inAnimMode;
         EditorGUIUtility.LookLikeControls ();
-		exCollisionHelper.CollisionType newCollisionType 
-            = (exCollisionHelper.CollisionType)EditorGUILayout.EnumPopup( "Collision Type", collisionType, GUILayout.Width(165) );
+        exCollisionHelper.CollisionType newCollisionType 
+            = (exCollisionHelper.CollisionType)EditorGUILayout.EnumPopup( "Collision Type", collisionType, GUILayout.Width(200) );
         EditorGUIUtility.LookLikeInspector ();
         GUI.enabled = true;
 

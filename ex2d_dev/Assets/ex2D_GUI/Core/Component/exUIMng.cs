@@ -123,11 +123,15 @@ public class exUIMng : MonoBehaviour {
     }
 
     ///////////////////////////////////////////////////////////////////////////////
-    // properties
+    // serializable 
     ///////////////////////////////////////////////////////////////////////////////
 
+    public bool useRayCast = false; /// if your UI element is in 3D space, turn this on.
 
-    //
+    ///////////////////////////////////////////////////////////////////////////////
+    // non-serialized
+    ///////////////////////////////////////////////////////////////////////////////
+
     // private RaycastSorter raycastSorter = new RaycastSorter();
     private ElementSorter elementSorter = new ElementSorter();
 
@@ -479,37 +483,43 @@ public class exUIMng : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     exUIElement PickElement ( Vector2 _pos ) {
-        Ray ray = camera.ScreenPointToRay ( _pos );
-        ray.origin = new Vector3 ( ray.origin.x, ray.origin.y, camera.transform.position.z );
-        RaycastHit[] hits = Physics.RaycastAll(ray);
-        // DISABLE { 
-        // System.Array.Sort(hits, raycastSorter);
-        // if ( hits.Length > 0 ) {
-        //     for ( int i = 0; i < hits.Length; ++i ) {
-        //         RaycastHit hit = hits[i];
-        //         GameObject go = hit.collider.gameObject;
-        //         exUIElement el = go.GetComponent<exUIElement>();
-        //         if ( el && el.enabled ) {
-        //             return el;
-        //         }
-        //     }
-        // }
-        // return null;
-        // } DISABLE end 
+        if ( useRayCast ) {
+            Ray ray = camera.ScreenPointToRay ( _pos );
+            ray.origin = new Vector3 ( ray.origin.x, ray.origin.y, camera.transform.position.z );
+            RaycastHit[] hits = Physics.RaycastAll(ray);
+            // DISABLE { 
+            // System.Array.Sort(hits, raycastSorter);
+            // if ( hits.Length > 0 ) {
+            //     for ( int i = 0; i < hits.Length; ++i ) {
+            //         RaycastHit hit = hits[i];
+            //         GameObject go = hit.collider.gameObject;
+            //         exUIElement el = go.GetComponent<exUIElement>();
+            //         if ( el && el.enabled ) {
+            //             return el;
+            //         }
+            //     }
+            // }
+            // return null;
+            // } DISABLE end 
 
-        List<exUIElement> elements = new List<exUIElement>();
-        for ( int i = 0; i < hits.Length; ++i ) {
-            RaycastHit hit = hits[i];
-            GameObject go = hit.collider.gameObject;
-            exUIElement el = go.GetComponent<exUIElement>();
-            if ( el && el.isActive ) {
-                elements.Add(el);
+            List<exUIElement> elements = new List<exUIElement>();
+            for ( int i = 0; i < hits.Length; ++i ) {
+                RaycastHit hit = hits[i];
+                GameObject go = hit.collider.gameObject;
+                exUIElement el = go.GetComponent<exUIElement>();
+                if ( el && el.isActive ) {
+                    elements.Add(el);
+                }
             }
+            if ( elements.Count > 0 ) {
+                elements.Sort(elementSorter);
+                return elements[elements.Count-1]; 
+            }
+            return null;
         }
-        if ( elements.Count > 0 ) {
-            elements.Sort(elementSorter);
-            return elements[elements.Count-1]; 
+        else {
+            // TODO:
+            return null;
         }
-        return null;
     }
 }
