@@ -145,6 +145,7 @@ public class exUIMng : MonoBehaviour {
 
     //
     private List<exUIEvent> eventList = new List<exUIEvent>();
+    private List<exUIElement> rootElements = new List<exUIElement>();
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -171,6 +172,11 @@ public class exUIMng : MonoBehaviour {
             exUIElement parent_el = el.FindParent();
             if ( parent_el == null ) {
                 exUIElement.FindAndAddChild (el);
+
+                //
+                if ( rootElements.IndexOf(el) == -1 ) {
+                    rootElements.Add(el);
+                }
             }
         }
 
@@ -518,8 +524,37 @@ public class exUIMng : MonoBehaviour {
             return null;
         }
         else {
-            // TODO:
+            Vector3 worldPointerPos = camera.ScreenToWorldPoint ( _pos );
+            for ( int i = 0; i < rootElements.Count; ++i ) {
+                exUIElement el = rootElements[i];
+                exUIElement resultEL = RecursivelyGetUIElement ( el, worldPointerPos );
+                if ( resultEL != null )
+                    return resultEL;
+            }
             return null;
         }
     }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    exUIElement RecursivelyGetUIElement ( exUIElement _el, Vector2 _pos ) {
+        if ( _el.isActive == false )
+            return null;
+
+        Vector2 localPos = new Vector2( _pos.x - _el.transform.position.x, 
+                                        _pos.y - _el.transform.position.y );
+        if ( _el.boundingRect.Contains(localPos) ) {
+            for ( int i = 0; i < _el.children.Count; ++i ) {
+                exUIElement childEL = _el.children[i];
+                exUIElement resultEL = RecursivelyGetUIElement ( childEL, _pos );
+                if ( resultEL != null )
+                    return resultEL;
+            }
+            return _el;
+        }
+
+        return null;
+    } 
 }

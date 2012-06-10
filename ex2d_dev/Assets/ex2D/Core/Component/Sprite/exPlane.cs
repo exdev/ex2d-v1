@@ -135,6 +135,24 @@ public class exPlane : MonoBehaviour {
     }
 
     // ------------------------------------------------------------------ 
+    /// the clipping plane contains this
+    // ------------------------------------------------------------------ 
+
+    public exClipping clippingPlane = null;
+
+    // ------------------------------------------------------------------ 
+    [SerializeField] protected Rect boundingRect_ = new Rect( 0.0f, 0.0f, 0.0f, 0.0f );
+    /// The bounding rect of the plane
+    // ------------------------------------------------------------------ 
+
+    public Rect boundingRect { 
+        get { return boundingRect_; } 
+        protected set {
+            boundingRect_ = value;
+        } 
+    }
+
+    // ------------------------------------------------------------------ 
     /// The cached exCollisionHelper component
     // ------------------------------------------------------------------ 
 
@@ -179,18 +197,6 @@ public class exPlane : MonoBehaviour {
         }
         get { return updateFlags_; }
     }
-
-    // ------------------------------------------------------------------ 
-    /// the clipping plane contains this
-    // ------------------------------------------------------------------ 
-
-    public exClipping clippingPlane = null;
-
-    // ------------------------------------------------------------------ 
-    /// The bounding rect of the plane
-    // ------------------------------------------------------------------ 
-
-    public Rect boundingRect { get; protected set; }
 
     // DISABLE { 
     // protected ClipInfo clipInfo_ = new ClipInfo();
