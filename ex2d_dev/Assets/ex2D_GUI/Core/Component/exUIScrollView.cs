@@ -192,12 +192,12 @@ public class exUIScrollView : exUIElement {
 
     public override bool OnEvent ( exUIEvent _e ) {
         switch ( _e.type ) {
-        case exUIEvent.Type.HoverIn: 
+        case exUIEvent.Type.PointerEnter: 
             if ( OnHoverIn != null )
                 OnHoverIn ();
             return true;
 
-        case exUIEvent.Type.HoverOut: 
+        case exUIEvent.Type.PointerExit: 
             if ( OnHoverOut != null )
                 OnHoverOut ();
             return true;
@@ -206,7 +206,7 @@ public class exUIScrollView : exUIElement {
             if ( _e.buttons == exUIEvent.PointerButtonFlags.Left ||
                  _e.buttons == exUIEvent.PointerButtonFlags.Touch ) 
             {
-                exUIMng.instance.activeElement = this;
+                exUIMng.focus = this;
                 velocity = Vector2.zero;
                 pressTime = Time.time;
                 pressPoint = _e.position;
@@ -219,7 +219,7 @@ public class exUIScrollView : exUIElement {
             if ( _e.buttons == exUIEvent.PointerButtonFlags.Left ||
                  _e.buttons == exUIEvent.PointerButtonFlags.Touch ) 
             {
-                exUIMng.instance.activeElement = null;
+                exUIMng.focus = null;
                 horizontalSlider.width = width/contentWidth * width;
                 verticalSlider.height = height/contentHeight * height;
                 if ( isDragging ) {

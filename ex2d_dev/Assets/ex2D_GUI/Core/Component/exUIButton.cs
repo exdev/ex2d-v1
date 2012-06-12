@@ -33,6 +33,14 @@ public class exUIButton : exUIElement {
 	public event EventHandler OnButtonPress;
 	public event EventHandler OnButtonRelease;
 
+    // TODO { 
+    // ///////////////////////////////////////////////////////////////////////////////
+    // // serializable
+    // ///////////////////////////////////////////////////////////////////////////////
+
+    // public List<MessageInfo> messageInfos = new List<MessageInfo>();
+    // } TODO end 
+
 
     // ------------------------------------------------------------------ 
     [SerializeField] protected string text_ = "";
@@ -80,25 +88,6 @@ public class exUIButton : exUIElement {
             BoxCollider boxCollider = GetComponent<BoxCollider>();
             font.transform.localPosition 
                 = new Vector3( boxCollider.center.x, boxCollider.center.y, font.transform.localPosition.z );
-
-            // DELME { 
-            // switch ( plane ) {
-            // case exSprite.Plane.XY:
-            //     font.transform.localPosition 
-            //         = new Vector3( boxCollider.center.x, boxCollider.center.y, font.transform.localPosition.z );
-            //     break;
-
-            // case exSprite.Plane.XZ:
-            //     font.transform.localPosition 
-            //         = new Vector3( boxCollider.center.x, font.transform.localPosition.y, boxCollider.center.z );
-            //     break;
-
-            // case exSprite.Plane.ZY:
-            //     font.transform.localPosition 
-            //         = new Vector3( font.transform.localPosition.x, boxCollider.center.y, boxCollider.center.z );
-            //     break;
-            // }
-            // } DELME end 
         }
     }
 
@@ -108,36 +97,35 @@ public class exUIButton : exUIElement {
 
     public override bool OnEvent ( exUIEvent _e ) {
         switch ( _e.type ) {
-        case exUIEvent.Type.HoverIn: 
-            if ( OnHoverIn != null )
-                OnHoverIn ();
+        case exUIEvent.Type.PointerEnter: 
+            if ( OnHoverIn != null ) OnHoverIn ();
             return true;
 
-        case exUIEvent.Type.HoverOut: 
-            if ( exUIMng.instance.activeElement == this ) {
+        case exUIEvent.Type.PointerExit: 
+            if ( exUIMng.focus == this ) {
                 isPressing = false;
-                exUIMng.instance.activeElement = null;
-                if ( OnHoverOut != null )
-                    OnHoverOut ();
+                exUIMng.focus = null;
             }
+            if ( OnHoverOut != null ) OnHoverOut();
             return true;
 
         case exUIEvent.Type.PointerPress: 
             if ( _e.buttons == exUIEvent.PointerButtonFlags.Left ||
                  _e.buttons == exUIEvent.PointerButtonFlags.Touch ) {
                 isPressing = true;
-                exUIMng.instance.activeElement = this;
-                if ( OnButtonPress != null )
-                    OnButtonPress ();
+                exUIMng.focus = this;
+                if ( OnButtonPress != null ) OnButtonPress ();
             }
             return true;
 
         case exUIEvent.Type.PointerRelease: 
             if ( _e.buttons == exUIEvent.PointerButtonFlags.Left ||
                  _e.buttons == exUIEvent.PointerButtonFlags.Touch ) {
-                exUIMng.instance.activeElement = null;
+                exUIMng.focus = null;
                 if ( isPressing ) {
-                    StartCoroutine ( DelayButtonRelease(0.0f) );
+                    isPressing = false;
+                    if ( OnButtonRelease != null ) OnButtonRelease ();
+                    if ( OnHoverOut != null ) OnHoverOut();
                 }
             }
             return true;
@@ -146,18 +134,4 @@ public class exUIButton : exUIElement {
         return false;
     }
 
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
-    IEnumerator DelayButtonRelease ( float _delay ) {
-        float delay = _delay;
-        while ( delay > 0.0f ) {
-            delay -= Time.deltaTime;
-            yield return false;
-        }
-        if ( OnButtonRelease != null )
-            OnButtonRelease ();
-        isPressing = false;
-    }
 }

@@ -61,14 +61,14 @@ public class exUIPanel : exUIElement {
 
     public override bool OnEvent ( exUIEvent _e ) {
         switch ( _e.type ) {
-        case exUIEvent.Type.HoverIn: 
+        case exUIEvent.Type.PointerEnter: 
             if ( OnHoverIn != null ) {
                 OnHoverIn ();
                 return true;
             }
             return false;
 
-        case exUIEvent.Type.HoverOut: 
+        case exUIEvent.Type.PointerExit: 
             if ( OnHoverOut != null ) {
                 OnHoverOut ();
                 return true;
@@ -76,7 +76,7 @@ public class exUIPanel : exUIElement {
             return false;
 
         case exUIEvent.Type.PointerPress: 
-            exUIMng.instance.activeElement = this;
+            exUIMng.focus = this;
             if ( OnButtonPress != null ) {
                 OnButtonPress ();
                 return true;
@@ -84,7 +84,7 @@ public class exUIPanel : exUIElement {
             return false;
 
         case exUIEvent.Type.PointerRelease: 
-            exUIMng.instance.activeElement = null;
+            exUIMng.focus = null;
             if ( OnButtonRelease != null ) {
                 OnButtonRelease ();
                 return true;

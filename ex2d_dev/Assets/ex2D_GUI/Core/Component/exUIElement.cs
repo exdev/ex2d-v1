@@ -23,8 +23,14 @@ using System.Collections.Generic;
 
 public class exUIElement : exPlane {
 
+    [System.Serializable]
+    public struct MessageInfo {
+        GameObject receiver;
+        string method;
+    }
+
     ///////////////////////////////////////////////////////////////////////////////
-    // properties
+    // non-Serializable
     ///////////////////////////////////////////////////////////////////////////////
 
     [System.NonSerialized] public exUIElement parent = null;
@@ -62,6 +68,7 @@ public class exUIElement : exPlane {
 
     // ------------------------------------------------------------------ 
     // Desc: 
+    // NOTE: used in Raycast test
     // ------------------------------------------------------------------ 
 
     public bool isActive {
@@ -165,22 +172,6 @@ public class exUIElement : exPlane {
         if ( boxCollider == null ) {
             boxCollider = gameObject.AddComponent<BoxCollider>();
             boxCollider.center = new Vector3( boxCollider.center.x, boxCollider.center.y, 0.2f );
-
-            // DELME { 
-            // switch ( plane ) {
-            // case exSprite.Plane.XY:
-            //     boxCollider.center = new Vector3( boxCollider.center.x, boxCollider.center.y, 0.2f );
-            //     break;
-
-            // case exSprite.Plane.XZ:
-            //     boxCollider.center = new Vector3( boxCollider.center.x, 0.2f, boxCollider.center.z );
-            //     break;
-
-            // case exSprite.Plane.ZY:
-            //     boxCollider.center = new Vector3( 0.2f, boxCollider.center.y, boxCollider.center.z );
-            //     break;
-            // }
-            // } DELME end 
         }
 
         // add collision helper
