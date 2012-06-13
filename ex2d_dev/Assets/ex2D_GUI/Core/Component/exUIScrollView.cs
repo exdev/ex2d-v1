@@ -191,131 +191,131 @@ public class exUIScrollView : exUIElement {
     // ------------------------------------------------------------------ 
 
     public override bool OnEvent ( exUIEvent _e ) {
-        switch ( _e.type ) {
-        case exUIEvent.Type.PointerEnter: 
-            if ( OnHoverIn != null )
-                OnHoverIn ();
-            return true;
+        // switch ( _e.type ) {
+        // case exUIEvent.Type.PointerEnter: 
+        //     if ( OnHoverIn != null )
+        //         OnHoverIn ();
+        //     return true;
 
-        case exUIEvent.Type.PointerExit: 
-            if ( OnHoverOut != null )
-                OnHoverOut ();
-            return true;
+        // case exUIEvent.Type.PointerExit: 
+        //     if ( OnHoverOut != null )
+        //         OnHoverOut ();
+        //     return true;
 
-        case exUIEvent.Type.PointerPress: 
-            if ( _e.buttons == exUIEvent.PointerButtonFlags.Left ||
-                 _e.buttons == exUIEvent.PointerButtonFlags.Touch ) 
-            {
-                exUIMng.focus = this;
-                velocity = Vector2.zero;
-                pressTime = Time.time;
-                pressPoint = _e.position;
-                isDragging = false;
-                stateUpdate = null;
-            }
-            return true;
+        // case exUIEvent.Type.PointerPress: 
+        //     if ( _e.buttons == exUIEvent.PointerButtonFlags.Left ||
+        //          _e.buttons == exUIEvent.PointerButtonFlags.Touch ) 
+        //     {
+        //         exUIMng.focus = this;
+        //         velocity = Vector2.zero;
+        //         pressTime = Time.time;
+        //         pressPoint = _e.position;
+        //         isDragging = false;
+        //         stateUpdate = null;
+        //     }
+        //     return true;
 
-        case exUIEvent.Type.PointerRelease: 
-            if ( _e.buttons == exUIEvent.PointerButtonFlags.Left ||
-                 _e.buttons == exUIEvent.PointerButtonFlags.Touch ) 
-            {
-                exUIMng.focus = null;
-                horizontalSlider.width = width/contentWidth * width;
-                verticalSlider.height = height/contentHeight * height;
-                if ( isDragging ) {
-                    isDragging = false;
-                    if ( Time.time - pressTime < 0.01f ) {
-                        velocity = Vector2.zero;
-                    }
-                    else {
-                        velocity = (pressPoint - _e.position)/(Time.time - pressTime);
-                    }
+        // case exUIEvent.Type.PointerRelease: 
+        //     if ( _e.buttons == exUIEvent.PointerButtonFlags.Left ||
+        //          _e.buttons == exUIEvent.PointerButtonFlags.Touch ) 
+        //     {
+        //         exUIMng.focus = null;
+        //         horizontalSlider.width = width/contentWidth * width;
+        //         verticalSlider.height = height/contentHeight * height;
+        //         if ( isDragging ) {
+        //             isDragging = false;
+        //             if ( Time.time - pressTime < 0.01f ) {
+        //                 velocity = Vector2.zero;
+        //             }
+        //             else {
+        //                 velocity = (pressPoint - _e.position)/(Time.time - pressTime);
+        //             }
 
-                    if ( scrollDirection == ScrollDirection.Vertical )
-                        velocity.x = 0.0f;
-                    else if ( scrollDirection == ScrollDirection.Horizontal )
-                        velocity.y = 0.0f;
-                }
-                else {
-                    velocity = Vector2.zero;
-                }
-                stateUpdate = DeaccelerateScrolling;
-            }
-            return true;
+        //             if ( scrollDirection == ScrollDirection.Vertical )
+        //                 velocity.x = 0.0f;
+        //             else if ( scrollDirection == ScrollDirection.Horizontal )
+        //                 velocity.y = 0.0f;
+        //         }
+        //         else {
+        //             velocity = Vector2.zero;
+        //         }
+        //         stateUpdate = DeaccelerateScrolling;
+        //     }
+        //     return true;
 
-        case exUIEvent.Type.PointerMove: 
-            if ( _e.buttons == exUIEvent.PointerButtonFlags.Left ||
-                 _e.buttons == exUIEvent.PointerButtonFlags.Touch ) 
-            {
-                if ( _e.delta.magnitude > 1.0f ) {
-                    if ( isDragging == false ) {
-                        pressTime = Time.time;
-                        pressPoint = _e.position;
-                        isDragging = true;
-                    }
-                }
-                else {
-                    pressTime = Time.time;
-                    pressPoint = _e.position;
-                    isDragging = false;
-                }
+        // case exUIEvent.Type.PointerMove: 
+        //     if ( _e.buttons == exUIEvent.PointerButtonFlags.Left ||
+        //          _e.buttons == exUIEvent.PointerButtonFlags.Touch ) 
+        //     {
+        //         if ( _e.delta.magnitude > 1.0f ) {
+        //             if ( isDragging == false ) {
+        //                 pressTime = Time.time;
+        //                 pressPoint = _e.position;
+        //                 isDragging = true;
+        //             }
+        //         }
+        //         else {
+        //             pressTime = Time.time;
+        //             pressPoint = _e.position;
+        //             isDragging = false;
+        //         }
 
-                float maxOffsetX = Mathf.Max(contentWidth - width, 0.0f);
-                float maxOffsetY = Mathf.Max(contentHeight - height, 0.0f);
-                float newX = -_e.delta.x;
-                float newY = -_e.delta.y;
-                Vector2 scrollDistance = Vector2.zero;
+        //         float maxOffsetX = Mathf.Max(contentWidth - width, 0.0f);
+        //         float maxOffsetY = Mathf.Max(contentHeight - height, 0.0f);
+        //         float newX = -_e.delta.x;
+        //         float newY = -_e.delta.y;
+        //         Vector2 scrollDistance = Vector2.zero;
 
-                //
-                if ( scrollDirection == ScrollDirection.Vertical )
-                    newX = 0.0f;
-                else if ( scrollDirection == ScrollDirection.Horizontal )
-                    newY = 0.0f;
+        //         //
+        //         if ( scrollDirection == ScrollDirection.Vertical )
+        //             newX = 0.0f;
+        //         else if ( scrollDirection == ScrollDirection.Horizontal )
+        //             newY = 0.0f;
 
-                //
-                if ( bounce ) {
-                    //
-                    float bounceX = 0.0f;
-                    if ( contentOffset.x > 0.0f ) {
-                        bounceX = contentOffset.x;
-                        // newX *= elasticity / bounceX;
-                        newX *= elasticity;
-                    }
-                    else if (  contentOffset.x < maxOffsetX ) {
-                        bounceX = maxOffsetX - contentOffset.x;
-                        // newX *= elasticity / bounceX;
-                        newX *= elasticity;
-                    }
-                    horizontalSlider.width = (width - bounceX)/contentWidth * (width - bounceX);
+        //         //
+        //         if ( bounce ) {
+        //             //
+        //             float bounceX = 0.0f;
+        //             if ( contentOffset.x > 0.0f ) {
+        //                 bounceX = contentOffset.x;
+        //                 // newX *= elasticity / bounceX;
+        //                 newX *= elasticity;
+        //             }
+        //             else if (  contentOffset.x < maxOffsetX ) {
+        //                 bounceX = maxOffsetX - contentOffset.x;
+        //                 // newX *= elasticity / bounceX;
+        //                 newX *= elasticity;
+        //             }
+        //             horizontalSlider.width = (width - bounceX)/contentWidth * (width - bounceX);
 
-                    //
-                    float bounceY = 0.0f;
-                    if ( contentOffset.y > 0.0f ) {
-                        bounceY = contentOffset.y;
-                        // newY *= elasticity / bounceY; 
-                        newY *= elasticity;
-                    }
-                    else if (  contentOffset.y < -maxOffsetY ) {
-                        bounceY = -maxOffsetY - contentOffset.y;
-                        // newY *= elasticity / bounceY; 
-                        newY *= elasticity;
-                    }
-                    verticalSlider.height = (height - bounceY)/contentHeight * (height - bounceY);
+        //             //
+        //             float bounceY = 0.0f;
+        //             if ( contentOffset.y > 0.0f ) {
+        //                 bounceY = contentOffset.y;
+        //                 // newY *= elasticity / bounceY; 
+        //                 newY *= elasticity;
+        //             }
+        //             else if (  contentOffset.y < -maxOffsetY ) {
+        //                 bounceY = -maxOffsetY - contentOffset.y;
+        //                 // newY *= elasticity / bounceY; 
+        //                 newY *= elasticity;
+        //             }
+        //             verticalSlider.height = (height - bounceY)/contentHeight * (height - bounceY);
 
-                    //
-                    scrollDistance = new Vector2( newX, newY );
-                    contentOffset += scrollDistance;
-                }
-                else {
-                    scrollDistance = new Vector2( newX, newY );
-                    contentOffset += scrollDistance;
-                    contentOffset = new Vector2 ( Mathf.Clamp ( contentOffset.x, 0.0f, maxOffsetX ),
-                                                  Mathf.Clamp ( contentOffset.y, -maxOffsetY, 0.0f ) );
-                }
-                SetOffset ( contentOffset );
-            }
-            return true;
-        }
+        //             //
+        //             scrollDistance = new Vector2( newX, newY );
+        //             contentOffset += scrollDistance;
+        //         }
+        //         else {
+        //             scrollDistance = new Vector2( newX, newY );
+        //             contentOffset += scrollDistance;
+        //             contentOffset = new Vector2 ( Mathf.Clamp ( contentOffset.x, 0.0f, maxOffsetX ),
+        //                                           Mathf.Clamp ( contentOffset.y, -maxOffsetY, 0.0f ) );
+        //         }
+        //         SetOffset ( contentOffset );
+        //     }
+        //     return true;
+        // }
 
         return false;
     }

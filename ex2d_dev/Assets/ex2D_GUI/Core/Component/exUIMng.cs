@@ -142,24 +142,24 @@ public class exUIMng : MonoBehaviour {
     // structures
     ///////////////////////////////////////////////////////////////////////////////
 
-    public struct EventInfo { 
-        public exUIElement primaryElement;
-        public exUIEvent uiEvent;
+    public class EventInfo { 
+        public exUIElement primaryElement = null;
+        public exUIEvent uiEvent = null;
     }
 
     //
-    public struct TouchState {
-        public int touchID;
-        public exUIElement hotElement;
-        public exUIElement focusElement;
+    public class TouchState {
+        public int touchID = -1;
+        public exUIElement hotElement = null;
+        public exUIElement focusElement = null;
     }
 
     //
-    public struct MouseState {
-        public Vector2 currentPos;
-        public exUIEvent.MouseButtonFlags currentButtons;
-        public exUIElement hotElement;
-        public exUIElement focusElement;
+    public class MouseState {
+        public Vector2 currentPos = Vector2.zero;
+        public exUIEvent.MouseButtonFlags currentButtons = exUIEvent.MouseButtonFlags.None;
+        public exUIElement hotElement = null;
+        public exUIElement focusElement = null;
     }
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -217,6 +217,7 @@ public class exUIMng : MonoBehaviour {
             }
         }
 
+        //
         mouseState.currentPos = Vector2.zero;
         mouseState.currentButtons = exUIEvent.MouseButtonFlags.None;
         mouseState.hotElement = null;
@@ -250,7 +251,6 @@ public class exUIMng : MonoBehaviour {
                 return;
             }
         }
-        Debug.LogError( "Can't find touch state by touchID " + _touchID );
     }
 
     // ------------------------------------------------------------------ 
@@ -284,7 +284,7 @@ public class exUIMng : MonoBehaviour {
     void Start () {
 #if UNITY_IPHONE
         if ( Application.isEditor == false ) {
-            touchID = -1;
+            touchStateList.Clear();
         } else {
 #endif
             mouseState.currentPos = Input.mousePosition;
@@ -350,112 +350,129 @@ public class exUIMng : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     void ProcessTouch () {
-        //
-        exUIElement lastHotElement = hotElement;
-        Vector2 deltaPos = Vector2.zero;
-        bool touchPress = false;
-        bool touchRelease = false;
+        for ( int i = 0; i < Input.touches.Length; ++i ) {
+            Touch touch = Input.touches[i];
+            TouchState touchState = null;
 
-        //
-        if ( touchID != -1 ) {
-            bool found = false;
-            for ( int i = 0; i < Input.touches.Length; ++i ) {
-                Touch touch = Input.touches[i];
-                if ( touchID == touch.fingerId ) {
-                    found = true;
-                    if ( touch.phase == TouchPhase.Ended ||
-                         touch.phase == TouchPhase.Canceled ) 
-                    {
-                        deltaPos = touch.deltaPosition;
-                        touchRelease = true;
-                        touchID = -1;
-                        break;
-                    }
-                    else if ( touch.phase == TouchPhase.Moved ) {
-                        deltaPos = touch.deltaPosition;
-                    }
-                    currentPos = touch.position;
-                    hotElement = PickElement(touch.position);
+            // find the touch state
+            int touchStateIndex = -1;
+            for ( int j = 0; j < touchStateList.Count; ++j ) {
+                touchState = touchStateList[j];
+                if ( touchState.touchID == touch.fingerId ) {
+                    touchStateIndex = j;
+                    break;
                 }
             }
 
-            // if not found
-            if ( found == false ) {
-                touchRelease = true;
-                touchID = -1;
+            // set the last and current hot element 
+            exUIElement focusElement = null;
+            exUIElement lastHotElement = null;
+            exUIElement hotElement = PickElement(touch.position);
+            if ( touchState != null ) {
+                lastHotElement = touchState.hotElement;
+                touchState.hotElement = hotElement;
+                focusElement = touchState.focusElement;
             }
-        }
-        else {
-            for ( int i = 0; i < Input.touches.Length; ++i ) {
-                Touch touch = Input.touches[i];
-                if ( touch.phase == TouchPhase.Began ) {
-                    hotElement = PickElement(touch.position);
+            
+            //
+            if ( touch.phase == TouchPhase.Began ) {
+                if ( hotElement != null ) {
+                    exUIEvent e = new exUIEvent(); 
+                    e.category = exUIEvent.Category.Touch;
+                    e.type =  exUIEvent.Type.TouchDown;
+                    e.position = touch.position;
+                    e.delta = touch.deltaPosition;
+                    e.touchID = touch.fingerId;
+
+                    EventInfo info = new EventInfo();
+                    info.primaryElement = hotElement;
+                    info.uiEvent = e;
+                    eventInfoList.Add(info);
+
+                    // NOTE: it must be null
+                    if ( touchState == null ) {
+                        touchState = new TouchState();
+                        touchState.touchID = touch.fingerId;
+                        touchState.hotElement = hotElement;
+                        touchState.focusElement = null;
+                        touchStateList.Add(touchState);
+                    }
+                    else {
+                        Debug.LogError( "something wrong that the touch state is exists while touch just began" );
+                    }
+                }
+            }
+            else if ( touch.phase == TouchPhase.Ended ) {
+                if ( touchState != null ) {
+                    if ( focusElement != null ) {
+                        exUIEvent e = new exUIEvent(); 
+                        e.category = exUIEvent.Category.Touch;
+                        e.type =  exUIEvent.Type.TouchUp;
+                        e.position = touch.position;
+                        e.delta = touch.deltaPosition;
+                        e.touchID = touch.fingerId;
+
+                        EventInfo info = new EventInfo();
+                        info.primaryElement = focusElement;
+                        info.uiEvent = e;
+                        eventInfoList.Add(info);
+                    }
+                    touchStateList.RemoveAt(touchStateIndex);
+                }
+            }
+            else if ( touch.phase == TouchPhase.Canceled ) {
+                if ( touchState != null )
+                    touchStateList.RemoveAt(touchStateIndex);
+            }
+            else if ( touch.phase == TouchPhase.Moved ) {
+                // process hover event
+                if ( lastHotElement != hotElement ) {
+                    // add hover-in event
                     if ( hotElement != null ) {
-                        currentPos = touch.position;
-                        touchID = touch.fingerId;
-                        touchPress = true;
-                        break;
+                        exUIEvent e = new exUIEvent(); 
+                        e.category = exUIEvent.Category.Touch;
+                        e.type =  exUIEvent.Type.TouchEnter;
+                        e.position = touch.position;
+                        e.delta = touch.deltaPosition;
+                        e.touchID = touch.fingerId;
+
+                        EventInfo info = new EventInfo();
+                        info.primaryElement = hotElement;
+                        info.uiEvent = e;
+                        eventInfoList.Add(info);
+                    }
+
+                    // add hover-out event
+                    if ( lastHotElement != null ) {
+                        exUIEvent e = new exUIEvent(); 
+                        e.category = exUIEvent.Category.Touch;
+                        e.type =  exUIEvent.Type.TouchExit;
+                        e.position = touch.position;
+                        e.delta = touch.deltaPosition;
+                        e.touchID = touch.fingerId;
+
+                        EventInfo info = new EventInfo();
+                        info.primaryElement = hotElement;
+                        info.uiEvent = e;
+                        eventInfoList.Add(info);
                     }
                 }
+
+                //
+                if ( focusElement != null ) {
+                    exUIEvent e = new exUIEvent(); 
+                    e.category = exUIEvent.Category.Touch;
+                    e.type =  exUIEvent.Type.TouchMove;
+                    e.position = touch.position;
+                    e.delta = touch.deltaPosition;
+                    e.touchID = touch.fingerId;
+
+                    EventInfo info = new EventInfo();
+                    info.primaryElement = focusElement;
+                    info.uiEvent = e;
+                    eventInfoList.Add(info);
+                }
             }
-        }
-
-        // process hover event
-        if ( lastHotElement != hotElement ) {
-            // add hover-in event
-            if ( hotElement != null ) {
-                exUIEvent e = new exUIEvent(); 
-                e.type =  exUIEvent.Type.PointerEnter;
-                e.position = currentPos;
-                e.delta = deltaPos;
-                e.target = hotElement;
-                e.buttons = exUIEvent.MouseButtonFlags.None;
-                eventInfoList.Add(e);
-            }
-
-            // add hover-out event
-            if ( lastHotElement != null ) {
-                exUIEvent e = new exUIEvent(); 
-                e.type =  exUIEvent.Type.PointerExit;
-                e.position = currentPos;
-                e.delta = deltaPos;
-                e.target = lastHotElement;
-                e.buttons = exUIEvent.MouseButtonFlags.None;
-                eventInfoList.Add(e);
-            }
-        }
-
-        // add pointer-move event
-        if ( focusElement != null && deltaPos != Vector2.zero ) {
-            exUIEvent e = new exUIEvent(); 
-            e.type =  exUIEvent.Type.PointerMove;
-            e.position = currentPos;
-            e.delta = deltaPos;
-            e.target = focusElement;
-            e.buttons = exUIEvent.MouseButtonFlags.None;
-            eventInfoList.Add(e);
-        }
-
-        // add pointer-press event
-        if ( hotElement != null && touchPress ) {
-            exUIEvent e = new exUIEvent(); 
-            e.type =  exUIEvent.Type.PointerPress;
-            e.position = currentPos;
-            e.delta = deltaPos;
-            e.target = hotElement;
-            e.buttons = exUIEvent.MouseButtonFlags.None;
-            eventInfoList.Add(e);
-        }
-
-        // add pointer-press event
-        if ( focusElement != null && touchRelease ) {
-            exUIEvent e = new exUIEvent(); 
-            e.type =  exUIEvent.Type.PointerRelease;
-            e.position = currentPos;
-            e.delta = deltaPos;
-            e.target = focusElement;
-            e.buttons = exUIEvent.MouseButtonFlags.None;
-            eventInfoList.Add(e);
         }
     }
 
@@ -464,15 +481,13 @@ public class exUIMng : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     void ProcessMouse () {
-        //
+        // get current position and delta pos
         Vector2 lastPointerPos = mouseState.currentPos;
-
-        // get current position
         mouseState.currentPos = Input.mousePosition;
         Vector2 deltaPos = mouseState.currentPos - lastPointerPos;
 
         // get current mouse button
-        exUIEvent.MouseButtonFlags lastPointerPressed = mouseState.currentButtons;
+        exUIEvent.MouseButtonFlags lastButtons = mouseState.currentButtons;
         exUIEvent.MouseButtonFlags buttonDown = exUIEvent.MouseButtonFlags.None;
         exUIEvent.MouseButtonFlags buttonUp = exUIEvent.MouseButtonFlags.None;
 
@@ -498,7 +513,7 @@ public class exUIMng : MonoBehaviour {
         }
 
         // handle release
-        if ( lastPointerPressed != mouseState.currentButtons ) {
+        if ( lastButtons != mouseState.currentButtons ) {
             if ( Input.GetMouseButtonUp(0) )
                 buttonUp = exUIEvent.MouseButtonFlags.Left;
             else if ( Input.GetMouseButtonUp(1) )
@@ -516,57 +531,77 @@ public class exUIMng : MonoBehaviour {
             // add hover-in event
             if ( mouseState.hotElement != null ) {
                 exUIEvent e = new exUIEvent(); 
-                e.type =  exUIEvent.Type.PointerEnter;
+                e.category = exUIEvent.Category.Mouse;
+                e.type =  exUIEvent.Type.MouseEnter;
                 e.position = mouseState.currentPos;
                 e.delta = deltaPos;
-                e.target = mouseState.hotElement;
                 e.buttons = mouseState.currentButtons;
-                eventInfoList.Add(e);
+
+                EventInfo info = new EventInfo();
+                info.primaryElement = mouseState.hotElement;
+                info.uiEvent = e;
+                eventInfoList.Add(info);
             }
 
             // add hover-out event
             if ( lastHotElement != null ) {
                 exUIEvent e = new exUIEvent(); 
-                e.type =  exUIEvent.Type.PointerExit;
+                e.category = exUIEvent.Category.Mouse;
+                e.type =  exUIEvent.Type.MouseExit;
                 e.position = mouseState.currentPos;
                 e.delta = deltaPos;
-                e.target = lastHotElement;
                 e.buttons = mouseState.currentButtons;
-                eventInfoList.Add(e);
+
+                EventInfo info = new EventInfo();
+                info.primaryElement = lastHotElement;
+                info.uiEvent = e;
+                eventInfoList.Add(info);
             }
         }
 
         // add pointer-move event
         if ( mouseState.focusElement != null && deltaPos != Vector2.zero ) {
             exUIEvent e = new exUIEvent(); 
-            e.type =  exUIEvent.Type.PointerMove;
+            e.category = exUIEvent.Category.Mouse;
+            e.type =  exUIEvent.Type.MouseMove;
             e.position = mouseState.currentPos;
             e.delta = deltaPos;
-            e.target = mouseState.focusElement;
             e.buttons = mouseState.currentButtons;
-            eventInfoList.Add(e);
+
+            EventInfo info = new EventInfo();
+            info.primaryElement = mouseState.focusElement;
+            info.uiEvent = e;
+            eventInfoList.Add(info);
         }
 
         // add pointer-press event
         if ( mouseState.hotElement != null && buttonDown != exUIEvent.MouseButtonFlags.None ) {
             exUIEvent e = new exUIEvent(); 
-            e.type =  exUIEvent.Type.PointerPress;
+            e.category = exUIEvent.Category.Mouse;
+            e.type =  exUIEvent.Type.MouseDown;
             e.position = mouseState.currentPos;
             e.delta = deltaPos;
-            e.target = mouseState.hotElement;
             e.buttons = buttonDown;
-            eventInfoList.Add(e);
+
+            EventInfo info = new EventInfo();
+            info.primaryElement = mouseState.hotElement;
+            info.uiEvent = e;
+            eventInfoList.Add(info);
         }
 
-        // add pointer-press event
+        // add pointer-release event
         if ( mouseState.focusElement != null && buttonUp != exUIEvent.MouseButtonFlags.None ) {
             exUIEvent e = new exUIEvent(); 
-            e.type =  exUIEvent.Type.PointerRelease;
+            e.category = exUIEvent.Category.Mouse;
+            e.type =  exUIEvent.Type.MouseUp;
             e.position = mouseState.currentPos;
             e.delta = deltaPos;
-            e.target = mouseState.focusElement;
             e.buttons = buttonUp;
-            eventInfoList.Add(e);
+
+            EventInfo info = new EventInfo();
+            info.primaryElement = mouseState.focusElement;
+            info.uiEvent = e;
+            eventInfoList.Add(info);
         }
     }
 

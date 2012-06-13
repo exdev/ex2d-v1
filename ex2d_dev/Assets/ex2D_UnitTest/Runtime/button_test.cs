@@ -23,25 +23,15 @@ public class button_test : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    void Awake () {
-        exUIButton button = GetComponent<exUIButton>();
-        button.OnButtonPress += OnButtonPress;
-        button.OnButtonRelease += OnButtonRelease;
+    void OnPress ( exUIEvent _e ) {
+        Debug.Log("OnPress");
     }
 
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    void OnButtonPress () {
-        Debug.Log("OnButtonPress");
-    }
-
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
-    void OnButtonRelease () {
-        Debug.Log("OnButtonRelease");
+    void OnRelease ( exUIEvent _e ) {
+        Debug.Log("OnRelease");
     }
 }

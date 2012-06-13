@@ -60,44 +60,44 @@ public class exUIPanel : exUIElement {
     // ------------------------------------------------------------------ 
 
     public override bool OnEvent ( exUIEvent _e ) {
-        switch ( _e.type ) {
-        case exUIEvent.Type.PointerEnter: 
-            if ( OnHoverIn != null ) {
-                OnHoverIn ();
-                return true;
-            }
-            return false;
+        // switch ( _e.type ) {
+        // case exUIEvent.Type.PointerEnter: 
+        //     if ( OnHoverIn != null ) {
+        //         OnHoverIn ();
+        //         return true;
+        //     }
+        //     return false;
 
-        case exUIEvent.Type.PointerExit: 
-            if ( OnHoverOut != null ) {
-                OnHoverOut ();
-                return true;
-            }
-            return false;
+        // case exUIEvent.Type.PointerExit: 
+        //     if ( OnHoverOut != null ) {
+        //         OnHoverOut ();
+        //         return true;
+        //     }
+        //     return false;
 
-        case exUIEvent.Type.PointerPress: 
-            exUIMng.focus = this;
-            if ( OnButtonPress != null ) {
-                OnButtonPress ();
-                return true;
-            }
-            return false;
+        // case exUIEvent.Type.PointerPress: 
+        //     exUIMng.focus = this;
+        //     if ( OnButtonPress != null ) {
+        //         OnButtonPress ();
+        //         return true;
+        //     }
+        //     return false;
 
-        case exUIEvent.Type.PointerRelease: 
-            exUIMng.focus = null;
-            if ( OnButtonRelease != null ) {
-                OnButtonRelease ();
-                return true;
-            }
-            return false;
+        // case exUIEvent.Type.PointerRelease: 
+        //     exUIMng.focus = null;
+        //     if ( OnButtonRelease != null ) {
+        //         OnButtonRelease ();
+        //         return true;
+        //     }
+        //     return false;
 
-        case exUIEvent.Type.PointerMove: 
-            if ( OnPointerMove != null ) {
-                OnPointerMove ();
-                return false;
-            }
-            return true;
-        }
+        // case exUIEvent.Type.PointerMove: 
+        //     if ( OnPointerMove != null ) {
+        //         OnPointerMove ();
+        //         return false;
+        //     }
+        //     return true;
+        // }
 
         return false;
     }

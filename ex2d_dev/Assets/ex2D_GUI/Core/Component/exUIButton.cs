@@ -24,15 +24,6 @@ using System.Collections.Generic;
 [AddComponentMenu("ex2D GUI/Button")]
 public class exUIButton : exUIElement {
 
-    // delegates
-	public delegate void EventHandler ();
-
-    // events
-	public event EventHandler OnHoverIn;
-	public event EventHandler OnHoverOut;
-	public event EventHandler OnButtonPress;
-	public event EventHandler OnButtonRelease;
-
     // TODO { 
     // ///////////////////////////////////////////////////////////////////////////////
     // // serializable
@@ -98,56 +89,115 @@ public class exUIButton : exUIElement {
     public override bool OnEvent ( exUIEvent _e ) {
         exUIMng uimng = exUIMng.instance;
 
-        if ( _e.type == exUIEvent.Type.MouseEnter ||
-             _e.type == exUIEvent.Type.TouchEnter )
-        {
-            if ( OnHoverIn != null ) OnHoverIn ();
-            return true;
-        }
-        else if ( _e.type == exUIEvent.Type.MouseExit )
-        {
-            if ( uimng.GetMouseFocus() == this ) {
-                isPressing = false;
-                uimng.SetMouseFocus(null);
+        if ( _e.category == exUIEvent.Category.Mouse ) {
+            if ( _e.type == exUIEvent.Type.MouseEnter ) {
+                OnHoverIn (_e);
+                return true;
             }
-            if ( OnHoverOut != null ) OnHoverOut();
-            return true;
-        }
-        else if ( _e.type == exUIEvent.Type.TouchExit )
-        {
-            if ( uimng.GetTouchFocus(_e.touchID) == this ) {
-                isPressing = false;
-                uimng.SetTouchFocus( _e.touchID, null );
+            else if ( _e.type == exUIEvent.Type.MouseExit ) {
+                if ( uimng.GetMouseFocus() == this ) {
+                    isPressing = false;
+                    uimng.SetMouseFocus(null);
+                }
+                OnHoverOut(_e);
+                return true;
             }
-            if ( OnHoverOut != null ) OnHoverOut();
-            return true;
+            else if ( _e.type == exUIEvent.Type.MouseDown &&
+                      _e.buttons == exUIEvent.MouseButtonFlags.Left ) 
+            {
+                uimng.SetMouseFocus( this );
+                isPressing = true;
+                OnPress(_e);
+                return true;
+            }
+            else if ( _e.type == exUIEvent.Type.MouseUp &&
+                      _e.buttons == exUIEvent.MouseButtonFlags.Left )
+            {
+                if ( isPressing ) {
+                    uimng.SetMouseFocus( null );
+                    isPressing = false;
+                    OnClick(_e);
+                }
+                OnRelease(_e);
+                OnHoverOut(_e);
+                return true;
+            }
+        }
+        else if ( _e.category == exUIEvent.Category.Touch ) {
+            if ( _e.type == exUIEvent.Type.TouchEnter ) {
+                OnHoverIn (_e);
+                return true;
+            }
+            else if ( _e.type == exUIEvent.Type.TouchExit ) {
+                if ( uimng.GetTouchFocus(_e.touchID) == this ) {
+                    isPressing = false;
+                    uimng.SetTouchFocus( _e.touchID, null );
+                }
+                OnHoverOut(_e);
+                return true;
+            }
+            else if ( _e.type == exUIEvent.Type.TouchDown ) {
+                uimng.SetTouchFocus( _e.touchID, this );
+                isPressing = true;
+                OnPress(_e);
+                return true;
+            }
+            else if ( _e.type == exUIEvent.Type.TouchUp ) {
+                if ( isPressing ) {
+                    uimng.SetTouchFocus( _e.touchID, null );
+                    isPressing = false;
+                    OnClick(_e);
+                }
+                OnRelease(_e);
+                OnHoverOut(_e);
+                return true;
+            }
         }
 
-        // TODO { 
-        // case exUIEvent.Type.PointerPress: 
-        //     if ( _e.buttons == exUIEvent.MouseButtonFlags.Left ||
-        //          _e.buttons == exUIEvent.MouseButtonFlags.Touch ) {
-        //         isPressing = true;
-        //         uimng.focus = this;
-        //         if ( OnButtonPress != null ) OnButtonPress ();
-        //     }
-        //     return true;
-
-        // case exUIEvent.Type.PointerRelease: 
-        //     if ( _e.buttons == exUIEvent.MouseButtonFlags.Left ||
-        //          _e.buttons == exUIEvent.MouseButtonFlags.Touch ) {
-        //         uimng.focus = null;
-        //         if ( isPressing ) {
-        //             isPressing = false;
-        //             if ( OnButtonRelease != null ) OnButtonRelease ();
-        //             if ( OnHoverOut != null ) OnHoverOut();
-        //         }
-        //     }
-        //     return true;
-        // }
-        // } TODO end 
-
+        //
         return false;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+	public virtual void OnHoverIn ( exUIEvent _e ) {
+        // TODO: message info send to the right game object
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+	public virtual void OnHoverOut ( exUIEvent _e ) {
+        // TODO: message info send to the right game object
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+	public virtual void OnPress ( exUIEvent _e ) {
+        // TODO: message info send to the right game object
+        Debug.Log("OnPress");
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+	public virtual void OnRelease ( exUIEvent _e ) {
+        // TODO: message info send to the right game object
+        Debug.Log("OnRelease");
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+	public virtual void OnClick ( exUIEvent _e ) {
+        // TODO: message info send to the right game object
     }
 
 }
