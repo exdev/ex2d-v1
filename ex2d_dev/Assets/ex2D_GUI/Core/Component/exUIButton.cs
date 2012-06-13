@@ -96,40 +96,56 @@ public class exUIButton : exUIElement {
     // ------------------------------------------------------------------ 
 
     public override bool OnEvent ( exUIEvent _e ) {
-        switch ( _e.type ) {
-        case exUIEvent.Type.PointerEnter: 
+        exUIMng uimng = exUIMng.instance;
+
+        if ( _e.type == exUIEvent.Type.MouseEnter ||
+             _e.type == exUIEvent.Type.TouchEnter )
+        {
             if ( OnHoverIn != null ) OnHoverIn ();
             return true;
-
-        case exUIEvent.Type.PointerExit: 
-            if ( exUIMng.focus == this ) {
+        }
+        else if ( _e.type == exUIEvent.Type.MouseExit )
+        {
+            if ( uimng.GetMouseFocus() == this ) {
                 isPressing = false;
-                exUIMng.focus = null;
+                uimng.SetMouseFocus(null);
             }
             if ( OnHoverOut != null ) OnHoverOut();
             return true;
-
-        case exUIEvent.Type.PointerPress: 
-            if ( _e.buttons == exUIEvent.PointerButtonFlags.Left ||
-                 _e.buttons == exUIEvent.PointerButtonFlags.Touch ) {
-                isPressing = true;
-                exUIMng.focus = this;
-                if ( OnButtonPress != null ) OnButtonPress ();
+        }
+        else if ( _e.type == exUIEvent.Type.TouchExit )
+        {
+            if ( uimng.GetTouchFocus(_e.touchID) == this ) {
+                isPressing = false;
+                uimng.SetTouchFocus( _e.touchID, null );
             }
-            return true;
-
-        case exUIEvent.Type.PointerRelease: 
-            if ( _e.buttons == exUIEvent.PointerButtonFlags.Left ||
-                 _e.buttons == exUIEvent.PointerButtonFlags.Touch ) {
-                exUIMng.focus = null;
-                if ( isPressing ) {
-                    isPressing = false;
-                    if ( OnButtonRelease != null ) OnButtonRelease ();
-                    if ( OnHoverOut != null ) OnHoverOut();
-                }
-            }
+            if ( OnHoverOut != null ) OnHoverOut();
             return true;
         }
+
+        // TODO { 
+        // case exUIEvent.Type.PointerPress: 
+        //     if ( _e.buttons == exUIEvent.MouseButtonFlags.Left ||
+        //          _e.buttons == exUIEvent.MouseButtonFlags.Touch ) {
+        //         isPressing = true;
+        //         uimng.focus = this;
+        //         if ( OnButtonPress != null ) OnButtonPress ();
+        //     }
+        //     return true;
+
+        // case exUIEvent.Type.PointerRelease: 
+        //     if ( _e.buttons == exUIEvent.MouseButtonFlags.Left ||
+        //          _e.buttons == exUIEvent.MouseButtonFlags.Touch ) {
+        //         uimng.focus = null;
+        //         if ( isPressing ) {
+        //             isPressing = false;
+        //             if ( OnButtonRelease != null ) OnButtonRelease ();
+        //             if ( OnHoverOut != null ) OnHoverOut();
+        //         }
+        //     }
+        //     return true;
+        // }
+        // } TODO end 
 
         return false;
     }

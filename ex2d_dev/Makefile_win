@@ -57,8 +57,8 @@ rebuild_ex2d: |clean_ex2d ex2d
 
 gui: $(EX2D_GUI_RUNTIME_TARGET) $(EX2D_GUI_EDITOR_TARGET) 
 clean_gui: 
-	$(RM) $(EX2D_GUI_RUNTIME_TARGET) 
-	$(RM) $(EX2D_GUI_EDITOR_TARGET) 
+	del /F ..\ex2d_gui_submit\Assets\ex2D_GUI\Core\ex2D.Runtime.dll
+	del /F ..\ex2d_gui_submit\Assets\ex2D_GUI\Editor\ex2D.Editor.dll
 rebuild_gui: |clean_gui gui 
 
 clean_all: |clean_ex2d
