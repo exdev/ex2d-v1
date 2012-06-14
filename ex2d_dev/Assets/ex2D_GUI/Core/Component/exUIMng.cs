@@ -388,18 +388,18 @@ public class exUIMng : MonoBehaviour {
                     info.primaryElement = hotElement;
                     info.uiEvent = e;
                     eventInfoList.Add(info);
+                }
 
-                    // NOTE: it must be null
-                    if ( touchState == null ) {
-                        touchState = new TouchState();
-                        touchState.touchID = touch.fingerId;
-                        touchState.hotElement = hotElement;
-                        touchState.focusElement = null;
-                        touchStateList.Add(touchState);
-                    }
-                    else {
-                        Debug.LogError( "something wrong that the touch state is exists while touch just began" );
-                    }
+                // NOTE: it must be null
+                if ( touchState == null ) {
+                    touchState = new TouchState();
+                    touchState.touchID = touch.fingerId;
+                    touchState.hotElement = hotElement;
+                    touchState.focusElement = null;
+                    touchStateList.Add(touchState);
+                }
+                else {
+                    Debug.LogError( "something wrong that the touch state is exists while touch just began" );
                 }
             }
             else if ( touch.phase == TouchPhase.Ended ) {
@@ -452,7 +452,7 @@ public class exUIMng : MonoBehaviour {
                         e.touchID = touch.fingerId;
 
                         EventInfo info = new EventInfo();
-                        info.primaryElement = hotElement;
+                        info.primaryElement = lastHotElement;
                         info.uiEvent = e;
                         eventInfoList.Add(info);
                     }

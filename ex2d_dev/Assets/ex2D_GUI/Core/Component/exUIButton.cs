@@ -119,7 +119,6 @@ public class exUIButton : exUIElement {
                     OnClick(_e);
                 }
                 OnRelease(_e);
-                OnHoverOut(_e);
                 return true;
             }
         }
@@ -164,6 +163,7 @@ public class exUIButton : exUIElement {
 
 	public virtual void OnHoverIn ( exUIEvent _e ) {
         // TODO: message info send to the right game object
+        Debug.Log("OnHoverIn");
     }
 
     // ------------------------------------------------------------------ 
@@ -172,6 +172,7 @@ public class exUIButton : exUIElement {
 
 	public virtual void OnHoverOut ( exUIEvent _e ) {
         // TODO: message info send to the right game object
+        Debug.Log("OnHoverOut");
     }
 
     // ------------------------------------------------------------------ 
@@ -198,6 +199,7 @@ public class exUIButton : exUIElement {
 
 	public virtual void OnClick ( exUIEvent _e ) {
         // TODO: message info send to the right game object
+        Debug.Log("OnClick");
     }
 
 }
