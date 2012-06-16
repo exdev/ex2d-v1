@@ -515,7 +515,7 @@ partial class exSpriteAnimClipEditor : EditorWindow {
              Event.current.button == 0 && 
              Event.current.clickCount == 1 ) {
 
-            Rect needleRect = new Rect ( spriteAnimClipRect.x + curEdit.editorOffset, 
+            Rect needleRect = new Rect ( spriteAnimClipRect.x,
                                          spriteAnimClipRect.y - 10.0f,
                                          spriteAnimClipRect.width,
                                          30.0f );

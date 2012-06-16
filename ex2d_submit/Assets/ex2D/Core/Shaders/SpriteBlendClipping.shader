@@ -42,7 +42,7 @@ Shader "ex2D/Alpha Blended (Clipping)" {
 			sampler2D _MainTex;
 			float4 _MainTex_ST;
 			float4 _ClipRect = float4(0.0, 0.0, 1.0, 1.0);
-			float4x4 _ClipRotation;
+			float4x4 _ClipMatrix;
 
 			struct appdata_t {
 				float4 vertex   : POSITION;
@@ -60,14 +60,7 @@ Shader "ex2D/Alpha Blended (Clipping)" {
 			v2f vert ( appdata_t _in ) {
 				v2f o;
                 float4 wpos = mul(_Object2World, _in.vertex);
-                o.worldPosition = mul(_ClipRotation, wpos).xy;
-
-                // DELME { 
-                // float4 wpos = mul(_in.vertex, _ClipRotation); // NOTE: here we inverse multiple the transform
-                // float4 wpos = mul(_ClipRotation,_in.vertex); // NOTE: here we inverse multiple the transform
-                // o.worldPosition = mul(_Object2World, wpos).xy;
-                // } DELME end 
-
+                o.worldPosition = mul(_ClipMatrix, wpos).xy;
 				o.vertex = mul(UNITY_MATRIX_MVP, _in.vertex);
 				o.color = _in.color;
 				o.texcoord = TRANSFORM_TEX(_in.texcoord, _MainTex);
