@@ -134,6 +134,10 @@ public class exSpriteEditor : exSpriteBaseEditor {
 
         // get atlas and index from textureGUID
         if ( !EditorApplication.isPlaying ) {
+            // if we don't use atlas and current edit target use atlas, clear it.
+            if ( editSprite.useAtlas != useAtlas )
+                editSprite.Clear();
+
             // if we use atlas, check if the atlas,index changes
             if ( useAtlas ) {
                 if ( editAtlas != editSprite.atlas ||
@@ -142,11 +146,6 @@ public class exSpriteEditor : exSpriteBaseEditor {
                     editSprite.SetSprite( editAtlas, editIndex );
                     GUI.changed = true;
                 }
-            }
-            // if we don't use atlas and current edit target use atlas, clear it.
-            else {
-                if ( editSprite.useAtlas )
-                    editSprite.Clear();
             }
 
             // check if we are first time assignment
