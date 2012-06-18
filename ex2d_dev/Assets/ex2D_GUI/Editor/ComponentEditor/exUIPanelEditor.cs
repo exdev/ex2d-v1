@@ -81,8 +81,10 @@ public class exUIPanelEditor : exUIElementEditor {
         // check dirty 
         // ======================================================== 
 
-        if ( EditorApplication.isPlaying == false )
-            editPanel.Sync();
+        // DELME { 
+        // if ( EditorApplication.isPlaying == false )
+        //     editPanel.Sync();
+        // } DELME end 
 
         if ( GUI.changed )
             EditorUtility.SetDirty (editPanel);
@@ -99,8 +101,10 @@ public class exUIPanelEditor : exUIElementEditor {
         // check dirty 
         // ======================================================== 
 
-        if ( EditorApplication.isPlaying == false )
-            editPanel.Sync();
+        // DELME { 
+        // if ( EditorApplication.isPlaying == false )
+        //     editPanel.Sync();
+        // } DELME end 
 
         if ( GUI.changed )
             EditorUtility.SetDirty (editPanel);

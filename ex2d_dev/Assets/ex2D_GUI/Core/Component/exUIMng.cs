@@ -629,6 +629,8 @@ public class exUIMng : MonoBehaviour {
             // return null;
             // } DISABLE end 
 
+            // TODO: consider clipping plane
+
             List<exUIElement> elements = new List<exUIElement>();
             for ( int i = 0; i < hits.Length; ++i ) {
                 RaycastHit hit = hits[i];
@@ -664,6 +666,15 @@ public class exUIMng : MonoBehaviour {
         if ( _el.enabled == false )
             return null;
 
+        // if we are out of clipping plane
+        if ( _el.clippingPlane != null ) {
+            Vector2 clipPos = new Vector2( _pos.x - _el.clippingPlane.transform.position.x, 
+                                           _pos.y - _el.clippingPlane.transform.position.y );
+            if ( _el.clippingPlane.boundingRect.Contains(clipPos) == false )
+                return null;
+        }
+
+        //
         Vector2 localPos = new Vector2( _pos.x - _el.transform.position.x, 
                                         _pos.y - _el.transform.position.y );
         if ( _el.boundingRect.Contains(localPos) ) {

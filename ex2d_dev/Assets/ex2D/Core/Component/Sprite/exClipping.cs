@@ -143,14 +143,7 @@ public class exClipping : exPlane {
         }
 
         // 
-        for ( int i = 0; i < planeInfoList.Count; ++i ) {
-            PlaneInfo pi = planeInfoList[i];
-            if ( pi.plane )
-                pi.plane.renderer.sharedMaterial = pi.material;
-        }
-        planeInfoList.Clear();
-        textureToClipMaterialTable.Clear();
-        clipMaterialList.Clear();
+        Clear();
     }
 
     // ------------------------------------------------------------------ 
@@ -309,6 +302,21 @@ public class exClipping : exPlane {
                 CheckAndRemoveClipMaterial(_plane.renderer.sharedMaterial.mainTexture as Texture2D);
         }
         return result;
+    }
+
+    // ------------------------------------------------------------------ 
+    /// remove all planes from clipping list
+    // ------------------------------------------------------------------ 
+
+    public void Clear () {
+        for ( int i = 0; i < planeInfoList.Count; ++i ) {
+            PlaneInfo pi = planeInfoList[i];
+            if ( pi.plane )
+                pi.plane.renderer.sharedMaterial = pi.material;
+        }
+        planeInfoList.Clear();
+        textureToClipMaterialTable.Clear();
+        clipMaterialList.Clear();
     }
 
     // ------------------------------------------------------------------ 

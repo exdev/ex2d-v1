@@ -40,20 +40,22 @@ public class exUIPanel : exUIElement {
     // functions
     ///////////////////////////////////////////////////////////////////////////////
 
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
+    // DELME { 
+    // // ------------------------------------------------------------------ 
+    // // Desc: 
+    // // ------------------------------------------------------------------ 
 
-    public override void Sync () {
-        base.Sync ();
+    // public override void Sync () {
+    //     base.Sync ();
 
-        if ( background ) {
-            background.anchor = anchor;
-            background.width = width;
-            background.height = height;
-            background.transform.localPosition = new Vector3 ( 0.0f, 0.0f, background.transform.localPosition.z );
-        }
-    }
+    //     if ( background ) {
+    //         background.anchor = anchor;
+    //         background.width = width;
+    //         background.height = height;
+    //         background.transform.localPosition = new Vector3 ( 0.0f, 0.0f, background.transform.localPosition.z );
+    //     }
+    // }
+    // } DELME end 
 
     // ------------------------------------------------------------------ 
     // Desc: 

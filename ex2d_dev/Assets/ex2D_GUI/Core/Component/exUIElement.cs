@@ -162,28 +162,30 @@ public class exUIElement : exPlane {
     // functions
     ///////////////////////////////////////////////////////////////////////////////
 
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
+    // DELME { 
+    // // ------------------------------------------------------------------ 
+    // // Desc: 
+    // // ------------------------------------------------------------------ 
 
-    void Reset () {
-        // add box collider
-        BoxCollider boxCollider = GetComponent<BoxCollider>();
-        if ( boxCollider == null ) {
-            boxCollider = gameObject.AddComponent<BoxCollider>();
-            boxCollider.center = new Vector3( boxCollider.center.x, boxCollider.center.y, 0.2f );
-        }
+    // void Reset () {
+    //     // add box collider
+    //     BoxCollider boxCollider = GetComponent<BoxCollider>();
+    //     if ( boxCollider == null ) {
+    //         boxCollider = gameObject.AddComponent<BoxCollider>();
+    //         boxCollider.center = new Vector3( boxCollider.center.x, boxCollider.center.y, 0.2f );
+    //     }
 
-        // add collision helper
-        exCollisionHelper collisionHelper = GetComponent<exCollisionHelper>();
-        if ( collisionHelper == null ) {
-            collisionHelper = gameObject.AddComponent<exCollisionHelper>();
-            collisionHelper.plane = this;
-            collisionHelper.autoLength = false;
-            collisionHelper.length = 0.2f;
-            collisionHelper.UpdateCollider();
-        }
-    }
+    //     // add collision helper
+    //     exCollisionHelper collisionHelper = GetComponent<exCollisionHelper>();
+    //     if ( collisionHelper == null ) {
+    //         collisionHelper = gameObject.AddComponent<exCollisionHelper>();
+    //         collisionHelper.plane = this;
+    //         collisionHelper.autoLength = false;
+    //         collisionHelper.length = 0.2f;
+    //         collisionHelper.UpdateCollider();
+    //     }
+    // }
+    // } DELME end 
 
     // ------------------------------------------------------------------ 
     // Desc: 

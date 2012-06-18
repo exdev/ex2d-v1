@@ -32,7 +32,6 @@ public class exUIButton : exUIElement {
     // public List<MessageInfo> messageInfos = new List<MessageInfo>();
     // } TODO end 
 
-
     // ------------------------------------------------------------------ 
     [SerializeField] protected string text_ = "";
     /// the text of the button

@@ -119,8 +119,10 @@ public class exUIScrollViewEditor : exUIElementEditor {
         // check dirty 
         // ======================================================== 
 
-        if ( EditorApplication.isPlaying == false )
-            editScrollView.Sync();
+        // DELME { 
+        // if ( EditorApplication.isPlaying == false )
+        //     editScrollView.Sync();
+        // } DELME end 
 
         if ( GUI.changed )
             EditorUtility.SetDirty (editScrollView);
@@ -137,8 +139,10 @@ public class exUIScrollViewEditor : exUIElementEditor {
         // check dirty 
         // ======================================================== 
 
-        if ( EditorApplication.isPlaying == false )
-            editScrollView.Sync();
+        // DELME { 
+        // if ( EditorApplication.isPlaying == false )
+        //     editScrollView.Sync();
+        // } DELME end 
 
         if ( GUI.changed )
             EditorUtility.SetDirty (editScrollView);

@@ -24,7 +24,8 @@ public class exUIElementEditor : exPlaneEditor {
     // properties
     ///////////////////////////////////////////////////////////////////////////////
 
-    private exUIElement editElement;
+    SerializedProperty widthProp;
+    SerializedProperty heightProp;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -36,9 +37,8 @@ public class exUIElementEditor : exPlaneEditor {
 
     protected new void OnEnable () {
         base.OnEnable();
-        if ( target != editElement ) {
-            editElement = target as exUIElement;
-        }
+        widthProp = serializedObject.FindProperty ("width_");
+        heightProp = serializedObject.FindProperty ("height_");
     }
 
     // ------------------------------------------------------------------ 
@@ -54,34 +54,21 @@ public class exUIElementEditor : exPlaneEditor {
         base.OnInspectorGUI();
         GUILayout.Space(20);
 
+        // ======================================================== 
+        // 
+        // ======================================================== 
+
         EditorGUIUtility.LookLikeInspector ();
-        EditorGUI.indentLevel = 1;
 
-        // ======================================================== 
-        // width
-        // ======================================================== 
+        EditorGUILayout.PropertyField( widthProp, new GUIContent("Width") );
+        EditorGUILayout.PropertyField( heightProp, new GUIContent("Height") );
 
-        GUI.enabled = !inAnimMode;
-        editElement.width = EditorGUILayout.FloatField( "Width", editElement.width );
-        GUI.enabled = true;
+        // DELME { 
+        // if ( EditorApplication.isPlaying == false )
+        //     curEdit.Sync();
+        // } DELME end 
 
-        // ======================================================== 
-        // height
-        // ======================================================== 
-
-        GUI.enabled = !inAnimMode;
-        editElement.height = EditorGUILayout.FloatField( "Height", editElement.height );
-        GUI.enabled = true;
-
-        // ======================================================== 
-        // check dirty 
-        // ======================================================== 
-
-        if ( EditorApplication.isPlaying == false )
-            editElement.Sync();
-
-        if ( GUI.changed )
-            EditorUtility.SetDirty (editElement);
+        serializedObject.ApplyModifiedProperties ();
     }
 
     // ------------------------------------------------------------------ 
@@ -89,19 +76,20 @@ public class exUIElementEditor : exPlaneEditor {
     // ------------------------------------------------------------------ 
 
     protected virtual void OnSceneGUI () {
+        exUIElement curEdit = target as exUIElement;
 
         //
         Vector3[] vertices = new Vector3[4]; 
         Vector3[] corners = new Vector3[5];
         Vector3[] controls = new Vector3[8];
 
-        float halfWidthScaled = editElement.width * 0.5f;
-        float halfHeightScaled = editElement.height * 0.5f;
+        float halfWidthScaled = curEdit.width * 0.5f;
+        float halfHeightScaled = curEdit.height * 0.5f;
         float offsetX = 0.0f;
         float offsetY = 0.0f;
 
         //
-        switch ( editElement.anchor ) {
+        switch ( curEdit.anchor ) {
         case exPlane.Anchor.TopLeft     : offsetX = -halfWidthScaled;   offsetY = -halfHeightScaled;  break;
         case exPlane.Anchor.TopCenter   : offsetX = 0.0f;               offsetY = -halfHeightScaled;  break;
         case exPlane.Anchor.TopRight    : offsetX = halfWidthScaled;    offsetY = -halfHeightScaled;  break;
@@ -123,37 +111,11 @@ public class exUIElementEditor : exPlaneEditor {
         vertices[2] = new Vector3 ( halfWidthScaled-offsetX, -halfHeightScaled+offsetY, 0.0f );
         vertices[3] = new Vector3 (-halfWidthScaled-offsetX, -halfHeightScaled+offsetY, 0.0f );
 
-        // DELME { 
-        // //
-        // switch ( editElement.plane ) {
-        // case exPlane.Plane.XY:
-        //     vertices[0] = new Vector3 (-halfWidthScaled-offsetX,  halfHeightScaled+offsetY, 0.0f );
-        //     vertices[1] = new Vector3 ( halfWidthScaled-offsetX,  halfHeightScaled+offsetY, 0.0f );
-        //     vertices[2] = new Vector3 ( halfWidthScaled-offsetX, -halfHeightScaled+offsetY, 0.0f );
-        //     vertices[3] = new Vector3 (-halfWidthScaled-offsetX, -halfHeightScaled+offsetY, 0.0f );
-        //     break;
-
-        // case exPlane.Plane.XZ:
-        //     vertices[0] = new Vector3 (-halfWidthScaled-offsetX, 0.0f,  halfHeightScaled+offsetY );
-        //     vertices[1] = new Vector3 ( halfWidthScaled-offsetX, 0.0f,  halfHeightScaled+offsetY );
-        //     vertices[2] = new Vector3 ( halfWidthScaled-offsetX, 0.0f, -halfHeightScaled+offsetY );
-        //     vertices[3] = new Vector3 (-halfWidthScaled-offsetX, 0.0f, -halfHeightScaled+offsetY );
-        //     break;
-
-        // case exPlane.Plane.ZY:
-        //     vertices[0] = new Vector3 (0.0f,  halfHeightScaled+offsetY, -halfWidthScaled-offsetX );
-        //     vertices[1] = new Vector3 (0.0f,  halfHeightScaled+offsetY,  halfWidthScaled-offsetX );
-        //     vertices[2] = new Vector3 (0.0f, -halfHeightScaled+offsetY,  halfWidthScaled-offsetX );
-        //     vertices[3] = new Vector3 (0.0f, -halfHeightScaled+offsetY, -halfWidthScaled-offsetX );
-        //     break;
-        // }
-        // } DELME end 
-
         // 0 -- 1
         // |    |
         // 3 -- 2
 
-        Transform trans = editElement.transform;
+        Transform trans = curEdit.transform;
         corners[0] = trans.localToWorldMatrix * new Vector4 ( vertices[0].x, vertices[0].y, vertices[0].z, 1.0f );
         corners[1] = trans.localToWorldMatrix * new Vector4 ( vertices[1].x, vertices[1].y, vertices[1].z, 1.0f );
         corners[2] = trans.localToWorldMatrix * new Vector4 ( vertices[2].x, vertices[2].y, vertices[2].z, 1.0f );
@@ -189,21 +151,23 @@ public class exUIElementEditor : exPlaneEditor {
             Handles.color = new Color( 1.0f, 1.0f, 0.0f, 0.5f );
 
             Vector3 newPos = Handles.FreeMoveHandle( pos,
-                                                     editElement.transform.rotation,
+                                                     curEdit.transform.rotation,
                                                      HandleUtility.GetHandleSize(pos) / 20.0f,
                                                      Vector3.zero,
                                                      Handles.DotCap
                                                    );
             HandleRezie ( i, pos, newPos );
         }
-        // Handles.Label( editElement.transform.position + Vector3.up * 2,
-        //                "Size = " + editElement.width + " x " + editElement.height );
+        // Handles.Label( curEdit.transform.position + Vector3.up * 2,
+        //                "Size = " + curEdit.width + " x " + curEdit.height );
 
-        if ( EditorApplication.isPlaying == false )
-            editElement.Sync();
+        // DELME { 
+        // if ( EditorApplication.isPlaying == false )
+        //     curEdit.Sync();
+        // } DELME end 
 
         if ( GUI.changed )
-            EditorUtility.SetDirty (editElement);
+            EditorUtility.SetDirty (curEdit);
     }
 
     // ------------------------------------------------------------------ 
@@ -215,12 +179,14 @@ public class exUIElementEditor : exPlaneEditor {
             return;
         }
 
+        exUIElement curEdit = target as exUIElement;
+
         //
         float dx, dy;
         GetDelatSize ( _newPos - _oldPos, out dx, out dy );
 
-        float oldWidth = editElement.width;
-        float oldHeight = editElement.height;
+        float oldWidth = curEdit.width;
+        float oldHeight = curEdit.height;
         float xRatio = 1.0f;
         float yRatio = 1.0f;
 
@@ -231,7 +197,7 @@ public class exUIElementEditor : exPlaneEditor {
         // 6 -- 5 -- 4
 
         if ( _handleID == 0 ) {
-            switch ( editElement.anchor ) {
+            switch ( curEdit.anchor ) {
             case exPlane.Anchor.TopLeft:     xRatio = -1.0f; yRatio = 1.0f; break;
             case exPlane.Anchor.TopCenter:   xRatio = -0.5f; yRatio = 1.0f; break;
             case exPlane.Anchor.TopRight:    xRatio = -0.0f; yRatio = 1.0f; break;
@@ -242,10 +208,10 @@ public class exUIElementEditor : exPlaneEditor {
             case exPlane.Anchor.BotCenter:   xRatio = -0.5f; yRatio = 0.0f; break;
             case exPlane.Anchor.BotRight:    xRatio = -0.0f; yRatio = 0.0f; break;
             }
-            editElement.width -= dx; editElement.height += dy;
+            curEdit.width -= dx; curEdit.height += dy;
         }
         else if ( _handleID == 1 ) {
-            switch ( editElement.anchor ) {
+            switch ( curEdit.anchor ) {
             case exPlane.Anchor.TopLeft:     xRatio = 0.0f; yRatio = 1.0f; break;
             case exPlane.Anchor.TopCenter:   xRatio = 0.0f; yRatio = 1.0f; break;
             case exPlane.Anchor.TopRight:    xRatio = 0.0f; yRatio = 1.0f; break;
@@ -256,10 +222,10 @@ public class exUIElementEditor : exPlaneEditor {
             case exPlane.Anchor.BotCenter:   xRatio = 0.0f; yRatio = 0.0f; break;
             case exPlane.Anchor.BotRight:    xRatio = 0.0f; yRatio = 0.0f; break;
             }
-            editElement.height += dy;
+            curEdit.height += dy;
         }
         else if ( _handleID == 2 ) {
-            switch ( editElement.anchor ) {
+            switch ( curEdit.anchor ) {
             case exPlane.Anchor.TopLeft:     xRatio = 0.0f; yRatio = 1.0f; break;
             case exPlane.Anchor.TopCenter:   xRatio = 0.5f; yRatio = 1.0f; break;
             case exPlane.Anchor.TopRight:    xRatio = 1.0f; yRatio = 1.0f; break;
@@ -270,10 +236,10 @@ public class exUIElementEditor : exPlaneEditor {
             case exPlane.Anchor.BotCenter:   xRatio = 0.5f; yRatio = 0.0f; break;
             case exPlane.Anchor.BotRight:    xRatio = 1.0f; yRatio = 0.0f; break;
             }
-            editElement.width += dx; editElement.height += dy;
+            curEdit.width += dx; curEdit.height += dy;
         }
         else if ( _handleID == 3 ) {
-            switch ( editElement.anchor ) {
+            switch ( curEdit.anchor ) {
             case exPlane.Anchor.TopLeft:     xRatio = 0.0f; yRatio = 0.0f; break;
             case exPlane.Anchor.TopCenter:   xRatio = 0.5f; yRatio = 0.0f; break;
             case exPlane.Anchor.TopRight:    xRatio = 1.0f; yRatio = 0.0f; break;
@@ -284,10 +250,10 @@ public class exUIElementEditor : exPlaneEditor {
             case exPlane.Anchor.BotCenter:   xRatio = 0.5f; yRatio = 0.0f; break;
             case exPlane.Anchor.BotRight:    xRatio = 1.0f; yRatio = 0.0f; break;
             }
-            editElement.width += dx;
+            curEdit.width += dx;
         }
         else if ( _handleID == 4 ) {
-            switch ( editElement.anchor ) {
+            switch ( curEdit.anchor ) {
             case exPlane.Anchor.TopLeft:     xRatio = 0.0f; yRatio = -0.0f; break;
             case exPlane.Anchor.TopCenter:   xRatio = 0.5f; yRatio = -0.0f; break;
             case exPlane.Anchor.TopRight:    xRatio = 1.0f; yRatio = -0.0f; break;
@@ -298,10 +264,10 @@ public class exUIElementEditor : exPlaneEditor {
             case exPlane.Anchor.BotCenter:   xRatio = 0.5f; yRatio = -1.0f; break;
             case exPlane.Anchor.BotRight:    xRatio = 1.0f; yRatio = -1.0f; break;
             }
-            editElement.width += dx; editElement.height -= dy;
+            curEdit.width += dx; curEdit.height -= dy;
         }
         else if ( _handleID == 5 ) {
-            switch ( editElement.anchor ) {
+            switch ( curEdit.anchor ) {
             case exPlane.Anchor.TopLeft:     xRatio = 0.0f; yRatio = -0.0f; break;
             case exPlane.Anchor.TopCenter:   xRatio = 0.0f; yRatio = -0.0f; break;
             case exPlane.Anchor.TopRight:    xRatio = 0.0f; yRatio = -0.0f; break;
@@ -312,10 +278,10 @@ public class exUIElementEditor : exPlaneEditor {
             case exPlane.Anchor.BotCenter:   xRatio = 0.0f; yRatio = -1.0f; break;
             case exPlane.Anchor.BotRight:    xRatio = 0.0f; yRatio = -1.0f; break;
             }
-            editElement.height -= dy;
+            curEdit.height -= dy;
         }
         else if ( _handleID == 6 ) {
-            switch ( editElement.anchor ) {
+            switch ( curEdit.anchor ) {
             case exPlane.Anchor.TopLeft:     xRatio = -1.0f; yRatio = -0.0f; break;
             case exPlane.Anchor.TopCenter:   xRatio = -0.5f; yRatio = -0.0f; break;
             case exPlane.Anchor.TopRight:    xRatio = -0.0f; yRatio = -0.0f; break;
@@ -326,10 +292,10 @@ public class exUIElementEditor : exPlaneEditor {
             case exPlane.Anchor.BotCenter:   xRatio = -0.5f; yRatio = -1.0f; break;
             case exPlane.Anchor.BotRight:    xRatio = -0.0f; yRatio = -1.0f; break;
             }
-            editElement.width -= dx; editElement.height -= dy;
+            curEdit.width -= dx; curEdit.height -= dy;
         }
         else if ( _handleID == 7 ) {
-            switch ( editElement.anchor ) {
+            switch ( curEdit.anchor ) {
             case exPlane.Anchor.TopLeft:     xRatio = -1.0f; yRatio = 0.0f; break;
             case exPlane.Anchor.TopCenter:   xRatio = -0.5f; yRatio = 0.0f; break;
             case exPlane.Anchor.TopRight:    xRatio = -0.0f; yRatio = 0.0f; break;
@@ -340,12 +306,12 @@ public class exUIElementEditor : exPlaneEditor {
             case exPlane.Anchor.BotCenter:   xRatio = -0.5f; yRatio = 0.0f; break;
             case exPlane.Anchor.BotRight:    xRatio = -0.0f; yRatio = 0.0f; break;
             }
-            editElement.width -= dx;
+            curEdit.width -= dx;
         }
 
-        float offsetX = (editElement.width - oldWidth) * xRatio;
-        float offsetY = (editElement.height - oldHeight) * yRatio;
-        editElement.Translate ( offsetX, offsetY );
+        float offsetX = (curEdit.width - oldWidth) * xRatio;
+        float offsetY = (curEdit.height - oldHeight) * yRatio;
+        curEdit.Translate ( offsetX, offsetY );
     }
 
     // ------------------------------------------------------------------ 
@@ -354,21 +320,5 @@ public class exUIElementEditor : exPlaneEditor {
 
     void GetDelatSize ( Vector3 _deltaVec, out float _dx, out float _dy ) {
         _dx = _deltaVec.x; _dy = _deltaVec.y;
-
-        // DELME { 
-        // switch ( editElement.plane ) {
-        // case exPlane.Plane.XY:
-        //     _dx = _deltaVec.x; _dy = _deltaVec.y;
-        //     break;
-
-        // case exPlane.Plane.XZ:
-        //     _dx = _deltaVec.x; _dy = _deltaVec.z;
-        //     break;
-
-        // case exPlane.Plane.ZY:
-        //     _dx = _deltaVec.z; _dy = _deltaVec.y;
-        //     break;
-        // }
-        // } DELME end 
     }
 }
