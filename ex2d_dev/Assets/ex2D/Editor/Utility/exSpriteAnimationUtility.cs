@@ -38,7 +38,7 @@ public static class exSpriteAnimationUtility {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    [MenuItem ("Assets/Create/ex2D Sprite Animation")]
+    [MenuItem ("Assets/Create/ex2D/Sprite Animation")]
     static void Create () {
         string assetPath = exEditorHelper.GetCurrentDirectory();
         string assetName = "New SpriteAnimation";

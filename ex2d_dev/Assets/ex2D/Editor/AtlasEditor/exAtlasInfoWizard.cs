@@ -43,7 +43,7 @@ class exAtlasInfoWizard : ScriptableWizard {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    [MenuItem ("Assets/Create/ex2D Atlas Info")]
+    [MenuItem ("Assets/Create/ex2D/Atlas Info")]
     public static void Create () {
         ScriptableWizard.DisplayWizard<exAtlasInfoWizard>("Create Atlas Info");
     }

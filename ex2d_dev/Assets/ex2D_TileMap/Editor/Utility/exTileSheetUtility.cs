@@ -24,7 +24,7 @@ public class exTileSheetUtility : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    [MenuItem ("Assets/Create/ex2D Tile Sheet")]
+    [MenuItem ("Assets/Create/ex2D/Tile Sheet")]
     public static exTileSheet Create () {
         return Create ( exEditorHelper.GetCurrentDirectory(), "New TileSheet" );
     }

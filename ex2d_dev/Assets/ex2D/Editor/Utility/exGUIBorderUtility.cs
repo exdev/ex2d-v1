@@ -29,7 +29,7 @@ public static class exGUIBorderUtility {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    [MenuItem ("Assets/Create/ex2D GUI Border")]
+    [MenuItem ("Assets/Create/ex2D/GUI Border")]
     static void Create () {
         string assetPath = exEditorHelper.GetCurrentDirectory();
         string assetName = "New GUIBorder";

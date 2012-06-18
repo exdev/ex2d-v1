@@ -36,7 +36,7 @@ class exTileMapWizard : ScriptableWizard {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    [MenuItem ("Assets/Create/ex2D Tile Map")]
+    [MenuItem ("Assets/Create/ex2D/Tile Map")]
     public static void Create () {
         ScriptableWizard.DisplayWizard<exTileMapWizard>("Create Tile Map");
     }

@@ -37,7 +37,7 @@ class exBitmapFontWizard : ScriptableWizard {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    [MenuItem ("Assets/Create/ex2D Bitmap Font")]
+    [MenuItem ("Assets/Create/ex2D/Bitmap Font")]
     public static void Create () {
         ScriptableWizard.DisplayWizard<exBitmapFontWizard>("Create Bitmap Font");
     }
