@@ -143,29 +143,21 @@ public class exSpriteFontEditor : exSpriteBaseEditor {
 
         GUI.enabled = !inAnimMode;
         GUILayout.BeginHorizontal();
-        editSpriteFont.fontInfo = (exBitmapFont)EditorGUILayout.ObjectField( "Font Info"
-                                                                           , editSpriteFont.fontInfo
-                                                                           , typeof(exBitmapFont)
-                                                                           , false 
-                                                                         );
+        exBitmapFont newFontInfo = (exBitmapFont)EditorGUILayout.ObjectField( "Font Info"
+                                                                              , editSpriteFont.fontInfo
+                                                                              , typeof(exBitmapFont)
+                                                                              , false 
+                                                                            );
+        if ( editSpriteFont.fontInfo != newFontInfo ) {
+            editSpriteFont.Clear(); // this will prevent leak of mesh
+            editSpriteFont.fontInfo = newFontInfo;
+        }
         if ( GUILayout.Button("Edit...", GUILayout.Width(40), GUILayout.Height(15) ) ) {
             exBitmapFontEditor editor = exBitmapFontEditor.NewWindow();
             editor.Edit(editSpriteFont.fontInfo);
         }
         GUILayout.EndHorizontal();
         GUI.enabled = true;
-
-        // DELME { 
-        // // check if fontInfo change to null
-        // if ( editSpriteFont.fontInfo == null ) {
-        //     editSpriteFont.Clear ();
-        // }
-        // else {
-        //     if ( isPrefab == false && editSpriteFont.meshFilter.sharedMesh == null ) {
-        //         needRebuild = true;
-        //     }
-        // }
-        // } DELME end 
 
         // ======================================================== 
         // use kerning
