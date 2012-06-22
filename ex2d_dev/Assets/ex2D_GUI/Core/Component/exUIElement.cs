@@ -24,9 +24,9 @@ using System.Collections.Generic;
 public class exUIElement : exPlane {
 
     [System.Serializable]
-    public struct MessageInfo {
-        GameObject receiver;
-        string method;
+    public class MessageInfo {
+        public GameObject receiver = null;
+        public string method = "";
     }
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -45,8 +45,7 @@ public class exUIElement : exPlane {
         get { return width_; }
         set {
             if ( width_ != value ) {
-                width_ = Mathf.Max(value, 0.0f);
-                updateFlags |= UpdateFlags.Vertex;
+                OnSizeChanged ( Mathf.Max(value, 0.0f), height_ );
             }
         }
     }
@@ -60,8 +59,7 @@ public class exUIElement : exPlane {
         get { return height_; }
         set {
             if ( height_ != value ) {
-                height_ = Mathf.Max(value, 0.0f);
-                updateFlags |= UpdateFlags.Vertex;
+                OnSizeChanged ( width_, Mathf.Max(value, 0.0f) );
             }
         }
     }
@@ -162,38 +160,6 @@ public class exUIElement : exPlane {
     // functions
     ///////////////////////////////////////////////////////////////////////////////
 
-    // DELME { 
-    // // ------------------------------------------------------------------ 
-    // // Desc: 
-    // // ------------------------------------------------------------------ 
-
-    // void Reset () {
-    //     // add box collider
-    //     BoxCollider boxCollider = GetComponent<BoxCollider>();
-    //     if ( boxCollider == null ) {
-    //         boxCollider = gameObject.AddComponent<BoxCollider>();
-    //         boxCollider.center = new Vector3( boxCollider.center.x, boxCollider.center.y, 0.2f );
-    //     }
-
-    //     // add collision helper
-    //     exCollisionHelper collisionHelper = GetComponent<exCollisionHelper>();
-    //     if ( collisionHelper == null ) {
-    //         collisionHelper = gameObject.AddComponent<exCollisionHelper>();
-    //         collisionHelper.plane = this;
-    //         collisionHelper.autoLength = false;
-    //         collisionHelper.length = 0.2f;
-    //         collisionHelper.UpdateCollider();
-    //     }
-    // }
-    // } DELME end 
-
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
-    public virtual void Sync () {
-    }
-
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
@@ -246,4 +212,27 @@ public class exUIElement : exPlane {
         }
         return null;
     } 
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    protected void ProcessMessageInfoList ( List<MessageInfo> _messageInfos ) {
+        for ( int i = 0; i < _messageInfos.Count; ++i ) {
+            MessageInfo msgInfo = _messageInfos[i];
+            if ( msgInfo.receiver != null ) {
+                msgInfo.receiver.SendMessage ( msgInfo.method, SendMessageOptions.DontRequireReceiver );
+            }
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    protected virtual void OnSizeChanged ( float _newWidth, float _newHeight ) {
+        width_ = _newWidth;
+        height_ = _newHeight;
+        updateFlags |= UpdateFlags.Vertex;
+    }
 }

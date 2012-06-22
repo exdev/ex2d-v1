@@ -100,7 +100,7 @@ public class exPlaneEditor : Editor {
 
         EditorGUIUtility.LookLikeInspector ();
         EditorGUILayout.Space ();
-        EditorGUI.indentLevel = 1;
+        ++EditorGUI.indentLevel;
 
         if ( isPrefab && editPlane.meshFilter && editPlane.meshFilter.sharedMesh ) {
             editPlane.meshFilter.sharedMesh = null;
@@ -250,6 +250,7 @@ public class exPlaneEditor : Editor {
         if ( GUI.changed ) {
             EditorUtility.SetDirty(editPlane);
         }
+        --EditorGUI.indentLevel;
 	}
 
     // ------------------------------------------------------------------ 

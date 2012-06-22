@@ -24,14 +24,6 @@ using System.Collections.Generic;
 [AddComponentMenu("ex2D GUI/Button")]
 public class exUIButton : exUIElement {
 
-    // TODO { 
-    // ///////////////////////////////////////////////////////////////////////////////
-    // // serializable
-    // ///////////////////////////////////////////////////////////////////////////////
-
-    // public List<MessageInfo> messageInfos = new List<MessageInfo>();
-    // } TODO end 
-
     // ------------------------------------------------------------------ 
     [SerializeField] protected string text_ = "";
     /// the text of the button
@@ -48,38 +40,28 @@ public class exUIButton : exUIElement {
     }
 
     ///////////////////////////////////////////////////////////////////////////////
-    // properties
+    // non-serialized
     ///////////////////////////////////////////////////////////////////////////////
 
     bool isPressing = false;
 
-    public exSpriteBorder border = null;
+    ///////////////////////////////////////////////////////////////////////////////
+    // serialized 
+    ///////////////////////////////////////////////////////////////////////////////
+
     public exSpriteFont font = null;
+    public exSpriteBase background = null;
+
+    // message infos
+    public List<MessageInfo> hoverInSlots   = new List<MessageInfo>();
+    public List<MessageInfo> hoverOutSlots  = new List<MessageInfo>();
+    public List<MessageInfo> pressSlots     = new List<MessageInfo>();
+    public List<MessageInfo> releaseSlots   = new List<MessageInfo>();
+    public List<MessageInfo> clickSlots     = new List<MessageInfo>();
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
     ///////////////////////////////////////////////////////////////////////////////
-
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
-    public override void Sync () {
-        base.Sync ();
-
-        if ( border ) {
-            border.anchor = anchor;
-            border.width = width;
-            border.height = height;
-            border.transform.localPosition = new Vector3 ( 0.0f, 0.0f, border.transform.localPosition.z );
-        }
-
-        if ( font ) {
-            BoxCollider boxCollider = GetComponent<BoxCollider>();
-            font.transform.localPosition 
-                = new Vector3( boxCollider.center.x, boxCollider.center.y, font.transform.localPosition.z );
-        }
-    }
 
     // ------------------------------------------------------------------ 
     // Desc: 
@@ -161,8 +143,7 @@ public class exUIButton : exUIElement {
     // ------------------------------------------------------------------ 
 
 	public virtual void OnHoverIn ( exUIEvent _e ) {
-        // TODO: message info send to the right game object
-        Debug.Log("OnHoverIn");
+        ProcessMessageInfoList ( hoverInSlots );
     }
 
     // ------------------------------------------------------------------ 
@@ -170,8 +151,7 @@ public class exUIButton : exUIElement {
     // ------------------------------------------------------------------ 
 
 	public virtual void OnHoverOut ( exUIEvent _e ) {
-        // TODO: message info send to the right game object
-        Debug.Log("OnHoverOut");
+        ProcessMessageInfoList ( hoverOutSlots );
     }
 
     // ------------------------------------------------------------------ 
@@ -179,8 +159,7 @@ public class exUIButton : exUIElement {
     // ------------------------------------------------------------------ 
 
 	public virtual void OnPress ( exUIEvent _e ) {
-        // TODO: message info send to the right game object
-        Debug.Log("OnPress");
+        ProcessMessageInfoList ( pressSlots );
     }
 
     // ------------------------------------------------------------------ 
@@ -188,8 +167,7 @@ public class exUIButton : exUIElement {
     // ------------------------------------------------------------------ 
 
 	public virtual void OnRelease ( exUIEvent _e ) {
-        // TODO: message info send to the right game object
-        Debug.Log("OnRelease");
+        ProcessMessageInfoList ( releaseSlots );
     }
 
     // ------------------------------------------------------------------ 
@@ -197,8 +175,28 @@ public class exUIButton : exUIElement {
     // ------------------------------------------------------------------ 
 
 	public virtual void OnClick ( exUIEvent _e ) {
-        // TODO: message info send to the right game object
-        Debug.Log("OnClick");
+        ProcessMessageInfoList ( clickSlots );
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    protected override void OnSizeChanged ( float _newWidth, float _newHeight ) {
+        base.OnSizeChanged( _newWidth, _newHeight );
+
+        if ( background ) {
+            exSprite spriteBG = background as exSprite;
+            if ( spriteBG ) {
+                spriteBG.width = _newWidth;
+                spriteBG.height = _newHeight;
+            }
+            exSpriteBorder borderBG = background as exSpriteBorder;
+            if ( borderBG ) {
+                borderBG.width = _newWidth;
+                borderBG.height = _newHeight;
+            }
+        }
     }
 
 }

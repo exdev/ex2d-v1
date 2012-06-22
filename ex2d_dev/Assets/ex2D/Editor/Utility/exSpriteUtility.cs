@@ -85,6 +85,7 @@ public static class exSpriteUtility {
             // NOTE: it is possible user duplicate an GameObject, 
             //       if we directly change the mesh, the original one will changed either.
             Mesh newMesh = new Mesh();
+            newMesh.hideFlags = HideFlags.DontSave;
             newMesh.Clear();
 
             // build vertices, normals, uvs and colors.

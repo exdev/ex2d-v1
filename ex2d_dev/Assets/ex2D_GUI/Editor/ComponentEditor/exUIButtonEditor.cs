@@ -12,6 +12,7 @@
 using UnityEngine;
 using UnityEditor;
 using System.Collections;
+using System.Collections.Generic;
 
 ///////////////////////////////////////////////////////////////////////////////
 // public
@@ -21,8 +22,8 @@ using System.Collections;
 public class exUIButtonEditor : exUIElementEditor {
 
     SerializedProperty textProp;
-    SerializedProperty borderProp;
     SerializedProperty fontProp;
+    SerializedProperty backgroundProp;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -36,8 +37,8 @@ public class exUIButtonEditor : exUIElementEditor {
         base.OnEnable();
 
         textProp = serializedObject.FindProperty ("text_");
-        borderProp = serializedObject.FindProperty ("border");
         fontProp = serializedObject.FindProperty ("font");
+        backgroundProp = serializedObject.FindProperty ("background");
     }
 
     // ------------------------------------------------------------------ 
@@ -45,7 +46,6 @@ public class exUIButtonEditor : exUIElementEditor {
     // ------------------------------------------------------------------ 
 
 	public override void OnInspectorGUI () {
-        exUIButton curEdit = target as exUIButton;
 
         // ======================================================== 
         // Base GUI 
@@ -54,47 +54,35 @@ public class exUIButtonEditor : exUIElementEditor {
         base.OnInspectorGUI();
         GUILayout.Space(20);
 
-        EditorGUILayout.PropertyField( textProp, new GUIContent("Text") );
-        curEdit.text = textProp.stringValue;
+        // ======================================================== 
+        // 
+        // ======================================================== 
 
-        // // ======================================================== 
-        // // Updates 
-        // // ======================================================== 
+        serializedObject.Update ();
 
-        // // update button
-        // GUILayout.BeginHorizontal();
-        // GUILayout.Space(15);
-        //     if ( GUILayout.Button("Update", GUILayout.Width(50), GUILayout.Height(20) ) ) {
-        //         editButton.border = editButton.transform.Find("Border").GetComponent<exSpriteBorder>();
-        //         editButton.font = editButton.transform.Find("Border/Text").GetComponent<exSpriteFont>();
-        //         GUI.changed = true;
-        //     }
-        // GUILayout.EndHorizontal();
+            exUIButton curEdit = target as exUIButton;
 
-        // EditorGUI.indentLevel = 2;
-        // GUI.enabled = false;
-        // EditorGUILayout.ObjectField( "Border"
-        //                              , editButton.border
-        //                              , typeof(exSpriteBorder)
-        //                              , false 
-        //                            );
-        // EditorGUILayout.ObjectField( "Font"
-        //                              , editButton.font
-        //                              , typeof(exSpriteFont)
-        //                              , false 
-        //                            );
-        // GUI.enabled = true;
-        // EditorGUI.indentLevel = 1;
+            EditorGUILayout.PropertyField( textProp, new GUIContent("Text") );
+            EditorGUILayout.PropertyField( fontProp );
+            EditorGUILayout.PropertyField( backgroundProp );
 
-        // // ======================================================== 
-        // // check dirty 
-        // // ======================================================== 
 
-        // if ( EditorApplication.isPlaying == false )
-        //     editButton.Sync();
+            // message infos
+            EditorGUILayout.Space();
+            MessageInfoListField ( "On Hover In", curEdit.hoverInSlots );
 
-        // if ( GUI.changed )
-        //     EditorUtility.SetDirty (editButton);
+            EditorGUILayout.Space();
+            MessageInfoListField ( "On Hover Out", curEdit.hoverOutSlots );
+
+            EditorGUILayout.Space();
+            MessageInfoListField ( "On Press", curEdit.pressSlots );
+
+            EditorGUILayout.Space();
+            MessageInfoListField ( "On Rlease", curEdit.releaseSlots );
+
+            EditorGUILayout.Space();
+            MessageInfoListField ( "On Click", curEdit.clickSlots );
+
 
         serializedObject.ApplyModifiedProperties ();
     }
@@ -106,14 +94,44 @@ public class exUIButtonEditor : exUIElementEditor {
     protected override void OnSceneGUI () {
         base.OnSceneGUI();
 
-        // // ======================================================== 
-        // // check dirty 
-        // // ======================================================== 
+        serializedObject.Update ();
+            exUIButton curEdit = target as exUIButton;
 
-        // if ( EditorApplication.isPlaying == false )
-        //     editButton.Sync();
+            if ( curEdit.font.text != textProp.stringValue ) {
+                curEdit.font.text = textProp.stringValue;
+                EditorUtility.SetDirty(curEdit.font);
+                HandleUtility.Repaint(); 
+            }
 
-        // if ( GUI.changed )
-        //     EditorUtility.SetDirty (editButton);
+            if ( curEdit.anchor != curEdit.background.anchor ) {
+                curEdit.background.anchor = curEdit.anchor;
+                EditorUtility.SetDirty(curEdit.background);
+                HandleUtility.Repaint(); 
+            }
+        serializedObject.ApplyModifiedProperties ();
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    protected void MessageInfoListField ( string _label, List<exUIElement.MessageInfo> _infoList ) {
+        EditorGUILayout.BeginHorizontal(new GUILayoutOption[0]);
+            EditorGUILayout.LabelField( _label );
+            GUILayout.FlexibleSpace();
+            if ( GUILayout.Button( "+", GUILayout.Width(20) ) ) {
+                exUIElement.MessageInfo msgInfo = new exUIElement.MessageInfo();
+                msgInfo.receiver = (target as exUIButton).gameObject;
+                _infoList.Add ( msgInfo );
+            }
+        EditorGUILayout.EndHorizontal();
+        GUILayout.Space(5);
+
+        for ( int i = 0; i < _infoList.Count; ++i ) {
+            if ( MessageInfoField ( "[" + i + "]", _infoList[i] ) ) {
+                _infoList.RemoveAt(i);
+                --i;
+            }
+        }
     }
 }

@@ -27,26 +27,52 @@ public static class exUIUtility {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    [MenuItem ("GameObject/Create Other/ex2D_GUI/Button")]
-    static void CreateButtonObject () {
+    static void CreateButtonObject ( bool _useSprite ) {
         // create button object
         GameObject buttonGO = new GameObject("Button");
         exUIButton button = buttonGO.AddComponent<exUIButton>();
 
-        GameObject borderGO = new GameObject("Border");
-        exSpriteBorder border = borderGO.AddComponent<exSpriteBorder>();
-        button.border = border;
+        // create Background
+        if ( _useSprite ) {
+            GameObject backgroundGO = new GameObject("Background");
+            exSprite background = backgroundGO.AddComponent<exSprite>();
+            button.background = background;
+            backgroundGO.transform.parent = buttonGO.transform;
+        }
+        else {
+            GameObject backgroundGO = new GameObject("Background");
+            exSpriteBorder background = backgroundGO.AddComponent<exSpriteBorder>();
+            button.background = background;
+            backgroundGO.transform.parent = buttonGO.transform;
+        }
 
-        GameObject fontGO = new GameObject("Text");
+        // create Font
+        GameObject fontGO = new GameObject("Font");
         exSpriteFont font = fontGO.AddComponent<exSpriteFont>();
         font.text = "";
-
-        borderGO.transform.parent = buttonGO.transform;
-        fontGO.transform.parent = borderGO.transform;
         button.font = font;
+        fontGO.transform.parent = buttonGO.transform;
 
         //
         Selection.activeObject = buttonGO;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    [MenuItem ("GameObject/Create Other/ex2D_GUI/Button")]
+    static void CreateButtonObject () {
+        CreateButtonObject (false);
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    [MenuItem ("GameObject/Create Other/ex2D_GUI/Button (Sprite)")]
+    static void CreateButtonObject_SpriteBackground () {
+        CreateButtonObject (true);
     }
 
     // ------------------------------------------------------------------ 
@@ -167,7 +193,7 @@ public static class exUIUtility {
         scrollView.verticalSlider = verticalSlider;
         scrollView.contentAnchor = contentAnchor;
         scrollView.clipRect = clipRect;
-        scrollView.Sync();
+        // scrollView.Sync(); // DELME
 
         //
         Selection.activeObject = scrollViewGO;

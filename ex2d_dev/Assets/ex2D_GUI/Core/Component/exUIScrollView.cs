@@ -102,89 +102,91 @@ public class exUIScrollView : exUIElement {
         }
     }
 
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
+    // DELME { 
+    // // ------------------------------------------------------------------ 
+    // // Desc: 
+    // // ------------------------------------------------------------------ 
 
-    public override void Sync () {
-        base.Sync();
+    // public override void Sync () {
+    //     base.Sync();
 
-        float startX = boundingRect.xMin;
-        float startY = boundingRect.yMax;
-        float endX = boundingRect.xMax;
-        float endY = boundingRect.yMin;
+    //     float startX = boundingRect.xMin;
+    //     float startY = boundingRect.yMax;
+    //     float endX = boundingRect.xMax;
+    //     float endY = boundingRect.yMin;
 
-        clipRect.anchor = anchor;
-        clipRect.width = width;
-        clipRect.height = height;
-        clipRect.transform.localPosition = new Vector3 ( 0.0f, 0.0f, clipRect.transform.localPosition.z );
+    //     clipRect.anchor = anchor;
+    //     clipRect.width = width;
+    //     clipRect.height = height;
+    //     clipRect.transform.localPosition = new Vector3 ( 0.0f, 0.0f, clipRect.transform.localPosition.z );
 
-        if ( contentAnchor )
-            contentAnchor.transform.localPosition = new Vector3 ( startX, startY, contentAnchor.transform.localPosition.z );
-        if ( horizontalBar )
-            horizontalBar.transform.localPosition = new Vector3 ( startX, endY, horizontalBar.transform.localPosition.z );
-        if ( horizontalSlider )
-            horizontalSlider.transform.localPosition = new Vector3 ( startX, endY, horizontalSlider.transform.localPosition.z );
-        if ( verticalBar )
-            verticalBar.transform.localPosition = new Vector3 ( endX, startY, verticalBar.transform.localPosition.z );
-        if ( verticalSlider )
-            verticalSlider.transform.localPosition = new Vector3 ( endX, startY, verticalSlider.transform.localPosition.z );
+    //     if ( contentAnchor )
+    //         contentAnchor.transform.localPosition = new Vector3 ( startX, startY, contentAnchor.transform.localPosition.z );
+    //     if ( horizontalBar )
+    //         horizontalBar.transform.localPosition = new Vector3 ( startX, endY, horizontalBar.transform.localPosition.z );
+    //     if ( horizontalSlider )
+    //         horizontalSlider.transform.localPosition = new Vector3 ( startX, endY, horizontalSlider.transform.localPosition.z );
+    //     if ( verticalBar )
+    //         verticalBar.transform.localPosition = new Vector3 ( endX, startY, verticalBar.transform.localPosition.z );
+    //     if ( verticalSlider )
+    //         verticalSlider.transform.localPosition = new Vector3 ( endX, startY, verticalSlider.transform.localPosition.z );
 
-        // DELME { 
-        // switch ( plane ) {
-        // case exPlane.Plane.XY:
-        //     if ( contentAnchor )
-        //         contentAnchor.transform.localPosition = new Vector3 ( startX, startY, 0.0f );
-        //     if ( horizontalBar )
-        //         horizontalBar.transform.localPosition = new Vector3 ( startX, endY, 0.0f );
-        //     if ( horizontalSlider )
-        //         horizontalSlider.transform.localPosition = new Vector3 ( startX, endY, 0.0f );
-        //     if ( verticalBar )
-        //         verticalBar.transform.localPosition = new Vector3 ( endX, startY, 0.0f );
-        //     if ( verticalSlider )
-        //         verticalSlider.transform.localPosition = new Vector3 ( endX, startY, 0.0f );
-        //     break;
+    //     // DELME { 
+    //     // switch ( plane ) {
+    //     // case exPlane.Plane.XY:
+    //     //     if ( contentAnchor )
+    //     //         contentAnchor.transform.localPosition = new Vector3 ( startX, startY, 0.0f );
+    //     //     if ( horizontalBar )
+    //     //         horizontalBar.transform.localPosition = new Vector3 ( startX, endY, 0.0f );
+    //     //     if ( horizontalSlider )
+    //     //         horizontalSlider.transform.localPosition = new Vector3 ( startX, endY, 0.0f );
+    //     //     if ( verticalBar )
+    //     //         verticalBar.transform.localPosition = new Vector3 ( endX, startY, 0.0f );
+    //     //     if ( verticalSlider )
+    //     //         verticalSlider.transform.localPosition = new Vector3 ( endX, startY, 0.0f );
+    //     //     break;
 
-        // case exPlane.Plane.XZ:
-        //     if ( contentAnchor )
-        //         contentAnchor.transform.localPosition = new Vector3 ( startX, 0.0f, startY );
-        //     if ( horizontalBar )
-        //         horizontalBar.transform.localPosition = new Vector3 ( startX, 0.0f, endY );
-        //     if ( horizontalSlider )
-        //         horizontalSlider.transform.localPosition = new Vector3 ( startX, 0.0f, endY );
-        //     if ( verticalBar )
-        //         verticalBar.transform.localPosition = new Vector3 ( endX, 0.0f, startY );
-        //     if ( verticalSlider )
-        //         verticalSlider.transform.localPosition = new Vector3 ( endX, 0.0f, startY );
-        //     break;
+    //     // case exPlane.Plane.XZ:
+    //     //     if ( contentAnchor )
+    //     //         contentAnchor.transform.localPosition = new Vector3 ( startX, 0.0f, startY );
+    //     //     if ( horizontalBar )
+    //     //         horizontalBar.transform.localPosition = new Vector3 ( startX, 0.0f, endY );
+    //     //     if ( horizontalSlider )
+    //     //         horizontalSlider.transform.localPosition = new Vector3 ( startX, 0.0f, endY );
+    //     //     if ( verticalBar )
+    //     //         verticalBar.transform.localPosition = new Vector3 ( endX, 0.0f, startY );
+    //     //     if ( verticalSlider )
+    //     //         verticalSlider.transform.localPosition = new Vector3 ( endX, 0.0f, startY );
+    //     //     break;
 
-        // case exPlane.Plane.ZY:
-        //     if ( contentAnchor )
-        //         contentAnchor.transform.localPosition = new Vector3 ( 0.0f, startY, startX );
-        //     if ( horizontalBar )
-        //         horizontalBar.transform.localPosition = new Vector3 ( 0.0f, endY, startX );
-        //     if ( horizontalSlider )
-        //         horizontalSlider.transform.localPosition = new Vector3 ( 0.0f, endY, startX );
-        //     if ( verticalBar )
-        //         verticalBar.transform.localPosition = new Vector3 ( 0.0f, endX, startY );
-        //     if ( verticalSlider )
-        //         verticalSlider.transform.localPosition = new Vector3 ( 0.0f, endX, startY );
-        //     break;
-        // }
-        // } DELME end 
+    //     // case exPlane.Plane.ZY:
+    //     //     if ( contentAnchor )
+    //     //         contentAnchor.transform.localPosition = new Vector3 ( 0.0f, startY, startX );
+    //     //     if ( horizontalBar )
+    //     //         horizontalBar.transform.localPosition = new Vector3 ( 0.0f, endY, startX );
+    //     //     if ( horizontalSlider )
+    //     //         horizontalSlider.transform.localPosition = new Vector3 ( 0.0f, endY, startX );
+    //     //     if ( verticalBar )
+    //     //         verticalBar.transform.localPosition = new Vector3 ( 0.0f, endX, startY );
+    //     //     if ( verticalSlider )
+    //     //         verticalSlider.transform.localPosition = new Vector3 ( 0.0f, endX, startY );
+    //     //     break;
+    //     // }
+    //     // } DELME end 
 
-        //
-        float hbarHeight = (horizontalBar && horizontalBar.guiBorder) ? horizontalBar.guiBorder.border.vertical : 0.0f;
-        float vbarWidth = (verticalBar && verticalBar.guiBorder) ? verticalBar.guiBorder.border.horizontal : 0.0f;
-        if ( horizontalBar ) {
-            horizontalBar.width = width - vbarWidth; 
-            horizontalBar.height = hbarHeight;
-        }
-        if ( verticalBar ) {
-            verticalBar.height = height - hbarHeight;
-            verticalBar.width = vbarWidth;
-        }
-    }
+    //     //
+    //     float hbarHeight = (horizontalBar && horizontalBar.guiBorder) ? horizontalBar.guiBorder.border.vertical : 0.0f;
+    //     float vbarWidth = (verticalBar && verticalBar.guiBorder) ? verticalBar.guiBorder.border.horizontal : 0.0f;
+    //     if ( horizontalBar ) {
+    //         horizontalBar.width = width - vbarWidth; 
+    //         horizontalBar.height = hbarHeight;
+    //     }
+    //     if ( verticalBar ) {
+    //         verticalBar.height = height - hbarHeight;
+    //         verticalBar.width = vbarWidth;
+    //     }
+    // }
+    // } DELME end 
 
     // ------------------------------------------------------------------ 
     // Desc: 

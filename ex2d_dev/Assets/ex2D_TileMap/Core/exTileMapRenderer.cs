@@ -68,6 +68,7 @@ public class exTileMapRenderer : exPlane {
              ( renderer.sharedMaterial != null && renderer.sharedMaterial.mainTexture != null ) ) 
         {
             meshFilter.mesh = new Mesh();
+            meshFilter_.sharedMesh.hideFlags = HideFlags.DontSave;
             ForceUpdateMesh( meshFilter.sharedMesh );
         }
     }
@@ -303,6 +304,7 @@ public class exTileMapRenderer : exPlane {
             }
 
             meshFilter_.mesh = new Mesh();
+            meshFilter_.sharedMesh.hideFlags = HideFlags.DontSave;
             ForceUpdateMesh( meshFilter_.sharedMesh );
         }
     }

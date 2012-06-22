@@ -70,6 +70,7 @@ public static class exSpriteFontUtility {
         if ( isPrefab == false ) {
             //
             Mesh newMesh = new Mesh();
+            newMesh.hideFlags = HideFlags.DontSave;
             newMesh.Clear();
 
             // update material 

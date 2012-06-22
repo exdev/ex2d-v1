@@ -55,19 +55,6 @@ public class exClippingEditor : exPlaneEditor {
         GUILayout.Space(20);
 
         EditorGUIUtility.LookLikeInspector ();
-        EditorGUI.indentLevel = 1;
-
-        // DELME { 
-        // // ======================================================== 
-        // // center
-        // // ======================================================== 
-
-        // EditorGUIUtility.LookLikeControls ();
-        // GUI.enabled = !inAnimMode;
-        // curEdit.center = EditorGUILayout.Vector2Field( "Center", curEdit.center );
-        // GUI.enabled = true;
-        // EditorGUIUtility.LookLikeInspector ();
-        // } DELME end 
 
         // ======================================================== 
         // width
@@ -95,10 +82,9 @@ public class exClippingEditor : exPlaneEditor {
         // clip material list 
         // ======================================================== 
 
-        EditorGUI.indentLevel = 0;
         showMaterialList = EditorGUILayout.Foldout(showMaterialList, "Clip Materials");
         if ( showMaterialList ) {
-            EditorGUI.indentLevel = 2;
+            ++EditorGUI.indentLevel;
             GUI.enabled = false;
             for ( int i = 0; i < curEdit.clipMaterialList.Count; ++i ) {
                 Material clipMat = curEdit.clipMaterialList[i];
@@ -108,6 +94,7 @@ public class exClippingEditor : exPlaneEditor {
                                              , true 
                                            );
             }
+            --EditorGUI.indentLevel;
             GUI.enabled = true;
         }
 
@@ -118,10 +105,9 @@ public class exClippingEditor : exPlaneEditor {
         Rect lastRect = new Rect( 0, 0, 1, 1 );
         Rect dropRect = new Rect( 0, 0, 1, 1 );
 
-        EditorGUI.indentLevel = 0;
         showClipList = EditorGUILayout.Foldout(showClipList, "Clip Objects");
         if ( showClipList ) {
-            EditorGUI.indentLevel = 2;
+            ++EditorGUI.indentLevel;
             int idxRemoved = -1;
             for ( int i = 0; i < curEdit.planeInfoList.Count; ++i ) {
                 GUILayout.BeginHorizontal();
@@ -149,7 +135,7 @@ public class exClippingEditor : exPlaneEditor {
                 curEdit.RemovePlaneInEditor(curEdit.planeInfoList[idxRemoved].plane);
             }
 
-            EditorGUI.indentLevel = 1;
+            --EditorGUI.indentLevel;
             EditorGUILayout.Space ();
 
             lastRect = GUILayoutUtility.GetLastRect ();  

@@ -58,18 +58,61 @@ public class exUIElementEditor : exPlaneEditor {
         // 
         // ======================================================== 
 
-        EditorGUIUtility.LookLikeInspector ();
+        serializedObject.Update ();
 
-        EditorGUILayout.PropertyField( widthProp, new GUIContent("Width") );
-        EditorGUILayout.PropertyField( heightProp, new GUIContent("Height") );
+            EditorGUIUtility.LookLikeInspector ();
 
-        // DELME { 
-        // if ( EditorApplication.isPlaying == false )
-        //     curEdit.Sync();
-        // } DELME end 
+            EditorGUILayout.PropertyField( widthProp, new GUIContent("Width") );
+            EditorGUILayout.PropertyField( heightProp, new GUIContent("Height") );
+
+            // DELME { 
+            // if ( EditorApplication.isPlaying == false )
+            //     curEdit.Sync();
+            // } DELME end 
 
         serializedObject.ApplyModifiedProperties ();
     }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    protected bool MessageInfoField ( string _label, exUIElement.MessageInfo _info ) {
+        bool doRemove = false;
+
+        ++EditorGUI.indentLevel;
+        EditorGUILayout.BeginHorizontal(new GUILayoutOption[0]);
+            // label
+            EditorGUILayout.LabelField(_label, GUILayout.Width(50));
+
+            // receiver
+            GameObject go = EditorGUILayout.ObjectField( _info.receiver, typeof(GameObject), true, GUILayout.Width(150) ) as GameObject;
+            if ( go != null && EditorUtility.IsPersistent(go) == false ) {
+                _info.receiver = go;
+            }
+            else {
+                _info.receiver = null;
+            }
+
+            // method
+            EditorGUIUtility.LookLikeControls ();
+                _info.method = EditorGUILayout.TextField( _info.method );
+            EditorGUIUtility.LookLikeInspector ();
+
+            // remove button
+            Color oldBGColor = GUI.backgroundColor;
+            Color oldCTColor = GUI.contentColor;
+            GUI.backgroundColor = Color.red;
+            GUI.contentColor = Color.yellow;
+            if ( GUILayout.Button( "-", GUILayout.Width(20) ) )
+                doRemove = true;
+            GUI.backgroundColor = oldBGColor;
+            GUI.contentColor = oldCTColor;
+        EditorGUILayout.EndHorizontal();
+        --EditorGUI.indentLevel;
+
+        return doRemove;
+    } 
 
     // ------------------------------------------------------------------ 
     // Desc: 

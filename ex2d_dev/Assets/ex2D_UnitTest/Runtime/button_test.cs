@@ -23,7 +23,7 @@ public class button_test : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    void OnPress ( exUIEvent _e ) {
+    void Press () {
         Debug.Log("OnPress");
     }
 
@@ -31,7 +31,25 @@ public class button_test : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    void OnRelease ( exUIEvent _e ) {
+    void Release () {
         Debug.Log("OnRelease");
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void HoverIn () {
+        exUIButton button = GetComponent<exUIButton>();
+        button.font.topColor = Color.blue;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    void HoverOut () {
+        exUIButton button = GetComponent<exUIButton>();
+        button.font.topColor = Color.black;
     }
 }
