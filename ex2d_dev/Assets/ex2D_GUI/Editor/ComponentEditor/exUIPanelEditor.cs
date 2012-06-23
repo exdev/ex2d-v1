@@ -20,11 +20,7 @@ using System.Collections;
 [CustomEditor(typeof(exUIPanel))]
 public class exUIPanelEditor : exUIElementEditor {
 
-    ///////////////////////////////////////////////////////////////////////////////
-    // properties
-    ///////////////////////////////////////////////////////////////////////////////
-
-    private exUIPanel editPanel;
+    SerializedProperty backgroundProp;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -36,9 +32,8 @@ public class exUIPanelEditor : exUIElementEditor {
 
     protected new void OnEnable () {
         base.OnEnable();
-        if ( target != editPanel ) {
-            editPanel = target as exUIPanel;
-        }
+
+        backgroundProp = serializedObject.FindProperty ("background");
     }
 
     // ------------------------------------------------------------------ 
@@ -55,39 +50,34 @@ public class exUIPanelEditor : exUIElementEditor {
         GUILayout.Space(20);
 
         // ======================================================== 
-        // Updates 
+        // 
         // ======================================================== 
 
-        // update button
-        GUILayout.BeginHorizontal();
-        GUILayout.Space(15);
-            if ( GUILayout.Button("Update", GUILayout.Width(50), GUILayout.Height(20) ) ) {
-                editPanel.background = editPanel.transform.Find("Background").GetComponent<exSpriteBorder>();
-                GUI.changed = true;
-            }
-        GUILayout.EndHorizontal();
+        serializedObject.Update ();
 
-        EditorGUI.indentLevel = 2;
-        GUI.enabled = false;
-        EditorGUILayout.ObjectField( "Background"
-                                     , editPanel.background
-                                     , typeof(exSpriteBorder)
-                                     , false 
-                                   );
-        GUI.enabled = true;
-        EditorGUI.indentLevel = 1;
+            exUIPanel curEdit = target as exUIPanel;
 
-        // ======================================================== 
-        // check dirty 
-        // ======================================================== 
+            EditorGUILayout.PropertyField( backgroundProp );
 
-        // DELME { 
-        // if ( EditorApplication.isPlaying == false )
-        //     editPanel.Sync();
-        // } DELME end 
 
-        if ( GUI.changed )
-            EditorUtility.SetDirty (editPanel);
+            // message infos
+            EditorGUILayout.Space();
+            MessageInfoListField ( "On Hover In", curEdit.hoverInSlots );
+
+            EditorGUILayout.Space();
+            MessageInfoListField ( "On Hover Out", curEdit.hoverOutSlots );
+
+            EditorGUILayout.Space();
+            MessageInfoListField ( "On Press", curEdit.pressSlots );
+
+            EditorGUILayout.Space();
+            MessageInfoListField ( "On Rlease", curEdit.releaseSlots );
+
+            EditorGUILayout.Space();
+            MessageInfoListField ( "On Pointer Move", curEdit.moveSlots );
+
+
+        serializedObject.ApplyModifiedProperties ();
     }
 
     // ------------------------------------------------------------------ 
@@ -97,16 +87,14 @@ public class exUIPanelEditor : exUIElementEditor {
     protected override void OnSceneGUI () {
         base.OnSceneGUI();
 
-        // ======================================================== 
-        // check dirty 
-        // ======================================================== 
+        serializedObject.Update ();
+            exUIPanel curEdit = target as exUIPanel;
 
-        // DELME { 
-        // if ( EditorApplication.isPlaying == false )
-        //     editPanel.Sync();
-        // } DELME end 
-
-        if ( GUI.changed )
-            EditorUtility.SetDirty (editPanel);
+            if ( curEdit.anchor != curEdit.background.anchor ) {
+                curEdit.background.anchor = curEdit.anchor;
+                EditorUtility.SetDirty(curEdit.background);
+                HandleUtility.Repaint(); 
+            }
+        serializedObject.ApplyModifiedProperties ();
     }
 }

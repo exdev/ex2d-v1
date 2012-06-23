@@ -12,7 +12,6 @@
 using UnityEngine;
 using UnityEditor;
 using System.Collections;
-using System.Collections.Generic;
 
 ///////////////////////////////////////////////////////////////////////////////
 // public
@@ -109,29 +108,5 @@ public class exUIButtonEditor : exUIElementEditor {
                 HandleUtility.Repaint(); 
             }
         serializedObject.ApplyModifiedProperties ();
-    }
-
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
-    protected void MessageInfoListField ( string _label, List<exUIElement.MessageInfo> _infoList ) {
-        EditorGUILayout.BeginHorizontal(new GUILayoutOption[0]);
-            EditorGUILayout.LabelField( _label );
-            GUILayout.FlexibleSpace();
-            if ( GUILayout.Button( "+", GUILayout.Width(20) ) ) {
-                exUIElement.MessageInfo msgInfo = new exUIElement.MessageInfo();
-                msgInfo.receiver = (target as exUIButton).gameObject;
-                _infoList.Add ( msgInfo );
-            }
-        EditorGUILayout.EndHorizontal();
-        GUILayout.Space(5);
-
-        for ( int i = 0; i < _infoList.Count; ++i ) {
-            if ( MessageInfoField ( "[" + i + "]", _infoList[i] ) ) {
-                _infoList.RemoveAt(i);
-                --i;
-            }
-        }
     }
 }

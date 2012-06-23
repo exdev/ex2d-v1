@@ -24,83 +24,154 @@ using System.Collections.Generic;
 [AddComponentMenu("ex2D GUI/Panel")]
 public class exUIPanel : exUIElement {
 
-    // delegates
-	public delegate void EventHandler ();
+    ///////////////////////////////////////////////////////////////////////////////
+    // serialized 
+    ///////////////////////////////////////////////////////////////////////////////
 
-    // events
-	public event EventHandler OnHoverIn;
-	public event EventHandler OnHoverOut;
-	public event EventHandler OnButtonPress;
-	public event EventHandler OnButtonRelease;
-	public event EventHandler OnPointerMove;
+    public exSpriteBase background = null;
 
-    public exSpriteBorder background = null;
+    // message infos
+    public List<MessageInfo> hoverInSlots   = new List<MessageInfo>();
+    public List<MessageInfo> hoverOutSlots  = new List<MessageInfo>();
+    public List<MessageInfo> pressSlots     = new List<MessageInfo>();
+    public List<MessageInfo> releaseSlots   = new List<MessageInfo>();
+    public List<MessageInfo> moveSlots   = new List<MessageInfo>();
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
     ///////////////////////////////////////////////////////////////////////////////
-
-    // DELME { 
-    // // ------------------------------------------------------------------ 
-    // // Desc: 
-    // // ------------------------------------------------------------------ 
-
-    // public override void Sync () {
-    //     base.Sync ();
-
-    //     if ( background ) {
-    //         background.anchor = anchor;
-    //         background.width = width;
-    //         background.height = height;
-    //         background.transform.localPosition = new Vector3 ( 0.0f, 0.0f, background.transform.localPosition.z );
-    //     }
-    // }
-    // } DELME end 
 
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
 
     public override bool OnEvent ( exUIEvent _e ) {
-        // switch ( _e.type ) {
-        // case exUIEvent.Type.PointerEnter: 
-        //     if ( OnHoverIn != null ) {
-        //         OnHoverIn ();
-        //         return true;
-        //     }
-        //     return false;
+        exUIMng uimng = exUIMng.instance;
 
-        // case exUIEvent.Type.PointerExit: 
-        //     if ( OnHoverOut != null ) {
-        //         OnHoverOut ();
-        //         return true;
-        //     }
-        //     return false;
+        if ( _e.category == exUIEvent.Category.Mouse ) {
+            if ( _e.type == exUIEvent.Type.MouseEnter ) {
+                OnHoverIn (_e);
+                return true;
+            }
+            else if ( _e.type == exUIEvent.Type.MouseExit ) {
+                if ( uimng.GetMouseFocus() == this ) {
+                    uimng.SetMouseFocus(null);
+                }
+                OnHoverOut(_e);
+                return true;
+            }
+            else if ( _e.type == exUIEvent.Type.MouseDown ) {
+                uimng.SetMouseFocus( this );
+                OnPress(_e);
+                return true;
+            }
+            else if ( _e.type == exUIEvent.Type.MouseUp ) {
+                if ( uimng.GetMouseFocus() == this ) {
+                    uimng.SetMouseFocus( null );
+                }
+                OnRelease(_e);
+                return true;
+            }
+            else if ( _e.type == exUIEvent.Type.MouseMove ) {
+                OnPointerMove(_e);
+                return true;
+            }
+        }
+        else if ( _e.category == exUIEvent.Category.Touch ) {
+            if ( _e.type == exUIEvent.Type.TouchEnter ) {
+                OnHoverIn (_e);
+                return true;
+            }
+            else if ( _e.type == exUIEvent.Type.TouchExit ) {
+                if ( uimng.GetTouchFocus(_e.touchID) == this ) {
+                    uimng.SetTouchFocus( _e.touchID, null );
+                }
+                OnHoverOut(_e);
+                return true;
+            }
+            else if ( _e.type == exUIEvent.Type.TouchDown ) {
+                uimng.SetTouchFocus( _e.touchID, this );
+                OnPress(_e);
+                return true;
+            }
+            else if ( _e.type == exUIEvent.Type.TouchUp ) {
+                if ( uimng.GetTouchFocus(_e.touchID) == this ) {
+                    uimng.SetTouchFocus( _e.touchID, null );
+                }
+                OnRelease(_e);
+                OnHoverOut(_e);
+                return true;
+            }
+            else if ( _e.type == exUIEvent.Type.TouchMove ) {
+                OnPointerMove(_e);
+                return true;
+            }
+        }
 
-        // case exUIEvent.Type.PointerPress: 
-        //     exUIMng.focus = this;
-        //     if ( OnButtonPress != null ) {
-        //         OnButtonPress ();
-        //         return true;
-        //     }
-        //     return false;
-
-        // case exUIEvent.Type.PointerRelease: 
-        //     exUIMng.focus = null;
-        //     if ( OnButtonRelease != null ) {
-        //         OnButtonRelease ();
-        //         return true;
-        //     }
-        //     return false;
-
-        // case exUIEvent.Type.PointerMove: 
-        //     if ( OnPointerMove != null ) {
-        //         OnPointerMove ();
-        //         return false;
-        //     }
-        //     return true;
-        // }
-
+        //
         return false;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    protected override void OnSizeChanged ( float _newWidth, float _newHeight ) {
+        base.OnSizeChanged( _newWidth, _newHeight );
+
+        if ( background ) {
+            exSprite spriteBG = background as exSprite;
+            if ( spriteBG ) {
+                spriteBG.width = _newWidth;
+                spriteBG.height = _newHeight;
+            }
+            else {
+                exSpriteBorder borderBG = background as exSpriteBorder;
+                if ( borderBG ) {
+                    borderBG.width = _newWidth;
+                    borderBG.height = _newHeight;
+                }
+            }
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+	public virtual void OnHoverIn ( exUIEvent _e ) {
+        ProcessMessageInfoList ( hoverInSlots );
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+	public virtual void OnHoverOut ( exUIEvent _e ) {
+        ProcessMessageInfoList ( hoverOutSlots );
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+	public virtual void OnPress ( exUIEvent _e ) {
+        ProcessMessageInfoList ( pressSlots );
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+	public virtual void OnRelease ( exUIEvent _e ) {
+        ProcessMessageInfoList ( releaseSlots );
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+	public virtual void OnPointerMove ( exUIEvent _e ) {
+        ProcessMessageInfoList ( moveSlots );
     }
 }

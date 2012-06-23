@@ -95,7 +95,9 @@ public class exUIButton : exUIElement {
                       _e.buttons == exUIEvent.MouseButtonFlags.Left )
             {
                 if ( isPressing ) {
-                    uimng.SetMouseFocus( null );
+                    if ( uimng.GetMouseFocus() == this ) {
+                        uimng.SetMouseFocus( null );
+                    }
                     isPressing = false;
                     OnClick(_e);
                 }
@@ -124,7 +126,9 @@ public class exUIButton : exUIElement {
             }
             else if ( _e.type == exUIEvent.Type.TouchUp ) {
                 if ( isPressing ) {
-                    uimng.SetTouchFocus( _e.touchID, null );
+                    if ( uimng.GetTouchFocus(_e.touchID) == this ) {
+                        uimng.SetTouchFocus( _e.touchID, null );
+                    }
                     isPressing = false;
                     OnClick(_e);
                 }
@@ -136,6 +140,29 @@ public class exUIButton : exUIElement {
 
         //
         return false;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    protected override void OnSizeChanged ( float _newWidth, float _newHeight ) {
+        base.OnSizeChanged( _newWidth, _newHeight );
+
+        if ( background ) {
+            exSprite spriteBG = background as exSprite;
+            if ( spriteBG ) {
+                spriteBG.width = _newWidth;
+                spriteBG.height = _newHeight;
+            }
+            else {
+                exSpriteBorder borderBG = background as exSpriteBorder;
+                if ( borderBG ) {
+                    borderBG.width = _newWidth;
+                    borderBG.height = _newHeight;
+                }
+            }
+        }
     }
 
     // ------------------------------------------------------------------ 
@@ -176,27 +203,6 @@ public class exUIButton : exUIElement {
 
 	public virtual void OnClick ( exUIEvent _e ) {
         ProcessMessageInfoList ( clickSlots );
-    }
-
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
-    protected override void OnSizeChanged ( float _newWidth, float _newHeight ) {
-        base.OnSizeChanged( _newWidth, _newHeight );
-
-        if ( background ) {
-            exSprite spriteBG = background as exSprite;
-            if ( spriteBG ) {
-                spriteBG.width = _newWidth;
-                spriteBG.height = _newHeight;
-            }
-            exSpriteBorder borderBG = background as exSpriteBorder;
-            if ( borderBG ) {
-                borderBG.width = _newWidth;
-                borderBG.height = _newHeight;
-            }
-        }
     }
 
 }

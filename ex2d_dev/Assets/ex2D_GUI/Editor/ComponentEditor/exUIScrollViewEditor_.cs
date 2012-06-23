@@ -1,7 +1,7 @@
 // ======================================================================================
-// File         : exUIScrollViewEditor.cs
+// File         : exUIScrollViewEditor_.cs
 // Author       : Wu Jie 
-// Last Change  : 11/03/2011 | 17:55:15 PM | Thursday,November
+// Last Change  : 06/23/2012 | 17:36:22 PM | Saturday,June
 // Description  : 
 // ======================================================================================
 
@@ -17,14 +17,14 @@ using System.Collections;
 // public
 ///////////////////////////////////////////////////////////////////////////////
 
-[CustomEditor(typeof(exUIScrollView))]
-public class exUIScrollViewEditor : exUIElementEditor {
+[CustomEditor(typeof(exUIScrollView_))]
+public class exUIScrollViewEditor_ : exUIElementEditor {
 
     ///////////////////////////////////////////////////////////////////////////////
     // properties
     ///////////////////////////////////////////////////////////////////////////////
 
-    private exUIScrollView editScrollView;
+    private exUIScrollView_ editScrollView;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -37,7 +37,7 @@ public class exUIScrollViewEditor : exUIElementEditor {
     protected new void OnEnable () {
         base.OnEnable();
         if ( target != editScrollView ) {
-            editScrollView = target as exUIScrollView;
+            editScrollView = target as exUIScrollView_;
         }
     }
 
@@ -95,7 +95,7 @@ public class exUIScrollViewEditor : exUIElementEditor {
 
         GUI.enabled = !inAnimMode;
         EditorGUIUtility.LookLikeControls ();
-        editScrollView.scrollDirection = (exUIScrollView.ScrollDirection)EditorGUILayout.EnumPopup( "Scroll Direction", editScrollView.scrollDirection, GUILayout.Width(165) );
+        editScrollView.scrollDirection = (exUIScrollView_.ScrollDirection)EditorGUILayout.EnumPopup( "Scroll Direction", editScrollView.scrollDirection, GUILayout.Width(165) );
         EditorGUIUtility.LookLikeInspector ();
         GUI.enabled = true;
 

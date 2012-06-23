@@ -1,7 +1,7 @@
 // ======================================================================================
-// File         : exUIScrollView.cs
+// File         : exUIScrollView_.cs
 // Author       : Wu Jie 
-// Last Change  : 11/01/2011 | 15:25:52 PM | Tuesday,November
+// Last Change  : 06/23/2012 | 17:36:09 PM | Saturday,June
 // Description  : 
 // ======================================================================================
 
@@ -23,7 +23,7 @@ using System.Collections.Generic;
 
 [ExecuteInEditMode]
 [AddComponentMenu("ex2D GUI/Button")]
-public class exUIScrollView : exUIElement {
+public class exUIScrollView_ : exUIElement {
 
     // delegates
 	public delegate void EventHandler ();
