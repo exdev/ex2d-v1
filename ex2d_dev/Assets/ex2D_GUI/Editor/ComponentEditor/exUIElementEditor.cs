@@ -78,26 +78,18 @@ public class exUIElementEditor : exPlaneEditor {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    protected bool MessageInfoField ( string _label, exUIElement.MessageInfo _info ) {
-        bool doRemove = false;
-
+    protected void MessageInfoField ( string _label, SerializedProperty _infoProp ) {
         ++EditorGUI.indentLevel;
         EditorGUILayout.BeginHorizontal(new GUILayoutOption[0]);
             // label
             EditorGUILayout.LabelField(_label, GUILayout.Width(50));
 
             // receiver
-            GameObject go = EditorGUILayout.ObjectField( _info.receiver, typeof(GameObject), true, GUILayout.Width(150) ) as GameObject;
-            if ( go != null && EditorUtility.IsPersistent(go) == false ) {
-                _info.receiver = go;
-            }
-            else {
-                _info.receiver = null;
-            }
+            EditorGUILayout.PropertyField( _infoProp.FindPropertyRelative ( "receiver" ), new GUIContent("") );
 
             // method
             EditorGUIUtility.LookLikeControls ();
-                _info.method = EditorGUILayout.TextField( _info.method );
+                EditorGUILayout.PropertyField ( _infoProp.FindPropertyRelative ( "method" ), new GUIContent("") );
             EditorGUIUtility.LookLikeInspector ();
 
             // remove button
@@ -106,36 +98,38 @@ public class exUIElementEditor : exPlaneEditor {
             GUI.backgroundColor = Color.red;
             GUI.contentColor = Color.yellow;
             if ( GUILayout.Button( "-", GUILayout.Width(20) ) )
-                doRemove = true;
+                _infoProp.DeleteCommand();
+
             GUI.backgroundColor = oldBGColor;
             GUI.contentColor = oldCTColor;
         EditorGUILayout.EndHorizontal();
         --EditorGUI.indentLevel;
-
-        return doRemove;
     } 
 
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    protected void MessageInfoListField ( string _label, List<exUIElement.MessageInfo> _infoList ) {
+    protected void MessageInfoListField ( string _label, SerializedProperty _infoListProp ) {
         EditorGUILayout.BeginHorizontal(new GUILayoutOption[0]);
             EditorGUILayout.LabelField( _label );
             GUILayout.FlexibleSpace();
             if ( GUILayout.Button( "+", GUILayout.Width(20) ) ) {
-                exUIElement.MessageInfo msgInfo = new exUIElement.MessageInfo();
-                msgInfo.receiver = (target as exUIButton).gameObject;
-                _infoList.Add ( msgInfo );
+                _infoListProp.InsertArrayElementAtIndex ( _infoListProp.arraySize-1 );
+                SerializedProperty msgInfoProp = _infoListProp.GetArrayElementAtIndex( _infoListProp.arraySize-1 );
+                msgInfoProp.FindPropertyRelative ( "receiver" ).objectReferenceValue = (target as exUIButton).gameObject;
+                msgInfoProp.FindPropertyRelative ( "method" ).stringValue = "";
             }
         EditorGUILayout.EndHorizontal();
         GUILayout.Space(5);
 
-        for ( int i = 0; i < _infoList.Count; ++i ) {
-            if ( MessageInfoField ( "[" + i + "]", _infoList[i] ) ) {
-                _infoList.RemoveAt(i);
-                --i;
-            }
+        //
+        int i = 0;
+        SerializedProperty infoProp = _infoListProp.GetArrayElementAtIndex(0);
+        SerializedProperty endProperty = _infoListProp.GetEndProperty();
+        while ( infoProp.NextVisible(false) && !SerializedProperty.EqualContents(infoProp, endProperty) ) {
+            MessageInfoField ( "[" + i + "]", infoProp );
+            ++i;
         }
     }
 

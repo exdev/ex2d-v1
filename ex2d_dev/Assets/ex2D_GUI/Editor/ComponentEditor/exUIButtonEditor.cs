@@ -24,6 +24,12 @@ public class exUIButtonEditor : exUIElementEditor {
     SerializedProperty fontProp;
     SerializedProperty backgroundProp;
 
+    SerializedProperty hoverInSlotsProp;
+    SerializedProperty hoverOutSlotsProp;
+    SerializedProperty pressSlotsProp;
+    SerializedProperty releaseSlotsProp;
+    SerializedProperty clickSlotsProp;
+
     ///////////////////////////////////////////////////////////////////////////////
     // functions
     ///////////////////////////////////////////////////////////////////////////////
@@ -38,6 +44,12 @@ public class exUIButtonEditor : exUIElementEditor {
         textProp = serializedObject.FindProperty ("text_");
         fontProp = serializedObject.FindProperty ("font");
         backgroundProp = serializedObject.FindProperty ("background");
+
+        hoverInSlotsProp = serializedObject.FindProperty ("hoverInSlots");
+        hoverOutSlotsProp = serializedObject.FindProperty ("hoverOutSlots");
+        pressSlotsProp = serializedObject.FindProperty ("pressSlots");
+        releaseSlotsProp = serializedObject.FindProperty ("releaseSlots");
+        clickSlotsProp = serializedObject.FindProperty ("clickSlots");
     }
 
     // ------------------------------------------------------------------ 
@@ -59,8 +71,7 @@ public class exUIButtonEditor : exUIElementEditor {
 
         serializedObject.Update ();
 
-            exUIButton curEdit = target as exUIButton;
-
+            //
             EditorGUILayout.PropertyField( textProp, new GUIContent("Text") );
             EditorGUILayout.PropertyField( fontProp );
             EditorGUILayout.PropertyField( backgroundProp );
@@ -68,19 +79,19 @@ public class exUIButtonEditor : exUIElementEditor {
 
             // message infos
             EditorGUILayout.Space();
-            MessageInfoListField ( "On Hover In", curEdit.hoverInSlots );
+            MessageInfoListField ( "On Hover In", hoverInSlotsProp );
 
             EditorGUILayout.Space();
-            MessageInfoListField ( "On Hover Out", curEdit.hoverOutSlots );
+            MessageInfoListField ( "On Hover Out", hoverOutSlotsProp );
 
             EditorGUILayout.Space();
-            MessageInfoListField ( "On Press", curEdit.pressSlots );
+            MessageInfoListField ( "On Press", pressSlotsProp );
 
             EditorGUILayout.Space();
-            MessageInfoListField ( "On Rlease", curEdit.releaseSlots );
+            MessageInfoListField ( "On Rlease", releaseSlotsProp );
 
             EditorGUILayout.Space();
-            MessageInfoListField ( "On Click", curEdit.clickSlots );
+            MessageInfoListField ( "On Click", clickSlotsProp );
 
 
         serializedObject.ApplyModifiedProperties ();
@@ -96,16 +107,20 @@ public class exUIButtonEditor : exUIElementEditor {
         serializedObject.Update ();
             exUIButton curEdit = target as exUIButton;
 
-            if ( curEdit.font.text != textProp.stringValue ) {
-                curEdit.font.text = textProp.stringValue;
-                EditorUtility.SetDirty(curEdit.font);
-                HandleUtility.Repaint(); 
+            if ( curEdit.font ) {
+                if ( curEdit.font.text != textProp.stringValue ) {
+                    curEdit.font.text = textProp.stringValue;
+                    EditorUtility.SetDirty(curEdit.font);
+                    HandleUtility.Repaint(); 
+                }
             }
 
-            if ( curEdit.anchor != curEdit.background.anchor ) {
-                curEdit.background.anchor = curEdit.anchor;
-                EditorUtility.SetDirty(curEdit.background);
-                HandleUtility.Repaint(); 
+            if ( curEdit.background ) {
+                if ( curEdit.background.anchor != curEdit.anchor ) {
+                    curEdit.background.anchor = curEdit.anchor;
+                    EditorUtility.SetDirty(curEdit.background);
+                    HandleUtility.Repaint(); 
+                }
             }
         serializedObject.ApplyModifiedProperties ();
     }
