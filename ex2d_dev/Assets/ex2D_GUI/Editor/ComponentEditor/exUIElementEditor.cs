@@ -115,21 +115,26 @@ public class exUIElementEditor : exPlaneEditor {
             EditorGUILayout.LabelField( _label );
             GUILayout.FlexibleSpace();
             if ( GUILayout.Button( "+", GUILayout.Width(20) ) ) {
+				if ( _infoListProp.arraySize == 0 ) {
+					_infoListProp.arraySize = 1;
+				}
                 _infoListProp.InsertArrayElementAtIndex ( _infoListProp.arraySize-1 );
                 SerializedProperty msgInfoProp = _infoListProp.GetArrayElementAtIndex( _infoListProp.arraySize-1 );
-                msgInfoProp.FindPropertyRelative ( "receiver" ).objectReferenceValue = (target as exUIButton).gameObject;
+                msgInfoProp.FindPropertyRelative ( "receiver" ).objectReferenceValue = (target as exUIElement).gameObject;
                 msgInfoProp.FindPropertyRelative ( "method" ).stringValue = "";
             }
         EditorGUILayout.EndHorizontal();
         GUILayout.Space(5);
 
         //
-        int i = 0;
-        SerializedProperty infoProp = _infoListProp.GetArrayElementAtIndex(0);
-        SerializedProperty endProperty = _infoListProp.GetEndProperty();
-        while ( infoProp.NextVisible(false) && !SerializedProperty.EqualContents(infoProp, endProperty) ) {
-            MessageInfoField ( "[" + i + "]", infoProp );
-            ++i;
+        if ( _infoListProp.arraySize > 0 ) {
+            int i = 0;
+            SerializedProperty infoProp = _infoListProp.GetArrayElementAtIndex(0);
+            SerializedProperty endProperty = _infoListProp.GetEndProperty();
+            while ( infoProp.NextVisible(false) && !SerializedProperty.EqualContents(infoProp, endProperty) ) {
+                MessageInfoField ( "[" + i + "]", infoProp );
+                ++i;
+            }
         }
     }
 
