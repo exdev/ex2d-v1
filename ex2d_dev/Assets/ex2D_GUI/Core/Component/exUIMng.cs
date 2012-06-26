@@ -65,6 +65,19 @@ public class ElementSorter: IComparer<exUIElement> {
 // Desc: 
 // ------------------------------------------------------------------ 
 
+public class ElementSorterByZ: IComparer<exUIElement> {
+    public int Compare( exUIElement _a, exUIElement _b ) {
+        int r = Mathf.CeilToInt(_a.transform.position.z - _b.transform.position.z);
+        if ( r != 0 )
+            return r;
+        return _a.GetInstanceID() - _b.GetInstanceID();
+    }
+}
+
+// ------------------------------------------------------------------ 
+// Desc: 
+// ------------------------------------------------------------------ 
+
 public class exUIEvent {
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -174,6 +187,7 @@ public class exUIMng : MonoBehaviour {
 
     // private RaycastSorter raycastSorter = new RaycastSorter();
     private ElementSorter elementSorter = new ElementSorter();
+    private ElementSorterByZ elementSorterByZ = new ElementSorterByZ();
 
     // internal ui status
     private bool initialized = false;
@@ -648,6 +662,7 @@ public class exUIMng : MonoBehaviour {
         }
         else {
             Vector3 worldPointerPos = camera.ScreenToWorldPoint ( _pos );
+            rootElements.Sort(elementSorterByZ);
             for ( int i = 0; i < rootElements.Count; ++i ) {
                 exUIElement el = rootElements[i];
                 exUIElement resultEL = RecursivelyGetUIElement ( el, worldPointerPos );
@@ -678,6 +693,7 @@ public class exUIMng : MonoBehaviour {
         Vector2 localPos = new Vector2( _pos.x - _el.transform.position.x, 
                                         _pos.y - _el.transform.position.y );
         if ( _el.boundingRect.Contains(localPos) ) {
+            _el.children.Sort(elementSorterByZ);
             for ( int i = 0; i < _el.children.Count; ++i ) {
                 exUIElement childEL = _el.children[i];
                 exUIElement resultEL = RecursivelyGetUIElement ( childEL, _pos );

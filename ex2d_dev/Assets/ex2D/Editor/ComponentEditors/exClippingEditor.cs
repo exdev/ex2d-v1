@@ -219,6 +219,8 @@ public class exClippingEditor : exPlaneEditor {
 
         default                         : offsetX = 0.0f;               offsetY = 0.0f;               break;
         }
+        offsetX += curEdit.offset.x;
+        offsetY += curEdit.offset.y;
 
         //
         vertices[0] = new Vector3 (-halfWidthScaled-offsetX,  halfHeightScaled+offsetY, 0.0f );
