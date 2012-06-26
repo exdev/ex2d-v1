@@ -147,11 +147,22 @@ public class exUIElement : exPlane {
 
     public static void FindAndAddChild ( exUIElement _el ) {
         _el.children.Clear();
-        foreach ( Transform child in _el.transform ) {
+        FindAndAddChildRecursively (_el, _el.transform );
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    static void FindAndAddChildRecursively ( exUIElement _el, Transform _trans ) {
+        foreach ( Transform child in _trans ) {
             exUIElement child_el = child.GetComponent<exUIElement>();
             if ( child_el ) {
                 _el.AddChild (child_el);
                 exUIElement.FindAndAddChild (child_el);
+            }
+            else {
+                FindAndAddChildRecursively( _el, child );
             }
         }
     }
