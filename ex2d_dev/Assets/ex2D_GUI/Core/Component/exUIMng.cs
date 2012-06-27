@@ -367,26 +367,7 @@ public class exUIMng : MonoBehaviour {
         for ( int i = 0; i < Input.touches.Length; ++i ) {
             Touch touch = Input.touches[i];
             TouchState touchState = null;
-
-            // find the touch state
-            int touchStateIndex = -1;
-            for ( int j = 0; j < touchStateList.Count; ++j ) {
-                touchState = touchStateList[j];
-                if ( touchState.touchID == touch.fingerId ) {
-                    touchStateIndex = j;
-                    break;
-                }
-            }
-
-            // set the last and current hot element 
-            exUIElement focusElement = null;
-            exUIElement lastHotElement = null;
             exUIElement hotElement = PickElement(touch.position);
-            if ( touchState != null ) {
-                lastHotElement = touchState.hotElement;
-                touchState.hotElement = hotElement;
-                focusElement = touchState.focusElement;
-            }
             
             //
             if ( touch.phase == TouchPhase.Began ) {
@@ -405,23 +386,93 @@ public class exUIMng : MonoBehaviour {
                 }
 
                 // NOTE: it must be null
-                if ( touchState == null ) {
-                    touchState = new TouchState();
-                    touchState.touchID = touch.fingerId;
-                    touchState.hotElement = hotElement;
-                    touchState.focusElement = null;
-                    touchStateList.Add(touchState);
-                }
-                else {
-                    Debug.LogError( "something wrong that the touch state is exists while touch just began" );
-                }
+                touchState = new TouchState();
+                touchState.touchID = touch.fingerId;
+                touchState.hotElement = hotElement;
+                touchState.focusElement = null;
+                touchStateList.Add(touchState);
             }
-            else if ( touch.phase == TouchPhase.Ended ) {
+            else {
+                // find the touch state
+                int touchStateIndex = -1;
+                for ( int j = 0; j < touchStateList.Count; ++j ) {
+                    touchState = touchStateList[j];
+                    if ( touchState.touchID == touch.fingerId ) {
+                        touchStateIndex = j;
+                        break;
+                    }
+                }
+
+                // set the last and current hot element 
+                exUIElement focusElement = null;
+                exUIElement lastHotElement = null;
                 if ( touchState != null ) {
+                    lastHotElement = touchState.hotElement;
+                    touchState.hotElement = hotElement;
+                    focusElement = touchState.focusElement;
+                }
+
+                if ( touch.phase == TouchPhase.Ended ) {
+                    if ( touchState != null ) {
+                        if ( focusElement != null ) {
+                            exUIEvent e = new exUIEvent(); 
+                            e.category = exUIEvent.Category.Touch;
+                            e.type =  exUIEvent.Type.TouchUp;
+                            e.position = touch.position;
+                            e.delta = touch.deltaPosition;
+                            e.touchID = touch.fingerId;
+
+                            EventInfo info = new EventInfo();
+                            info.primaryElement = focusElement;
+                            info.uiEvent = e;
+                            eventInfoList.Add(info);
+                        }
+                        touchStateList.RemoveAt(touchStateIndex);
+                    }
+                }
+                else if ( touch.phase == TouchPhase.Canceled ) {
+                    if ( touchState != null )
+                        touchStateList.RemoveAt(touchStateIndex);
+                }
+                else if ( touch.phase == TouchPhase.Moved ) {
+                    // process hover event
+                    if ( lastHotElement != hotElement ) {
+                        // add hover-in event
+                        if ( hotElement != null ) {
+                            exUIEvent e = new exUIEvent(); 
+                            e.category = exUIEvent.Category.Touch;
+                            e.type =  exUIEvent.Type.TouchEnter;
+                            e.position = touch.position;
+                            e.delta = touch.deltaPosition;
+                            e.touchID = touch.fingerId;
+
+                            EventInfo info = new EventInfo();
+                            info.primaryElement = hotElement;
+                            info.uiEvent = e;
+                            eventInfoList.Add(info);
+                        }
+
+                        // add hover-out event
+                        if ( lastHotElement != null ) {
+                            exUIEvent e = new exUIEvent(); 
+                            e.category = exUIEvent.Category.Touch;
+                            e.type =  exUIEvent.Type.TouchExit;
+                            e.position = touch.position;
+                            e.delta = touch.deltaPosition;
+                            e.touchID = touch.fingerId;
+
+                            EventInfo info = new EventInfo();
+                            info.primaryElement = lastHotElement;
+                            info.uiEvent = e;
+                            eventInfoList.Add(info);
+                        }
+                    }
+
+                    //
                     if ( focusElement != null ) {
                         exUIEvent e = new exUIEvent(); 
                         e.category = exUIEvent.Category.Touch;
-                        e.type =  exUIEvent.Type.TouchUp;
+                        e.type =  exUIEvent.Type.TouchMove;
                         e.position = touch.position;
                         e.delta = touch.deltaPosition;
                         e.touchID = touch.fingerId;
@@ -431,60 +482,6 @@ public class exUIMng : MonoBehaviour {
                         info.uiEvent = e;
                         eventInfoList.Add(info);
                     }
-                    touchStateList.RemoveAt(touchStateIndex);
-                }
-            }
-            else if ( touch.phase == TouchPhase.Canceled ) {
-                if ( touchState != null )
-                    touchStateList.RemoveAt(touchStateIndex);
-            }
-            else if ( touch.phase == TouchPhase.Moved ) {
-                // process hover event
-                if ( lastHotElement != hotElement ) {
-                    // add hover-in event
-                    if ( hotElement != null ) {
-                        exUIEvent e = new exUIEvent(); 
-                        e.category = exUIEvent.Category.Touch;
-                        e.type =  exUIEvent.Type.TouchEnter;
-                        e.position = touch.position;
-                        e.delta = touch.deltaPosition;
-                        e.touchID = touch.fingerId;
-
-                        EventInfo info = new EventInfo();
-                        info.primaryElement = hotElement;
-                        info.uiEvent = e;
-                        eventInfoList.Add(info);
-                    }
-
-                    // add hover-out event
-                    if ( lastHotElement != null ) {
-                        exUIEvent e = new exUIEvent(); 
-                        e.category = exUIEvent.Category.Touch;
-                        e.type =  exUIEvent.Type.TouchExit;
-                        e.position = touch.position;
-                        e.delta = touch.deltaPosition;
-                        e.touchID = touch.fingerId;
-
-                        EventInfo info = new EventInfo();
-                        info.primaryElement = lastHotElement;
-                        info.uiEvent = e;
-                        eventInfoList.Add(info);
-                    }
-                }
-
-                //
-                if ( focusElement != null ) {
-                    exUIEvent e = new exUIEvent(); 
-                    e.category = exUIEvent.Category.Touch;
-                    e.type =  exUIEvent.Type.TouchMove;
-                    e.position = touch.position;
-                    e.delta = touch.deltaPosition;
-                    e.touchID = touch.fingerId;
-
-                    EventInfo info = new EventInfo();
-                    info.primaryElement = focusElement;
-                    info.uiEvent = e;
-                    eventInfoList.Add(info);
                 }
             }
         }
