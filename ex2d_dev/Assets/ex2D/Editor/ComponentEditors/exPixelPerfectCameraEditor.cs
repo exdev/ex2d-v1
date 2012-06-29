@@ -19,13 +19,14 @@ using System.IO;
 ///////////////////////////////////////////////////////////////////////////////
 
 [CustomEditor(typeof(exPixelPerfectCamera))]
+[CanEditMultipleObjects]
 public class exPixelPerfectCameraEditor : Editor {
 
-    ///////////////////////////////////////////////////////////////////////////////
-    // properties
-    ///////////////////////////////////////////////////////////////////////////////
-
-    private exPixelPerfectCamera curEdit;
+    SerializedProperty customResolutionProp;
+    SerializedProperty widthProp;
+    SerializedProperty heightProp;
+    SerializedProperty fixOrthographicSizeProp;
+    SerializedProperty orthographicSizeProp;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -36,9 +37,11 @@ public class exPixelPerfectCameraEditor : Editor {
     // ------------------------------------------------------------------ 
 
     void OnEnable () {
-        if ( target != curEdit ) {
-            curEdit = target as exPixelPerfectCamera;
-        }
+        customResolutionProp    = serializedObject.FindProperty("customResolution");
+        widthProp               = serializedObject.FindProperty("width");
+        heightProp              = serializedObject.FindProperty("height");
+        fixOrthographicSizeProp = serializedObject.FindProperty("fixOrthographicSize");
+        orthographicSizeProp    = serializedObject.FindProperty("orthographicSize");
     }
 
     // ------------------------------------------------------------------ 
@@ -46,33 +49,25 @@ public class exPixelPerfectCameraEditor : Editor {
     // ------------------------------------------------------------------ 
 
 	public override void OnInspectorGUI () {
+        serializedObject.Update ();
 
-        EditorGUIUtility.LookLikeInspector ();
-        EditorGUILayout.Space ();
-        EditorGUI.indentLevel = 1;
+            //
+            EditorGUILayout.PropertyField (customResolutionProp);
+            GUI.enabled = customResolutionProp.boolValue;
+                ++EditorGUI.indentLevel;
+                EditorGUILayout.PropertyField (widthProp);
+                EditorGUILayout.PropertyField (heightProp);
+                --EditorGUI.indentLevel;
+            GUI.enabled = true;
 
-        // customResolution
-        GUILayout.BeginHorizontal();
-        GUILayout.Space(15);
-            curEdit.customResolution = GUILayout.Toggle ( curEdit.customResolution, "Custom Resolution" ); 
-        GUILayout.EndHorizontal();
+            //
+            EditorGUILayout.PropertyField (fixOrthographicSizeProp);
+            GUI.enabled = fixOrthographicSizeProp.boolValue;
+                ++EditorGUI.indentLevel;
+                EditorGUILayout.PropertyField (orthographicSizeProp);
+                --EditorGUI.indentLevel;
+            GUI.enabled = true;
 
-        GUI.enabled = curEdit.customResolution;
-        EditorGUI.indentLevel = 2;
-            // width
-            curEdit.width = EditorGUILayout.IntField ( "Width", curEdit.width );
-
-            // height
-            curEdit.height = EditorGUILayout.IntField ( "Height", curEdit.height );
-        EditorGUI.indentLevel = 1;
-        GUI.enabled = true;
-
-        // ======================================================== 
-        // check dirty 
-        // ======================================================== 
-
-        if ( GUI.changed ) {
-            EditorUtility.SetDirty(curEdit);
-        }
+        serializedObject.ApplyModifiedProperties ();
     }
 }
