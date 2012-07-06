@@ -119,6 +119,8 @@ public static partial class exAtlasInfoUtility {
             TextureImporter importSettings = TextureImporter.GetAtPath(atlasTexturePath) as TextureImporter;
             importSettings.maxTextureSize = Mathf.Max( newAtlasInfo.width, newAtlasInfo.height );
             importSettings.textureFormat = TextureImporterFormat.AutomaticTruecolor;
+            importSettings.wrapMode = TextureWrapMode.Clamp; // atlases should always be clamped, which allows to remove padding
+                                                             // around atlas and free up some pixel space
             importSettings.isReadable = false;
             importSettings.mipmapEnabled = false;
             importSettings.textureType = TextureImporterType.Advanced;
