@@ -581,14 +581,31 @@ partial class exAtlasEditor : EditorWindow {
                 // edge bleeding 
                 // ======================================================== 
 
+                GUI.enabled = !curEdit.useBuildColor;
                 GUILayout.BeginHorizontal();
-                    bool newUseEdgeBleeding = GUILayout.Toggle ( curEdit.useEdgeBleeding, new GUIContent( "Use Edge Bleeding", "Prevents edge artifacts due to bilinear filtering" )); 
+                    bool newUseEdgeBleeding = GUILayout.Toggle ( curEdit.useEdgeBleeding, new GUIContent( "Use Edge Bleeding", "Prevents artifacts around the visible edges of artwork due to bilinear filtering (requires Build Color to be turned off)" )) && !curEdit.useBuildColor; 
                     if ( newUseEdgeBleeding != curEdit.useEdgeBleeding ) {
                         curEdit.useEdgeBleeding = newUseEdgeBleeding;
                         curEdit.needRebuild = true;
                         GUI.changed = true;
                     }
                 GUILayout.EndHorizontal();
+                GUI.enabled = true;
+
+                // ======================================================== 
+                // border bleeding 
+                // ======================================================== 
+
+                GUI.enabled = curEdit.padding >= 2;
+                GUILayout.BeginHorizontal();
+                    bool newUseBorderBleeding = GUILayout.Toggle ( curEdit.useBorderBleeding, new GUIContent( "Use Border Bleeding", "Prevents artifacts and seams around the outer bounds of a texture due to bilinear filtering (requires padding >= 2)" )); 
+                    if ( newUseBorderBleeding != curEdit.useBorderBleeding ) {
+                        curEdit.useBorderBleeding = newUseBorderBleeding;
+                        curEdit.needRebuild = true;
+                        GUI.changed = true;
+                    }
+                GUILayout.EndHorizontal();
+                GUI.enabled = true;
 
                 // ======================================================== 
                 // bitmap fonts 
