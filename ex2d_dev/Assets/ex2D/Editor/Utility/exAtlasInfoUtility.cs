@@ -334,6 +334,11 @@ public static partial class exAtlasInfoUtility {
                 }
             }
 
+            // apply edge bleeding
+            if ( _atlasInfo.useEdgeBleeding ) {
+                srcTexture = exTextureHelper.ApplyEdgeBleeding( srcTexture );
+            }
+
             //
             exTextureHelper.Fill( _tex, 
                                   new Vector2 (el.coord[0], _tex.height - el.coord[1] - el.Height() ),  

@@ -208,5 +208,62 @@ public static class exTextureHelper {
         rect.y = _tex.height - rect.yMax;
         return rect;
     }
+
+    // ======================================================== 
+    // X and Y offsets used in edge bleeding for sampling all around each purely transparent pixel
+    // ======================================================== 
+
+    private static readonly int[] bleedingXOffsets = new []{ -1,  0,  1, -1,  1, -1,  0,  1 };
+    private static readonly int[] bleedingYOffsets = new []{ -1, -1, -1,  0,  0,  1,  1,  1 };
+
+    // ------------------------------------------------------------------ 
+    /// \param _tex the texture in which to apply edge bleeding
+    /// prevents edge artifacts due to bilinear filtering
+    /// Note: Some image editors like Photoshop tend to fill purely transparent pixel with
+    /// white color (R=1, G=1, B=1, A=0). This is generally OK, because these white pixels
+    /// are impossible to see in normal circumstances.  However, when such textures are
+    /// used in 3D with bilinear filtering, the shader will sometimes sample beyond visible
+    /// edges into purely transparent pixels and the white color stored there will bleed
+    /// into the visible edge.  This method scans the texture to find all purely transparent
+    /// pixels that have a visible neighbor pixel, and copy the color data from that neighbor
+    /// into the transparent pixel, while preserving its 0 alpha value.  In order to
+    /// optimize the algorithm for speed of execution, a compromise is made to use any
+    /// arbitrary neighboring pixel, as this should generally lead to correct results.
+    /// It also limits itself to the immediate neighbors around the edge, resulting in a
+    /// a bleeding of a single pixel border around the edges, which should be fine, as bilinear
+    /// filtering should generally not sample beyond that one pixel range.
+    // ------------------------------------------------------------------ 
+
+    public static Texture2D ApplyEdgeBleeding ( Texture2D _tex ) {
+        // Extract pixel buffer to be modified
+        Color32[] pixels = _tex.GetPixels32(0);
+
+        for ( int x = 0; x < _tex.width; ++x ) {
+            for ( int y = 0; y < _tex.height; ++y ) {
+                // only try to bleed into purely transparent pixels
+                if ( pixels[x + y * _tex.width].a == 0 ) {
+                    // sample all around to find any non-purely transparent pixels
+                    for ( int i = 0; i < bleedingXOffsets.Length; i++ ) {
+                        int sampleX = x + bleedingXOffsets[i];
+                        int sampleY = y + bleedingYOffsets[i];
+						// check to stay within texture bounds
+                        if (sampleX >= 0 && sampleX < _tex.width && sampleY >= 0 && sampleY < _tex.height) {
+                            Color32 color = pixels[sampleX + sampleY * _tex.width];
+                            if (color.a != 0) {
+                                // Copy RGB color channels to purely transparent pixel, but preserving its 0 alpha
+                                pixels[x + y * _tex.width] = new Color32(color.r, color.g, color.b, 0);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Copy modified pixel buffer to new texture (to preserve original and allow user to uncheck the option)
+        Texture2D tex = new Texture2D(_tex.width, _tex.height, _tex.format, false);
+        tex.SetPixels32(pixels);
+        return tex;
+    }
 }
 

@@ -578,6 +578,19 @@ partial class exAtlasEditor : EditorWindow {
                 }
 
                 // ======================================================== 
+                // edge bleeding 
+                // ======================================================== 
+
+                GUILayout.BeginHorizontal();
+                    bool newUseEdgeBleeding = GUILayout.Toggle ( curEdit.useEdgeBleeding, new GUIContent( "Use Edge Bleeding", "Prevents edge artifacts due to bilinear filtering" )); 
+                    if ( newUseEdgeBleeding != curEdit.useEdgeBleeding ) {
+                        curEdit.useEdgeBleeding = newUseEdgeBleeding;
+                        curEdit.needRebuild = true;
+                        GUI.changed = true;
+                    }
+                GUILayout.EndHorizontal();
+
+                // ======================================================== 
                 // bitmap fonts 
                 // ======================================================== 
 
