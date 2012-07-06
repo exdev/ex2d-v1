@@ -338,9 +338,9 @@ public static partial class exAtlasInfoUtility {
                 }
             }
 
-            // apply edge bleeding
-            if ( _atlasInfo.useEdgeBleeding ) {
-                srcTexture = exTextureHelper.ApplyEdgeBleeding( srcTexture );
+            // apply contour bleed
+            if ( _atlasInfo.useContourBleed ) {
+                srcTexture = exTextureHelper.ApplyContourBleed( srcTexture );
             }
 
             // copy element's texture into atlas texture
@@ -353,10 +353,10 @@ public static partial class exAtlasInfoUtility {
                                   _atlasInfo.useBuildColor,
                                   _atlasInfo.buildColor );
 
-            // apply border bleeding
-            if ( _atlasInfo.useBorderBleeding ) {
-                exTextureHelper.ApplyBorderBleeding( _tex,
-                                                     new Rect( destX, destY, el.trimRect.width, el.trimRect.height ) );
+            // apply padding bleed
+            if ( _atlasInfo.usePaddingBleed ) {
+                exTextureHelper.ApplyPaddingBleed( _tex,
+                                                   new Rect( destX, destY, el.trimRect.width, el.trimRect.height ) );
             }
 
             // TODO { 

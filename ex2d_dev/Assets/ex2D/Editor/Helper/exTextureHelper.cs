@@ -211,14 +211,14 @@ public static class exTextureHelper {
     }
 
     // ======================================================== 
-    // X and Y offsets used in edge bleeding for sampling all around each purely transparent pixel
+    // X and Y offsets used in contour bleed for sampling all around each purely transparent pixel
     // ======================================================== 
 
-    private static readonly int[] bleedingXOffsets = new []{ -1,  0,  1, -1,  1, -1,  0,  1 };
-    private static readonly int[] bleedingYOffsets = new []{ -1, -1, -1,  0,  0,  1,  1,  1 };
+    private static readonly int[] bleedXOffsets = new []{ -1,  0,  1, -1,  1, -1,  0,  1 };
+    private static readonly int[] bleedYOffsets = new []{ -1, -1, -1,  0,  0,  1,  1,  1 };
 
     // ------------------------------------------------------------------ 
-    /// \param _tex the texture in which to apply edge bleeding
+    /// \param _tex the texture in which to apply contour bleed
     /// prevents edge artifacts due to bilinear filtering
     /// Note: Some image editors like Photoshop tend to fill purely transparent pixel with
     /// white color (R=1, G=1, B=1, A=0). This is generally OK, because these white pixels
@@ -231,11 +231,11 @@ public static class exTextureHelper {
     /// optimize the algorithm for speed of execution, a compromise is made to use any
     /// arbitrary neighboring pixel, as this should generally lead to correct results.
     /// It also limits itself to the immediate neighbors around the edge, resulting in a
-    /// a bleeding of a single pixel border around the edges, which should be fine, as bilinear
+    /// a bleed of a single pixel border around the edges, which should be fine, as bilinear
     /// filtering should generally not sample beyond that one pixel range.
     // ------------------------------------------------------------------ 
 
-    public static Texture2D ApplyEdgeBleeding ( Texture2D _tex ) {
+    public static Texture2D ApplyContourBleed ( Texture2D _tex ) {
         // Extract pixel buffer to be modified
         Color32[] pixels = _tex.GetPixels32(0);
 
@@ -244,9 +244,9 @@ public static class exTextureHelper {
                 // only try to bleed into purely transparent pixels
                 if ( pixels[x + y * _tex.width].a == 0 ) {
                     // sample all around to find any non-purely transparent pixels
-                    for ( int i = 0; i < bleedingXOffsets.Length; i++ ) {
-                        int sampleX = x + bleedingXOffsets[i];
-                        int sampleY = y + bleedingYOffsets[i];
+                    for ( int i = 0; i < bleedXOffsets.Length; i++ ) {
+                        int sampleX = x + bleedXOffsets[i];
+                        int sampleY = y + bleedYOffsets[i];
 						// check to stay within texture bounds
                         if (sampleX >= 0 && sampleX < _tex.width && sampleY >= 0 && sampleY < _tex.height) {
                             Color32 color = pixels[sampleX + sampleY * _tex.width];
@@ -268,14 +268,14 @@ public static class exTextureHelper {
     }
 
     // ------------------------------------------------------------------ 
-    /// \param _tex the texture in which to apply border bleeding
-    /// \param _rect the bounds of the element around which to apply bleeding
+    /// \param _tex the texture in which to apply padding bleed
+    /// \param _rect the bounds of the element around which to apply bleed
     /// prevents border artifacts due to bilinear filtering
     /// Note: Shaders with bilinear filtering will sometimes sample outside the bounds
     /// of the element, in the padding area, resulting in the padding color to bleed
     /// around the rectangular borders of the element.  This is true even when padding is
     /// purely transparent, because in that case, it is the 0 alpha that bleeds into the
-    /// alpha of the outer pixels.  Such alpha bleeding is especially problematic when
+    /// alpha of the outer pixels.  Such alpha bleed is especially problematic when
     /// trying to seamlessly tile multiple rectangular textures, as semi-transparent seams
     /// will sometimes appear at different scales.  This method duplicates a single row of
     /// pixels from the inner border of an element into the padding area.  This technique
@@ -284,7 +284,18 @@ public static class exTextureHelper {
     /// or transparent) values when it exceeds the bounds of the element.
     // ------------------------------------------------------------------ 
 
-    public static void ApplyBorderBleeding( Texture2D _tex, Rect _rect ) {
+    public static void ApplyPaddingBleed( Texture2D _tex, Rect _rect ) {
+        
+        // NOTE: Possible optimization: If Get/SetPixels32() make a copy of the data (instead
+        // of just returning a reference to it, this method call might be very intensive on
+        // CPU, as the *entire* atlas would be copied twice for *every* element.  A simple way
+        // to optimize that would be to externalize the call to GetPixels32() out of this method
+        // and out of the foreach, then call ApplyPaddingBleed() for every element, and finally
+        // call SetPixel32() to copy data back into atlas.  It would require two foreach instead
+        // of one, but the performance could be greatly improved.  That stands *only* if
+        // Get/SetPixels32() make a copy of the data, otherwise there is no performance
+        // cost to the current algorithm.  It might be worth investigating that...
+        
         // Extract pixel buffer to be modified
         Color32[] pixels = _tex.GetPixels32(0);
         
