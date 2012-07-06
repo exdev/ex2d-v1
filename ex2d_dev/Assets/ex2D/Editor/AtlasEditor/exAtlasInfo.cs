@@ -128,6 +128,7 @@ public partial class exAtlasInfo : ScriptableObject {
     public bool useEdgeBleeding = false; ///< extends the color of pixels at the edge of transparent pixels to prevent bilinear filtering artifacts
     public bool useBorderBleeding = false; ///< extends the color and alpha of pixels on border of each element into the surrounding padding area
     public bool trimElements = true; ///< trim all element when importing
+    public bool readable = false; ///< enabled Read/Write option for atlas texture after build
 
     // canvas settings
     public bool foldCanvas = true; ///< canvas fold option

@@ -341,7 +341,8 @@ partial class exAtlasEditor : EditorWindow {
 
                         TextureImporter importSettings = TextureImporter.GetAtPath(path) as TextureImporter;
                         importSettings.maxTextureSize = Mathf.Max( width, height );
-                        importSettings.isReadable = false;
+                        importSettings.wrapMode = TextureWrapMode.Clamp;
+                        importSettings.isReadable = curEdit.readable;
                         AssetDatabase.ImportAsset( path );
                     }
 
@@ -477,6 +478,7 @@ partial class exAtlasEditor : EditorWindow {
                         importSettings.maxTextureSize = Mathf.Max( curEdit.width, curEdit.height );
                         importSettings.textureFormat = TextureImporterFormat.AutomaticTruecolor;
                         importSettings.isReadable = true;
+                        importSettings.wrapMode = TextureWrapMode.Clamp;
                         importSettings.mipmapEnabled = false;
                         importSettings.textureType = TextureImporterType.Advanced;
                         importSettings.npotScale = TextureImporterNPOTScale.None;
@@ -564,20 +566,6 @@ partial class exAtlasEditor : EditorWindow {
                 GUILayout.EndHorizontal();
 
                 // ======================================================== 
-                // trim elements 
-                // ======================================================== 
-
-                bool newTrimElements = GUILayout.Toggle ( curEdit.trimElements, "Trimmed Elements" ); 
-                if ( newTrimElements != curEdit.trimElements ) {
-                    curEdit.trimElements = newTrimElements;
-                    foreach ( exAtlasInfo.Element el in curEdit.elements ) {
-                        curEdit.UpdateElement( el.texture, newTrimElements );
-                    }
-                    curEdit.needRebuild = true;
-                    GUI.changed = true;
-                }
-
-                // ======================================================== 
                 // edge bleeding 
                 // ======================================================== 
 
@@ -606,6 +594,31 @@ partial class exAtlasEditor : EditorWindow {
                     }
                 GUILayout.EndHorizontal();
                 GUI.enabled = true;
+
+                // ======================================================== 
+                // trim elements 
+                // ======================================================== 
+
+                bool newTrimElements = GUILayout.Toggle ( curEdit.trimElements, "Trimmed Elements" ); 
+                if ( newTrimElements != curEdit.trimElements ) {
+                    curEdit.trimElements = newTrimElements;
+                    foreach ( exAtlasInfo.Element el in curEdit.elements ) {
+                        curEdit.UpdateElement( el.texture, newTrimElements );
+                    }
+                    curEdit.needRebuild = true;
+                    GUI.changed = true;
+                }
+
+                // ======================================================== 
+                // readable
+                // ======================================================== 
+
+                bool newReadable = GUILayout.Toggle ( curEdit.readable, "Read/Write Enabled" ); 
+                if ( newReadable != curEdit.readable ) {
+                    curEdit.readable = newReadable;
+                    GUI.changed = true;
+                    exTextureHelper.SetReadable ( curEdit.texture, curEdit.readable );
+                }
 
                 // ======================================================== 
                 // bitmap fonts 

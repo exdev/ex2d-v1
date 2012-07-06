@@ -231,7 +231,8 @@ public static partial class exAtlasInfoUtility {
 
             // now we finish atlas texture filling, we should turn off Read/Write settings, that will save memory a lot!
             TextureImporter importSettings = TextureImporter.GetAtPath(path) as TextureImporter;
-            importSettings.isReadable = false;
+            importSettings.wrapMode = TextureWrapMode.Clamp;
+            importSettings.isReadable = _atlasInfo.readable;
             AssetDatabase.ImportAsset( path );
 
             //
