@@ -61,7 +61,7 @@ partial class exAtlasInfo {
             //
             float areaWidth = _el.trimRect.width + _el.atlasInfo.padding;
             float areaHeight = _el.trimRect.height + _el.atlasInfo.padding;
-            if ( areaWidth <= rect.width && areaHeight <= rect.height )
+            if (_el.trimRect.width <= rect.width && _el.trimRect.height <= rect.height)
             {
                 child = new Node[2];
                 child[0] = new Node( new Rect ( rect.x + areaWidth, 
@@ -89,16 +89,16 @@ partial class exAtlasInfo {
         int i = 0; 
         Node root = new Node( new Rect( 0,
                                         0,
-                                        width - padding,
-                                        height - padding ) );
+                                        width,
+                                        height ) );
         foreach ( exAtlasInfo.Element el in elements ) {
             Node n = root.Insert (el);
             if ( n == null ) {
                 Debug.LogError( "Failed to layout element " + el.texture.name );
                 break;
             }
-            el.coord[0] = (int)n.rect.x + padding;
-            el.coord[1] = (int)n.rect.y + padding;
+            el.coord[0] = (int)n.rect.x;
+            el.coord[1] = (int)n.rect.y;
             ++i;
         }
     }
@@ -108,21 +108,18 @@ partial class exAtlasInfo {
     // ------------------------------------------------------------------ 
 
     void BasicPack () {
-        int curX = padding;
-        int curY = padding;
+        int curX = 0;
+        int curY = 0;
         int maxY = 0; 
         int i = 0; 
 
-        foreach ( exAtlasInfo.Element el in elements ) {
-            if ( (curX + el.Width() + padding) >= width ) {
-                curX = padding;
+        foreach ( Element el in elements ) {
+            if ( (curX + el.Width()) > width ) {
+                curX = 0;
                 curY = curY + maxY + padding;
                 maxY = 0;
             }
-            if ( el.Height() > maxY ) {
-                maxY = el.Height();
-            }
-            if ( (maxY + el.Height()) >= height ) {
+            if ( (curY + el.Height()) > height ) {
                 Debug.LogError( "Failed to layout element " + el.texture.name );
                 break;
             }
@@ -130,6 +127,9 @@ partial class exAtlasInfo {
             el.coord[1] = curY;
 
             curX = curX + el.Width() + padding;
+            if (el.Height() > maxY) {
+                maxY = el.Height();
+            }
             ++i;
         }
     }

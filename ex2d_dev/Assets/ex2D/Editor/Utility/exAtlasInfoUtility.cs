@@ -119,6 +119,8 @@ public static partial class exAtlasInfoUtility {
             TextureImporter importSettings = TextureImporter.GetAtPath(atlasTexturePath) as TextureImporter;
             importSettings.maxTextureSize = Mathf.Max( newAtlasInfo.width, newAtlasInfo.height );
             importSettings.textureFormat = TextureImporterFormat.AutomaticTruecolor;
+            importSettings.wrapMode = TextureWrapMode.Clamp; // atlases should always be clamped, which allows to remove padding
+                                                             // around atlas and free up some pixel space
             importSettings.isReadable = false;
             importSettings.mipmapEnabled = false;
             importSettings.textureType = TextureImporterType.Advanced;
@@ -313,11 +315,12 @@ public static partial class exAtlasInfoUtility {
             // } DISABLE end 
 
             Texture2D srcTexture = el.texture;
+            int destX = el.coord[0];
             if ( el.isFontElement ) {
                 // build the font
                 exBitmapFont.CharInfo charInfo = el.destFontInfo.GetCharInfo(el.charInfo.id);
                 if ( charInfo != null ) {
-                    charInfo.uv0 = new Vector2 ( (float)el.coord[0] / _tex.width,
+                    charInfo.uv0 = new Vector2 ( (float)destX / _tex.width,
                                                  (_tex.height - (float)el.coord[1] - charInfo.height) / _tex.height );
                     EditorUtility.SetDirty(el.destFontInfo);
                 }
@@ -334,14 +337,27 @@ public static partial class exAtlasInfoUtility {
                 }
             }
 
-            //
+            // apply edge bleeding
+            if ( _atlasInfo.useEdgeBleeding ) {
+                srcTexture = exTextureHelper.ApplyEdgeBleeding( srcTexture );
+            }
+
+            // copy element's texture into atlas texture
+            int destY = _tex.height - el.coord[1] - el.Height();
             exTextureHelper.Fill( _tex, 
-                                  new Vector2 (el.coord[0], _tex.height - el.coord[1] - el.Height() ),  
+                                  new Vector2 ( destX, destY ),  
                                   srcTexture,
                                   el.trimRect,
                                   el.rotated ? exTextureHelper.RotateDirection.RotRight : exTextureHelper.RotateDirection.None,
                                   _atlasInfo.useBuildColor,
-                                  _atlasInfo.buildColor ); 
+                                  _atlasInfo.buildColor );
+
+            // apply border bleeding
+            if ( _atlasInfo.useBorderBleeding ) {
+                exTextureHelper.ApplyBorderBleeding( _tex,
+                                                     new Rect( destX, destY, el.trimRect.width, el.trimRect.height ) );
+            }
+
             // TODO { 
             // Color32[] colors = srcTexture.GetPixels32();
             // Color32[] colors_d = new Color32[_tex.width * _tex.height];
