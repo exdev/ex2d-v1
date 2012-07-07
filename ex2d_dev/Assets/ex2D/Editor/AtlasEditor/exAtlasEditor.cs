@@ -9,11 +9,13 @@
 // usings
 ///////////////////////////////////////////////////////////////////////////////
 
+using System;
 using UnityEditor;
 using UnityEngine;
 using System.IO;
 using System.Collections;
 using System.Collections.Generic;
+using Object = UnityEngine.Object;
 
 ///////////////////////////////////////////////////////////////////////////////
 ///
@@ -376,7 +378,13 @@ partial class exAtlasEditor : EditorWindow {
                 curEdit.sortOrder = (exAtlasInfo.SortOrder)EditorGUILayout.EnumPopup ( "Sort Order", curEdit.sortOrder );
 
                 // padding
-                curEdit.padding = EditorGUILayout.IntField( "Padding", curEdit.padding );
+                curEdit.paddingMode = (exAtlasInfo.PaddingMode)EditorGUILayout.EnumPopup("Padding", curEdit.paddingMode);
+                GUILayout.BeginHorizontal();
+                    GUILayout.Space(20);
+                    GUI.enabled = (curEdit.paddingMode == exAtlasInfo.PaddingMode.Custom);
+                    curEdit.customPadding = Math.Max( EditorGUILayout.IntField("Pixels", curEdit.actualPadding), 0 ); // Clamp to 0
+                    GUI.enabled = true;
+                GUILayout.EndHorizontal();
 
                 // TODO: have bug, just disable it { 
                 // allow rotate
@@ -584,9 +592,9 @@ partial class exAtlasEditor : EditorWindow {
                 // padding bleed
                 // ======================================================== 
 
-                GUI.enabled = curEdit.padding >= 2;
+                GUI.enabled = (curEdit.paddingMode == exAtlasInfo.PaddingMode.Auto) || (curEdit.actualPadding >= 2);
                 GUILayout.BeginHorizontal();
-                    bool newUsePaddingBleed = GUILayout.Toggle ( curEdit.usePaddingBleed, new GUIContent( "Use Padding Bleed", "Prevents artifacts and seams around the outer bounds of a texture due to bilinear filtering (requires padding >= 2)" )); 
+                    bool newUsePaddingBleed = GUILayout.Toggle ( curEdit.usePaddingBleed, new GUIContent( "Use Padding Bleed", "Prevents artifacts and seams around the outer bounds of a texture due to bilinear filtering (requires at least Padding of 2)" )) && GUI.enabled; 
                     if ( newUsePaddingBleed != curEdit.usePaddingBleed ) {
                         curEdit.usePaddingBleed = newUsePaddingBleed;
                         curEdit.needRebuild = true;
