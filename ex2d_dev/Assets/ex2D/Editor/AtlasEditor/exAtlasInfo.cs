@@ -57,6 +57,16 @@ public partial class exAtlasInfo : ScriptableObject {
     }
 
     // ------------------------------------------------------------------ 
+    /// the padding mode used to determine the actualPadding value
+    // ------------------------------------------------------------------ 
+
+    public enum PaddingMode {
+        None,   ///< 0 pixel padding
+        Auto,   ///< 2 pixels padding when usePaddingBleed is true, otherwise 1 pixel padding
+        Custom  ///< custom padding value is specified by user
+    }
+
+    // ------------------------------------------------------------------ 
     /// the structure to store the edit information of each element in atlas 
     // ------------------------------------------------------------------ 
 
@@ -125,8 +135,8 @@ public partial class exAtlasInfo : ScriptableObject {
     public Material material; ///< the default material we used
     public bool useBuildColor = false; ///< use buildColor as background color for transparent pixels
     public Color buildColor = new Color(1.0f, 1.0f, 1.0f, 0.0f); ///< the color of transparent pixels in atlas texture
-    public bool useEdgeBleeding = false; ///< extends the color of pixels at the edge of transparent pixels to prevent bilinear filtering artifacts
-    public bool useBorderBleeding = false; ///< extends the color and alpha of pixels on border of each element into the surrounding padding area
+    public bool useContourBleed = false; ///< extends the color of pixels at the edge of transparent pixels to prevent bilinear filtering artifacts
+    public bool usePaddingBleed = false; ///< extends the color and alpha of pixels on border of each element into the surrounding padding area
     public bool trimElements = true; ///< trim all element when importing
     public bool readable = false; ///< enabled Read/Write option for atlas texture after build
 
@@ -140,7 +150,8 @@ public partial class exAtlasInfo : ScriptableObject {
     public Algorithm algorithm = Algorithm.Tree; ///< the algorithm used for texture packer
     public SortBy sortBy = SortBy.UseBest; ///< the method to sort the elements in atlas editor info
     public SortOrder sortOrder = SortOrder.UseBest; ///< the order to sort the elements in atlas editor info
-    public int padding = 2; ///< the padding size between each element
+    public PaddingMode paddingMode = PaddingMode.Auto; ///< the padding mode used to determine the actualPadding value
+    public int customPadding = 1; ///< the user-specified padding size between each element, used when paddingMode is Custom
     public bool allowRotate = false; ///< if allow texture rotated, disabled in current version 
 
     // element settings
@@ -159,6 +170,27 @@ public partial class exAtlasInfo : ScriptableObject {
     public bool needUpdateAnimClips = false; ///< if need update anim clips
     public bool needRebuild = false; ///< if need rebuild the atlas
     public bool needLayout = false; ///< if need layout the atlas
+
+    ///////////////////////////////////////////////////////////////////////////////
+    // properties
+    ///////////////////////////////////////////////////////////////////////////////
+
+    // ------------------------------------------------------------------ 
+    /// \return the dynamically computed padding value to use for building the atlas
+    // ------------------------------------------------------------------ 
+
+    public int actualPadding {
+        get {
+            if (paddingMode == PaddingMode.None)
+                return 0;
+
+            if (paddingMode == PaddingMode.Custom)
+                return customPadding;
+
+            // PaddingMode.Auto : padding bleed requires 2 pixels, otherwise 1 pixel is enough
+            return usePaddingBleed ? 2 : 1;
+        }
+    }
 
     ///////////////////////////////////////////////////////////////////////////////
     // static
@@ -344,8 +376,8 @@ public partial class exAtlasInfo : ScriptableObject {
         el.trim = _trim;
         el.atlasInfo = this;
         el.texture = _tex;
-        el.coord[0] = padding;
-        el.coord[1] = padding;
+        el.coord[0] = 0;
+        el.coord[1] = 0;
         elements.Add(el);
 
         // get sprite animation clip by textureGUID, add them to rebuildAnimClipGUIDs
@@ -395,8 +427,8 @@ public partial class exAtlasInfo : ScriptableObject {
         el.trim = true;
         el.atlasInfo = this;
         el.texture = _srcFontInfo.pageInfos[0].texture;
-        el.coord[0] = padding;
-        el.coord[1] = padding;
+        el.coord[0] = 0;
+        el.coord[1] = 0;
 
         exBitmapFont.CharInfo destCharInfo = el.destFontInfo.GetCharInfo(el.charInfo.id);
         if ( destCharInfo != null ) {

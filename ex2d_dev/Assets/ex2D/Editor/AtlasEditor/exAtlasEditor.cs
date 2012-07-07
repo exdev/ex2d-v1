@@ -9,11 +9,13 @@
 // usings
 ///////////////////////////////////////////////////////////////////////////////
 
+using System;
 using UnityEditor;
 using UnityEngine;
 using System.IO;
 using System.Collections;
 using System.Collections.Generic;
+using Object = UnityEngine.Object;
 
 ///////////////////////////////////////////////////////////////////////////////
 ///
@@ -376,7 +378,13 @@ partial class exAtlasEditor : EditorWindow {
                 curEdit.sortOrder = (exAtlasInfo.SortOrder)EditorGUILayout.EnumPopup ( "Sort Order", curEdit.sortOrder );
 
                 // padding
-                curEdit.padding = EditorGUILayout.IntField( "Padding", curEdit.padding );
+                curEdit.paddingMode = (exAtlasInfo.PaddingMode)EditorGUILayout.EnumPopup("Padding", curEdit.paddingMode);
+                GUILayout.BeginHorizontal();
+                    GUILayout.Space(20);
+                    GUI.enabled = (curEdit.paddingMode == exAtlasInfo.PaddingMode.Custom);
+                    curEdit.customPadding = Math.Max( EditorGUILayout.IntField("Pixels", curEdit.actualPadding), 0 ); // Clamp to 0
+                    GUI.enabled = true;
+                GUILayout.EndHorizontal();
 
                 // TODO: have bug, just disable it { 
                 // allow rotate
@@ -566,14 +574,14 @@ partial class exAtlasEditor : EditorWindow {
                 GUILayout.EndHorizontal();
 
                 // ======================================================== 
-                // edge bleeding 
+                // contour bleed
                 // ======================================================== 
 
                 GUI.enabled = !curEdit.useBuildColor;
                 GUILayout.BeginHorizontal();
-                    bool newUseEdgeBleeding = GUILayout.Toggle ( curEdit.useEdgeBleeding, new GUIContent( "Use Edge Bleeding", "Prevents artifacts around the visible edges of artwork due to bilinear filtering (requires Build Color to be turned off)" )) && !curEdit.useBuildColor; 
-                    if ( newUseEdgeBleeding != curEdit.useEdgeBleeding ) {
-                        curEdit.useEdgeBleeding = newUseEdgeBleeding;
+                    bool newUseContourBleed = GUILayout.Toggle ( curEdit.useContourBleed, new GUIContent( "Use Contour Bleed", "Prevents artifacts around the silhouette of artwork due to bilinear filtering (requires Build Color to be turned off)" )) && !curEdit.useBuildColor; 
+                    if ( newUseContourBleed != curEdit.useContourBleed ) {
+                        curEdit.useContourBleed = newUseContourBleed;
                         curEdit.needRebuild = true;
                         GUI.changed = true;
                     }
@@ -581,14 +589,14 @@ partial class exAtlasEditor : EditorWindow {
                 GUI.enabled = true;
 
                 // ======================================================== 
-                // border bleeding 
+                // padding bleed
                 // ======================================================== 
 
-                GUI.enabled = curEdit.padding >= 2;
+                GUI.enabled = (curEdit.paddingMode == exAtlasInfo.PaddingMode.Auto) || (curEdit.actualPadding >= 2);
                 GUILayout.BeginHorizontal();
-                    bool newUseBorderBleeding = GUILayout.Toggle ( curEdit.useBorderBleeding, new GUIContent( "Use Border Bleeding", "Prevents artifacts and seams around the outer bounds of a texture due to bilinear filtering (requires padding >= 2)" )); 
-                    if ( newUseBorderBleeding != curEdit.useBorderBleeding ) {
-                        curEdit.useBorderBleeding = newUseBorderBleeding;
+                    bool newUsePaddingBleed = GUILayout.Toggle ( curEdit.usePaddingBleed, new GUIContent( "Use Padding Bleed", "Prevents artifacts and seams around the outer bounds of a texture due to bilinear filtering (requires at least Padding of 2)" )) && GUI.enabled; 
+                    if ( newUsePaddingBleed != curEdit.usePaddingBleed ) {
+                        curEdit.usePaddingBleed = newUsePaddingBleed;
                         curEdit.needRebuild = true;
                         GUI.changed = true;
                     }
