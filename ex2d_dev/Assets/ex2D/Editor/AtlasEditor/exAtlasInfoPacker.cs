@@ -59,8 +59,8 @@ partial class exAtlasInfo {
             }
 
             //
-            float areaWidth = _el.trimRect.width + _el.atlasInfo.padding;
-            float areaHeight = _el.trimRect.height + _el.atlasInfo.padding;
+            float areaWidth = _el.trimRect.width + _el.atlasInfo.actualPadding;
+            float areaHeight = _el.trimRect.height + _el.atlasInfo.actualPadding;
             if (_el.trimRect.width <= rect.width && _el.trimRect.height <= rect.height)
             {
                 child = new Node[2];
@@ -116,7 +116,7 @@ partial class exAtlasInfo {
         foreach ( Element el in elements ) {
             if ( (curX + el.Width()) > width ) {
                 curX = 0;
-                curY = curY + maxY + padding;
+                curY = curY + maxY + actualPadding;
                 maxY = 0;
             }
             if ( (curY + el.Height()) > height ) {
@@ -126,7 +126,7 @@ partial class exAtlasInfo {
             el.coord[0] = curX;
             el.coord[1] = curY;
 
-            curX = curX + el.Width() + padding;
+            curX = curX + el.Width() + actualPadding;
             if (el.Height() > maxY) {
                 maxY = el.Height();
             }
