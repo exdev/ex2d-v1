@@ -61,7 +61,7 @@ partial class exAtlasInfo {
             //
             float areaWidth = _el.trimRect.width + _el.atlasInfo.actualPadding;
             float areaHeight = _el.trimRect.height + _el.atlasInfo.actualPadding;
-            if (_el.trimRect.width <= rect.width && _el.trimRect.height <= rect.height)
+            if (areaWidth <= rect.width && areaHeight <= rect.height)
             {
                 child = new Node[2];
                 child[0] = new Node( new Rect ( rect.x + areaWidth, 
