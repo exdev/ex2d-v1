@@ -59,23 +59,26 @@ partial class exAtlasInfo {
             }
 
             //
-            float areaWidth = _el.trimRect.width + _el.atlasInfo.actualPadding;
-            float areaHeight = _el.trimRect.height + _el.atlasInfo.actualPadding;
-            if (areaWidth <= rect.width && areaHeight <= rect.height)
+            float trimmedWidth = _el.trimRect.width;
+            float trimmedHeight = _el.trimRect.height;
+            float paddedWidth = trimmedWidth + _el.atlasInfo.actualPadding;
+            float paddedHeight = trimmedHeight + _el.atlasInfo.actualPadding;
+
+            if (trimmedWidth <= rect.width && trimmedHeight <= rect.height)
             {
                 child = new Node[2];
-                child[0] = new Node( new Rect ( rect.x + areaWidth, 
+                child[0] = new Node( new Rect ( rect.x + paddedWidth, 
                                                 rect.y,
-                                                rect.width - areaWidth, 
-                                                areaHeight ) );
+                                                rect.width - paddedWidth, 
+                                                trimmedHeight ) );
                 child[1] = new Node( new Rect ( rect.x,
-                                                rect.y + areaHeight,
+                                                rect.y + paddedHeight,
                                                 rect.width, 
-                                                rect.height - areaHeight ) );
+                                                rect.height - paddedHeight ) );
                 node = new Node( new Rect ( rect.x, 
                                             rect.y, 
-                                            areaWidth,
-                                            areaHeight ) );
+                                            paddedWidth,
+                                            paddedHeight ) );
             }
             return node;
         }
