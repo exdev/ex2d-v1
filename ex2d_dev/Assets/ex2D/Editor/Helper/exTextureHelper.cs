@@ -313,7 +313,7 @@ public static class exTextureHelper {
 
         // Copy left and right columns of pixels (plus 2 extra pixels for corners)
         int startY = Math.Max((int)_rect.yMin - 1, 0); // Clamp
-        int endY = Math.Min((int)_rect.yMax + 1, _tex.width); // Clamp
+        int endY = Math.Min((int)_rect.yMax + 1, _tex.height); // Clamp
         for (int y = startY; y < endY; ++y)
         {
             int xMin = (int)_rect.xMin;
