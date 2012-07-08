@@ -58,23 +58,32 @@ partial class exAtlasInfo {
                 }
             }
 
-            //
+            // determine trimmed and padded sizes
             float trimmedWidth = _el.trimRect.width;
             float trimmedHeight = _el.trimRect.height;
             float paddedWidth = trimmedWidth + _el.atlasInfo.actualPadding;
             float paddedHeight = trimmedHeight + _el.atlasInfo.actualPadding;
 
+            // trimmed element size must fit current node rect
             if (trimmedWidth <= rect.width && trimmedHeight <= rect.height)
             {
                 child = new Node[2];
+
+                // create first child node in remaining space to the right, using trimmedHeight
+                // so that only other elements with the same height or less can be added there
+                // (we do not use paddedHeight, because the padding area is reserved and should
+                // not be occupied)
                 child[0] = new Node( new Rect ( rect.x + paddedWidth, 
                                                 rect.y,
                                                 rect.width - paddedWidth, 
                                                 trimmedHeight ) );
+
+                // create second child node in remaining space at the bottom, occupying the entire width
                 child[1] = new Node( new Rect ( rect.x,
                                                 rect.y + paddedHeight,
                                                 rect.width, 
                                                 rect.height - paddedHeight ) );
+
                 node = new Node( new Rect ( rect.x, 
                                             rect.y, 
                                             paddedWidth,
