@@ -285,6 +285,11 @@ public static class exTextureHelper {
     // ------------------------------------------------------------------ 
 
     public static void ApplyPaddingBleed( Texture2D _tex, Rect _rect ) {
+        // exAtlas allows bitmap font put in into atlas texture. Some font character didn't have
+        // width and height (), they still need one element represent otherwise sprite will not index
+        // on it and get null
+        if ( _rect.width == 0 || _rect.height == 0 )
+            return;
         
         // NOTE: Possible optimization: If Get/SetPixels32() make a copy of the data (instead
         // of just returning a reference to it, this method call might be very intensive on
