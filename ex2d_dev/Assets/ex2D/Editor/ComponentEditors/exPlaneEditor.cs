@@ -182,15 +182,15 @@ public class exPlaneEditor : Editor {
         if ( isPrefab ) {
             GUILayout.BeginHorizontal();
                 bool isPrefabCamera = false;
-                if ( editPlane.renderCamera != null ) {
+                if ( editPlane.renderCameraForPrefab != null ) {
 #if UNITY_3_4
-                    isPrefabCamera = (EditorUtility.GetPrefabType(editPlane.renderCamera) == PrefabType.Prefab);
+                    isPrefabCamera = (EditorUtility.GetPrefabType(editPlane.renderCameraForPrefab) == PrefabType.Prefab);
 #else
-                    isPrefabCamera = (PrefabUtility.GetPrefabType(editPlane.renderCamera) == PrefabType.Prefab);
+                    isPrefabCamera = (PrefabUtility.GetPrefabType(editPlane.renderCameraForPrefab) == PrefabType.Prefab);
 #endif
                 }
                 editPlane.renderCamera = (Camera)EditorGUILayout.ObjectField( "Camera"
-                                                                              , isPrefabCamera ? editPlane.renderCamera : null 
+                                                                              , isPrefabCamera ? editPlane.renderCameraForPrefab : null 
                                                                               , typeof(Camera) 
                                                                               , false 
                                                                               , GUILayout.Width(300) );

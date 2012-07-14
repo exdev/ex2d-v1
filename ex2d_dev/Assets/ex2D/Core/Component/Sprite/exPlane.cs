@@ -72,6 +72,7 @@ public class exPlane : MonoBehaviour {
     /// The camera you used to calculate the pixel perfect scale
     // ------------------------------------------------------------------ 
 
+    public Camera renderCameraForPrefab { get { return camera_; } }
     public Camera renderCamera {
         get { 
             // NOTE: this is because prefab may missing link of main camera ( but will not missing second one )

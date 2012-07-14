@@ -112,7 +112,7 @@ public static class exClippingUtility {
 
     static void ApplyClipMaterialInEditor ( this exClipping _clipping, exPlane _plane ) {
         Renderer r = _plane.renderer;
-        if ( r != null ) {
+        if ( r != null && r.sharedMaterial != null ) {
             Texture2D texture = r.sharedMaterial.mainTexture as Texture2D;
             if ( _clipping.textureToClipMaterialTable.ContainsKey(texture) == false ) {
                 r.sharedMaterial = exEditorHelper.GetDefaultMaterial ( texture, 
