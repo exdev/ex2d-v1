@@ -59,10 +59,16 @@ public static class exSpriteUtility {
 
         //
         if ( _sprite.atlas == null && _texture == null ) {
+            _sprite.clippingPlane = null;
             GameObject.DestroyImmediate( _sprite.meshFilter.sharedMesh, true );
             _sprite.meshFilter.sharedMesh = null; 
             _sprite.renderer.sharedMaterial = null;
             return;
+        }
+
+        exClipping clipping = _sprite.clippingPlane;
+        if ( clipping != null ) {
+            clipping.RemovePlane(_sprite);
         }
 
         // set a texture to it
@@ -99,6 +105,11 @@ public static class exSpriteUtility {
         // update collider
         if ( _sprite.collisionHelper ) {
             _sprite.collisionHelper.UpdateCollider ();
+        }
+
+        //
+        if ( clipping != null ) {
+            clipping.AddPlaneInEditor(_sprite);
         }
     }
 

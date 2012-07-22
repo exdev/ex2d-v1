@@ -60,6 +60,7 @@ public static class exSpriteFontUtility {
         EditorUtility.SetDirty (_spriteFont);
 
         if ( _spriteFont.fontInfo == null ) {
+            _spriteFont.clippingPlane = null;
             GameObject.DestroyImmediate( _spriteFont.meshFilter.sharedMesh, true );
             _spriteFont.meshFilter.sharedMesh = null; 
             _spriteFont.renderer.sharedMaterial = null;
@@ -68,6 +69,12 @@ public static class exSpriteFontUtility {
 
         // prefab do not need rebuild mesh
         if ( isPrefab == false ) {
+
+            exClipping clipping = _spriteFont.clippingPlane;
+            if ( clipping != null ) {
+                clipping.RemovePlane(_spriteFont);
+            }
+
             //
             Mesh newMesh = new Mesh();
             newMesh.hideFlags = HideFlags.DontSave;
@@ -82,6 +89,11 @@ public static class exSpriteFontUtility {
             //
             GameObject.DestroyImmediate( _spriteFont.meshFilter.sharedMesh, true ); // delete old mesh (to avoid leaking)
             _spriteFont.meshFilter.sharedMesh = newMesh;
+
+            //
+            if ( clipping != null ) {
+                clipping.AddPlaneInEditor(_spriteFont);
+            }
         }
 
         // update collider

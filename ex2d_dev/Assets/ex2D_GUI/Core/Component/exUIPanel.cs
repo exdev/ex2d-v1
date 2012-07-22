@@ -120,18 +120,7 @@ public class exUIPanel : exUIElement {
         base.OnSizeChanged( _newWidth, _newHeight );
 
         if ( background ) {
-            exSprite spriteBG = background as exSprite;
-            if ( spriteBG ) {
-                spriteBG.width = _newWidth;
-                spriteBG.height = _newHeight;
-            }
-            else {
-                exSpriteBorder borderBG = background as exSpriteBorder;
-                if ( borderBG ) {
-                    borderBG.width = _newWidth;
-                    borderBG.height = _newHeight;
-                }
-            }
+            exUIMng.SetSize ( background, _newWidth, _newHeight );
         }
     }
 

@@ -151,6 +151,25 @@ public class exUIMng : MonoBehaviour {
         }
     }
 
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public static void SetSize ( exSpriteBase _sp, float _newWidth, float _newHeight ) {
+        exSprite spriteBG = _sp as exSprite;
+        if ( spriteBG ) {
+            spriteBG.width = _newWidth;
+            spriteBG.height = _newHeight;
+        }
+        else {
+            exSpriteBorder borderBG = _sp as exSpriteBorder;
+            if ( borderBG ) {
+                borderBG.width = _newWidth;
+                borderBG.height = _newHeight;
+            }
+        }
+    }
+
     ///////////////////////////////////////////////////////////////////////////////
     // structures
     ///////////////////////////////////////////////////////////////////////////////
@@ -702,4 +721,5 @@ public class exUIMng : MonoBehaviour {
 
         return null;
     } 
+
 }
