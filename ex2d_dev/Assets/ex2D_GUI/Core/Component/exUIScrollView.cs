@@ -72,6 +72,8 @@ public class exUIScrollView : exUIElement {
     // protected bool isDragging = false;
     // } TODO end 
 
+    protected List<exUIElement> elements = new List<exUIElement>();
+
     ///////////////////////////////////////////////////////////////////////////////
     // functions
     ///////////////////////////////////////////////////////////////////////////////
@@ -90,6 +92,14 @@ public class exUIScrollView : exUIElement {
 
     protected override void OnSizeChanged ( float _newWidth, float _newHeight ) {
     }
+
+    // // ------------------------------------------------------------------ 
+    // // Desc: 
+    // // ------------------------------------------------------------------ 
+
+    // protected float GetContentWidth () {
+    //     // float width = boundingRect.width - verticalBar. 
+    // }
 
     // DELME { 
     // // ------------------------------------------------------------------ 

@@ -29,6 +29,12 @@ public class exUIElement : exPlane {
         public string method = "";
     }
 
+    [System.Serializable]
+    public class Style {
+        public RectOffset margin;
+        public RectOffset padding;
+    }
+
     ///////////////////////////////////////////////////////////////////////////////
     // non-Serializable
     ///////////////////////////////////////////////////////////////////////////////
