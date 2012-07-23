@@ -54,11 +54,11 @@ public class exUIScrollView : exUIElement {
     public exUIButton btnDown = null;
 
     public exClipping clipRect;
-    public exSpriteBase horizontalBar;
-    public exSpriteBase horizontalSlider;
-    public exSpriteBase verticalBar;
-    public exSpriteBase verticalSlider;
-    public GameObject contentAnchor;
+    public exSpriteBorder horizontalBar;
+    public exSpriteBorder horizontalSlider;
+    public exSpriteBorder verticalBar;
+    public exSpriteBorder verticalSlider;
+    public Transform contentAnchor;
 
     // TODO { 
     // protected Vector2 contentOffset = Vector2.zero;
@@ -71,8 +71,6 @@ public class exUIScrollView : exUIElement {
     // protected Vector2 velocity = Vector2.zero;
     // protected bool isDragging = false;
     // } TODO end 
-
-    protected List<exUIElement> elements = new List<exUIElement>();
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -91,15 +89,67 @@ public class exUIScrollView : exUIElement {
     // ------------------------------------------------------------------ 
 
     protected override void OnSizeChanged ( float _newWidth, float _newHeight ) {
+        // TODO: calculate including horizontalBar, verticalBar
+        clipRect.width = _newWidth - style.padding.left - style.padding.right;
+        clipRect.height = _newHeight - style.padding.top - style.padding.bottom;
+        clipRect.transform.localPosition = new Vector3 ( style.padding.left,
+                                                         style.padding.top,
+                                                         clipRect.transform.localPosition.z );
+
+        // TODO: horizontalBar, verticalBar
     }
 
-    // // ------------------------------------------------------------------ 
-    // // Desc: 
-    // // ------------------------------------------------------------------ 
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
 
-    // protected float GetContentWidth () {
-    //     // float width = boundingRect.width - verticalBar. 
-    // }
+    protected float GetContentWidth () {
+        float maxWidth = 9999.0f;
+        for ( int i = 0; i < children.Count; ++i ) {
+            exUIElement el = children[i];
+            if ( el.boundingRect.width > maxWidth )
+                maxWidth = el.boundingRect.width;
+        }
+        return maxWidth;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    protected float GetContentHeight () {
+        float height = 0.0f;
+        for ( int i = 0; i < children.Count; ++i ) {
+            exUIElement el = children[i];
+            height += el.boundingRect.height;
+        }
+        return height;
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void AddElement ( exUIElement _el ) {
+        AddChild(_el);
+        UpdateLayout();
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void UpdateLayout () {
+        float y = contentAnchor.localPosition.y;
+
+        for ( int i = 0; i < children.Count; ++i ) {
+            exUIElement el = children[i];
+            Vector3 pos = el.transform.localPosition; 
+            pos.x = el.style.margin.left;
+            pos.y = y + el.style.margin.top;
+            y = pos.y +  el.boundingRect.height;
+        }
+    }
 
     // DELME { 
     // // ------------------------------------------------------------------ 
