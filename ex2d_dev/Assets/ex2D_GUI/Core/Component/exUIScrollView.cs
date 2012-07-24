@@ -48,10 +48,10 @@ public class exUIScrollView : exUIElement {
     // properties
     ///////////////////////////////////////////////////////////////////////////////
 
-    public exUIButton btnLeft = null;
-    public exUIButton btnRight = null;
-    public exUIButton btnUp = null;
-    public exUIButton btnDown = null;
+    // public exUIButton btnLeft = null;
+    // public exUIButton btnRight = null;
+    // public exUIButton btnUp = null;
+    // public exUIButton btnDown = null;
 
     public exClipping clipRect;
     public exSpriteBorder horizontalBar;
