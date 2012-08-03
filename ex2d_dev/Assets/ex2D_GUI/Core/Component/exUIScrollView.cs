@@ -89,7 +89,10 @@ public class exUIScrollView : exUIElement {
     // ------------------------------------------------------------------ 
 
     protected override void OnSizeChanged ( float _newWidth, float _newHeight ) {
-        // TODO: calculate including horizontalBar, verticalBar
+        base.OnSizeChanged( _newWidth, _newHeight );
+
+        // resize clip rect
+        clipRect.anchor = anchor;
         clipRect.width = _newWidth - style.padding.left - style.padding.right;
         clipRect.height = _newHeight - style.padding.top - style.padding.bottom;
         clipRect.transform.localPosition = new Vector3 ( style.padding.left,

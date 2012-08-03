@@ -147,71 +147,71 @@ public static class exUIUtility {
         GameObject contentAnchor = new GameObject("ContentAnchor");
         contentAnchor.transform.parent = clipRect.transform;
 
-        // //
-        // GameObject horizontalBarGO = new GameObject("HorizontalBar");
-        // horizontalBarGO.transform.parent = scrollViewGO.transform;
-        // exSpriteBorder horizontalBar = horizontalBarGO.AddComponent<exSpriteBorder>();
-        // // myBorder = AssetDatabase.LoadAssetAtPath("Assets/ex2D_GUI/Resource/GUIBorder/HorizontalScrollBar.asset", 
-        // //                                          typeof(exGUIBorder)) as exGUIBorder;
-        // // elInfo = exAtlasDB.GetElementInfo(myBorder.textureGUID);
-        // // if ( elInfo != null ) {
-        // //     atlas = exEditorHelper.LoadAssetFromGUID<exAtlas>(elInfo.guidAtlas);
-        // //     index = elInfo.indexInAtlas;
-        // // }
-        // // horizontalBar.SetBorder( myBorder, atlas, index ); 
-        // // horizontalBar.Rebuild ();
-        // horizontalBar.anchor = exPlane.Anchor.BotLeft;
-        // horizontalBar.enabled = false;
+        //
+        GameObject horizontalBarGO = new GameObject("HorizontalBar");
+        horizontalBarGO.transform.parent = scrollViewGO.transform;
+        exSpriteBorder horizontalBar = horizontalBarGO.AddComponent<exSpriteBorder>();
+        // myBorder = AssetDatabase.LoadAssetAtPath("Assets/ex2D_GUI/Resource/GUIBorder/HorizontalScrollBar.asset", 
+        //                                          typeof(exGUIBorder)) as exGUIBorder;
+        // elInfo = exAtlasDB.GetElementInfo(myBorder.textureGUID);
+        // if ( elInfo != null ) {
+        //     atlas = exEditorHelper.LoadAssetFromGUID<exAtlas>(elInfo.guidAtlas);
+        //     index = elInfo.indexInAtlas;
+        // }
+        // horizontalBar.SetBorder( myBorder, atlas, index ); 
+        // horizontalBar.Rebuild ();
+        horizontalBar.anchor = exPlane.Anchor.BotLeft;
+        horizontalBar.enabled = false;
 
-        // //
-        // GameObject horizontalSliderGO = new GameObject("HorizontalSlider");
-        // horizontalSliderGO.transform.parent = scrollViewGO.transform;
-        // exSpriteBorder horizontalSlider = horizontalSliderGO.AddComponent<exSpriteBorder>();
-        // // myBorder = AssetDatabase.LoadAssetAtPath("Assets/ex2D_GUI/Resource/GUIBorder/HorizontalSlider.asset", 
-        // //                                          typeof(exGUIBorder)) as exGUIBorder;
-        // // elInfo = exAtlasDB.GetElementInfo(myBorder.textureGUID);
-        // // if ( elInfo != null ) {
-        // //     atlas = exEditorHelper.LoadAssetFromGUID<exAtlas>(elInfo.guidAtlas);
-        // //     index = elInfo.indexInAtlas;
-        // // }
-        // // horizontalSlider.SetBorder( myBorder, atlas, index ); 
-        // horizontalSlider.anchor = exPlane.Anchor.BotLeft;
-        // horizontalSlider.width = 0.0f;
-        // horizontalSlider.height = 0.0f;
-        // horizontalSlider.enabled = false;
+        //
+        GameObject horizontalSliderGO = new GameObject("HorizontalSlider");
+        horizontalSliderGO.transform.parent = scrollViewGO.transform;
+        exSpriteBorder horizontalSlider = horizontalSliderGO.AddComponent<exSpriteBorder>();
+        // myBorder = AssetDatabase.LoadAssetAtPath("Assets/ex2D_GUI/Resource/GUIBorder/HorizontalSlider.asset", 
+        //                                          typeof(exGUIBorder)) as exGUIBorder;
+        // elInfo = exAtlasDB.GetElementInfo(myBorder.textureGUID);
+        // if ( elInfo != null ) {
+        //     atlas = exEditorHelper.LoadAssetFromGUID<exAtlas>(elInfo.guidAtlas);
+        //     index = elInfo.indexInAtlas;
+        // }
+        // horizontalSlider.SetBorder( myBorder, atlas, index ); 
+        horizontalSlider.anchor = exPlane.Anchor.BotLeft;
+        horizontalSlider.width = 0.0f;
+        horizontalSlider.height = 0.0f;
+        horizontalSlider.enabled = false;
 
-        // //
-        // GameObject verticalBarGO = new GameObject("VerticalBar");
-        // verticalBarGO.transform.parent = scrollViewGO.transform;
-        // exSpriteBorder verticalBar = verticalBarGO.AddComponent<exSpriteBorder>();
-        // // myBorder = AssetDatabase.LoadAssetAtPath("Assets/ex2D_GUI/Resource/GUIBorder/VerticalScrollBar.asset", 
-        // //                                           typeof(exGUIBorder)) as exGUIBorder;
-        // // elInfo = exAtlasDB.GetElementInfo(myBorder.textureGUID);
-        // // if ( elInfo != null ) {
-        // //     atlas = exEditorHelper.LoadAssetFromGUID<exAtlas>(elInfo.guidAtlas);
-        // //     index = elInfo.indexInAtlas;
-        // // }
-        // // verticalBar.SetBorder( myBorder, atlas, index ); 
-        // // verticalBar.Rebuild ();
-        // verticalBar.anchor = exPlane.Anchor.TopRight;
-        // verticalBar.enabled = false;
+        //
+        GameObject verticalBarGO = new GameObject("VerticalBar");
+        verticalBarGO.transform.parent = scrollViewGO.transform;
+        exSpriteBorder verticalBar = verticalBarGO.AddComponent<exSpriteBorder>();
+        // myBorder = AssetDatabase.LoadAssetAtPath("Assets/ex2D_GUI/Resource/GUIBorder/VerticalScrollBar.asset", 
+        //                                           typeof(exGUIBorder)) as exGUIBorder;
+        // elInfo = exAtlasDB.GetElementInfo(myBorder.textureGUID);
+        // if ( elInfo != null ) {
+        //     atlas = exEditorHelper.LoadAssetFromGUID<exAtlas>(elInfo.guidAtlas);
+        //     index = elInfo.indexInAtlas;
+        // }
+        // verticalBar.SetBorder( myBorder, atlas, index ); 
+        // verticalBar.Rebuild ();
+        verticalBar.anchor = exPlane.Anchor.TopRight;
+        verticalBar.enabled = false;
 
-        // //
-        // GameObject verticalSliderGO = new GameObject("VerticalSlider");
-        // verticalSliderGO.transform.parent = scrollViewGO.transform;
-        // exSpriteBorder verticalSlider = verticalSliderGO.AddComponent<exSpriteBorder>();
-        // // myBorder = AssetDatabase.LoadAssetAtPath("Assets/ex2D_GUI/Resource/GUIBorder/verticalSlider.asset", 
-        // //                                          typeof(exGUIBorder)) as exGUIBorder;
-        // // elInfo = exAtlasDB.GetElementInfo(myBorder.textureGUID);
-        // // if ( elInfo != null ) {
-        // //     atlas = exEditorHelper.LoadAssetFromGUID<exAtlas>(elInfo.guidAtlas);
-        // //     index = elInfo.indexInAtlas;
-        // // }
-        // // verticalSlider.SetBorder( myBorder, atlas, index ); 
-        // verticalSlider.anchor = exPlane.Anchor.TopRight; 
-        // verticalSlider.width = 0.0f;
-        // verticalSlider.height = 0.0f;
-        // verticalSlider.enabled = false;
+        //
+        GameObject verticalSliderGO = new GameObject("VerticalSlider");
+        verticalSliderGO.transform.parent = scrollViewGO.transform;
+        exSpriteBorder verticalSlider = verticalSliderGO.AddComponent<exSpriteBorder>();
+        // myBorder = AssetDatabase.LoadAssetAtPath("Assets/ex2D_GUI/Resource/GUIBorder/verticalSlider.asset", 
+        //                                          typeof(exGUIBorder)) as exGUIBorder;
+        // elInfo = exAtlasDB.GetElementInfo(myBorder.textureGUID);
+        // if ( elInfo != null ) {
+        //     atlas = exEditorHelper.LoadAssetFromGUID<exAtlas>(elInfo.guidAtlas);
+        //     index = elInfo.indexInAtlas;
+        // }
+        // verticalSlider.SetBorder( myBorder, atlas, index ); 
+        verticalSlider.anchor = exPlane.Anchor.TopRight; 
+        verticalSlider.width = 0.0f;
+        verticalSlider.height = 0.0f;
+        verticalSlider.enabled = false;
 
         //
         exUIScrollView scrollView = scrollViewGO.AddComponent<exUIScrollView>();
@@ -222,6 +222,9 @@ public static class exUIUtility {
         // scrollView.verticalSlider = verticalSlider;
         scrollView.contentAnchor = contentAnchor.transform;
         scrollView.clipRect = clipRect;
+
+        scrollView.width = 100.0f;
+        scrollView.width = 100.0f;
 
         //
         Selection.activeObject = scrollViewGO;
