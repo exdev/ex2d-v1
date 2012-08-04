@@ -646,7 +646,8 @@ public partial class exAtlasInfo : ScriptableObject {
 
                     // add char info
                     foreach ( exBitmapFont.CharInfo c in f.charInfos ) {
-                        f2.charInfos.Add(c);
+                        exBitmapFont.CharInfo c2 = new exBitmapFont.CharInfo(c);
+                        f2.charInfos.Add(c2);
                     }
 
                     // add kerning info
