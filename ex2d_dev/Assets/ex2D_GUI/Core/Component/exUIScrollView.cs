@@ -90,6 +90,12 @@ public class exUIScrollView : exUIElement {
 
     protected override void OnSizeChanged ( float _newWidth, float _newHeight ) {
         base.OnSizeChanged( _newWidth, _newHeight );
+        Commit();
+
+        float startX = boundingRect.xMin;
+        float startY = boundingRect.yMax;
+        float endX = boundingRect.xMax;
+        float endY = boundingRect.yMin;
 
         // resize clip rect
         clipRect.anchor = anchor;
@@ -100,6 +106,31 @@ public class exUIScrollView : exUIElement {
                                                          clipRect.transform.localPosition.z );
 
         // TODO: horizontalBar, verticalBar
+        if ( contentAnchor )
+            contentAnchor.transform.localPosition = new Vector3 ( startX, startY, contentAnchor.transform.localPosition.z );
+
+        if ( horizontalBar )
+            horizontalBar.transform.localPosition = new Vector3 ( startX, endY, horizontalBar.transform.localPosition.z );
+
+        if ( horizontalSlider )
+            horizontalSlider.transform.localPosition = new Vector3 ( startX, endY, horizontalSlider.transform.localPosition.z );
+
+        if ( verticalBar )
+            verticalBar.transform.localPosition = new Vector3 ( endX, startY, verticalBar.transform.localPosition.z );
+
+        if ( verticalSlider )
+            verticalSlider.transform.localPosition = new Vector3 ( endX, startY, verticalSlider.transform.localPosition.z );
+
+        float hbarHeight = (horizontalBar && horizontalBar.guiBorder) ? horizontalBar.guiBorder.border.vertical : 0.0f;
+        float vbarWidth = (verticalBar && verticalBar.guiBorder) ? verticalBar.guiBorder.border.horizontal : 0.0f;
+        if ( horizontalBar ) {
+            horizontalBar.width = width - vbarWidth; 
+            horizontalBar.height = hbarHeight;
+        }
+        if ( verticalBar ) {
+            verticalBar.height = height - hbarHeight;
+            verticalBar.width = vbarWidth;
+        }
     }
 
     // ------------------------------------------------------------------ 
