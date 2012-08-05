@@ -216,10 +216,10 @@ public static class exUIUtility {
         //
         exUIScrollView scrollView = scrollViewGO.AddComponent<exUIScrollView>();
         scrollView.anchor = exPlane.Anchor.TopCenter;
-        // scrollView.horizontalBar = horizontalBar;
-        // scrollView.horizontalSlider = horizontalSlider;
-        // scrollView.verticalBar = verticalBar;
-        // scrollView.verticalSlider = verticalSlider;
+        scrollView.horizontalBar = horizontalBar;
+        scrollView.horizontalSlider = horizontalSlider;
+        scrollView.verticalBar = verticalBar;
+        scrollView.verticalSlider = verticalSlider;
         scrollView.contentAnchor = contentAnchor.transform;
         scrollView.clipRect = clipRect;
 
