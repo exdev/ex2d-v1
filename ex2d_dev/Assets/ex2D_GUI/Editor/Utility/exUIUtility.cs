@@ -128,6 +128,25 @@ public static class exUIUtility {
         CreatePanelObject (true);
     }
 
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    [MenuItem ("GameObject/Create Other/ex2D_GUI/Label")]
+    static void CreateLabelObject () {
+        GameObject labelGO = new GameObject("Label");
+        exUILabel label = labelGO.AddComponent<exUILabel>();
+
+        // create Font
+        GameObject fontGO = new GameObject("Font");
+        exSpriteFont font = fontGO.AddComponent<exSpriteFont>();
+        font.text = "";
+        label.font = font;
+        fontGO.transform.parent = labelGO.transform;
+
+        //
+        Selection.activeObject = labelGO;
+    }
 
     // ------------------------------------------------------------------ 
     // Desc: 
