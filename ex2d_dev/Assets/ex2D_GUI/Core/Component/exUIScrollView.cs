@@ -150,6 +150,8 @@ public class exUIScrollView : exUIElement {
         // 
         UpdateLayout(); // TODO TEMP
         SetOffset ( Vector2.zero ); // TODO TEMP
+        // TODO TEMP
+        verticalSlider.height = height_/contentHeight * height_;
     }
 
     // ------------------------------------------------------------------ 

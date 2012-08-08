@@ -20,11 +20,13 @@ using System.Collections;
 [CustomEditor(typeof(exUILabel))]
 public class exUILabelEditor : exUIElementEditor {
 
-    private static string[] textAlignStrings = new string[] { "Left", "Center", "Right" };
+    // private static string[] textAlignStrings = new string[] { "Left", "Center", "Right" };
 
-    SerializedProperty textProp;
     SerializedProperty fontProp;
+    SerializedProperty autoSizeProp;
     SerializedProperty useMultilineProp;
+    SerializedProperty textProp;
+    SerializedProperty alignmentProp;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -37,9 +39,12 @@ public class exUILabelEditor : exUIElementEditor {
     protected new void OnEnable () {
         base.OnEnable();
 
-        textProp = serializedObject.FindProperty ("text_");
         fontProp = serializedObject.FindProperty ("font");
-        useMultilineProp = new SerializedObject ( serializedObject.FindProperty ("font").objectReferenceValue ).FindProperty("useMultiline_");
+        autoSizeProp = serializedObject.FindProperty ("autoSize_");
+        if ( fontProp.objectReferenceValue )
+            useMultilineProp = new SerializedObject ( fontProp.objectReferenceValue ).FindProperty("useMultiline_");
+        textProp = serializedObject.FindProperty ("text_");
+        alignmentProp = serializedObject.FindProperty ("alignment_");
     }
 
     // ------------------------------------------------------------------ 
@@ -62,62 +67,49 @@ public class exUILabelEditor : exUIElementEditor {
 
         serializedObject.Update ();
 
+            // font
+            EditorGUILayout.PropertyField( fontProp );
+
+            // autoSize
+            EditorGUILayout.PropertyField( autoSizeProp, new GUIContent ( "Auto Size" ) );
+            editTarget.autoSize = autoSizeProp.boolValue;
+
             // use Multiline
-            EditorGUILayout.PropertyField( useMultilineProp, new GUIContent ("Use Multiline") );
-            editTarget.font.useMultiline = useMultilineProp.boolValue;
+            if ( useMultilineProp != null ) {
+                EditorGUILayout.PropertyField( useMultilineProp, new GUIContent ("Use Multiline") );
+                if ( editTarget.font ) editTarget.font.useMultiline = useMultilineProp.boolValue;
+            }
 
             // text
-            if ( useMultilineProp.boolValue ) {
+            if ( useMultilineProp != null && useMultilineProp.boolValue ) {
                 EditorGUILayout.LabelField ( "Text" );
                 textProp.stringValue = EditorGUILayout.TextArea ( textProp.stringValue, EditorGUIUtility.GetBuiltinSkin( EditorSkin.Inspector ).textArea );
-                GUILayout.BeginHorizontal();
-                GUILayout.Space(20);
-                    editTarget.font.textAlign = (exSpriteFont.TextAlign)GUILayout.Toolbar ( (int)editTarget.font.textAlign, 
-                                                                                            textAlignStrings, 
-                                                                                            GUILayout.Width(150) );  
-                GUILayout.EndHorizontal();
             }
             else {
                 EditorGUILayout.PropertyField ( textProp, new GUIContent("Text") );
             }
-
-            // font
-            EditorGUILayout.PropertyField( fontProp );
-
-            // TODO { 
-            // // anchor
-            // EditorGUILayout.LabelField ( "Anchor", "" );
-            // GUILayout.BeginHorizontal();
-            // GUILayout.Space(30);
-            //     editPlane.anchor 
-            //         = (exPlane.Anchor)GUILayout.SelectionGrid ( (int)editPlane.anchor, 
-            //                                                       anchorTexts, 
-            //                                                       3, 
-            //                                                       GUILayout.Width(80) );  
-            // GUILayout.EndHorizontal();
-            // } TODO end 
-
-        serializedObject.ApplyModifiedProperties ();
-
-    }
-
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
-    protected override void OnSceneGUI () {
-        base.OnSceneGUI();
-
-        serializedObject.Update ();
-            exUILabel curEdit = target as exUILabel;
-
-            if ( curEdit.font ) {
-                if ( curEdit.font.text != textProp.stringValue ) {
-                    curEdit.font.text = textProp.stringValue;
-                    EditorUtility.SetDirty(curEdit.font);
-                    HandleUtility.Repaint(); 
+            editTarget.text = textProp.stringValue;
+            if ( editTarget.autoSize ) {
+                if ( editTarget.font ) {
+                    editTarget.font.Commit();
+                    widthProp.floatValue = editTarget.font.boundingRect.width;
+                    heightProp.floatValue = editTarget.font.boundingRect.height;
                 }
             }
+
+            // alignment
+            EditorGUILayout.LabelField ( "Alignment", "" );
+            GUILayout.BeginHorizontal();
+            GUILayout.Space(30);
+                alignmentProp.enumValueIndex 
+                    = GUILayout.SelectionGrid ( alignmentProp.enumValueIndex, 
+                                                anchorTexts, 
+                                                3, 
+                                                GUILayout.Width(80) );  
+                editTarget.alignment = (exPlane.Anchor)alignmentProp.enumValueIndex;
+            GUILayout.EndHorizontal();
+
         serializedObject.ApplyModifiedProperties ();
+
     }
 }

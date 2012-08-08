@@ -92,7 +92,6 @@ public class exSpriteEditor : exSpriteBaseEditor {
         // ======================================================== 
 
         bool textureChanged = false;
-        EditorGUI.indentLevel = 1;
 
         GUI.enabled = !inAnimMode;
         GUILayout.BeginHorizontal();
@@ -235,7 +234,7 @@ public class exSpriteEditor : exSpriteBaseEditor {
         // width & height 
         // ======================================================== 
 
-        EditorGUI.indentLevel = 2;
+        ++EditorGUI.indentLevel;
         GUI.enabled = !inAnimMode && editSprite.customSize;
             // width
             float newWidth = EditorGUILayout.FloatField( "Width", editSprite.width );
@@ -252,7 +251,7 @@ public class exSpriteEditor : exSpriteBaseEditor {
                     newHeight = 1.0f;
                 editSprite.height = newHeight;
             }
-        EditorGUI.indentLevel = 1;
+        --EditorGUI.indentLevel;
 
         // ======================================================== 
         // Reset to original

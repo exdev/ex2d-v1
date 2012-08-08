@@ -21,7 +21,7 @@ using System.IO;
 [CustomEditor(typeof(exPlane))]
 public class exPlaneEditor : Editor {
 
-    static string[] anchorTexts = new string[] {
+    protected static string[] anchorTexts = new string[] {
         "", "", "", 
         "", "", "", 
         "", "", "", 

@@ -68,6 +68,14 @@ public class exUIScrollViewEditor : exUIElementEditor {
 
         serializedObject.ApplyModifiedProperties ();
 
+        GUILayout.Space(10);
+        GUILayout.BeginHorizontal();
+        GUILayout.FlexibleSpace();
+        if ( GUILayout.Button("Update...", GUILayout.Height(20) ) ) {
+            exUIElement.FindAndAddChild(target as exUIScrollView);
+            EditorUtility.SetDirty(this);
+        }
+        GUILayout.EndHorizontal();
     }
 
     // ------------------------------------------------------------------ 

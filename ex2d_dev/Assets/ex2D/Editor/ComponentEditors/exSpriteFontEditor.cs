@@ -30,7 +30,6 @@ public class exSpriteFontEditor : exSpriteBaseEditor {
     ///////////////////////////////////////////////////////////////////////////////
 
     private exSpriteFont editSpriteFont;
-    private float textAreaHeight = 0.0f; 
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -44,10 +43,6 @@ public class exSpriteFontEditor : exSpriteBaseEditor {
         base.OnEnable();
         if ( target != editSpriteFont ) {
             editSpriteFont = target as exSpriteFont;
-            if ( EditorApplication.isPlaying == false ) {
-                long lines = exStringHelper.CountLinesInString(editSpriteFont.text);
-                textAreaHeight = lines * EditorStyles.textField.lineHeight;
-            }
         }
     }
 
@@ -73,7 +68,6 @@ public class exSpriteFontEditor : exSpriteBaseEditor {
         // } DELME end 
 
         EditorGUIUtility.LookLikeInspector ();
-        EditorGUI.indentLevel = 1;
 
         // ======================================================== 
         // pt size
@@ -101,25 +95,28 @@ public class exSpriteFontEditor : exSpriteBaseEditor {
             editSpriteFont.text = EditorGUILayout.TextField ( "Text", editSpriteFont.text );
         }
         else {
-            EditorGUIUtility.LookLikeControls ();
-                EditorGUILayout.LabelField ( "Text", "" );
-                GUILayout.BeginHorizontal();
-                GUILayout.Space (30);
-                    if ( Event.current.Equals ( Event.KeyboardEvent ("^return") ) ||
-                         Event.current.Equals ( Event.KeyboardEvent ("%return") ) ) 
-                    {
-                        GUIUtility.keyboardControl = -1; // remove any keyboard control
-                        Repaint();
-                    }
-                    string newText = EditorGUILayout.TextArea ( editSpriteFont.text, GUILayout.Height(textAreaHeight + 3) );
-                    if ( newText != editSpriteFont.text ) {
-                        editSpriteFont.text = newText;
-                        long lines = exStringHelper.CountLinesInString(editSpriteFont.text);
-                        textAreaHeight = lines * EditorStyles.textField.lineHeight;
-                    }
-                GUILayout.Space (10);
-                GUILayout.EndHorizontal();
-            EditorGUIUtility.LookLikeInspector ();
+            EditorGUILayout.LabelField ( "Text" );
+            editSpriteFont.text = EditorGUILayout.TextArea ( editSpriteFont.text, EditorGUIUtility.GetBuiltinSkin( EditorSkin.Inspector ).textArea );
+
+            // EditorGUIUtility.LookLikeControls ();
+            //     EditorGUILayout.LabelField ( "Text", "" );
+            //     GUILayout.BeginHorizontal();
+            //     GUILayout.Space (30);
+            //         if ( Event.current.Equals ( Event.KeyboardEvent ("^return") ) ||
+            //              Event.current.Equals ( Event.KeyboardEvent ("%return") ) ) 
+            //         {
+            //             GUIUtility.keyboardControl = -1; // remove any keyboard control
+            //             Repaint();
+            //         }
+            //         string newText = EditorGUILayout.TextArea ( editSpriteFont.text, GUILayout.Height(textAreaHeight + 3) );
+            //         if ( newText != editSpriteFont.text ) {
+            //             editSpriteFont.text = newText;
+            //             long lines = exStringHelper.CountLinesInString(editSpriteFont.text);
+            //             textAreaHeight = lines * EditorStyles.textField.lineHeight;
+            //         }
+            //     GUILayout.Space (10);
+            //     GUILayout.EndHorizontal();
+            // EditorGUIUtility.LookLikeInspector ();
         }
         GUI.enabled = true;
 
@@ -129,7 +126,7 @@ public class exSpriteFontEditor : exSpriteBaseEditor {
 
         if ( editSpriteFont.useMultiline ) {
             GUILayout.BeginHorizontal();
-            GUILayout.Space(30);
+            GUILayout.Space(20);
             editSpriteFont.textAlign 
                 = (exSpriteFont.TextAlign)GUILayout.Toolbar ( (int)editSpriteFont.textAlign, 
                                                               textAlignStrings, 
@@ -207,7 +204,7 @@ public class exSpriteFontEditor : exSpriteBaseEditor {
         editSpriteFont.useOutline = EditorGUILayout.Toggle ( "Use Outline", editSpriteFont.useOutline );
 
         GUI.enabled = editSpriteFont.useOutline;
-        EditorGUI.indentLevel = 2;
+        ++EditorGUI.indentLevel;
 
         // ======================================================== 
         // Outline Width 
@@ -221,7 +218,7 @@ public class exSpriteFontEditor : exSpriteBaseEditor {
 
         editSpriteFont.outlineColor = EditorGUILayout.ColorField ( "Outline Color", editSpriteFont.outlineColor );
 
-        EditorGUI.indentLevel = 1;
+        --EditorGUI.indentLevel;
         GUI.enabled = true;
 
         ///////////////////////////////////////////////////////////////////////////////
@@ -231,14 +228,14 @@ public class exSpriteFontEditor : exSpriteBaseEditor {
         editSpriteFont.useShadow = EditorGUILayout.Toggle ( "Use Shadow", editSpriteFont.useShadow );
 
         GUI.enabled = editSpriteFont.useShadow;
-        EditorGUI.indentLevel = 2;
+        ++EditorGUI.indentLevel;
 
         // ======================================================== 
         // Shadow Bias 
         // ======================================================== 
 
         EditorGUILayout.LabelField ( "Shadow Bias", "" );
-        EditorGUI.indentLevel = 3;
+        ++EditorGUI.indentLevel;
         float newShadowBiasX = EditorGUILayout.FloatField ( "X", editSpriteFont.shadowBias.x );
         float newShadowBiasY = EditorGUILayout.FloatField ( "Y", editSpriteFont.shadowBias.y );
         if ( newShadowBiasX != editSpriteFont.shadowBias.x ||
@@ -246,7 +243,7 @@ public class exSpriteFontEditor : exSpriteBaseEditor {
         {
             editSpriteFont.shadowBias = new Vector2(newShadowBiasX, newShadowBiasY);
         }
-        EditorGUI.indentLevel = 2;
+        --EditorGUI.indentLevel;
 
         // ======================================================== 
         // Shadow Color 
@@ -254,7 +251,7 @@ public class exSpriteFontEditor : exSpriteBaseEditor {
 
         editSpriteFont.shadowColor = EditorGUILayout.ColorField ( "Shadow Color", editSpriteFont.shadowColor );
 
-        EditorGUI.indentLevel = 1;
+        --EditorGUI.indentLevel;
         GUI.enabled = true;
 
         // ======================================================== 

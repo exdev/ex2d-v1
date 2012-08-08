@@ -75,7 +75,7 @@ public class exSpriteBaseEditor : exPlaneEditor {
         GUILayout.Space(20);
 
         EditorGUIUtility.LookLikeInspector ();
-        EditorGUI.indentLevel = 1;
+        ++EditorGUI.indentLevel;
 
             // ======================================================== 
             // Collision Type 
@@ -228,6 +228,7 @@ public class exSpriteBaseEditor : exPlaneEditor {
         if ( GUI.changed ) {
             EditorUtility.SetDirty(editSpriteBase);
         }
+        --EditorGUI.indentLevel;
 	}
 
     // ------------------------------------------------------------------ 
