@@ -70,7 +70,10 @@ public class exUIButton : exUIElement {
     public override bool OnEvent ( exUIEvent _e ) {
         exUIMng uimng = exUIMng.instance;
 
+        // ======================================================== 
         if ( _e.category == exUIEvent.Category.Mouse ) {
+        // ======================================================== 
+
             if ( _e.type == exUIEvent.Type.MouseEnter ) {
                 OnHoverIn (_e);
                 return true;
@@ -105,7 +108,11 @@ public class exUIButton : exUIElement {
                 return true;
             }
         }
+
+        // ======================================================== 
         else if ( _e.category == exUIEvent.Category.Touch ) {
+        // ======================================================== 
+
             if ( _e.type == exUIEvent.Type.TouchEnter ) {
                 OnHoverIn (_e);
                 return true;

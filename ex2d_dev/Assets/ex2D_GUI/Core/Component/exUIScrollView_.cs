@@ -30,8 +30,8 @@ public class exUIScrollView_ : exUIElement {
 	public delegate void StateUpdate ();
 
     // events
-	public event EventHandler OnHoverIn;
-	public event EventHandler OnHoverOut;
+    // public event EventHandler OnHoverIn;
+    // public event EventHandler OnHoverOut;
 
     public enum ScrollDirection {
         Vertical,

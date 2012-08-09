@@ -35,8 +35,6 @@ public class exUIScrollView : exUIElement {
     //
     ///////////////////////////////////////////////////////////////////////////////
 
-    public ScrollDirection scrollDirection = ScrollDirection.Both;
-
     // TODO { 
     // public bool bounce = true;
     // public float bounceDuration = 0.5f;
@@ -61,24 +59,28 @@ public class exUIScrollView : exUIElement {
     public Transform contentAnchor;
 
     public bool showSliderOnDragging = false;
+    public ScrollDirection scrollDirection = ScrollDirection.Both;
+
 
     ///////////////////////////////////////////////////////////////////////////////
     //
     ///////////////////////////////////////////////////////////////////////////////
 
+    protected bool isPressing = false;
+    protected bool isDragging = false;
+    protected Vector2 pressPoint = Vector2.zero;
+    protected float pressTime = 0.0f;
+    protected Vector2 velocity = Vector2.zero;
+
+    protected Vector2 contentOffset = Vector2.zero;
     protected float contentWidth = 0.0f; 
     protected float contentHeight = 0.0f; 
 
     // TODO { 
-    // protected Vector2 contentOffset = Vector2.zero;
     // protected Vector2 startPos;
     // protected Vector2 destPos;
     // protected float duration;
     // protected StateUpdate stateUpdate;
-    // protected float pressTime = 0.0f;
-    // protected Vector2 pressPoint = Vector2.zero;
-    // protected Vector2 velocity = Vector2.zero;
-    // protected bool isDragging = false;
     // } TODO end 
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -89,7 +91,149 @@ public class exUIScrollView : exUIElement {
     // Desc: 
     // ------------------------------------------------------------------ 
 
+    protected void Start () {
+        UpdateLayout();
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    protected void Update () {
+        Vector2 delta = velocity * Time.deltaTime;
+        contentOffset += delta;
+
+        SetOffset ( contentOffset );
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
     public override bool OnEvent ( exUIEvent _e ) {
+        exUIMng uimng = exUIMng.instance;
+
+        // ======================================================== 
+        if ( _e.category == exUIEvent.Category.Mouse ) {
+        // ======================================================== 
+
+            if ( _e.type == exUIEvent.Type.MouseUp ) {
+                if ( uimng.GetMouseFocus() == this ) {
+                    isPressing = false;
+                    uimng.SetMouseFocus(null);
+                    if ( isDragging ) {
+                        isDragging = false;
+
+                        if ( Time.time - pressTime < 0.01f )
+                            velocity = Vector2.zero;
+                        else
+                            velocity = (pressPoint - _e.position)/(Time.time - pressTime);
+
+                        if ( scrollDirection == ScrollDirection.Vertical )
+                            velocity.x = 0.0f;
+                        else if ( scrollDirection == ScrollDirection.Horizontal )
+                            velocity.y = 0.0f;
+                    }
+                }
+                return true;
+            }
+            else if ( _e.type == exUIEvent.Type.MouseDown &&
+                      _e.buttons == exUIEvent.MouseButtonFlags.Left ) 
+            {
+                uimng.SetMouseFocus( this );
+                isPressing = true;
+                velocity = Vector2.zero;
+                return true;
+            }
+            else if ( _e.type == exUIEvent.Type.MouseMove &&
+                      _e.buttons == exUIEvent.MouseButtonFlags.Left ) 
+            {
+                if ( _e.delta.magnitude > 1.0f ) {
+                    if ( isDragging == false ) {
+                        pressPoint = _e.position;
+                        pressTime = Time.time;
+                        isDragging = true;
+                    }
+                }
+                else {
+                    pressPoint = _e.position;
+                    isDragging = false;
+                }
+
+                float maxOffsetX = Mathf.Max(contentWidth - width, 0.0f);
+                float maxOffsetY = Mathf.Max(contentHeight - height, 0.0f);
+                float newX = -_e.delta.x;
+                float newY = -_e.delta.y;
+                Vector2 scrollDistance = Vector2.zero;
+
+                //
+                if ( scrollDirection == ScrollDirection.Vertical )
+                    newX = 0.0f;
+                else if ( scrollDirection == ScrollDirection.Horizontal )
+                    newY = 0.0f;
+
+                scrollDistance = new Vector2( newX, newY );
+                contentOffset += scrollDistance;
+                contentOffset = new Vector2 ( Mathf.Clamp ( contentOffset.x, 0.0f, maxOffsetX ),
+                                              Mathf.Clamp ( contentOffset.y, -maxOffsetY, 0.0f ) );
+
+                SetOffset ( contentOffset );
+
+                return true;
+            }
+        }
+
+        // ======================================================== 
+        else if ( _e.category == exUIEvent.Category.Touch ) {
+        // ======================================================== 
+
+            if ( _e.type == exUIEvent.Type.TouchUp ) {
+                if ( uimng.GetTouchFocus(_e.touchID) == this ) {
+                    isPressing = false;
+                    uimng.SetTouchFocus( _e.touchID, null );
+                }
+                return true;
+            }
+            else if ( _e.type == exUIEvent.Type.TouchDown ) {
+                uimng.SetTouchFocus( _e.touchID, this );
+                isPressing = true;
+                return true;
+            }
+            else if ( _e.type == exUIEvent.Type.TouchMove ) {
+                if ( _e.delta.magnitude > 1.0f ) {
+                    if ( isDragging == false ) {
+                        pressPoint = _e.position;
+                        isDragging = true;
+                    }
+                }
+                else {
+                    pressPoint = _e.position;
+                    isDragging = false;
+                }
+
+                float maxOffsetX = Mathf.Max(contentWidth - width, 0.0f);
+                float maxOffsetY = Mathf.Max(contentHeight - height, 0.0f);
+                float newX = -_e.delta.x;
+                float newY = -_e.delta.y;
+                Vector2 scrollDistance = Vector2.zero;
+
+                //
+                if ( scrollDirection == ScrollDirection.Vertical )
+                    newX = 0.0f;
+                else if ( scrollDirection == ScrollDirection.Horizontal )
+                    newY = 0.0f;
+
+                scrollDistance = new Vector2( newX, newY );
+                contentOffset += scrollDistance;
+                contentOffset = new Vector2 ( Mathf.Clamp ( contentOffset.x, 0.0f, maxOffsetX ),
+                                              Mathf.Clamp ( contentOffset.y, -maxOffsetY, 0.0f ) );
+
+                SetOffset ( contentOffset );
+
+                return true;
+            }
+        }
+
         return false;
     }
 
@@ -147,11 +291,11 @@ public class exUIScrollView : exUIElement {
                                                          style.padding.top,
                                                          clipRect.transform.localPosition.z );
 
-        // 
-        UpdateLayout(); // TODO TEMP
-        SetOffset ( Vector2.zero ); // TODO TEMP
-        // TODO TEMP
-        verticalSlider.height = height_/contentHeight * height_;
+        // TEST { 
+        // UpdateLayout();
+        // SetOffset ( Vector2.zero );
+        // verticalSlider.height = height_/contentHeight * height_;
+        // } TEST end 
     }
 
     // ------------------------------------------------------------------ 
@@ -251,134 +395,4 @@ public class exUIScrollView : exUIElement {
 
         contentAnchor.transform.localPosition = new Vector3 ( -_offset.x, -_offset.y, contentAnchor.transform.localPosition.z );
     }
-
-    // // ------------------------------------------------------------------ 
-    // // Desc: 
-    // // ------------------------------------------------------------------ 
-
-    // void DeaccelerateScrolling () {
-    //     float maxOffsetX = Mathf.Max(contentWidth - boundingRect.width, 0.0f);
-    //     float maxOffsetY = Mathf.Max(contentHeight - boundingRect.height, 0.0f);
-
-    //     //
-    //     bool needRelocate = false;
-    //     if ( bounce ) {
-    //         //
-    //         float newX = velocity.x;
-    //         float newY = velocity.y;
-    //         float bounceX = 0.0f;
-    //         if ( contentOffset.x > 0.0f ) {
-    //             bounceX = contentOffset.x;
-    //             newX *= elasticity;
-    //             needRelocate = true;
-    //         }
-    //         else if (  contentOffset.x < maxOffsetX ) {
-    //             bounceX = maxOffsetX - contentOffset.x;
-    //             newX *= elasticity;
-    //             needRelocate = true;
-    //         }
-    //         else {
-    //             newX *= damping;
-    //         }
-    //         horizontalSlider.width = (width - bounceX)/contentWidth * (width - bounceX);
-
-    //         //
-    //         float bounceY = 0.0f;
-    //         if ( contentOffset.y > 0.0f ) {
-    //             bounceY = contentOffset.y;
-    //             newY *= elasticity;
-    //             needRelocate = true;
-    //         }
-    //         else if (  contentOffset.y < -maxOffsetY ) {
-    //             bounceY = -maxOffsetY - contentOffset.y;
-    //             newY *= elasticity;
-    //             needRelocate = true;
-    //         }
-    //         else {
-    //             newY *= damping;
-    //         }
-    //         verticalSlider.height = (height - bounceY)/contentHeight * (height - bounceY);
-
-    //         //
-    //         velocity = new Vector2( newX, newY );
-    //         contentOffset += velocity * Time.deltaTime;
-    //     }
-    //     else {
-    //         velocity *= damping;
-    //         contentOffset += velocity * Time.deltaTime;
-    //         contentOffset = new Vector2 ( Mathf.Clamp ( contentOffset.x, 0.0f, maxOffsetX ),
-    //                                Mathf.Clamp ( contentOffset.y, -maxOffsetY, 0.0f ) );
-    //     }
-    //     SetOffset ( contentOffset );
-
-    //     //
-    //     if ( (Mathf.Abs(velocity.x) <= 0.1f && 
-    //           Mathf.Abs(velocity.y) <= 0.1f) ) {
-
-    //         if ( needRelocate ) {
-    //             duration = 0.0f;
-    //             startPos = contentOffset;
-    //             destPos = new Vector2 ( Mathf.Clamp ( contentOffset.x, 0.0f, maxOffsetX ),
-    //                                     Mathf.Clamp ( contentOffset.y, -maxOffsetY, 0.0f ) );
-    //             stateUpdate = RelocateContent;
-    //         }
-    //         else {
-    //             stateUpdate = null;
-    //         }
-    //     }
-    // }
-
-    // // ------------------------------------------------------------------ 
-    // // Desc: 
-    // public static float ExpoOut ( float _t ) {
-    //     return (_t==1.0f) ? 1.0f : 1.001f * (-Mathf.Pow(2.0f, -10 * _t) + 1);
-    // }
-    // // ------------------------------------------------------------------ 
-
-    // void RelocateContent () {
-    //     duration += Time.deltaTime;
-    //     float ratio = Mathf.Clamp( duration/bounceDuration, 0.0f, 1.0f );
-    //     float maxOffsetX = Mathf.Max(contentWidth - boundingRect.width, 0.0f);
-    //     float maxOffsetY = Mathf.Max(contentHeight - boundingRect.height, 0.0f);
-
-    //     contentOffset = new Vector2 ( Mathf.Lerp ( startPos.x, destPos.x, ExpoOut(ratio) ),
-    //                                   Mathf.Lerp ( startPos.y, destPos.y, ExpoOut(ratio) ) );
-
-    //     //
-    //     float bounceX = 0.0f;
-    //     if ( contentOffset.x > 0.0f ) {
-    //         bounceX = contentOffset.x;
-    //     }
-    //     else if (  contentOffset.x < maxOffsetX ) {
-    //         bounceX = maxOffsetX - contentOffset.x;
-    //     }
-    //     horizontalSlider.width = (width - bounceX)/contentWidth * (width - bounceX);
-
-    //     //
-    //     float bounceY = 0.0f;
-    //     if ( contentOffset.y > 0.0f ) {
-    //         bounceY = contentOffset.y;
-    //     }
-    //     else if (  contentOffset.y < -maxOffsetY ) {
-    //         bounceY = -maxOffsetY - contentOffset.y;
-    //     }
-    //     verticalSlider.height = (height - bounceY)/contentHeight * (height - bounceY);
-
-    //     //
-    //     SetOffset ( contentOffset );
-
-    //     if ( duration >= bounceDuration ) {
-    //         stateUpdate = null;
-    //     }
-    // }
-
-    // // ------------------------------------------------------------------ 
-    // // Desc: 
-    // // ------------------------------------------------------------------ 
-
-    // void LateUpdate () {
-    //     if ( stateUpdate != null ) {
-    //         stateUpdate ();
-    //     }
-    // }
 }

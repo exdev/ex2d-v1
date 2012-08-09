@@ -25,6 +25,8 @@ public class exUIScrollViewEditor : exUIElementEditor {
     SerializedProperty verticalBarProp;
     SerializedProperty verticalSliderProp;
 
+    SerializedProperty scrollDirectionProp;
+
     ///////////////////////////////////////////////////////////////////////////////
     // functions
     ///////////////////////////////////////////////////////////////////////////////
@@ -40,6 +42,8 @@ public class exUIScrollViewEditor : exUIElementEditor {
         horizontalSliderProp = serializedObject.FindProperty ("horizontalSlider");
         verticalBarProp = serializedObject.FindProperty ("verticalBar");
         verticalSliderProp = serializedObject.FindProperty ("verticalSlider");
+
+        scrollDirectionProp = serializedObject.FindProperty ("scrollDirection");
     }
 
     // ------------------------------------------------------------------ 
@@ -65,6 +69,8 @@ public class exUIScrollViewEditor : exUIElementEditor {
             EditorGUILayout.PropertyField( horizontalSliderProp );
             EditorGUILayout.PropertyField( verticalBarProp );
             EditorGUILayout.PropertyField( verticalSliderProp );
+
+            EditorGUILayout.PropertyField( scrollDirectionProp );
 
         serializedObject.ApplyModifiedProperties ();
 
