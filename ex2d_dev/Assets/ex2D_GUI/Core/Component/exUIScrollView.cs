@@ -61,6 +61,8 @@ public class exUIScrollView : exUIElement {
     public bool showSliderOnDragging = false;
     public ScrollDirection scrollDirection = ScrollDirection.Both;
 
+    public float deceleration = 0.98f;
+
 
     ///////////////////////////////////////////////////////////////////////////////
     //
@@ -71,6 +73,7 @@ public class exUIScrollView : exUIElement {
     protected Vector2 pressPoint = Vector2.zero;
     protected float pressTime = 0.0f;
     protected Vector2 velocity = Vector2.zero;
+    protected bool flicking = false;
 
     protected Vector2 contentOffset = Vector2.zero;
     protected float contentWidth = 0.0f; 
@@ -100,10 +103,17 @@ public class exUIScrollView : exUIElement {
     // ------------------------------------------------------------------ 
 
     protected void Update () {
-        Vector2 delta = velocity * Time.deltaTime;
-        contentOffset += delta;
+        if ( flicking ) {
+            Vector2 delta = velocity * Time.deltaTime;
+            velocity *= deceleration;
+            contentOffset += delta;
 
-        SetOffset ( contentOffset );
+            SetOffset ( contentOffset );
+
+            if ( Mathf.Abs(velocity.magnitude) <= 0.015f ) {
+                flicking = false;
+            }
+        }
     }
 
     // ------------------------------------------------------------------ 
@@ -133,6 +143,10 @@ public class exUIScrollView : exUIElement {
                             velocity.x = 0.0f;
                         else if ( scrollDirection == ScrollDirection.Horizontal )
                             velocity.y = 0.0f;
+
+                        if ( Mathf.Abs(velocity.magnitude) > 0.015f ) {
+                            flicking = true;
+                        }
                     }
                 }
                 return true;
