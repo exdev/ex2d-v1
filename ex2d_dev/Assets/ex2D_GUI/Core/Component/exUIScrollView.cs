@@ -32,17 +32,6 @@ public class exUIScrollView : exUIElement {
     }
 
     ///////////////////////////////////////////////////////////////////////////////
-    //
-    ///////////////////////////////////////////////////////////////////////////////
-
-    // TODO { 
-    // public bool bounce = true;
-    // public float bounceDuration = 0.5f;
-    // public float damping = 0.95f;
-    // public float elasticity = 0.2f;
-    // } TODO end 
-
-    ///////////////////////////////////////////////////////////////////////////////
     // properties
     ///////////////////////////////////////////////////////////////////////////////
 
@@ -62,12 +51,14 @@ public class exUIScrollView : exUIElement {
     public ScrollDirection scrollDirection = ScrollDirection.Both;
 
     public float deceleration = 0.98f;
-
+    public float bounce = 0.8f;
+    public float bounceBackDuration = 0.5f;
 
     ///////////////////////////////////////////////////////////////////////////////
     //
     ///////////////////////////////////////////////////////////////////////////////
 
+    // flicking
     protected bool isPressing = false;
     protected bool isDragging = false;
     protected Vector2 pressPoint = Vector2.zero;
@@ -75,16 +66,24 @@ public class exUIScrollView : exUIElement {
     protected Vector2 velocity = Vector2.zero;
     protected bool flicking = false;
 
+    // scroll to
+    protected bool scrollingToX = false;
+    protected bool scrollingToY = false;
+
+    protected float srcX = 0.0f;
+    protected float destX = 0.0f;
+    protected float timerX = 0.0f;
+    protected float srcY = 0.0f;
+    protected float destY = 0.0f;
+    protected float timerY = 0.0f;
+
     protected Vector2 contentOffset = Vector2.zero;
     protected float contentWidth = 0.0f; 
     protected float contentHeight = 0.0f; 
-
-    // TODO { 
-    // protected Vector2 startPos;
-    // protected Vector2 destPos;
-    // protected float duration;
-    // protected StateUpdate stateUpdate;
-    // } TODO end 
+    protected float minX = 0.0f;
+    protected float maxX = 0.0f;
+    protected float minY = 0.0f;
+    protected float maxY = 0.0f;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -100,18 +99,78 @@ public class exUIScrollView : exUIElement {
 
     // ------------------------------------------------------------------ 
     // Desc: 
+    public static float easing ( float _t ) {
+        _t-=1.0f;
+        return _t*_t*_t + 1;
+    }
     // ------------------------------------------------------------------ 
 
     protected void Update () {
         if ( flicking ) {
             Vector2 delta = velocity * Time.deltaTime;
-            velocity *= deceleration;
             contentOffset += delta;
-
             SetOffset ( contentOffset );
 
-            if ( Mathf.Abs(velocity.magnitude) <= 0.015f ) {
+            velocity *= deceleration;
+            if ( scrollDirection == ScrollDirection.Vertical ) {
+                if ( contentOffset.y < minY || contentOffset.y > maxY ) {
+                    velocity.y *= bounce;
+                }
+            }
+
+            if ( scrollDirection == ScrollDirection.Horizontal ) {
+                if ( contentOffset.x < minX || contentOffset.x > maxX ) {
+                    velocity.x *= bounce;
+                }
+            }
+
+
+            if ( Mathf.Abs(velocity.magnitude) <= 30.0f ) {
                 flicking = false;
+
+                if ( contentOffset.x < minX || contentOffset.x > maxX ) {
+                    scrollingToX = true;
+                }
+                else if ( contentOffset.y < minY || contentOffset.y > maxY ) {
+                    scrollingToY = true;
+                    srcY = contentOffset.y;
+                    if ( contentOffset.y < minY )
+                        destY = minY; 
+                    else
+                        destY = maxY; 
+                    timerY = 0.0f;
+                }
+            }
+        }
+
+        if ( scrollingToX ) {
+            timerX += Time.deltaTime;
+            if ( timerX >= bounceBackDuration ) {
+                contentOffset.x = destX;
+                SetOffset(contentOffset);
+                scrollingToX = false;
+            }
+            else {
+                float ratio = timerX / bounceBackDuration;
+                float x = Mathf.Lerp( srcX, destX, ratio );
+                contentOffset.x = x;
+                SetOffset(contentOffset);
+            }
+        }
+
+        if ( scrollingToY ) {
+            timerY += Time.deltaTime;
+            if ( timerY >= bounceBackDuration ) {
+                contentOffset.y = destY;
+                SetOffset(contentOffset);
+                scrollingToY = false;
+            }
+            else {
+                float ratio = timerY / bounceBackDuration;
+                ratio = easing(ratio);
+                float y = Mathf.Lerp( srcY, destY, ratio );
+                contentOffset.y = y;
+                SetOffset(contentOffset);
             }
         }
     }
@@ -134,19 +193,23 @@ public class exUIScrollView : exUIElement {
                     if ( isDragging ) {
                         isDragging = false;
 
-                        if ( Time.time - pressTime < 0.01f )
+                        if ( Time.time - pressTime < 0.01f ||
+                             contentOffset.x < minX || contentOffset.x > maxX ||
+                             contentOffset.y < minY || contentOffset.y > maxY )
+                        {
                             velocity = Vector2.zero;
+                        }
                         else
+                        {
                             velocity = (pressPoint - _e.position)/(Time.time - pressTime);
+                        }
 
                         if ( scrollDirection == ScrollDirection.Vertical )
                             velocity.x = 0.0f;
                         else if ( scrollDirection == ScrollDirection.Horizontal )
                             velocity.y = 0.0f;
 
-                        if ( Mathf.Abs(velocity.magnitude) > 0.015f ) {
-                            flicking = true;
-                        }
+                        flicking = true;
                     }
                 }
                 return true;
@@ -156,7 +219,11 @@ public class exUIScrollView : exUIElement {
             {
                 uimng.SetMouseFocus( this );
                 isPressing = true;
+                scrollingToX = false;
+                scrollingToY = false;
                 velocity = Vector2.zero;
+                pressPoint = _e.position;
+                pressTime = Time.time;
                 return true;
             }
             else if ( _e.type == exUIEvent.Type.MouseMove &&
@@ -169,15 +236,17 @@ public class exUIScrollView : exUIElement {
                         isDragging = true;
                     }
                 }
-                else {
-                    pressPoint = _e.position;
-                    isDragging = false;
-                }
 
-                float maxOffsetX = Mathf.Max(contentWidth - width, 0.0f);
-                float maxOffsetY = Mathf.Max(contentHeight - height, 0.0f);
-                float newX = -_e.delta.x;
-                float newY = -_e.delta.y;
+                float dragCoefX = 1.0f;
+                float dragCoefY = 1.0f;
+
+                if ( contentOffset.x < minX || contentOffset.x > maxX )
+                    dragCoefX = 0.4f;
+                if ( contentOffset.y < minY || contentOffset.y > maxY )
+                    dragCoefY = 0.4f;
+
+                float newX = -_e.delta.x * dragCoefX;
+                float newY = -_e.delta.y * dragCoefY;
                 Vector2 scrollDistance = Vector2.zero;
 
                 //
@@ -188,9 +257,6 @@ public class exUIScrollView : exUIElement {
 
                 scrollDistance = new Vector2( newX, newY );
                 contentOffset += scrollDistance;
-                contentOffset = new Vector2 ( Mathf.Clamp ( contentOffset.x, 0.0f, maxOffsetX ),
-                                              Mathf.Clamp ( contentOffset.y, -maxOffsetY, 0.0f ) );
-
                 SetOffset ( contentOffset );
 
                 return true;
@@ -202,33 +268,64 @@ public class exUIScrollView : exUIElement {
         // ======================================================== 
 
             if ( _e.type == exUIEvent.Type.TouchUp ) {
-                if ( uimng.GetTouchFocus(_e.touchID) == this ) {
+                if ( isPressing ) {
+                    if ( uimng.GetTouchFocus(_e.touchID) == this ) {
+                        uimng.SetTouchFocus( _e.touchID, null );
+                    }
+                    if ( isDragging ) {
+                        isDragging = false;
+
+                        if ( Time.time - pressTime < 0.01f ||
+                             contentOffset.x < minX || contentOffset.x > maxX ||
+                             contentOffset.y < minY || contentOffset.y > maxY )
+                        {
+                            velocity = Vector2.zero;
+                        }
+                        else
+                        {
+                            velocity = (pressPoint - _e.position)/(Time.time - pressTime);
+                        }
+
+                        if ( scrollDirection == ScrollDirection.Vertical )
+                            velocity.x = 0.0f;
+                        else if ( scrollDirection == ScrollDirection.Horizontal )
+                            velocity.y = 0.0f;
+
+                        flicking = true;
+                    }
                     isPressing = false;
-                    uimng.SetTouchFocus( _e.touchID, null );
                 }
                 return true;
             }
             else if ( _e.type == exUIEvent.Type.TouchDown ) {
                 uimng.SetTouchFocus( _e.touchID, this );
                 isPressing = true;
+                scrollingToX = false;
+                scrollingToY = false;
+                velocity = Vector2.zero;
+                pressPoint = _e.position;
+                pressTime = Time.time;
                 return true;
             }
             else if ( _e.type == exUIEvent.Type.TouchMove ) {
-                if ( _e.delta.magnitude > 1.0f ) {
-                    if ( isDragging == false ) {
+                if ( isDragging == false ) {
+                    if ( (pressPoint - _e.position).sqrMagnitude > 1.0f ) {
                         pressPoint = _e.position;
+                        pressTime = Time.time;
                         isDragging = true;
                     }
                 }
-                else {
-                    pressPoint = _e.position;
-                    isDragging = false;
-                }
 
-                float maxOffsetX = Mathf.Max(contentWidth - width, 0.0f);
-                float maxOffsetY = Mathf.Max(contentHeight - height, 0.0f);
-                float newX = -_e.delta.x;
-                float newY = -_e.delta.y;
+                float dragCoefX = 1.0f;
+                float dragCoefY = 1.0f;
+
+                if ( contentOffset.x < minX || contentOffset.x > maxX )
+                    dragCoefX = 0.4f;
+                if ( contentOffset.y < minY || contentOffset.y > maxY )
+                    dragCoefY = 0.4f;
+
+                float newX = -_e.delta.x * dragCoefX;
+                float newY = -_e.delta.y * dragCoefY;
                 Vector2 scrollDistance = Vector2.zero;
 
                 //
@@ -239,9 +336,6 @@ public class exUIScrollView : exUIElement {
 
                 scrollDistance = new Vector2( newX, newY );
                 contentOffset += scrollDistance;
-                contentOffset = new Vector2 ( Mathf.Clamp ( contentOffset.x, 0.0f, maxOffsetX ),
-                                              Mathf.Clamp ( contentOffset.y, -maxOffsetY, 0.0f ) );
-
                 SetOffset ( contentOffset );
 
                 return true;
@@ -259,10 +353,10 @@ public class exUIScrollView : exUIElement {
         base.OnSizeChanged( _newWidth, _newHeight );
         Commit();
 
-        float startX = boundingRect.xMin;
-        float startY = boundingRect.yMax;
-        float endX = boundingRect.xMax;
-        float endY = boundingRect.yMin;
+        float startX = clipRect.transform.localPosition.x;
+        float startY = clipRect.transform.localPosition.y;
+        float endX = startX + clipRect.width;
+        float endY = startY + clipRect.height;
 
         // horizontalBar, verticalBar
         if ( contentAnchor )
@@ -270,10 +364,10 @@ public class exUIScrollView : exUIElement {
 
         if ( showSliderOnDragging == false ) {
             if ( horizontalBar )
-                horizontalBar.transform.localPosition = new Vector3 ( startX, endY, horizontalBar.transform.localPosition.z );
+                horizontalBar.transform.localPosition = new Vector3 ( startX, endY + horizontalBar.height, horizontalBar.transform.localPosition.z );
 
             if ( verticalBar )
-                verticalBar.transform.localPosition = new Vector3 ( endX, startY, verticalBar.transform.localPosition.z );
+                verticalBar.transform.localPosition = new Vector3 ( endX + verticalBar.width, startY, verticalBar.transform.localPosition.z );
         }
 
         if ( horizontalSlider )
@@ -289,11 +383,11 @@ public class exUIScrollView : exUIElement {
         float hbarHeight = (horizontalBar && horizontalBar.guiBorder) ? horizontalBar.guiBorder.border.vertical : 0.0f;
         float vbarWidth = (verticalBar && verticalBar.guiBorder) ? verticalBar.guiBorder.border.horizontal : 0.0f;
         if ( horizontalBar ) {
-            horizontalBar.width = width - vbarWidth; 
+            horizontalBar.width = clipRect.width - vbarWidth; 
             horizontalBar.height = hbarHeight;
         }
         if ( verticalBar ) {
-            verticalBar.height = height - hbarHeight;
+            verticalBar.height = clipRect.height - hbarHeight;
             verticalBar.width = vbarWidth;
         }
 
@@ -305,11 +399,9 @@ public class exUIScrollView : exUIElement {
                                                          style.padding.top,
                                                          clipRect.transform.localPosition.z );
 
-        // TEST { 
-        // UpdateLayout();
-        // SetOffset ( Vector2.zero );
-        // verticalSlider.height = height_/contentHeight * height_;
-        // } TEST end 
+        //
+        if ( horizontalSlider ) horizontalSlider.width = width_/contentWidth * width_;
+        if ( verticalSlider ) verticalSlider.height = height_/contentHeight * height_;
     }
 
     // ------------------------------------------------------------------ 
@@ -331,12 +423,12 @@ public class exUIScrollView : exUIElement {
     // ------------------------------------------------------------------ 
 
     protected float GetContentHeight () {
-        float height = 0.0f;
+        float cHeight = 0.0f;
         for ( int i = 0; i < children.Count; ++i ) {
             exUIElement el = children[i];
-            height += el.boundingRect.height;
+            cHeight += el.boundingRect.height;
         }
-        return height;
+        return cHeight;
     }
 
     // ------------------------------------------------------------------ 
@@ -368,6 +460,15 @@ public class exUIScrollView : exUIElement {
 
         contentHeight = (y == 0.0f) ? 1.0f : y;
         contentWidth = (x == 0.0f) ? 1.0f : x;
+
+        minX = 0.0f;
+        maxX = Mathf.Max(contentWidth - clipRect.width, 0.0f);
+        
+        minY = -Mathf.Max(contentHeight - clipRect.height, 0.0f);
+        maxY = 0.0f;
+
+        if ( horizontalSlider ) horizontalSlider.width = width_/contentWidth * width_;
+        if ( verticalSlider ) verticalSlider.height = height_/contentHeight * height_;
     }
 
     // ------------------------------------------------------------------ 
@@ -375,35 +476,48 @@ public class exUIScrollView : exUIElement {
     // ------------------------------------------------------------------ 
 
     void SetOffset ( Vector2 _offset ) {
-        float maxOffsetX = Mathf.Max(contentWidth - width, 0.0f);
-        float maxOffsetY = Mathf.Max(contentHeight - height, 0.0f);
-
-        float startX = boundingRect.xMin;
-        float startY = boundingRect.yMax;
+        float startX = clipRect.transform.localPosition.x;
+        float startY = clipRect.transform.localPosition.y;
 
         // vslider
         if ( verticalSlider != null && verticalSlider.enabled ) {
             float vsliderX = verticalSlider.transform.localPosition.x;
-            float vsliderY = startY + _offset.y * height/contentHeight;
-            if ( _offset.y < -maxOffsetY ) {
-                vsliderY = -height + verticalSlider.height;
-            }
-            else if ( _offset.y > 0 ) {
+            float vsliderY = startY + _offset.y * clipRect.height/contentHeight;
+            float over = 0.0f;
+
+            if ( _offset.y < minY )
+                over = minY - _offset.y;
+            else if ( _offset.y > maxY )
+                over = _offset.y - maxY;
+
+            verticalSlider.height = (height_/contentHeight * height_) - over;
+
+            if ( _offset.y < minY )
+                vsliderY = -clipRect.height + verticalSlider.height;
+            else if ( _offset.y > maxY )
                 vsliderY = 0.0f;
-            }
+
             verticalSlider.transform.localPosition = new Vector3( vsliderX, vsliderY, verticalSlider.transform.localPosition.z );
         }
 
         // hslider
         if ( horizontalSlider != null && horizontalSlider.enabled ) {
-            float hsliderX = startX + _offset.x * width/contentWidth;
-            if ( _offset.x < -maxOffsetX ) {
-                hsliderX = width - horizontalSlider.width;
-            }
-            else if ( _offset.y > 0 ) {
-                hsliderX = 0.0f;
-            }
+            float hsliderX = startX + _offset.x * clipRect.width/contentWidth;
             float hsliderY = horizontalSlider.transform.localPosition.y;
+            float over = 0.0f;
+
+            if ( _offset.x < minX )
+                over = minX - _offset.x;
+            else if ( _offset.x > maxX )
+                over = _offset.x - maxX;
+
+            verticalSlider.width = (width_/contentWidth * width_) - over;
+
+            if ( _offset.x < minX )
+                hsliderX = clipRect.width - horizontalSlider.width;
+            else if ( _offset.x > maxX )
+                hsliderX = 0.0f;
+
             horizontalSlider.transform.localPosition = new Vector3( hsliderX, hsliderY, horizontalSlider.transform.localPosition.z );
         }
 

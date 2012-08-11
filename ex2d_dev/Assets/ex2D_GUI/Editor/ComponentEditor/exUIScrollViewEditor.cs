@@ -25,7 +25,11 @@ public class exUIScrollViewEditor : exUIElementEditor {
     SerializedProperty verticalBarProp;
     SerializedProperty verticalSliderProp;
 
+    SerializedProperty showSliderOnDraggingProp;
     SerializedProperty scrollDirectionProp;
+    SerializedProperty decelerationProp;
+    SerializedProperty bounceProp;
+    SerializedProperty bounceBackDurationProp;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -43,7 +47,11 @@ public class exUIScrollViewEditor : exUIElementEditor {
         verticalBarProp = serializedObject.FindProperty ("verticalBar");
         verticalSliderProp = serializedObject.FindProperty ("verticalSlider");
 
+        showSliderOnDraggingProp = serializedObject.FindProperty ("showSliderOnDragging");
         scrollDirectionProp = serializedObject.FindProperty ("scrollDirection");
+        decelerationProp = serializedObject.FindProperty ("deceleration");
+        bounceProp = serializedObject.FindProperty ("bounce");
+        bounceBackDurationProp = serializedObject.FindProperty ("bounceBackDuration");
     }
 
     // ------------------------------------------------------------------ 
@@ -70,7 +78,11 @@ public class exUIScrollViewEditor : exUIElementEditor {
             EditorGUILayout.PropertyField( verticalBarProp );
             EditorGUILayout.PropertyField( verticalSliderProp );
 
+            EditorGUILayout.PropertyField( showSliderOnDraggingProp );
             EditorGUILayout.PropertyField( scrollDirectionProp );
+            EditorGUILayout.PropertyField( decelerationProp );
+            EditorGUILayout.PropertyField( bounceProp );
+            EditorGUILayout.PropertyField( bounceBackDurationProp );
 
         serializedObject.ApplyModifiedProperties ();
 
