@@ -25,8 +25,8 @@ public class exUIElementEditor : exPlaneEditor {
     // properties
     ///////////////////////////////////////////////////////////////////////////////
 
-    SerializedProperty widthProp;
-    SerializedProperty heightProp;
+    protected SerializedProperty widthProp;
+    protected SerializedProperty heightProp;
 
     ///////////////////////////////////////////////////////////////////////////////
     // functions
@@ -65,11 +65,6 @@ public class exUIElementEditor : exPlaneEditor {
 
             EditorGUILayout.PropertyField( widthProp, new GUIContent("Width") );
             EditorGUILayout.PropertyField( heightProp, new GUIContent("Height") );
-
-            // DELME { 
-            // if ( EditorApplication.isPlaying == false )
-            //     curEdit.Sync();
-            // } DELME end 
 
         serializedObject.ApplyModifiedProperties ();
     }

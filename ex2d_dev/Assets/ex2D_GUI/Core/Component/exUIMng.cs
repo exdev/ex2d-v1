@@ -135,6 +135,7 @@ public class exUIEvent {
 // Desc: 
 // ------------------------------------------------------------------ 
 
+[ExecuteInEditMode]
 public class exUIMng : MonoBehaviour {
 
     protected static exUIMng instance_ = null; 
