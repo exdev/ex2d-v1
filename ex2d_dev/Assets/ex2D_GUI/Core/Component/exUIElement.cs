@@ -193,10 +193,6 @@ public class exUIElement : exPlane {
         if ( parent != null ) {
             parent.RemoveChild(this);
         }
-        else {
-            if ( exUIMng.instance )
-                exUIMng.instance.RemoveRootElement(this);
-        }
     }
 
     // ------------------------------------------------------------------ 

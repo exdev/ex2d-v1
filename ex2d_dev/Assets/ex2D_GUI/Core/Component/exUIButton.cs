@@ -75,37 +75,59 @@ public class exUIButton : exUIElement {
         // ======================================================== 
 
             if ( _e.type == exUIEvent.Type.MouseEnter ) {
-                OnHoverIn (_e);
-                return true;
+                if ( hoverInSlots.Count > 0 ) {
+                    OnHoverIn (_e);
+                    return true;
+                }
+                return false;
             }
             else if ( _e.type == exUIEvent.Type.MouseExit ) {
                 if ( uimng.GetMouseFocus() == this ) {
                     isPressing = false;
                     uimng.SetMouseFocus(null);
                 }
-                OnHoverOut(_e);
-                return true;
+
+                if ( hoverOutSlots.Count > 0 ) {
+                    OnHoverOut(_e);
+                    return true;
+                }
+                return false;
             }
             else if ( _e.type == exUIEvent.Type.MouseDown &&
                       _e.buttons == exUIEvent.MouseButtonFlags.Left ) 
             {
-                uimng.SetMouseFocus( this );
-                isPressing = true;
-                OnPress(_e);
-                return true;
+                if ( uimng.GetMouseFocus() == null ) {
+                    uimng.SetMouseFocus( this );
+                    isPressing = true;
+
+                    if ( pressSlots.Count > 0 ) {
+                        OnPress(_e);
+                        return true;
+                    }
+                }
+                return false;
             }
             else if ( _e.type == exUIEvent.Type.MouseUp &&
                       _e.buttons == exUIEvent.MouseButtonFlags.Left )
             {
+                bool used = false;
                 if ( isPressing ) {
                     if ( uimng.GetMouseFocus() == this ) {
                         uimng.SetMouseFocus( null );
+
+                        if ( clickSlots.Count > 0 ) {
+                            OnClick(_e);
+                            used = true;
+                        }
                     }
                     isPressing = false;
-                    OnClick(_e);
                 }
-                OnRelease(_e);
-                return true;
+
+                if ( releaseSlots.Count > 0 ) {
+                    OnRelease(_e);
+                    used = true;
+                }
+                return used;
             }
         }
 
@@ -114,34 +136,61 @@ public class exUIButton : exUIElement {
         // ======================================================== 
 
             if ( _e.type == exUIEvent.Type.TouchEnter ) {
-                OnHoverIn (_e);
-                return true;
+                if ( hoverInSlots.Count > 0 ) {
+                    OnHoverIn (_e);
+                    return true;
+                }
+                return false;
             }
             else if ( _e.type == exUIEvent.Type.TouchExit ) {
                 if ( uimng.GetTouchFocus(_e.touchID) == this ) {
                     isPressing = false;
                     uimng.SetTouchFocus( _e.touchID, null );
                 }
-                OnHoverOut(_e);
-                return true;
+
+                if ( hoverOutSlots.Count > 0 ) {
+                    OnHoverOut(_e);
+                    return true;
+                }
+                return false;
             }
             else if ( _e.type == exUIEvent.Type.TouchDown ) {
-                uimng.SetTouchFocus( _e.touchID, this );
-                isPressing = true;
-                OnPress(_e);
-                return true;
+                if ( uimng.GetTouchFocus( _e.touchID ) == null ) {
+                    uimng.SetTouchFocus( _e.touchID, this );
+                    isPressing = true;
+
+                    if ( pressSlots.Count > 0 ) {
+                        OnPress(_e);
+                        return true;
+                    }
+                }
+                return false;
             }
             else if ( _e.type == exUIEvent.Type.TouchUp ) {
+                bool used = false;
                 if ( isPressing ) {
                     if ( uimng.GetTouchFocus(_e.touchID) == this ) {
                         uimng.SetTouchFocus( _e.touchID, null );
+
+                        if ( clickSlots.Count > 0 ) {
+                            OnClick(_e);
+                            used = true;
+                        }
                     }
                     isPressing = false;
-                    OnClick(_e);
                 }
-                OnRelease(_e);
-                OnHoverOut(_e);
-                return true;
+
+                if ( releaseSlots.Count > 0 ) {
+                    OnRelease(_e);
+                    used = true;
+                }
+
+                if ( hoverOutSlots.Count > 0 ) {
+                    OnHoverOut(_e);
+                    used = true;
+                }
+
+                return used;
             }
         }
 

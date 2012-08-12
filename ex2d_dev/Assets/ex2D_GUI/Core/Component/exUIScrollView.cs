@@ -103,6 +103,10 @@ public class exUIScrollView : exUIElement {
             horizontalSlider.color = new Color(horizontalSlider.color.r, horizontalSlider.color.g, horizontalSlider.color.b, 0.0f);
             verticalSlider.color = new Color(verticalSlider.color.r, verticalSlider.color.g, verticalSlider.color.b, 0.0f);
         }
+        else {
+            horizontalSlider.color = new Color(horizontalSlider.color.r, horizontalSlider.color.g, horizontalSlider.color.b, 1.0f);
+            verticalSlider.color = new Color(verticalSlider.color.r, verticalSlider.color.g, verticalSlider.color.b, 1.0f);
+        }
     }
 
     // ------------------------------------------------------------------ 
@@ -298,9 +302,10 @@ public class exUIScrollView : exUIElement {
         // ======================================================== 
 
             if ( _e.type == exUIEvent.Type.MouseUp ) {
-                if ( uimng.GetMouseFocus() == this ) {
-                    isPressing = false;
-                    uimng.SetMouseFocus(null);
+                if ( isPressing ) {
+                    if ( uimng.GetMouseFocus() == this ) {
+                        uimng.SetMouseFocus(null);
+                    }
                     if ( isDragging ) {
                         isDragging = false;
 
@@ -321,13 +326,13 @@ public class exUIScrollView : exUIElement {
                         flickingX = true;
                         flickingY = true;
                     }
+                    isPressing = false;
                 }
                 return true;
             }
             else if ( _e.type == exUIEvent.Type.MouseDown &&
                       _e.buttons == exUIEvent.MouseButtonFlags.Left ) 
             {
-                uimng.SetMouseFocus( this );
                 isPressing = true;
                 scrollingToX = false;
                 scrollingToY = false;
@@ -339,11 +344,12 @@ public class exUIScrollView : exUIElement {
             else if ( _e.type == exUIEvent.Type.MouseMove &&
                       _e.buttons == exUIEvent.MouseButtonFlags.Left ) 
             {
-                if ( _e.delta.magnitude > 1.0f ) {
-                    if ( isDragging == false ) {
+                if ( isDragging == false ) {
+                    if ( (pressPoint - _e.position).sqrMagnitude > 1.0f ) {
                         pressPoint = _e.position;
                         pressTime = Time.time;
                         isDragging = true;
+                        uimng.SetMouseFocus( this );
 
                         if ( showSliderOnDragging ) {
                             if ( scrollDirection != ScrollDirection.Vertical ) {
@@ -359,27 +365,29 @@ public class exUIScrollView : exUIElement {
                     }
                 }
 
-                float dragCoefX = 1.0f;
-                float dragCoefY = 1.0f;
+                if ( isDragging ) {
+                    float dragCoefX = 1.0f;
+                    float dragCoefY = 1.0f;
 
-                if ( contentOffset.x < minX || contentOffset.x > maxX )
-                    dragCoefX = 0.4f;
-                if ( contentOffset.y < minY || contentOffset.y > maxY )
-                    dragCoefY = 0.4f;
+                    if ( contentOffset.x < minX || contentOffset.x > maxX )
+                        dragCoefX = 0.4f;
+                    if ( contentOffset.y < minY || contentOffset.y > maxY )
+                        dragCoefY = 0.4f;
 
-                float newX = -_e.delta.x * dragCoefX;
-                float newY = -_e.delta.y * dragCoefY;
-                Vector2 scrollDistance = Vector2.zero;
+                    float newX = -_e.delta.x * dragCoefX;
+                    float newY = -_e.delta.y * dragCoefY;
+                    Vector2 scrollDistance = Vector2.zero;
 
-                //
-                if ( scrollDirection == ScrollDirection.Vertical )
-                    newX = 0.0f;
-                else if ( scrollDirection == ScrollDirection.Horizontal )
-                    newY = 0.0f;
+                    //
+                    if ( scrollDirection == ScrollDirection.Vertical )
+                        newX = 0.0f;
+                    else if ( scrollDirection == ScrollDirection.Horizontal )
+                        newY = 0.0f;
 
-                scrollDistance = new Vector2( newX, newY );
-                contentOffset += scrollDistance;
-                SetOffset ( contentOffset );
+                    scrollDistance = new Vector2( newX, newY );
+                    contentOffset += scrollDistance;
+                    SetOffset ( contentOffset );
+                }
 
                 return true;
             }
@@ -419,7 +427,6 @@ public class exUIScrollView : exUIElement {
                 return true;
             }
             else if ( _e.type == exUIEvent.Type.TouchDown ) {
-                uimng.SetTouchFocus( _e.touchID, this );
                 isPressing = true;
                 scrollingToX = false;
                 scrollingToY = false;
@@ -430,10 +437,12 @@ public class exUIScrollView : exUIElement {
             }
             else if ( _e.type == exUIEvent.Type.TouchMove ) {
                 if ( isDragging == false ) {
+
                     if ( (pressPoint - _e.position).sqrMagnitude > 1.0f ) {
                         pressPoint = _e.position;
                         pressTime = Time.time;
                         isDragging = true;
+                        uimng.SetTouchFocus( _e.touchID, this );
 
                         if ( showSliderOnDragging ) {
                             if ( scrollDirection != ScrollDirection.Vertical ) {
@@ -449,27 +458,29 @@ public class exUIScrollView : exUIElement {
                     }
                 }
 
-                float dragCoefX = 1.0f;
-                float dragCoefY = 1.0f;
+                if ( isDragging ) {
+                    float dragCoefX = 1.0f;
+                    float dragCoefY = 1.0f;
 
-                if ( contentOffset.x < minX || contentOffset.x > maxX )
-                    dragCoefX = 0.4f;
-                if ( contentOffset.y < minY || contentOffset.y > maxY )
-                    dragCoefY = 0.4f;
+                    if ( contentOffset.x < minX || contentOffset.x > maxX )
+                        dragCoefX = 0.4f;
+                    if ( contentOffset.y < minY || contentOffset.y > maxY )
+                        dragCoefY = 0.4f;
 
-                float newX = -_e.delta.x * dragCoefX;
-                float newY = -_e.delta.y * dragCoefY;
-                Vector2 scrollDistance = Vector2.zero;
+                    float newX = -_e.delta.x * dragCoefX;
+                    float newY = -_e.delta.y * dragCoefY;
+                    Vector2 scrollDistance = Vector2.zero;
 
-                //
-                if ( scrollDirection == ScrollDirection.Vertical )
-                    newX = 0.0f;
-                else if ( scrollDirection == ScrollDirection.Horizontal )
-                    newY = 0.0f;
+                    //
+                    if ( scrollDirection == ScrollDirection.Vertical )
+                        newX = 0.0f;
+                    else if ( scrollDirection == ScrollDirection.Horizontal )
+                        newY = 0.0f;
 
-                scrollDistance = new Vector2( newX, newY );
-                contentOffset += scrollDistance;
-                SetOffset ( contentOffset );
+                    scrollDistance = new Vector2( newX, newY );
+                    contentOffset += scrollDistance;
+                    SetOffset ( contentOffset );
+                }
 
                 return true;
             }

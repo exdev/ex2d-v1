@@ -212,7 +212,7 @@ public class exUIMng : MonoBehaviour {
     // internal ui status
     private bool initialized = false;
     private MouseState mouseState = new MouseState();
-    private List<TouchState> touchStateList = new List<TouchState>();
+    private TouchState[] touchStateList = new TouchState[10];
 
     //
     private List<EventInfo> eventInfoList = new List<EventInfo>();
@@ -226,14 +226,6 @@ public class exUIMng : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
-    public void RemoveRootElement ( exUIElement _element ) {
-        rootElements.Remove(_element);
-    }
-
-    // ------------------------------------------------------------------ 
-    // Desc: 
-    // ------------------------------------------------------------------ 
-
     public void Init () {
         if ( initialized )
             return;
@@ -242,6 +234,11 @@ public class exUIMng : MonoBehaviour {
         if ( camera == null ) {
             Debug.LogError ( "The exUIMng should attach to a camera" );
             return;
+        }
+
+        //
+        for ( int i = 0; i < 10; ++i ) {
+            touchStateList[i] = new TouchState();
         }
 
         // recursively add ui-tree
@@ -273,12 +270,7 @@ public class exUIMng : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     public exUIElement GetTouchFocus ( int _touchID ) { 
-        for ( int i = 0; i < touchStateList.Count; ++i ) {
-            TouchState state = touchStateList[i];
-            if ( state.touchID == _touchID )
-                return state.focusElement;
-        }
-        return null;
+        return touchStateList[_touchID].focusElement;
     }
 
     // ------------------------------------------------------------------ 
@@ -286,13 +278,7 @@ public class exUIMng : MonoBehaviour {
     // ------------------------------------------------------------------ 
 
     public void SetTouchFocus ( int _touchID, exUIElement _el ) { 
-        for ( int i = 0; i < touchStateList.Count; ++i ) {
-            TouchState state = touchStateList[i];
-            if ( state.touchID == _touchID ) {
-                state.focusElement = _el;
-                return;
-            }
-        }
+        touchStateList[_touchID].focusElement = _el;
     }
 
     // ------------------------------------------------------------------ 
@@ -326,7 +312,6 @@ public class exUIMng : MonoBehaviour {
     void Start () {
 #if UNITY_IPHONE
         if ( Application.isEditor == false ) {
-            touchStateList.Clear();
         } else {
 #endif
             mouseState.currentPos = Input.mousePosition;
@@ -414,22 +399,12 @@ public class exUIMng : MonoBehaviour {
                 }
 
                 // NOTE: it must be null
-                touchState = new TouchState();
-                touchState.touchID = touch.fingerId;
-                touchState.hotElement = hotElement;
-                touchState.focusElement = null;
-                touchStateList.Add(touchState);
+                SetTouchFocus ( touch.fingerId, null );
+                touchStateList[touch.fingerId].hotElement = hotElement;
             }
             else {
                 // find the touch state
-                int touchStateIndex = -1;
-                for ( int j = 0; j < touchStateList.Count; ++j ) {
-                    touchState = touchStateList[j];
-                    if ( touchState.touchID == touch.fingerId ) {
-                        touchStateIndex = j;
-                        break;
-                    }
-                }
+                touchState = touchStateList[touch.fingerId];
 
                 // set the last and current hot element 
                 exUIElement focusElement = null;
@@ -455,12 +430,11 @@ public class exUIMng : MonoBehaviour {
                             info.uiEvent = e;
                             eventInfoList.Add(info);
                         }
-                        touchStateList.RemoveAt(touchStateIndex);
                     }
                 }
                 else if ( touch.phase == TouchPhase.Canceled ) {
                     if ( touchState != null )
-                        touchStateList.RemoveAt(touchStateIndex);
+                        SetTouchFocus ( touch.fingerId, null );
                 }
                 else if ( touch.phase == TouchPhase.Moved ) {
                     // process hover event
@@ -497,7 +471,7 @@ public class exUIMng : MonoBehaviour {
                     }
 
                     //
-                    if ( focusElement != null ) {
+                    if ( hotElement != null || focusElement != null ) {
                         exUIEvent e = new exUIEvent(); 
                         e.category = exUIEvent.Category.Touch;
                         e.type =  exUIEvent.Type.TouchMove;
@@ -506,7 +480,7 @@ public class exUIMng : MonoBehaviour {
                         e.touchID = touch.fingerId;
 
                         EventInfo info = new EventInfo();
-                        info.primaryElement = focusElement;
+                        info.primaryElement = (focusElement != null) ? focusElement : hotElement;
                         info.uiEvent = e;
                         eventInfoList.Add(info);
                     }
@@ -599,7 +573,7 @@ public class exUIMng : MonoBehaviour {
         }
 
         // add pointer-move event
-        if ( mouseState.focusElement != null && deltaPos != Vector2.zero ) {
+        if ( (mouseState.hotElement != null || mouseState.focusElement != null) && deltaPos != Vector2.zero ) {
             exUIEvent e = new exUIEvent(); 
             e.category = exUIEvent.Category.Mouse;
             e.type =  exUIEvent.Type.MouseMove;
@@ -608,7 +582,7 @@ public class exUIMng : MonoBehaviour {
             e.buttons = mouseState.currentButtons;
 
             EventInfo info = new EventInfo();
-            info.primaryElement = mouseState.focusElement;
+            info.primaryElement = (mouseState.focusElement != null) ? mouseState.focusElement : mouseState.hotElement;
             info.uiEvent = e;
             eventInfoList.Add(info);
         }
