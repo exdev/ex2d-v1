@@ -92,12 +92,77 @@ public class exUIScrollView : exUIElement {
     // functions
     ///////////////////////////////////////////////////////////////////////////////
 
+
     // ------------------------------------------------------------------ 
     // Desc: 
     // ------------------------------------------------------------------ 
 
     protected void Start () {
         UpdateLayout();
+        if ( showSliderOnDragging ) {
+            horizontalSlider.color = new Color(horizontalSlider.color.r, horizontalSlider.color.g, horizontalSlider.color.b, 0.0f);
+            verticalSlider.color = new Color(verticalSlider.color.r, verticalSlider.color.g, verticalSlider.color.b, 0.0f);
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    protected struct FadeToParams {
+        public exSpriteBorder slider;
+        public float destAlpha; 
+        public float duration;
+
+        public FadeToParams ( exSpriteBorder _slider, float _destAlpha, float _duration ) {
+            slider = _slider;
+            destAlpha = _destAlpha; 
+            duration = _duration;
+        }
+
+    }
+    // ------------------------------------------------------------------ 
+    protected IEnumerator FadeToHorizontal ( FadeToParams _params ) {
+        float timer = 0.0f;
+        float srcAlpha = _params.slider.color.a;
+
+        while ( timer <= _params.duration ) {
+            float ratio = timer / _params.duration;
+            float alpha = Mathf.Lerp ( srcAlpha, _params.destAlpha, ratio );
+            _params.slider.color = new Color( _params.slider.color.r, _params.slider.color.g, _params.slider.color.b, alpha );
+
+            yield return 0;
+            timer += Time.deltaTime;
+        }
+        _params.slider.color = new Color( _params.slider.color.r, _params.slider.color.g, _params.slider.color.b, _params.destAlpha );
+    }
+
+    protected IEnumerator FadeToVertical ( FadeToParams _params ) {
+        float timer = 0.0f;
+        float srcAlpha = _params.slider.color.a;
+
+        while ( timer <= _params.duration ) {
+            float ratio = timer / _params.duration;
+            float alpha = Mathf.Lerp ( srcAlpha, _params.destAlpha, ratio );
+            _params.slider.color = new Color( _params.slider.color.r, _params.slider.color.g, _params.slider.color.b, alpha );
+
+            yield return 0;
+            timer += Time.deltaTime;
+        }
+        _params.slider.color = new Color( _params.slider.color.r, _params.slider.color.g, _params.slider.color.b, _params.destAlpha );
+    }
+
+    protected IEnumerator FadeTo ( FadeToParams _params ) {
+        float timer = 0.0f;
+        float srcAlpha = _params.slider.color.a;
+
+        while ( timer <= _params.duration ) {
+            float ratio = timer / _params.duration;
+            float alpha = Mathf.Lerp ( srcAlpha, _params.destAlpha, ratio );
+            _params.slider.color = new Color( _params.slider.color.r, _params.slider.color.g, _params.slider.color.b, alpha );
+
+            yield return 0;
+            timer += Time.deltaTime;
+        }
+        _params.slider.color = new Color( _params.slider.color.r, _params.slider.color.g, _params.slider.color.b, _params.destAlpha );
     }
 
     // ------------------------------------------------------------------ 
@@ -137,6 +202,12 @@ public class exUIScrollView : exUIElement {
                             destX = maxX; 
                         timerX = 0.0f;
                     }
+                    else {
+                        if ( showSliderOnDragging ) {
+                            StopCoroutine ( "FadeToHorizontal" );
+                            StartCoroutine ( "FadeToHorizontal", new FadeToParams( horizontalSlider, 0.0f, 0.3f ) );
+                        }
+                    }
                 }
             }
 
@@ -162,6 +233,12 @@ public class exUIScrollView : exUIElement {
                             destY = maxY; 
                         timerY = 0.0f;
                     }
+                    else {
+                        if ( showSliderOnDragging ) {
+                            StopCoroutine ( "FadeToVertical" );
+                            StartCoroutine ( "FadeToVertical", new FadeToParams( verticalSlider, 0.0f, 0.3f ) );
+                        }
+                    }
                 }
             }
         }
@@ -172,6 +249,11 @@ public class exUIScrollView : exUIElement {
                 if ( timerX >= bounceBackDuration ) {
                     contentOffset.x = destX;
                     scrollingToX = false;
+
+                    if ( showSliderOnDragging ) {
+                        StopCoroutine ( "FadeToHorizontal" );
+                        StartCoroutine ( "FadeToHorizontal", new FadeToParams( horizontalSlider, 0.0f, 0.3f ) );
+                    }
                 }
                 else {
                     float ratio = timerX / bounceBackDuration;
@@ -186,6 +268,11 @@ public class exUIScrollView : exUIElement {
                 if ( timerY >= bounceBackDuration ) {
                     contentOffset.y = destY;
                     scrollingToY = false;
+
+                    if ( showSliderOnDragging ) {
+                        StopCoroutine ( "FadeToVertical" );
+                        StartCoroutine ( "FadeToVertical", new FadeToParams( verticalSlider, 0.0f, 0.3f ) );
+                    }
                 }
                 else {
                     float ratio = timerY / bounceBackDuration;
@@ -257,6 +344,18 @@ public class exUIScrollView : exUIElement {
                         pressPoint = _e.position;
                         pressTime = Time.time;
                         isDragging = true;
+
+                        if ( showSliderOnDragging ) {
+                            if ( scrollDirection != ScrollDirection.Vertical ) {
+                                StopCoroutine ( "FadeToHorizontal" );
+                                StartCoroutine ( "FadeToHorizontal", new FadeToParams( horizontalSlider, 1.0f, 0.3f ) );
+                            }
+
+                            if ( scrollDirection != ScrollDirection.Horizontal ) {
+                                StopCoroutine ( "FadeToVertical" );
+                                StartCoroutine ( "FadeToVertical", new FadeToParams( verticalSlider, 1.0f, 0.3f ) );
+                            }
+                        }
                     }
                 }
 
@@ -384,13 +483,11 @@ public class exUIScrollView : exUIElement {
         if ( contentAnchor )
             contentAnchor.transform.localPosition = new Vector3 ( 0.0f, 0.0f, contentAnchor.transform.localPosition.z );
 
-        if ( showSliderOnDragging == false ) {
-            if ( horizontalBar )
-                horizontalBar.transform.localPosition = new Vector3 ( startX, endY + horizontalBar.height, horizontalBar.transform.localPosition.z );
+        if ( horizontalBar )
+            horizontalBar.transform.localPosition = new Vector3 ( startX, endY, horizontalBar.transform.localPosition.z );
 
-            if ( verticalBar )
-                verticalBar.transform.localPosition = new Vector3 ( endX + verticalBar.width, startY, verticalBar.transform.localPosition.z );
-        }
+        if ( verticalBar )
+            verticalBar.transform.localPosition = new Vector3 ( endX, startY, verticalBar.transform.localPosition.z );
 
         if ( horizontalSlider )
             horizontalSlider.transform.localPosition = new Vector3 ( horizontalBar.transform.localPosition.x, 
