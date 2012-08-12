@@ -434,6 +434,18 @@ public class exUIScrollView : exUIElement {
                         pressPoint = _e.position;
                         pressTime = Time.time;
                         isDragging = true;
+
+                        if ( showSliderOnDragging ) {
+                            if ( scrollDirection != ScrollDirection.Vertical ) {
+                                StopCoroutine ( "FadeToHorizontal" );
+                                StartCoroutine ( "FadeToHorizontal", new FadeToParams( horizontalSlider, 1.0f, 0.3f ) );
+                            }
+
+                            if ( scrollDirection != ScrollDirection.Horizontal ) {
+                                StopCoroutine ( "FadeToVertical" );
+                                StartCoroutine ( "FadeToVertical", new FadeToParams( verticalSlider, 1.0f, 0.3f ) );
+                            }
+                        }
                     }
                 }
 
@@ -484,10 +496,10 @@ public class exUIScrollView : exUIElement {
             contentAnchor.transform.localPosition = new Vector3 ( 0.0f, 0.0f, contentAnchor.transform.localPosition.z );
 
         if ( horizontalBar )
-            horizontalBar.transform.localPosition = new Vector3 ( startX, endY, horizontalBar.transform.localPosition.z );
+            horizontalBar.transform.localPosition = new Vector3 ( startX, endY + style.padding.bottom, horizontalBar.transform.localPosition.z );
 
         if ( verticalBar )
-            verticalBar.transform.localPosition = new Vector3 ( endX, startY, verticalBar.transform.localPosition.z );
+            verticalBar.transform.localPosition = new Vector3 ( endX + style.padding.right, startY, verticalBar.transform.localPosition.z );
 
         if ( horizontalSlider )
             horizontalSlider.transform.localPosition = new Vector3 ( horizontalBar.transform.localPosition.x, 
@@ -501,6 +513,7 @@ public class exUIScrollView : exUIElement {
 
         float hbarHeight = (horizontalBar && horizontalBar.guiBorder) ? horizontalBar.guiBorder.border.vertical : 0.0f;
         float vbarWidth = (verticalBar && verticalBar.guiBorder) ? verticalBar.guiBorder.border.horizontal : 0.0f;
+
         if ( horizontalBar ) {
             horizontalBar.width = clipRect.width - vbarWidth; 
             horizontalBar.height = hbarHeight;
@@ -515,12 +528,12 @@ public class exUIScrollView : exUIElement {
         clipRect.width = _newWidth - style.padding.left - style.padding.right - vbarWidth;
         clipRect.height = _newHeight - style.padding.top - style.padding.bottom - hbarHeight;
         clipRect.transform.localPosition = new Vector3 ( -_newWidth * 0.5f + style.padding.left,
-                                                         style.padding.top,
+                                                         -style.padding.top,
                                                          clipRect.transform.localPosition.z );
 
         //
-        if ( horizontalSlider ) horizontalSlider.width = (contentWidth == 0.0f) ? clipRect.width : clipRect.width/contentWidth * clipRect.width;
-        if ( verticalSlider ) verticalSlider.height = (contentHeight == 0.0f) ? clipRect.height : clipRect.height/contentHeight * clipRect.height;
+        if ( horizontalSlider ) horizontalSlider.width = (contentWidth <= clipRect.width) ? clipRect.width : clipRect.width/contentWidth * clipRect.width;
+        if ( verticalSlider ) verticalSlider.height = (contentHeight <= clipRect.height) ? clipRect.height : clipRect.height/contentHeight * clipRect.height;
     }
 
     // ------------------------------------------------------------------ 
@@ -586,8 +599,8 @@ public class exUIScrollView : exUIElement {
         minY = -Mathf.Max(contentHeight - clipRect.height, 0.0f);
         maxY = 0.0f;
 
-        if ( horizontalSlider ) horizontalSlider.width = (contentWidth == 0.0f) ? clipRect.width : clipRect.width/contentWidth * clipRect.width;
-        if ( verticalSlider ) verticalSlider.height = (contentHeight == 0.0f) ? clipRect.height : clipRect.height/contentHeight * clipRect.height;
+        if ( horizontalSlider ) horizontalSlider.width = (contentWidth <= clipRect.width) ? clipRect.width : clipRect.width/contentWidth * clipRect.width;
+        if ( verticalSlider ) verticalSlider.height = (contentHeight <= clipRect.height) ? clipRect.height : clipRect.height/contentHeight * clipRect.height;
     }
 
     // ------------------------------------------------------------------ 
@@ -609,12 +622,13 @@ public class exUIScrollView : exUIElement {
             else if ( _offset.y > maxY )
                 over = _offset.y - maxY;
 
-            verticalSlider.height = (height_/contentHeight * height_) - over;
+            float vsliderHeight = (contentHeight <= clipRect.height) ? clipRect.height : clipRect.height/contentHeight * clipRect.height;
+            verticalSlider.height = vsliderHeight - over;
 
             if ( _offset.y < minY )
-                vsliderY = -clipRect.height + verticalSlider.height;
+                vsliderY = -clipRect.height + verticalSlider.height - style.padding.top;
             else if ( _offset.y > maxY )
-                vsliderY = 0.0f;
+                vsliderY = - style.padding.top;
 
             verticalSlider.transform.localPosition = new Vector3( vsliderX, vsliderY, verticalSlider.transform.localPosition.z );
         }
@@ -630,10 +644,11 @@ public class exUIScrollView : exUIElement {
             else if ( _offset.x > maxX )
                 over = _offset.x - maxX;
 
-            verticalSlider.width = (width_/contentWidth * width_) - over;
+            float hsliderWidth = (contentWidth <= clipRect.width) ? clipRect.width : clipRect.width/contentWidth * clipRect.width;
+            verticalSlider.width = hsliderWidth - over;
 
             if ( _offset.x < minX )
-                hsliderX = clipRect.width - horizontalSlider.width;
+                hsliderX = clipRect.width - horizontalSlider.width + style.padding.left;
             else if ( _offset.x > maxX )
                 hsliderX = 0.0f;
 
