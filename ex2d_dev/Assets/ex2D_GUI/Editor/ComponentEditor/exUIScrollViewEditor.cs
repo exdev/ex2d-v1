@@ -90,7 +90,16 @@ public class exUIScrollViewEditor : exUIElementEditor {
         GUILayout.BeginHorizontal();
         GUILayout.FlexibleSpace();
         if ( GUILayout.Button("Update...", GUILayout.Height(20) ) ) {
-            exUIElement.FindAndAddChild(target as exUIScrollView);
+            exUIScrollView scrollView = target as exUIScrollView;
+
+            exUIElement.FindAndAddChild(scrollView);
+
+            exPlane[] planes = scrollView.contentAnchor.GetComponentsInChildren<exPlane>();
+            foreach ( exPlane plane in planes ) {
+                if ( plane as exUIElement == false )
+                    scrollView.clipRect.AddPlaneInEditor(plane);
+            }
+
             EditorUtility.SetDirty(this);
         }
         GUILayout.EndHorizontal();

@@ -57,6 +57,9 @@ public static class exUIUtility {
         button.font = font;
         fontGO.transform.parent = buttonGO.transform;
 
+        button.width = 50.0f;
+        button.height = 20.0f;
+
         //
         Selection.activeObject = buttonGO;
     }
@@ -106,6 +109,9 @@ public static class exUIUtility {
             backgroundGO.transform.parent = panelGO.transform;
         }
 
+        panel.width = 100.0f;
+        panel.height = 100.0f;
+
         //
         Selection.activeObject = panelGO;
     }
@@ -144,6 +150,9 @@ public static class exUIUtility {
         label.font = font;
         fontGO.transform.parent = labelGO.transform;
 
+        label.width = 50.0f;
+        label.height = 20.0f;
+
         //
         Selection.activeObject = labelGO;
     }
@@ -161,6 +170,7 @@ public static class exUIUtility {
         GameObject clipRectGO = new GameObject("ClipRect");
         clipRectGO.transform.parent = scrollViewGO.transform;
         exClipping clipRect = clipRectGO.AddComponent<exClipping>();
+        clipRect.anchor = exPlane.Anchor.TopLeft; 
 
         //
         GameObject contentAnchor = new GameObject("ContentAnchor");
@@ -179,7 +189,7 @@ public static class exUIUtility {
         // }
         // horizontalBar.SetBorder( myBorder, atlas, index ); 
         // horizontalBar.Rebuild ();
-        horizontalBar.anchor = exPlane.Anchor.BotLeft;
+        horizontalBar.anchor = exPlane.Anchor.TopLeft;
         horizontalBar.enabled = false;
 
         //
@@ -194,7 +204,7 @@ public static class exUIUtility {
         //     index = elInfo.indexInAtlas;
         // }
         // horizontalSlider.SetBorder( myBorder, atlas, index ); 
-        horizontalSlider.anchor = exPlane.Anchor.BotLeft;
+        horizontalSlider.anchor = exPlane.Anchor.TopLeft;
         horizontalSlider.width = 0.0f;
         horizontalSlider.height = 0.0f;
         horizontalSlider.enabled = false;
@@ -212,7 +222,7 @@ public static class exUIUtility {
         // }
         // verticalBar.SetBorder( myBorder, atlas, index ); 
         // verticalBar.Rebuild ();
-        verticalBar.anchor = exPlane.Anchor.TopRight;
+        verticalBar.anchor = exPlane.Anchor.TopLeft;
         verticalBar.enabled = false;
 
         //
@@ -227,7 +237,7 @@ public static class exUIUtility {
         //     index = elInfo.indexInAtlas;
         // }
         // verticalSlider.SetBorder( myBorder, atlas, index ); 
-        verticalSlider.anchor = exPlane.Anchor.TopRight; 
+        verticalSlider.anchor = exPlane.Anchor.TopLeft; 
         verticalSlider.width = 0.0f;
         verticalSlider.height = 0.0f;
         verticalSlider.enabled = false;
@@ -243,7 +253,7 @@ public static class exUIUtility {
         scrollView.clipRect = clipRect;
 
         scrollView.width = 100.0f;
-        scrollView.width = 100.0f;
+        scrollView.height = 100.0f;
 
         //
         Selection.activeObject = scrollViewGO;

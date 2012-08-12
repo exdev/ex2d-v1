@@ -25,6 +25,7 @@ public class exUIElementEditor : exPlaneEditor {
     // properties
     ///////////////////////////////////////////////////////////////////////////////
 
+    protected SerializedProperty styleProp;
     protected SerializedProperty widthProp;
     protected SerializedProperty heightProp;
 
@@ -38,6 +39,7 @@ public class exUIElementEditor : exPlaneEditor {
 
     protected new void OnEnable () {
         base.OnEnable();
+        styleProp = serializedObject.FindProperty ("style");
         widthProp = serializedObject.FindProperty ("width_");
         heightProp = serializedObject.FindProperty ("height_");
     }
@@ -63,6 +65,7 @@ public class exUIElementEditor : exPlaneEditor {
 
             EditorGUIUtility.LookLikeInspector ();
 
+            EditorGUILayout.PropertyField( styleProp, new GUIContent("Style"), true );
             EditorGUILayout.PropertyField( widthProp, new GUIContent("Width") );
             EditorGUILayout.PropertyField( heightProp, new GUIContent("Height") );
 

@@ -226,6 +226,14 @@ public class exUIMng : MonoBehaviour {
     // Desc: 
     // ------------------------------------------------------------------ 
 
+    public void RemoveRootElement ( exUIElement _element ) {
+        rootElements.Remove(_element);
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
     public void Init () {
         if ( initialized )
             return;

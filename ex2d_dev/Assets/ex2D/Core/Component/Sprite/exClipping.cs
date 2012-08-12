@@ -177,7 +177,7 @@ public class exClipping : exPlane {
         // 
         for ( int i = 0; i < planeInfoList.Count; ++i ) {
             PlaneInfo pi = planeInfoList[i];
-            if ( pi.plane )
+            if ( pi.plane && pi.plane.renderer )
                 pi.plane.renderer.sharedMaterial = pi.material;
         }
     }
@@ -226,7 +226,8 @@ public class exClipping : exPlane {
         for ( int i = 0; i < planeInfoList.Count; ++i ) {
             PlaneInfo pi = planeInfoList[i];
             if ( _plane ==  pi.plane ) {
-                _plane.renderer.sharedMaterial = pi.material;
+                if ( _plane.renderer != null )
+                    _plane.renderer.sharedMaterial = pi.material;
                 planeInfoList.RemoveAt(i);
                 return true;
             }
@@ -375,7 +376,7 @@ public class exClipping : exPlane {
         bool hasPlaneUseIt = false;
         for ( int i = 0; i < planeInfoList.Count; ++i ) {
             PlaneInfo pi = planeInfoList[i];
-            if ( pi.material.mainTexture == _texture ) {
+            if ( pi.material != null && pi.material.mainTexture == _texture ) {
                 hasPlaneUseIt = true;
                 break;
             }

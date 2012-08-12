@@ -58,13 +58,16 @@ public class exUIScrollView : exUIElement {
     //
     ///////////////////////////////////////////////////////////////////////////////
 
+    protected static float flickingStop = 30.0f;
+
     // flicking
     protected bool isPressing = false;
     protected bool isDragging = false;
     protected Vector2 pressPoint = Vector2.zero;
     protected float pressTime = 0.0f;
     protected Vector2 velocity = Vector2.zero;
-    protected bool flicking = false;
+    protected bool flickingX = false;
+    protected bool flickingY = false;
 
     // scroll to
     protected bool scrollingToX = false;
@@ -106,72 +109,93 @@ public class exUIScrollView : exUIElement {
     // ------------------------------------------------------------------ 
 
     protected void Update () {
-        if ( flicking ) {
+        if ( flickingX || flickingY ) {
             Vector2 delta = velocity * Time.deltaTime;
             contentOffset += delta;
             SetOffset ( contentOffset );
 
-            velocity *= deceleration;
-            if ( scrollDirection == ScrollDirection.Vertical ) {
-                if ( contentOffset.y < minY || contentOffset.y > maxY ) {
-                    velocity.y *= bounce;
+            if ( flickingX ) {
+
+                velocity.x *= deceleration;
+
+                if ( scrollDirection != ScrollDirection.Vertical ) {
+                    if ( contentOffset.x < minX || contentOffset.x > maxX ) {
+                        velocity.x *= bounce;
+                    }
+                }
+
+
+                if ( Mathf.Abs(velocity.x) <= flickingStop ) {
+                    flickingX = false;
+                    if ( contentOffset.x < minX || contentOffset.x > maxX ) {
+                        scrollingToX = true;
+
+                        srcX = contentOffset.x;
+                        if ( contentOffset.x < minX )
+                            destX = minX; 
+                        else
+                            destX = maxX; 
+                        timerX = 0.0f;
+                    }
                 }
             }
 
-            if ( scrollDirection == ScrollDirection.Horizontal ) {
-                if ( contentOffset.x < minX || contentOffset.x > maxX ) {
-                    velocity.x *= bounce;
+            if ( flickingY ) {
+
+                velocity.y *= deceleration;
+
+                if ( scrollDirection != ScrollDirection.Horizontal ) {
+                    if ( contentOffset.y < minY || contentOffset.y > maxY ) {
+                        velocity.y *= bounce;
+                    }
                 }
-            }
 
+                if ( Mathf.Abs(velocity.y) <= flickingStop ) {
+                    flickingY = false;
+                    if ( contentOffset.y < minY || contentOffset.y > maxY ) {
+                        scrollingToY = true;
 
-            if ( Mathf.Abs(velocity.magnitude) <= 30.0f ) {
-                flicking = false;
-
-                if ( contentOffset.x < minX || contentOffset.x > maxX ) {
-                    scrollingToX = true;
-                }
-                else if ( contentOffset.y < minY || contentOffset.y > maxY ) {
-                    scrollingToY = true;
-                    srcY = contentOffset.y;
-                    if ( contentOffset.y < minY )
-                        destY = minY; 
-                    else
-                        destY = maxY; 
-                    timerY = 0.0f;
+                        srcY = contentOffset.y;
+                        if ( contentOffset.y < minY )
+                            destY = minY; 
+                        else
+                            destY = maxY; 
+                        timerY = 0.0f;
+                    }
                 }
             }
         }
 
-        if ( scrollingToX ) {
-            timerX += Time.deltaTime;
-            if ( timerX >= bounceBackDuration ) {
-                contentOffset.x = destX;
-                SetOffset(contentOffset);
-                scrollingToX = false;
+        if ( scrollingToX || scrollingToY ) {
+            if ( scrollingToX ) {
+                timerX += Time.deltaTime;
+                if ( timerX >= bounceBackDuration ) {
+                    contentOffset.x = destX;
+                    scrollingToX = false;
+                }
+                else {
+                    float ratio = timerX / bounceBackDuration;
+                    ratio = easing(ratio);
+                    float x = Mathf.Lerp( srcX, destX, ratio );
+                    contentOffset.x = x;
+                }
             }
-            else {
-                float ratio = timerX / bounceBackDuration;
-                float x = Mathf.Lerp( srcX, destX, ratio );
-                contentOffset.x = x;
-                SetOffset(contentOffset);
-            }
-        }
 
-        if ( scrollingToY ) {
-            timerY += Time.deltaTime;
-            if ( timerY >= bounceBackDuration ) {
-                contentOffset.y = destY;
-                SetOffset(contentOffset);
-                scrollingToY = false;
+            if ( scrollingToY ) {
+                timerY += Time.deltaTime;
+                if ( timerY >= bounceBackDuration ) {
+                    contentOffset.y = destY;
+                    scrollingToY = false;
+                }
+                else {
+                    float ratio = timerY / bounceBackDuration;
+                    ratio = easing(ratio);
+                    float y = Mathf.Lerp( srcY, destY, ratio );
+                    contentOffset.y = y;
+                }
             }
-            else {
-                float ratio = timerY / bounceBackDuration;
-                ratio = easing(ratio);
-                float y = Mathf.Lerp( srcY, destY, ratio );
-                contentOffset.y = y;
-                SetOffset(contentOffset);
-            }
+
+            SetOffset(contentOffset);
         }
     }
 
@@ -193,23 +217,22 @@ public class exUIScrollView : exUIElement {
                     if ( isDragging ) {
                         isDragging = false;
 
-                        if ( Time.time - pressTime < 0.01f ||
-                             contentOffset.x < minX || contentOffset.x > maxX ||
-                             contentOffset.y < minY || contentOffset.y > maxY )
-                        {
+                        if ( Time.time - pressTime < 0.01f ) {
                             velocity = Vector2.zero;
                         }
-                        else
-                        {
+                        else {
                             velocity = (pressPoint - _e.position)/(Time.time - pressTime);
                         }
 
-                        if ( scrollDirection == ScrollDirection.Vertical )
+                        if ( scrollDirection == ScrollDirection.Vertical || contentOffset.x < minX || contentOffset.x > maxX ) {
                             velocity.x = 0.0f;
-                        else if ( scrollDirection == ScrollDirection.Horizontal )
+                        }
+                        if ( scrollDirection == ScrollDirection.Horizontal || contentOffset.y < minY || contentOffset.y > maxY ) {
                             velocity.y = 0.0f;
+                        }
 
-                        flicking = true;
+                        flickingX = true;
+                        flickingY = true;
                     }
                 }
                 return true;
@@ -275,23 +298,22 @@ public class exUIScrollView : exUIElement {
                     if ( isDragging ) {
                         isDragging = false;
 
-                        if ( Time.time - pressTime < 0.01f ||
-                             contentOffset.x < minX || contentOffset.x > maxX ||
-                             contentOffset.y < minY || contentOffset.y > maxY )
-                        {
+                        if ( Time.time - pressTime < 0.01f ) {
                             velocity = Vector2.zero;
                         }
-                        else
-                        {
+                        else {
                             velocity = (pressPoint - _e.position)/(Time.time - pressTime);
                         }
 
-                        if ( scrollDirection == ScrollDirection.Vertical )
+                        if ( scrollDirection == ScrollDirection.Vertical || contentOffset.x < minX || contentOffset.x > maxX ) {
                             velocity.x = 0.0f;
-                        else if ( scrollDirection == ScrollDirection.Horizontal )
+                        }
+                        if ( scrollDirection == ScrollDirection.Horizontal || contentOffset.y < minY || contentOffset.y > maxY ) {
                             velocity.y = 0.0f;
+                        }
 
-                        flicking = true;
+                        flickingX = true;
+                        flickingY = true;
                     }
                     isPressing = false;
                 }
@@ -400,8 +422,8 @@ public class exUIScrollView : exUIElement {
                                                          clipRect.transform.localPosition.z );
 
         //
-        if ( horizontalSlider ) horizontalSlider.width = width_/contentWidth * width_;
-        if ( verticalSlider ) verticalSlider.height = height_/contentHeight * height_;
+        if ( horizontalSlider ) horizontalSlider.width = (contentWidth == 0.0f) ? clipRect.width : clipRect.width/contentWidth * clipRect.width;
+        if ( verticalSlider ) verticalSlider.height = (contentHeight == 0.0f) ? clipRect.height : clipRect.height/contentHeight * clipRect.height;
     }
 
     // ------------------------------------------------------------------ 
@@ -458,8 +480,8 @@ public class exUIScrollView : exUIElement {
                 x = el.boundingRect.width; 
         }
 
-        contentHeight = (y == 0.0f) ? 1.0f : y;
-        contentWidth = (x == 0.0f) ? 1.0f : x;
+        contentHeight = y;
+        contentWidth = x;
 
         minX = 0.0f;
         maxX = Mathf.Max(contentWidth - clipRect.width, 0.0f);
@@ -467,8 +489,8 @@ public class exUIScrollView : exUIElement {
         minY = -Mathf.Max(contentHeight - clipRect.height, 0.0f);
         maxY = 0.0f;
 
-        if ( horizontalSlider ) horizontalSlider.width = width_/contentWidth * width_;
-        if ( verticalSlider ) verticalSlider.height = height_/contentHeight * height_;
+        if ( horizontalSlider ) horizontalSlider.width = (contentWidth == 0.0f) ? clipRect.width : clipRect.width/contentWidth * clipRect.width;
+        if ( verticalSlider ) verticalSlider.height = (contentHeight == 0.0f) ? clipRect.height : clipRect.height/contentHeight * clipRect.height;
     }
 
     // ------------------------------------------------------------------ 
