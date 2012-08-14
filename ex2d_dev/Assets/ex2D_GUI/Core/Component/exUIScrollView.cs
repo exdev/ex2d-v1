@@ -579,8 +579,34 @@ public class exUIScrollView : exUIElement {
     // ------------------------------------------------------------------ 
 
     public void AddElement ( exUIElement _el ) {
+        int lastEl = children.Count-1;
         AddChild(_el);
-        UpdateLayout();
+
+        if ( lastEl == -1 ) {
+            _el.transform.parent = contentAnchor;
+            _el.transform.localPosition = new Vector3( 0.0f, 0.0f, 0.0f );
+        }
+        else {
+            _el.transform.parent = contentAnchor;
+            float y = children[lastEl].transform.localPosition.y 
+                - ( children[lastEl].boundingRect.height
+                    + children[lastEl].style.margin.bottom
+                    + _el.style.margin.top )
+                ;
+            _el.transform.localPosition = new Vector3 ( 0.0f, y, 0.0f );
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void UpdateClipList () {
+        exPlane[] planes = contentAnchor.GetComponentsInChildren<exPlane>();
+        foreach ( exPlane plane in planes ) {
+            if ( plane as exUIElement == false )
+                clipRect.AddPlane(plane);
+        }
     }
 
     // ------------------------------------------------------------------ 
@@ -595,7 +621,7 @@ public class exUIScrollView : exUIElement {
             exUIElement el = children[i];
             Vector3 pos = el.transform.localPosition; 
             pos.x = el.style.margin.left;
-            pos.y = y + el.style.margin.top;
+            pos.y = y + el.style.margin.top + el.style.margin.bottom;
             y = pos.y + el.boundingRect.height;
             if ( el.boundingRect.width > x )
                 x = el.boundingRect.width; 
