@@ -325,7 +325,8 @@ public class exLayerEditor : EditorWindow {
                     }
                 }
                 foreach ( exLayer li in parentOfNewLayers ) {
-                    EditorUtility.SetDirty(li.parent);
+                    if ( li.parent != null )
+                        EditorUtility.SetDirty(li.parent);
                     li.ForceSetParent(curLayer);
                     EditorUtility.SetDirty(li);
                 }
@@ -482,7 +483,8 @@ public class exLayerEditor : EditorWindow {
                     }
                     if ( hlLayer.children.Count == 0 ) {
                         foreach ( exLayer layer in insertList ) {
-                            EditorUtility.SetDirty(layer.parent);
+                            if ( layer.parent != null )
+                                EditorUtility.SetDirty(layer.parent);
                             layer.parent = hlLayer;
                             EditorUtility.SetDirty(layer);
                         }
@@ -490,7 +492,8 @@ public class exLayerEditor : EditorWindow {
                     else {
                         for ( int i = insertList.Count-1; i >=0; --i ) {
                             int insertIdx = hlLayer.children.IndexOf(insertLayer) + 1; 
-                            EditorUtility.SetDirty(insertList[i].parent);
+                            if ( insertList[i].parent != null )
+                                EditorUtility.SetDirty(insertList[i].parent);
                             hlLayer.InsertAt ( insertIdx, insertList[i] );
                             EditorUtility.SetDirty(insertList[i]); 
                         }
