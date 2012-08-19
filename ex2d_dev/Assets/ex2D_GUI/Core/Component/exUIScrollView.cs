@@ -584,7 +584,7 @@ public class exUIScrollView : exUIElement {
 
         if ( lastEl == -1 ) {
             _el.transform.parent = contentAnchor;
-            _el.transform.localPosition = new Vector3( 0.0f, 0.0f, 0.0f );
+            _el.transform.localPosition = new Vector3( 0.0f, -_el.style.margin.top, 0.0f );
         }
         else {
             _el.transform.parent = contentAnchor;
@@ -594,6 +594,24 @@ public class exUIScrollView : exUIElement {
                     + _el.style.margin.top )
                 ;
             _el.transform.localPosition = new Vector3 ( 0.0f, y, 0.0f );
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    public void UpdateChildPosition () {
+        float y = contentAnchor.localPosition.y;
+
+        for ( int i = 0; i < children.Count; ++i ) {
+
+            exUIElement el = children[i];
+
+            y -= el.style.margin.top;
+            el.transform.localPosition = new Vector3( 0.0f, y, 0.0f );
+            y -= el.boundingRect.height;
+            y -= el.style.margin.bottom;
         }
     }
 
