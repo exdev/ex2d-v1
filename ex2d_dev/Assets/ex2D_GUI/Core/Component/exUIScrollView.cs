@@ -602,7 +602,7 @@ public class exUIScrollView : exUIElement {
     // ------------------------------------------------------------------ 
 
     public void UpdateChildPosition () {
-        float y = contentAnchor.localPosition.y;
+        float y = 0.0f;
 
         for ( int i = 0; i < children.Count; ++i ) {
 
@@ -632,7 +632,7 @@ public class exUIScrollView : exUIElement {
     // ------------------------------------------------------------------ 
 
     public void UpdateLayout () {
-        float y = contentAnchor.localPosition.y;
+        float y = 0.0f;
         float x = 0.0f;
 
         for ( int i = 0; i < children.Count; ++i ) {
