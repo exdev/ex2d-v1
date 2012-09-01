@@ -395,7 +395,7 @@ public class exSprite : exSpriteBase {
 
                     if ( x < minX ) minX = x;
                     else if ( x > maxX ) maxX = x;
-                    if ( x < minY ) minY = y;
+                    if ( y < minY ) minY = y;
                     else if ( y > maxY ) maxY = y;
                 }
             }
