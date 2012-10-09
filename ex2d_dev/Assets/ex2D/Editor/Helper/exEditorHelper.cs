@@ -778,6 +778,27 @@ public static class exEditorHelper {
     // Desc: 
     // ------------------------------------------------------------------ 
 
+    [MenuItem ("Edit/ex2D/Rebuild Selected Prefabs")]
+    static void ex2D_RebuildSelectedPrefabs () {
+        try {
+            EditorUtility.DisplayProgressBar( "Rebuilding Prefabs...", "Rebuilding...", 0.5f );    
+            List<exSpriteBase> sprites = new List<exSpriteBase>();
+            GetSpritesFromPrefabsInSelection ( ref sprites );
+            RebuildSprites(sprites.ToArray());
+            sprites.Clear();
+            EditorUtility.UnloadUnusedAssets();
+            EditorUtility.ClearProgressBar();    
+        }
+        catch ( System.Exception ) {
+            EditorUtility.ClearProgressBar();    
+            throw;
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
     static void GetSpritesFromPrefabs ( string _path, ref List<exSpriteBase> _sprites ) {
         // Process the list of files found in the directory.
         string [] files = Directory.GetFiles(_path, "*.prefab");
@@ -800,6 +821,25 @@ public static class exEditorHelper {
         string [] dirs = Directory.GetDirectories(_path);
         foreach( string dirName in dirs ) {
             GetSpritesFromPrefabs ( dirName, ref _sprites );
+        }
+    }
+
+    // ------------------------------------------------------------------ 
+    // Desc: 
+    // ------------------------------------------------------------------ 
+
+    static void GetSpritesFromPrefabsInSelection ( ref List<exSpriteBase> _sprites ) {
+        Object[] prefabs = Selection.GetFiltered( typeof(Texture2D), SelectionMode.DeepAssets);
+        foreach ( Object prefab in prefabs ) {
+            Object [] objs = EditorUtility.CollectDeepHierarchy ( new Object [] {prefab} );
+            foreach ( Object o in objs ) {
+                GameObject go = o as GameObject;
+                if ( go != null ) {
+                    exSpriteBase sp = go.GetComponent<exSpriteBase>();
+                    if ( sp != null )
+                        _sprites.Add(sp);
+                }
+            }
         }
     }
 
