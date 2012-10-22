@@ -645,8 +645,8 @@ public class exUIScrollView : exUIElement {
                 x = el.boundingRect.width; 
         }
 
-        contentHeight = y;
-        contentWidth = x;
+        contentHeight = Mathf.Max( y, 0.1f );
+        contentWidth = Mathf.Max( x, 0.1f );
 
         minX = 0.0f;
         maxX = Mathf.Max(contentWidth - clipRect.width, 0.0f);
