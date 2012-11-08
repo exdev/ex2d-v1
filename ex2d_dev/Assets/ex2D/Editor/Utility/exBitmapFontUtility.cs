@@ -43,10 +43,18 @@ public static class exBitmapFontUtility {
             return null;
         }
         string assetPath = Path.Combine( _path, _name + ".asset" );
+        exBitmapFont newBitmapFont = null;
+
+        FileInfo fileInfo = new FileInfo(assetPath);
+        if ( fileInfo.Exists ) {
+            newBitmapFont = (exBitmapFont)AssetDatabase.LoadAssetAtPath( assetPath, typeof(exBitmapFont) );
+        }
+        else {
+            newBitmapFont = ScriptableObject.CreateInstance<exBitmapFont>();
+            AssetDatabase.CreateAsset(newBitmapFont, assetPath);
+        }
 
         //
-        exBitmapFont newBitmapFont = ScriptableObject.CreateInstance<exBitmapFont>();
-        AssetDatabase.CreateAsset(newBitmapFont, assetPath);
         Selection.activeObject = newBitmapFont;
         return newBitmapFont;
     }

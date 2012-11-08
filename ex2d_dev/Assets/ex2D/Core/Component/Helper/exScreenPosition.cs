@@ -130,7 +130,7 @@ public class exScreenPosition : MonoBehaviour {
         newPos.z = transform.position.z;
 
         //
-        if ( plane ) {
+        if ( plane && plane.renderCamera ) {
             newPos = plane.ScreenToWorldPoint ( plane.renderCamera, anchor_, x_, y_ );
         }
         else if ( Camera.main ) {

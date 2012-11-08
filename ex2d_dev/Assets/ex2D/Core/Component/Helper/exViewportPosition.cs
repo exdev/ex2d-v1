@@ -117,7 +117,7 @@ public class exViewportPosition : MonoBehaviour {
         newPos.z = transform.position.z;
 
         //
-        if ( plane ) {
+        if ( plane && plane.renderCamera ) {
             newPos = plane.ViewportToWorldPoint ( plane.renderCamera, x_, y_ );
         }
         else if ( Camera.main ) {
