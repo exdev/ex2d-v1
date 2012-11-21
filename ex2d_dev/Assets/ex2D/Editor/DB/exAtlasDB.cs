@@ -100,6 +100,7 @@ public class exAtlasDB : ScriptableObject {
 
             atlasInfo = null;
             EditorUtility.UnloadUnusedAssetsIgnoreManagedReferences();
+            System.GC.Collect();
         }
     }
 
@@ -151,6 +152,7 @@ public class exAtlasDB : ScriptableObject {
 
                 atlasInfo = null;
                 EditorUtility.UnloadUnusedAssetsIgnoreManagedReferences();
+                System.GC.Collect();
             }
         }
 

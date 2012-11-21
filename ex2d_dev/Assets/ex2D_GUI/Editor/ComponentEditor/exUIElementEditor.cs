@@ -83,11 +83,11 @@ public class exUIElementEditor : exPlaneEditor {
             EditorGUILayout.LabelField(_label, GUILayout.Width(50));
 
             // receiver
-            EditorGUILayout.PropertyField( _infoProp.FindPropertyRelative ( "receiver" ), new GUIContent("") );
+            EditorGUILayout.PropertyField( _infoProp.FindPropertyRelative ( "receiver" ), new GUIContent(""), GUILayout.MaxWidth(150) );
 
             // method
             EditorGUIUtility.LookLikeControls ();
-                EditorGUILayout.PropertyField ( _infoProp.FindPropertyRelative ( "method" ), new GUIContent("") );
+                EditorGUILayout.PropertyField ( _infoProp.FindPropertyRelative ( "method" ), new GUIContent(""), new GUILayoutOption[] { GUILayout.MaxWidth(200), GUILayout.ExpandWidth(true) } );
             EditorGUIUtility.LookLikeInspector ();
 
             // remove button

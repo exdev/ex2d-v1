@@ -150,6 +150,7 @@ public class exSpriteAnimationDB : ScriptableObject {
 
                 spAnimClip = null;
                 EditorUtility.UnloadUnusedAssetsIgnoreManagedReferences();
+                System.GC.Collect();
             }
         }
 
