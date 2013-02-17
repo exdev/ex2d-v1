@@ -598,9 +598,9 @@ public class exLayerEditor : EditorWindow {
             // draw foldout
             curX += _indentLevel * 15.0f + 10.0f;
             if ( _layer.children.Count > 0 ) {
-                _layer.foldout = EditorGUI.Foldout ( new Rect ( curX, 2, 10, _rect.height-2 ), _layer.foldout, "" );
+                _layer.foldout = EditorGUI.Foldout ( new Rect ( curX, 2, 20, _rect.height-2 ), _layer.foldout, "" );
             }
-            curX += 15;
+            curX += 20;
             _layer.indentLevel = _indentLevel;
 
             // draw label
