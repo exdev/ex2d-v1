@@ -206,28 +206,35 @@ public static partial class exAtlasInfoUtility {
                                      0.0f );
 
         string path = AssetDatabase.GetAssetPath(texture);
-        Texture2D tex = new Texture2D(_atlasInfo.width, _atlasInfo.height, TextureFormat.ARGB32, false);
+
+        TextureImporter importer = TextureImporter.GetAtPath(path) as TextureImporter;
+        // TextureImporterSettings textureImporterSettings = new TextureImporterSettings();
+        // importer.ReadTextureSettings(textureImporterSettings);
+        // textureImporterSettings.readable = true;
+        // importer.SetTextureSettings(textureImporterSettings);
+        importer.wrapMode = TextureWrapMode.Clamp;
+        importer.isReadable = true;
+        AssetDatabase.ImportAsset( path );
+
         Color32[] colors = new Color32[_atlasInfo.width*_atlasInfo.height];
         for ( int i = 0; i < _atlasInfo.width * _atlasInfo.height; ++i )
             colors[i] = buildColor;
-        tex.SetPixels32( colors );
+        texture.SetPixels32( colors );
 
         try {
             EditorUtility.DisplayProgressBar( "Building Atlas " + _atlasInfo.name, "Building Atlas...", 0.1f );    
 
             // build atlas texture
             _atlasInfo.elements.Sort( exAtlasInfo.CompareByName );
-            FillAtlasTexture ( tex, _atlasInfo, _noImport );
+            FillAtlasTexture ( texture, _atlasInfo, _noImport );
             EditorUtility.DisplayProgressBar( "Building Atlas " + _atlasInfo.name,
                                               "Import Atlas",
                                               0.9f );    
 
             // write to disk
-            byte[] pngData = tex.EncodeToPNG();
+            byte[] pngData = texture.EncodeToPNG();
             if (pngData != null)
                 File.WriteAllBytes(path, pngData);
-            Object.DestroyImmediate(tex);
-            AssetDatabase.ImportAsset( path );
 
             // now we finish atlas texture filling, we should turn off Read/Write settings, that will save memory a lot!
             TextureImporter importSettings = TextureImporter.GetAtPath(path) as TextureImporter;
