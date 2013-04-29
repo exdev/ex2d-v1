@@ -163,7 +163,7 @@ class ex2D_PostProcessor : AssetPostprocessor {
 // 
 ///////////////////////////////////////////////////////////////////////////////
 
-class ex2D_SaveAssetsProcessor : UnityEditor.AssetModificationProcessor {
+class ex2D_SaveAssetsProcessor : AssetModificationProcessor {
 
     // ------------------------------------------------------------------ 
     // Desc: 
