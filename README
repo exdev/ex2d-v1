@@ -1,4 +1,11 @@
-ex2D Unity 2D solution
+Warning:
 
-Official Site: http://www.ex-dev.com/ex2d
-Documentation: http://www.ex-dev.com/ex2d/wiki 
+This is old version of ex2D (v1.x).
+
+The ex2D v2.+ is now on beta test, and can be download from http://www.ex-dev.com/ex2d.
+If you are ex2D Pro user, you can get the access to ex2D v2.+ repository.
+
+This repository exists for user who still working with ex2D v1.x, and want source code and other help directly from it.
+
+v1.x documentation: http://exdev.webfactional.com/ex2d/wiki
+v1.x script referecne: http://exdev.webfactional.com/ex2d/script_ref/
